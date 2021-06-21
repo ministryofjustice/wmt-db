@@ -1,7 +1,3 @@
-CREATE DATABASE wmt_db;
-GO
-USE wmt_db;
-GO
 CREATE SCHEMA app;
 GO
 CREATE SCHEMA staging;
@@ -9,13 +5,13 @@ GO
 
 -- Legacy 
 
--- [wmt_db].dbo.CapacityAbsoluteOM definition
+-- dbo.CapacityAbsoluteOM definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.CapacityAbsoluteOM;
+-- DROP TABLE dbo.CapacityAbsoluteOM;
 
-CREATE TABLE [wmt_db].dbo.CapacityAbsoluteOM (
+CREATE TABLE dbo.CapacityAbsoluteOM (
 	Id int IDENTITY(1,1) NOT NULL,
 	OffenderManagerTypeId int NOT NULL,
 	Gt110 int NOT NULL,
@@ -27,13 +23,13 @@ CREATE TABLE [wmt_db].dbo.CapacityAbsoluteOM (
 );
 
 
--- [wmt_db].dbo.CapacityAverageDirectorate definition
+-- dbo.CapacityAverageDirectorate definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.CapacityAverageDirectorate;
+-- DROP TABLE dbo.CapacityAverageDirectorate;
 
-CREATE TABLE [wmt_db].dbo.CapacityAverageDirectorate (
+CREATE TABLE dbo.CapacityAverageDirectorate (
 	Id int IDENTITY(1,1) NOT NULL,
 	DirectorateId int NOT NULL,
 	Capacity float NOT NULL,
@@ -43,13 +39,13 @@ CREATE TABLE [wmt_db].dbo.CapacityAverageDirectorate (
 );
 
 
--- [wmt_db].dbo.CapacityAverageLdu definition
+-- dbo.CapacityAverageLdu definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.CapacityAverageLdu;
+-- DROP TABLE dbo.CapacityAverageLdu;
 
-CREATE TABLE [wmt_db].dbo.CapacityAverageLdu (
+CREATE TABLE dbo.CapacityAverageLdu (
 	Id int IDENTITY(1,1) NOT NULL,
 	DirectorateId int NOT NULL,
 	LduId int NOT NULL,
@@ -60,13 +56,13 @@ CREATE TABLE [wmt_db].dbo.CapacityAverageLdu (
 );
 
 
--- [wmt_db].dbo.CapacityAverageOM definition
+-- dbo.CapacityAverageOM definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.CapacityAverageOM;
+-- DROP TABLE dbo.CapacityAverageOM;
 
-CREATE TABLE [wmt_db].dbo.CapacityAverageOM (
+CREATE TABLE dbo.CapacityAverageOM (
 	Id int IDENTITY(1,1) NOT NULL,
 	DirectorateId int DEFAULT 0 NOT NULL,
 	LduId int DEFAULT 0 NOT NULL,
@@ -80,13 +76,13 @@ CREATE TABLE [wmt_db].dbo.CapacityAverageOM (
 );
 
 
--- [wmt_db].dbo.CapacityPeriodOfficer definition
+-- dbo.CapacityPeriodOfficer definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.CapacityPeriodOfficer;
+-- DROP TABLE dbo.CapacityPeriodOfficer;
 
-CREATE TABLE [wmt_db].dbo.CapacityPeriodOfficer (
+CREATE TABLE dbo.CapacityPeriodOfficer (
 	Id int IDENTITY(1,1) NOT NULL,
 	OffenderManagerId int NOT NULL,
 	OffenderManagerTypeId int NOT NULL,
@@ -98,13 +94,13 @@ CREATE TABLE [wmt_db].dbo.CapacityPeriodOfficer (
 );
 
 
--- [wmt_db].dbo.CaseloadOfficer definition
+-- dbo.CaseloadOfficer definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.CaseloadOfficer;
+-- DROP TABLE dbo.CaseloadOfficer;
 
-CREATE TABLE [wmt_db].dbo.CaseloadOfficer (
+CREATE TABLE dbo.CaseloadOfficer (
 	Id int IDENTITY(1,1) NOT NULL,
 	CaseCountDesc varchar(50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	OffenderManagerTypeId int NOT NULL,
@@ -117,39 +113,39 @@ CREATE TABLE [wmt_db].dbo.CaseloadOfficer (
 );
 
 
--- [wmt_db].dbo.DatabaseUpdateResultType definition
+-- dbo.DatabaseUpdateResultType definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.DatabaseUpdateResultType;
+-- DROP TABLE dbo.DatabaseUpdateResultType;
 
-CREATE TABLE [wmt_db].dbo.DatabaseUpdateResultType (
+CREATE TABLE dbo.DatabaseUpdateResultType (
 	Id int NOT NULL,
 	Description nvarchar(50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	CONSTRAINT PK_DatabaseUpdateResultType PRIMARY KEY (Id)
 );
 
 
--- [wmt_db].dbo.DeliveryType definition
+-- dbo.DeliveryType definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.DeliveryType;
+-- DROP TABLE dbo.DeliveryType;
 
-CREATE TABLE [wmt_db].dbo.DeliveryType (
+CREATE TABLE dbo.DeliveryType (
 	Id int NOT NULL,
 	Name nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	CONSTRAINT PK_DeliveryType PRIMARY KEY (Id)
 );
 
 
--- [wmt_db].dbo.DisplaySettings definition
+-- dbo.DisplaySettings definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.DisplaySettings;
+-- DROP TABLE dbo.DisplaySettings;
 
-CREATE TABLE [wmt_db].dbo.DisplaySettings (
+CREATE TABLE dbo.DisplaySettings (
 	Id int IDENTITY(1,1) NOT NULL,
 	MonthsBeforeArchivingNotes int NOT NULL,
 	DisplayWorkloadInHours bit DEFAULT 0 NOT NULL,
@@ -158,13 +154,13 @@ CREATE TABLE [wmt_db].dbo.DisplaySettings (
 );
 
 
--- [wmt_db].dbo.Logging definition
+-- dbo.Logging definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.Logging;
+-- DROP TABLE dbo.Logging;
 
-CREATE TABLE [wmt_db].dbo.Logging (
+CREATE TABLE dbo.Logging (
 	Id int IDENTITY(1,1) NOT NULL,
 	Message nvarchar(MAX) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	LoggingTypeId int NOT NULL,
@@ -174,13 +170,13 @@ CREATE TABLE [wmt_db].dbo.Logging (
 );
 
 
--- [wmt_db].dbo.Messages definition
+-- dbo.Messages definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.Messages;
+-- DROP TABLE dbo.Messages;
 
-CREATE TABLE [wmt_db].dbo.Messages (
+CREATE TABLE dbo.Messages (
 	Id int IDENTITY(1,1) NOT NULL,
 	ImportantMessages nvarchar(MAX) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	IsDeleted bit DEFAULT 0 NOT NULL,
@@ -190,13 +186,13 @@ CREATE TABLE [wmt_db].dbo.Messages (
 );
 
 
--- [wmt_db].dbo.OffenderManagerType definition
+-- dbo.OffenderManagerType definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.OffenderManagerType;
+-- DROP TABLE dbo.OffenderManagerType;
 
-CREATE TABLE [wmt_db].dbo.OffenderManagerType (
+CREATE TABLE dbo.OffenderManagerType (
 	Id int NOT NULL,
 	Name nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	IsDeleted bit DEFAULT 0 NOT NULL,
@@ -204,13 +200,13 @@ CREATE TABLE [wmt_db].dbo.OffenderManagerType (
 );
 
 
--- [wmt_db].dbo.Roles definition
+-- dbo.Roles definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.Roles;
+-- DROP TABLE dbo.Roles;
 
-CREATE TABLE [wmt_db].dbo.Roles (
+CREATE TABLE dbo.Roles (
 	Id int IDENTITY(1,1) NOT NULL,
 	Code nvarchar(50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	Name nvarchar(MAX) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
@@ -219,13 +215,13 @@ CREATE TABLE [wmt_db].dbo.Roles (
 );
 
 
--- [wmt_db].dbo.archive_reduction_data definition
+-- dbo.archive_reduction_data definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.archive_reduction_data;
+-- DROP TABLE dbo.archive_reduction_data;
 
-CREATE TABLE [wmt_db].dbo.archive_reduction_data (
+CREATE TABLE dbo.archive_reduction_data (
 	id int IDENTITY(1,1) NOT NULL,
 	om_name nvarchar(511) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	hours_reduced real NOT NULL,
@@ -236,13 +232,13 @@ CREATE TABLE [wmt_db].dbo.archive_reduction_data (
 );
 
 
--- [wmt_db].dbo.daily_archive_data definition
+-- dbo.daily_archive_data definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.daily_archive_data;
+-- DROP TABLE dbo.daily_archive_data;
 
-CREATE TABLE [wmt_db].dbo.daily_archive_data (
+CREATE TABLE dbo.daily_archive_data (
 	id int IDENTITY(1,1) NOT NULL,
 	unique_identifier nvarchar(50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	om_id int NOT NULL,
@@ -267,13 +263,13 @@ CREATE TABLE [wmt_db].dbo.daily_archive_data (
 );
 
 
--- [wmt_db].dbo.fortnightly_archive_data definition
+-- dbo.fortnightly_archive_data definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.fortnightly_archive_data;
+-- DROP TABLE dbo.fortnightly_archive_data;
 
-CREATE TABLE [wmt_db].dbo.fortnightly_archive_data (
+CREATE TABLE dbo.fortnightly_archive_data (
 	id int IDENTITY(1,1) NOT NULL,
 	unique_identifier nvarchar(50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	om_id int NOT NULL,
@@ -295,13 +291,13 @@ CREATE TABLE [wmt_db].dbo.fortnightly_archive_data (
 );
 
 
--- [wmt_db].dbo.DatabaseUpdateVersionLog definition
+-- dbo.DatabaseUpdateVersionLog definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.DatabaseUpdateVersionLog;
+-- DROP TABLE dbo.DatabaseUpdateVersionLog;
 
-CREATE TABLE [wmt_db].dbo.DatabaseUpdateVersionLog (
+CREATE TABLE dbo.DatabaseUpdateVersionLog (
 	Id uniqueidentifier NOT NULL,
 	SVNRevisionFrom bigint NOT NULL,
 	SVNRevisionTo bigint NOT NULL,
@@ -309,35 +305,35 @@ CREATE TABLE [wmt_db].dbo.DatabaseUpdateVersionLog (
 	ResultMessage nvarchar(MAX) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	CreatedDate datetime NOT NULL,
 	CONSTRAINT PK_DatabaseUpdateVersionLog PRIMARY KEY (Id),
-	CONSTRAINT FK_DatabaseUpdateVersionLog_DatabaseUpdateResultType FOREIGN KEY (ResultTypeId) REFERENCES [wmt_db].dbo.DatabaseUpdateResultType(Id)
+	CONSTRAINT FK_DatabaseUpdateVersionLog_DatabaseUpdateResultType FOREIGN KEY (ResultTypeId) REFERENCES dbo.DatabaseUpdateResultType(Id)
 );
 
 
--- [wmt_db].dbo.OrganisationalUnitType definition
+-- dbo.OrganisationalUnitType definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.OrganisationalUnitType;
+-- DROP TABLE dbo.OrganisationalUnitType;
 
-CREATE TABLE [wmt_db].dbo.OrganisationalUnitType (
+CREATE TABLE dbo.OrganisationalUnitType (
 	Id int NOT NULL,
 	Name nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	IsDeleted bit DEFAULT 0 NOT NULL,
 	ParentOrganisationalUnitTypeId int NULL,
 	CONSTRAINT PK_OrganisationalUnitType PRIMARY KEY (Id),
 	CONSTRAINT UC_Parent UNIQUE (ParentOrganisationalUnitTypeId),
-	CONSTRAINT FK_OrganisationalUnitType_ParentOrganisationalUnitType FOREIGN KEY (ParentOrganisationalUnitTypeId) REFERENCES [wmt_db].dbo.OrganisationalUnitType(Id)
+	CONSTRAINT FK_OrganisationalUnitType_ParentOrganisationalUnitType FOREIGN KEY (ParentOrganisationalUnitTypeId) REFERENCES dbo.OrganisationalUnitType(Id)
 );
-CREATE UNIQUE NONCLUSTERED INDEX UC_Parent_1 ON [wmt_db].dbo.OrganisationalUnitType (ParentOrganisationalUnitTypeId);
+CREATE UNIQUE NONCLUSTERED INDEX UC_Parent_1 ON dbo.OrganisationalUnitType (ParentOrganisationalUnitTypeId);
 
 
--- [wmt_db].dbo.Users definition
+-- dbo.Users definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.Users;
+-- DROP TABLE dbo.Users;
 
-CREATE TABLE [wmt_db].dbo.Users (
+CREATE TABLE dbo.Users (
 	Id int IDENTITY(1,1) NOT NULL,
 	Username nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	IsDeleted bit DEFAULT 0 NOT NULL,
@@ -349,18 +345,18 @@ CREATE TABLE [wmt_db].dbo.Users (
 	Fullname varchar(200) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	CONSTRAINT PK_Users PRIMARY KEY (Id),
 	CONSTRAINT UQ__Users__536C85E4744FE1F1 UNIQUE (Username),
-	CONSTRAINT FK_Users_ModifiedByUser FOREIGN KEY (ModifiedByUserId) REFERENCES [wmt_db].dbo.Users(Id)
+	CONSTRAINT FK_Users_ModifiedByUser FOREIGN KEY (ModifiedByUserId) REFERENCES dbo.Users(Id)
 );
-CREATE UNIQUE NONCLUSTERED INDEX UQ__Users__536C85E4744FE1F11 ON [wmt_db].dbo.Users (Username);
+CREATE UNIQUE NONCLUSTERED INDEX UQ__Users__536C85E4744FE1F11 ON dbo.Users (Username);
 
 
--- [wmt_db].dbo.WorkloadPoints definition
+-- dbo.WorkloadPoints definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.WorkloadPoints;
+-- DROP TABLE dbo.WorkloadPoints;
 
-CREATE TABLE [wmt_db].dbo.WorkloadPoints (
+CREATE TABLE dbo.WorkloadPoints (
 	Id int IDENTITY(1,1) NOT NULL,
 	ComTier1 decimal(3,0) DEFAULT 0 NOT NULL,
 	ComTier1CP decimal(3,0) DEFAULT 0 NOT NULL,
@@ -395,33 +391,33 @@ CREATE TABLE [wmt_db].dbo.WorkloadPoints (
 	CusMappaL2 decimal(3,0) DEFAULT 0 NOT NULL,
 	CusMappaL3 decimal(3,0) DEFAULT 0 NOT NULL,
 	CONSTRAINT PK_WorkloadPoints PRIMARY KEY (Id),
-	CONSTRAINT FK_WorkloadPoints_Users FOREIGN KEY (CreatedByUserId) REFERENCES [wmt_db].dbo.Users(Id)
+	CONSTRAINT FK_WorkloadPoints_Users FOREIGN KEY (CreatedByUserId) REFERENCES dbo.Users(Id)
 );
 
 
--- [wmt_db].dbo.WorkloadReport definition
+-- dbo.WorkloadReport definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.WorkloadReport;
+-- DROP TABLE dbo.WorkloadReport;
 
-CREATE TABLE [wmt_db].dbo.WorkloadReport (
+CREATE TABLE dbo.WorkloadReport (
 	Id int IDENTITY(1,1) NOT NULL,
 	[Date] datetime NOT NULL,
 	WorkloadPointsId int NOT NULL,
 	IsDeleted bit DEFAULT 0 NOT NULL,
 	CONSTRAINT PK_OrganisationalUnitWorkload PRIMARY KEY (Id),
-	CONSTRAINT FK_WorkloadReport_WorkloadPoints FOREIGN KEY (WorkloadPointsId) REFERENCES [wmt_db].dbo.WorkloadPoints(Id)
+	CONSTRAINT FK_WorkloadReport_WorkloadPoints FOREIGN KEY (WorkloadPointsId) REFERENCES dbo.WorkloadPoints(Id)
 );
 
 
--- [wmt_db].dbo.DatabaseUpdateScriptLog definition
+-- dbo.DatabaseUpdateScriptLog definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.DatabaseUpdateScriptLog;
+-- DROP TABLE dbo.DatabaseUpdateScriptLog;
 
-CREATE TABLE [wmt_db].dbo.DatabaseUpdateScriptLog (
+CREATE TABLE dbo.DatabaseUpdateScriptLog (
 	Id uniqueidentifier NOT NULL,
 	DatabaseUpdateVersionLogId uniqueidentifier NOT NULL,
 	ScriptName nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
@@ -433,18 +429,18 @@ CREATE TABLE [wmt_db].dbo.DatabaseUpdateScriptLog (
 	ResultMessage nvarchar(MAX) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	CreatedDate datetime NOT NULL,
 	CONSTRAINT PK_DatabaseUpdateScriptLog PRIMARY KEY (Id),
-	CONSTRAINT FK_DatabaseUpdateScriptLog_DatabaseUpdateResultType FOREIGN KEY (ResultTypeId) REFERENCES [wmt_db].dbo.DatabaseUpdateResultType(Id),
-	CONSTRAINT FK_DatabaseUpdateScriptLog_DatabaseUpdateVersionLog FOREIGN KEY (DatabaseUpdateVersionLogId) REFERENCES [wmt_db].dbo.DatabaseUpdateVersionLog(Id)
+	CONSTRAINT FK_DatabaseUpdateScriptLog_DatabaseUpdateResultType FOREIGN KEY (ResultTypeId) REFERENCES dbo.DatabaseUpdateResultType(Id),
+	CONSTRAINT FK_DatabaseUpdateScriptLog_DatabaseUpdateVersionLog FOREIGN KEY (DatabaseUpdateVersionLogId) REFERENCES dbo.DatabaseUpdateVersionLog(Id)
 );
 
 
--- [wmt_db].dbo.OffenderManager definition
+-- dbo.OffenderManager definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.OffenderManager;
+-- DROP TABLE dbo.OffenderManager;
 
-CREATE TABLE [wmt_db].dbo.OffenderManager (
+CREATE TABLE dbo.OffenderManager (
 	Id int IDENTITY(1,1) NOT NULL,
 	OffenderManagerTypeId int NOT NULL,
 	UniqueIdentifier nvarchar(50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -455,18 +451,18 @@ CREATE TABLE [wmt_db].dbo.OffenderManager (
 	LastUpdateUserId int NULL,
 	LastUpdateDateTime datetime NULL,
 	CONSTRAINT PK_OffenderManager PRIMARY KEY (Id),
-	CONSTRAINT FK_OffenderManager_OffenderManagerType FOREIGN KEY (OffenderManagerTypeId) REFERENCES [wmt_db].dbo.OffenderManagerType(Id),
-	CONSTRAINT FK_OffenderManager_Users FOREIGN KEY (LastUpdateUserId) REFERENCES [wmt_db].dbo.Users(Id)
+	CONSTRAINT FK_OffenderManager_OffenderManagerType FOREIGN KEY (OffenderManagerTypeId) REFERENCES dbo.OffenderManagerType(Id),
+	CONSTRAINT FK_OffenderManager_Users FOREIGN KEY (LastUpdateUserId) REFERENCES dbo.Users(Id)
 );
 
 
--- [wmt_db].dbo.OrganisationalUnit definition
+-- dbo.OrganisationalUnit definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.OrganisationalUnit;
+-- DROP TABLE dbo.OrganisationalUnit;
 
-CREATE TABLE [wmt_db].dbo.OrganisationalUnit (
+CREATE TABLE dbo.OrganisationalUnit (
 	Id int IDENTITY(1,1) NOT NULL,
 	OrganisationalUnitTypeId int NOT NULL,
 	UniqueIdentifier nvarchar(50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -479,37 +475,37 @@ CREATE TABLE [wmt_db].dbo.OrganisationalUnit (
 	Notes nvarchar(MAX) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	DeliveryTypeId int NULL,
 	CONSTRAINT PK_OrganisationalUnit PRIMARY KEY (Id),
-	CONSTRAINT FK_OrganisationalUnit_DeliveryType FOREIGN KEY (DeliveryTypeId) REFERENCES [wmt_db].dbo.DeliveryType(Id),
-	CONSTRAINT FK_OrganisationalUnit_OrganisationalUnit FOREIGN KEY (ParentOrganisationalUnitId) REFERENCES [wmt_db].dbo.OrganisationalUnit(Id),
-	CONSTRAINT FK_OrganisationalUnit_OrganisationalUnitType FOREIGN KEY (OrganisationalUnitTypeId) REFERENCES [wmt_db].dbo.OrganisationalUnitType(Id),
-	CONSTRAINT FK_OrganisationalUnit_Users FOREIGN KEY (LastUpdateUserId) REFERENCES [wmt_db].dbo.Users(Id)
+	CONSTRAINT FK_OrganisationalUnit_DeliveryType FOREIGN KEY (DeliveryTypeId) REFERENCES dbo.DeliveryType(Id),
+	CONSTRAINT FK_OrganisationalUnit_OrganisationalUnit FOREIGN KEY (ParentOrganisationalUnitId) REFERENCES dbo.OrganisationalUnit(Id),
+	CONSTRAINT FK_OrganisationalUnit_OrganisationalUnitType FOREIGN KEY (OrganisationalUnitTypeId) REFERENCES dbo.OrganisationalUnitType(Id),
+	CONSTRAINT FK_OrganisationalUnit_Users FOREIGN KEY (LastUpdateUserId) REFERENCES dbo.Users(Id)
 );
 
 
--- [wmt_db].dbo.OrganisationalUnitWorkloadReport definition
+-- dbo.OrganisationalUnitWorkloadReport definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.OrganisationalUnitWorkloadReport;
+-- DROP TABLE dbo.OrganisationalUnitWorkloadReport;
 
-CREATE TABLE [wmt_db].dbo.OrganisationalUnitWorkloadReport (
+CREATE TABLE dbo.OrganisationalUnitWorkloadReport (
 	Id int IDENTITY(1,1) NOT NULL,
 	OrganisationalUnitId int NOT NULL,
 	WorkloadReportId int NOT NULL,
 	IsDeleted bit DEFAULT 0 NOT NULL,
 	CONSTRAINT PK_OrganisationalUnitWorkloadReport PRIMARY KEY (Id),
-	CONSTRAINT FK_OrganisationalUnitWorkloadReport_OrganisationalUnit FOREIGN KEY (OrganisationalUnitId) REFERENCES [wmt_db].dbo.OrganisationalUnit(Id),
-	CONSTRAINT FK_OrganisationalUnitWorkloadReport_WorkloadReport FOREIGN KEY (WorkloadReportId) REFERENCES [wmt_db].dbo.WorkloadReport(Id)
+	CONSTRAINT FK_OrganisationalUnitWorkloadReport_OrganisationalUnit FOREIGN KEY (OrganisationalUnitId) REFERENCES dbo.OrganisationalUnit(Id),
+	CONSTRAINT FK_OrganisationalUnitWorkloadReport_WorkloadReport FOREIGN KEY (WorkloadReportId) REFERENCES dbo.WorkloadReport(Id)
 );
 
 
--- [wmt_db].dbo.RequirementType definition
+-- dbo.RequirementType definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.RequirementType;
+-- DROP TABLE dbo.RequirementType;
 
-CREATE TABLE [wmt_db].dbo.RequirementType (
+CREATE TABLE dbo.RequirementType (
 	Id int IDENTITY(12,1) NOT NULL,
 	ParentRequirementTypeId int NULL,
 	Code nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
@@ -523,53 +519,53 @@ CREATE TABLE [wmt_db].dbo.RequirementType (
 	IsDeleted bit DEFAULT 0 NOT NULL,
 	DefaultChildRequirementTypeId int NULL,
 	CONSTRAINT PK_RequirementType PRIMARY KEY (Id),
-	CONSTRAINT FK_RequirementType_CreatedByUser FOREIGN KEY (CreatedByUserId) REFERENCES [wmt_db].dbo.Users(Id),
-	CONSTRAINT FK_RequirementType_DefaultChildRequirementType FOREIGN KEY (DefaultChildRequirementTypeId) REFERENCES [wmt_db].dbo.RequirementType(Id),
-	CONSTRAINT FK_RequirementType_ModifiedByUser FOREIGN KEY (ModifiedByUserId) REFERENCES [wmt_db].dbo.Users(Id),
-	CONSTRAINT FK_RequirementType_OriginalParentRequirementType FOREIGN KEY (OriginalParentRequirementTypeId) REFERENCES [wmt_db].dbo.RequirementType(Id),
-	CONSTRAINT FK_RequirementType_ParentRequirementType FOREIGN KEY (ParentRequirementTypeId) REFERENCES [wmt_db].dbo.RequirementType(Id)
+	CONSTRAINT FK_RequirementType_CreatedByUser FOREIGN KEY (CreatedByUserId) REFERENCES dbo.Users(Id),
+	CONSTRAINT FK_RequirementType_DefaultChildRequirementType FOREIGN KEY (DefaultChildRequirementTypeId) REFERENCES dbo.RequirementType(Id),
+	CONSTRAINT FK_RequirementType_ModifiedByUser FOREIGN KEY (ModifiedByUserId) REFERENCES dbo.Users(Id),
+	CONSTRAINT FK_RequirementType_OriginalParentRequirementType FOREIGN KEY (OriginalParentRequirementTypeId) REFERENCES dbo.RequirementType(Id),
+	CONSTRAINT FK_RequirementType_ParentRequirementType FOREIGN KEY (ParentRequirementTypeId) REFERENCES dbo.RequirementType(Id)
 );
 
 
--- [wmt_db].dbo.RequirementWorkloadPoints definition
+-- dbo.RequirementWorkloadPoints definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.RequirementWorkloadPoints;
+-- DROP TABLE dbo.RequirementWorkloadPoints;
 
-CREATE TABLE [wmt_db].dbo.RequirementWorkloadPoints (
+CREATE TABLE dbo.RequirementWorkloadPoints (
 	Id int IDENTITY(12,1) NOT NULL,
 	WorkloadPointsId int NOT NULL,
 	RequirementTypeId int NOT NULL,
 	Points int NOT NULL,
 	CONSTRAINT PK_RequirementWorkloadPoints PRIMARY KEY (Id),
-	CONSTRAINT FK_RequirementWorkloadPoints_RequirementType FOREIGN KEY (RequirementTypeId) REFERENCES [wmt_db].dbo.RequirementType(Id),
-	CONSTRAINT FK_RequirementWorkloadPoints_WorkloadPoints FOREIGN KEY (WorkloadPointsId) REFERENCES [wmt_db].dbo.WorkloadPoints(Id)
+	CONSTRAINT FK_RequirementWorkloadPoints_RequirementType FOREIGN KEY (RequirementTypeId) REFERENCES dbo.RequirementType(Id),
+	CONSTRAINT FK_RequirementWorkloadPoints_WorkloadPoints FOREIGN KEY (WorkloadPointsId) REFERENCES dbo.WorkloadPoints(Id)
 );
 
 
--- [wmt_db].dbo.UserRoles definition
+-- dbo.UserRoles definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.UserRoles;
+-- DROP TABLE dbo.UserRoles;
 
-CREATE TABLE [wmt_db].dbo.UserRoles (
+CREATE TABLE dbo.UserRoles (
 	UsersId int NOT NULL,
 	RolesId int NOT NULL,
 	CONSTRAINT PK_UserRoles PRIMARY KEY (UsersId,RolesId),
-	CONSTRAINT FK_UserRoles_Roles FOREIGN KEY (RolesId) REFERENCES [wmt_db].dbo.Roles(Id),
-	CONSTRAINT FK_UserRoles_Users FOREIGN KEY (UsersId) REFERENCES [wmt_db].dbo.Users(Id)
+	CONSTRAINT FK_UserRoles_Roles FOREIGN KEY (RolesId) REFERENCES dbo.Roles(Id),
+	CONSTRAINT FK_UserRoles_Users FOREIGN KEY (UsersId) REFERENCES dbo.Users(Id)
 );
 
 
--- [wmt_db].dbo.Workload definition
+-- dbo.Workload definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.Workload;
+-- DROP TABLE dbo.Workload;
 
-CREATE TABLE [wmt_db].dbo.Workload (
+CREATE TABLE dbo.Workload (
 	Id int IDENTITY(1,1) NOT NULL,
 	OrganisationalUnitWorkloadReportId int NOT NULL,
 	TrustId int NULL,
@@ -651,18 +647,18 @@ CREATE TABLE [wmt_db].dbo.Workload (
 	CusMappaL2 int DEFAULT 0 NOT NULL,
 	CusMappaL3 int DEFAULT 0 NOT NULL,
 	CONSTRAINT PK_Workload PRIMARY KEY (Id),
-	CONSTRAINT FK_Workload_OffenderManager FOREIGN KEY (OffenderManagerId) REFERENCES [wmt_db].dbo.OffenderManager(Id),
-	CONSTRAINT FK_Workload_OrganisationalUnitWorkloadReport FOREIGN KEY (OrganisationalUnitWorkloadReportId) REFERENCES [wmt_db].dbo.OrganisationalUnitWorkloadReport(Id)
+	CONSTRAINT FK_Workload_OffenderManager FOREIGN KEY (OffenderManagerId) REFERENCES dbo.OffenderManager(Id),
+	CONSTRAINT FK_Workload_OrganisationalUnitWorkloadReport FOREIGN KEY (OrganisationalUnitWorkloadReportId) REFERENCES dbo.OrganisationalUnitWorkloadReport(Id)
 );
 
 
--- [wmt_db].dbo.InactiveCase definition
+-- dbo.InactiveCase definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.InactiveCase;
+-- DROP TABLE dbo.InactiveCase;
 
-CREATE TABLE [wmt_db].dbo.InactiveCase (
+CREATE TABLE dbo.InactiveCase (
 	Id int IDENTITY(1,1) NOT NULL,
 	IsDeleted bit DEFAULT 0 NOT NULL,
 	Flag nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -670,17 +666,17 @@ CREATE TABLE [wmt_db].dbo.InactiveCase (
 	CRN nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	WorkloadId int NOT NULL,
 	CONSTRAINT PK_InactiveCase PRIMARY KEY (Id),
-	CONSTRAINT FK_InactiveCase_Workload FOREIGN KEY (WorkloadId) REFERENCES [wmt_db].dbo.Workload(Id)
+	CONSTRAINT FK_InactiveCase_Workload FOREIGN KEY (WorkloadId) REFERENCES dbo.Workload(Id)
 );
 
 
--- [wmt_db].dbo.Note definition
+-- dbo.Note definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.Note;
+-- DROP TABLE dbo.Note;
 
-CREATE TABLE [wmt_db].dbo.Note (
+CREATE TABLE dbo.Note (
 	Id int IDENTITY(1,1) NOT NULL,
 	OffenderManagerId int NULL,
 	OrganisationalUnitId int NULL,
@@ -690,43 +686,43 @@ CREATE TABLE [wmt_db].dbo.Note (
 	HoursReduced float NOT NULL,
 	OffenderManagerParentId int NULL,
 	CONSTRAINT PK_OffenderManagerNote PRIMARY KEY (Id),
-	CONSTRAINT FK_Note_OrganisationalUnit FOREIGN KEY (OrganisationalUnitId) REFERENCES [wmt_db].dbo.OrganisationalUnit(Id),
-	CONSTRAINT FK_Note_Users FOREIGN KEY (LastUpdateUserId) REFERENCES [wmt_db].dbo.Users(Id),
-	CONSTRAINT FK_OffenderManagerNote_OffenderManager FOREIGN KEY (OffenderManagerId) REFERENCES [wmt_db].dbo.OffenderManager(Id)
+	CONSTRAINT FK_Note_OrganisationalUnit FOREIGN KEY (OrganisationalUnitId) REFERENCES dbo.OrganisationalUnit(Id),
+	CONSTRAINT FK_Note_Users FOREIGN KEY (LastUpdateUserId) REFERENCES dbo.Users(Id),
+	CONSTRAINT FK_OffenderManagerNote_OffenderManager FOREIGN KEY (OffenderManagerId) REFERENCES dbo.OffenderManager(Id)
 );
 
 
--- [wmt_db].dbo.RequirementWorkload definition
+-- dbo.RequirementWorkload definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.RequirementWorkload;
+-- DROP TABLE dbo.RequirementWorkload;
 
-CREATE TABLE [wmt_db].dbo.RequirementWorkload (
+CREATE TABLE dbo.RequirementWorkload (
 	Id int IDENTITY(12,1) NOT NULL,
 	WorkloadId int NOT NULL,
 	RequirementTypeId int NOT NULL,
 	Count int NOT NULL,
 	Points int NOT NULL,
 	CONSTRAINT PK_RequirementWorkload PRIMARY KEY (Id),
-	CONSTRAINT FK_RequirementWorkload_RequirementType FOREIGN KEY (RequirementTypeId) REFERENCES [wmt_db].dbo.RequirementType(Id),
-	CONSTRAINT FK_RequirementWorkload_Workload FOREIGN KEY (WorkloadId) REFERENCES [wmt_db].dbo.Workload(Id)
+	CONSTRAINT FK_RequirementWorkload_RequirementType FOREIGN KEY (RequirementTypeId) REFERENCES dbo.RequirementType(Id),
+	CONSTRAINT FK_RequirementWorkload_Workload FOREIGN KEY (WorkloadId) REFERENCES dbo.Workload(Id)
 );
 
 
--- [wmt_db].dbo.RequirementDetails definition
+-- dbo.RequirementDetails definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].dbo.RequirementDetails;
+-- DROP TABLE dbo.RequirementDetails;
 
-CREATE TABLE [wmt_db].dbo.RequirementDetails (
+CREATE TABLE dbo.RequirementDetails (
 	Id int IDENTITY(12,1) NOT NULL,
 	RequirementWorkloadId int NOT NULL,
 	Tier nvarchar(50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	CRN nvarchar(50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	CONSTRAINT PK_RequirementDetails PRIMARY KEY (Id),
-	CONSTRAINT FK_RequirementDetails_RequirementWorkload FOREIGN KEY (RequirementWorkloadId) REFERENCES [wmt_db].dbo.RequirementWorkload(Id)
+	CONSTRAINT FK_RequirementDetails_RequirementWorkload FOREIGN KEY (RequirementWorkloadId) REFERENCES dbo.RequirementWorkload(Id)
 );
 
 
@@ -3800,12 +3796,12 @@ GO
 -- staging
 
 
--- [wmt_db].staging.Included_Excluded definition
+-- staging.Included_Excluded definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].staging.Included_Excluded;
-CREATE TABLE [wmt_db].staging.Included_Excluded (
+-- DROP TABLE staging.Included_Excluded;
+CREATE TABLE staging.Included_Excluded (
 	id int IDENTITY(1,1) NOT NULL,
 	Team_Cd_OFM nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	Staff_Cd_OFM nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -3829,13 +3825,13 @@ CREATE TABLE [wmt_db].staging.Included_Excluded (
 );
 
 
--- [wmt_db].staging.OMIC definition
+-- staging.OMIC definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].staging.OMIC;
+-- DROP TABLE staging.OMIC;
 
-CREATE TABLE [wmt_db].staging.OMIC (
+CREATE TABLE staging.OMIC (
 	id int IDENTITY(1,1) NOT NULL,
 	Team_OFM nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	Team_Cd_OFM nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -3847,13 +3843,13 @@ CREATE TABLE [wmt_db].staging.OMIC (
 );
 
 
--- [wmt_db].staging.arms definition
+-- staging.arms definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].staging.arms;
+-- DROP TABLE staging.arms;
 
-CREATE TABLE [wmt_db].staging.arms (
+CREATE TABLE staging.arms (
 	id int IDENTITY(1,1) NOT NULL,
 	assessment_date nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	assessment_code nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -3881,13 +3877,13 @@ CREATE TABLE [wmt_db].staging.arms (
 );
 
 
--- [wmt_db].staging.cms definition
+-- staging.cms definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].staging.cms;
+-- DROP TABLE staging.cms;
 
-CREATE TABLE [wmt_db].staging.cms (
+CREATE TABLE staging.cms (
 	id int IDENTITY(1,1) NOT NULL,
 	contact_id nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	contact_date nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -3908,13 +3904,13 @@ CREATE TABLE [wmt_db].staging.cms (
 );
 
 
--- [wmt_db].staging.court_reporters definition
+-- staging.court_reporters definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].staging.court_reporters;
+-- DROP TABLE staging.court_reporters;
 
-CREATE TABLE [wmt_db].staging.court_reporters (
+CREATE TABLE staging.court_reporters (
 	id int IDENTITY(1,1) NOT NULL,
 	trust nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	region_desc nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -3938,13 +3934,13 @@ CREATE TABLE [wmt_db].staging.court_reporters (
 );
 
 
--- [wmt_db].staging.court_reports definition
+-- staging.court_reports definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].staging.court_reports;
+-- DROP TABLE staging.court_reports;
 
-CREATE TABLE [wmt_db].staging.court_reports (
+CREATE TABLE staging.court_reports (
 	id int IDENTITY(1,1) NOT NULL,
 	team_desc nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	team_code nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -3969,13 +3965,13 @@ CREATE TABLE [wmt_db].staging.court_reports (
 );
 
 
--- [wmt_db].staging.flag_o_due definition
+-- staging.flag_o_due definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].staging.flag_o_due;
+-- DROP TABLE staging.flag_o_due;
 
-CREATE TABLE [wmt_db].staging.flag_o_due (
+CREATE TABLE staging.flag_o_due (
 	id int IDENTITY(1,1) NOT NULL,
 	row_type nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	case_ref_no nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -3988,13 +3984,13 @@ CREATE TABLE [wmt_db].staging.flag_o_due (
 );
 
 
--- [wmt_db].staging.flag_priority definition
+-- staging.flag_priority definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].staging.flag_priority;
+-- DROP TABLE staging.flag_priority;
 
-CREATE TABLE [wmt_db].staging.flag_priority (
+CREATE TABLE staging.flag_priority (
 	id int IDENTITY(1,1) NOT NULL,
 	row_type nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	case_ref_no nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -4007,13 +4003,13 @@ CREATE TABLE [wmt_db].staging.flag_priority (
 );
 
 
--- [wmt_db].staging.flag_upw definition
+-- staging.flag_upw definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].staging.flag_upw;
+-- DROP TABLE staging.flag_upw;
 
-CREATE TABLE [wmt_db].staging.flag_upw (
+CREATE TABLE staging.flag_upw (
 	id int IDENTITY(1,1) NOT NULL,
 	row_type nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	case_ref_no nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -4026,13 +4022,13 @@ CREATE TABLE [wmt_db].staging.flag_upw (
 );
 
 
--- [wmt_db].staging.flag_warr_4_n definition
+-- staging.flag_warr_4_n definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].staging.flag_warr_4_n;
+-- DROP TABLE staging.flag_warr_4_n;
 
-CREATE TABLE [wmt_db].staging.flag_warr_4_n (
+CREATE TABLE staging.flag_warr_4_n (
 	id int IDENTITY(1,1) NOT NULL,
 	row_type nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	case_ref_no nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -4045,13 +4041,13 @@ CREATE TABLE [wmt_db].staging.flag_warr_4_n (
 );
 
 
--- [wmt_db].staging.gs definition
+-- staging.gs definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].staging.gs;
+-- DROP TABLE staging.gs;
 
-CREATE TABLE [wmt_db].staging.gs (
+CREATE TABLE staging.gs (
 	id int IDENTITY(1,1) NOT NULL,
 	contact_id nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	contact_date nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -4067,13 +4063,13 @@ CREATE TABLE [wmt_db].staging.gs (
 );
 
 
--- [wmt_db].staging.inst_reports definition
+-- staging.inst_reports definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].staging.inst_reports;
+-- DROP TABLE staging.inst_reports;
 
-CREATE TABLE [wmt_db].staging.inst_reports (
+CREATE TABLE staging.inst_reports (
 	id int IDENTITY(1,1) NOT NULL,
 	team_desc nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	team_code nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -4087,13 +4083,13 @@ CREATE TABLE [wmt_db].staging.inst_reports (
 );
 
 
--- [wmt_db].staging.knex_migrations definition
+-- staging.knex_migrations definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].staging.knex_migrations;
+-- DROP TABLE staging.knex_migrations;
 
-CREATE TABLE [wmt_db].staging.knex_migrations (
+CREATE TABLE staging.knex_migrations (
 	id int IDENTITY(1,1) NOT NULL,
 	name nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	batch int NULL,
@@ -4102,24 +4098,24 @@ CREATE TABLE [wmt_db].staging.knex_migrations (
 );
 
 
--- [wmt_db].staging.knex_migrations_lock definition
+-- staging.knex_migrations_lock definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].staging.knex_migrations_lock;
+-- DROP TABLE staging.knex_migrations_lock;
 
-CREATE TABLE [wmt_db].staging.knex_migrations_lock (
+CREATE TABLE staging.knex_migrations_lock (
 	is_locked int NULL
 );
 
 
--- [wmt_db].staging.omic_teams definition
+-- staging.omic_teams definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].staging.omic_teams;
+-- DROP TABLE staging.omic_teams;
 
-CREATE TABLE [wmt_db].staging.omic_teams (
+CREATE TABLE staging.omic_teams (
 	id int IDENTITY(1,1) NOT NULL,
 	trust nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	region_desc nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -4208,13 +4204,13 @@ CREATE TABLE [wmt_db].staging.omic_teams (
 );
 
 
--- [wmt_db].staging.suspended_lifers definition
+-- staging.suspended_lifers definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].staging.suspended_lifers;
+-- DROP TABLE staging.suspended_lifers;
 
-CREATE TABLE [wmt_db].staging.suspended_lifers (
+CREATE TABLE staging.suspended_lifers (
 	id int IDENTITY(1,1) NOT NULL,
 	location nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	row_type nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -4237,13 +4233,13 @@ CREATE TABLE [wmt_db].staging.suspended_lifers (
 );
 
 
--- [wmt_db].staging.t2a definition
+-- staging.t2a definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].staging.t2a;
+-- DROP TABLE staging.t2a;
 
-CREATE TABLE [wmt_db].staging.t2a (
+CREATE TABLE staging.t2a (
 	id int IDENTITY(1,1) NOT NULL,
 	trust nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	region_desc nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -4331,13 +4327,13 @@ CREATE TABLE [wmt_db].staging.t2a (
 );
 
 
--- [wmt_db].staging.t2a_detail definition
+-- staging.t2a_detail definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].staging.t2a_detail;
+-- DROP TABLE staging.t2a_detail;
 
-CREATE TABLE [wmt_db].staging.t2a_detail (
+CREATE TABLE staging.t2a_detail (
 	id int IDENTITY(1,1) NOT NULL,
 	crn nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	event_no nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -4373,13 +4369,13 @@ CREATE TABLE [wmt_db].staging.t2a_detail (
 );
 
 
--- [wmt_db].staging.wmt_extract definition
+-- staging.wmt_extract definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].staging.wmt_extract;
+-- DROP TABLE staging.wmt_extract;
 
-CREATE TABLE [wmt_db].staging.wmt_extract (
+CREATE TABLE staging.wmt_extract (
 	id int IDENTITY(1,1) NOT NULL,
 	trust nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	region_desc nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -4467,13 +4463,13 @@ CREATE TABLE [wmt_db].staging.wmt_extract (
 );
 
 
--- [wmt_db].staging.wmt_extract_filtered definition
+-- staging.wmt_extract_filtered definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].staging.wmt_extract_filtered;
+-- DROP TABLE staging.wmt_extract_filtered;
 
-CREATE TABLE [wmt_db].staging.wmt_extract_filtered (
+CREATE TABLE staging.wmt_extract_filtered (
 	id int IDENTITY(1,1) NOT NULL,
 	trust nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	region_desc nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -4561,13 +4557,13 @@ CREATE TABLE [wmt_db].staging.wmt_extract_filtered (
 );
 
 
--- [wmt_db].staging.wmt_extract_sa definition
+-- staging.wmt_extract_sa definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].staging.wmt_extract_sa;
+-- DROP TABLE staging.wmt_extract_sa;
 
-CREATE TABLE [wmt_db].staging.wmt_extract_sa (
+CREATE TABLE staging.wmt_extract_sa (
 	id int IDENTITY(1,1) NOT NULL,
 	case_ref_no nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	tier_code nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -4584,26 +4580,26 @@ CREATE TABLE [wmt_db].staging.wmt_extract_sa (
 
 -- app
 
--- [wmt_db].app.adjustment_category definition
+-- app.adjustment_category definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.adjustment_category;
+-- DROP TABLE app.adjustment_category;
 
-CREATE TABLE [wmt_db].app.adjustment_category (
+CREATE TABLE app.adjustment_category (
 	id int IDENTITY(1,1) NOT NULL,
 	category nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	CONSTRAINT PK__adjustme__3213E83FAB7E5D72 PRIMARY KEY (id)
 );
 
 
--- [wmt_db].app.adjustment_reason definition
+-- app.adjustment_reason definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.adjustment_reason;
+-- DROP TABLE app.adjustment_reason;
 
-CREATE TABLE [wmt_db].app.adjustment_reason (
+CREATE TABLE app.adjustment_reason (
 	id int IDENTITY(1,1) NOT NULL,
 	contact_code nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	contact_description nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -4613,13 +4609,13 @@ CREATE TABLE [wmt_db].app.adjustment_reason (
 );
 
 
--- [wmt_db].app.adjustments definition
+-- app.adjustments definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.adjustments;
+-- DROP TABLE app.adjustments;
 
-CREATE TABLE [wmt_db].app.adjustments (
+CREATE TABLE app.adjustments (
 	id int IDENTITY(1,1) NOT NULL,
 	adjustment_reason_id int NOT NULL,
 	workload_owner_id int NOT NULL,
@@ -4633,26 +4629,26 @@ CREATE TABLE [wmt_db].app.adjustments (
 );
 
 
--- [wmt_db].app.case_category definition
+-- app.case_category definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.case_category;
+-- DROP TABLE app.case_category;
 
-CREATE TABLE [wmt_db].app.case_category (
+CREATE TABLE app.case_category (
 	id int IDENTITY(1,1) NOT NULL,
 	category_id int NULL,
 	category_name varchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 );
 
 
--- [wmt_db].app.export_file definition
+-- app.export_file definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.export_file;
+-- DROP TABLE app.export_file;
 
-CREATE TABLE [wmt_db].app.export_file (
+CREATE TABLE app.export_file (
 	id int IDENTITY(1,1) NOT NULL,
 	file_type nvarchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	date_created datetime NOT NULL,
@@ -4662,13 +4658,13 @@ CREATE TABLE [wmt_db].app.export_file (
 );
 
 
--- [wmt_db].app.knex_migrations definition
+-- app.knex_migrations definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.knex_migrations;
+-- DROP TABLE app.knex_migrations;
 
-CREATE TABLE [wmt_db].app.knex_migrations (
+CREATE TABLE app.knex_migrations (
 	id int IDENTITY(1,1) NOT NULL,
 	name nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	batch int NULL,
@@ -4677,24 +4673,24 @@ CREATE TABLE [wmt_db].app.knex_migrations (
 );
 
 
--- [wmt_db].app.knex_migrations_lock definition
+-- app.knex_migrations_lock definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.knex_migrations_lock;
+-- DROP TABLE app.knex_migrations_lock;
 
-CREATE TABLE [wmt_db].app.knex_migrations_lock (
+CREATE TABLE app.knex_migrations_lock (
 	is_locked int NULL
 );
 
 
--- [wmt_db].app.offender_manager_type definition
+-- app.offender_manager_type definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.offender_manager_type;
+-- DROP TABLE app.offender_manager_type;
 
-CREATE TABLE [wmt_db].app.offender_manager_type (
+CREATE TABLE app.offender_manager_type (
 	id int IDENTITY(1,1) NOT NULL,
 	grade_code nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	description nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -4702,26 +4698,26 @@ CREATE TABLE [wmt_db].app.offender_manager_type (
 );
 
 
--- [wmt_db].app.reduction_category definition
+-- app.reduction_category definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.reduction_category;
+-- DROP TABLE app.reduction_category;
 
-CREATE TABLE [wmt_db].app.reduction_category (
+CREATE TABLE app.reduction_category (
 	id int IDENTITY(1,1) NOT NULL,
 	category nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	CONSTRAINT PK__reductio__3213E83F982ADEED PRIMARY KEY (id)
 );
 
 
--- [wmt_db].app.region definition
+-- app.region definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.region;
+-- DROP TABLE app.region;
 
-CREATE TABLE [wmt_db].app.region (
+CREATE TABLE app.region (
 	id int IDENTITY(1,1) NOT NULL,
 	code nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	description nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -4729,28 +4725,28 @@ CREATE TABLE [wmt_db].app.region (
 );
 
 
--- [wmt_db].app.roles definition
+-- app.roles definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.roles;
+-- DROP TABLE app.roles;
 
-CREATE TABLE [wmt_db].app.roles (
+CREATE TABLE app.roles (
 	id int IDENTITY(1,1) NOT NULL,
 	[role] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	CONSTRAINT PK__roles__3213E83F137713D5 PRIMARY KEY (id),
 	CONSTRAINT roles_role_unique UNIQUE ([role])
 );
-CREATE UNIQUE NONCLUSTERED INDEX roles_role_unique_1 ON [wmt_db].app.roles ([role]);
+CREATE UNIQUE NONCLUSTERED INDEX roles_role_unique_1 ON app.roles ([role]);
 
 
--- [wmt_db].app.row_type_definitions definition
+-- app.row_type_definitions definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.row_type_definitions;
+-- DROP TABLE app.row_type_definitions;
 
-CREATE TABLE [wmt_db].app.row_type_definitions (
+CREATE TABLE app.row_type_definitions (
 	id int IDENTITY(1,1) NOT NULL,
 	row_type nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	row_type_full_name nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
@@ -4758,29 +4754,29 @@ CREATE TABLE [wmt_db].app.row_type_definitions (
 );
 
 
--- [wmt_db].app.users definition
+-- app.users definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.users;
+-- DROP TABLE app.users;
 
-CREATE TABLE [wmt_db].app.users (
+CREATE TABLE app.users (
 	id int IDENTITY(1,1) NOT NULL,
 	username nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	name nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	CONSTRAINT PK__users__3213E83F57E9C76F PRIMARY KEY (id),
 	CONSTRAINT users_username_unique UNIQUE (username)
 );
-CREATE UNIQUE NONCLUSTERED INDEX users_username_unique_1 ON [wmt_db].app.users (username);
+CREATE UNIQUE NONCLUSTERED INDEX users_username_unique_1 ON app.users (username);
 
 
--- [wmt_db].app.workload_points definition
+-- app.workload_points definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.workload_points;
+-- DROP TABLE app.workload_points;
 
-CREATE TABLE [wmt_db].app.workload_points (
+CREATE TABLE app.workload_points (
 	id int IDENTITY(1,1) NOT NULL,
 	comm_tier_1 int NOT NULL,
 	comm_tier_2 int NOT NULL,
@@ -4852,13 +4848,13 @@ CREATE TABLE [wmt_db].app.workload_points (
 );
 
 
--- [wmt_db].app.workload_report definition
+-- app.workload_report definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.workload_report;
+-- DROP TABLE app.workload_report;
 
-CREATE TABLE [wmt_db].app.workload_report (
+CREATE TABLE app.workload_report (
 	id int IDENTITY(1,1) NOT NULL,
 	effective_from datetime DEFAULT getdate() NULL,
 	effective_to datetime NULL,
@@ -4867,19 +4863,19 @@ CREATE TABLE [wmt_db].app.workload_report (
 	status_description nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	CONSTRAINT PK__workload__3213E83FE5F0FB29 PRIMARY KEY (id)
 );
- CREATE NONCLUSTERED INDEX ix_workload_report_effective_dates ON [wmt_db].app.workload_report (  id ASC  )  
+ CREATE NONCLUSTERED INDEX ix_workload_report_effective_dates ON app.workload_report (  id ASC  )  
 	 INCLUDE ( effective_from , effective_to ) 
 	 WITH (  PAD_INDEX = OFF ,FILLFACTOR = 100  ,SORT_IN_TEMPDB = OFF , IGNORE_DUP_KEY = OFF , STATISTICS_NORECOMPUTE = OFF , ONLINE = OFF , ALLOW_ROW_LOCKS = ON , ALLOW_PAGE_LOCKS = ON  )
 	 ON [PRIMARY ] ;
 
 
--- [wmt_db].app.ldu definition
+-- app.ldu definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.ldu;
+-- DROP TABLE app.ldu;
 
-CREATE TABLE [wmt_db].app.ldu (
+CREATE TABLE app.ldu (
 	id int IDENTITY(1,1) NOT NULL,
 	code nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	description nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -4887,21 +4883,21 @@ CREATE TABLE [wmt_db].app.ldu (
 	effective_from datetime DEFAULT getdate() NULL,
 	effective_to datetime NULL,
 	CONSTRAINT PK__ldu__3213E83F38EF5F02 PRIMARY KEY (id),
-	CONSTRAINT ldu_region_id_foreign FOREIGN KEY (region_id) REFERENCES [wmt_db].app.region(id)
+	CONSTRAINT ldu_region_id_foreign FOREIGN KEY (region_id) REFERENCES app.region(id)
 );
- CREATE NONCLUSTERED INDEX idx_ldu_region_id ON [wmt_db].app.ldu (  region_id ASC  )  
+ CREATE NONCLUSTERED INDEX idx_ldu_region_id ON app.ldu (  region_id ASC  )  
 	 INCLUDE ( description ) 
 	 WITH (  PAD_INDEX = OFF ,FILLFACTOR = 100  ,SORT_IN_TEMPDB = OFF , IGNORE_DUP_KEY = OFF , STATISTICS_NORECOMPUTE = OFF , ONLINE = OFF , ALLOW_ROW_LOCKS = ON , ALLOW_PAGE_LOCKS = ON  )
 	 ON [PRIMARY ] ;
 
 
--- [wmt_db].app.offender_manager definition
+-- app.offender_manager definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.offender_manager;
+-- DROP TABLE app.offender_manager;
 
-CREATE TABLE [wmt_db].app.offender_manager (
+CREATE TABLE app.offender_manager (
 	id int IDENTITY(1,1) NOT NULL,
 	[key] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	forename nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -4910,17 +4906,17 @@ CREATE TABLE [wmt_db].app.offender_manager (
 	effective_from datetime DEFAULT getdate() NULL,
 	effective_to datetime NULL,
 	CONSTRAINT PK__offender__3213E83FBFFA39C9 PRIMARY KEY (id),
-	CONSTRAINT offender_manager_type_id_foreign FOREIGN KEY (type_id) REFERENCES [wmt_db].app.offender_manager_type(id)
+	CONSTRAINT offender_manager_type_id_foreign FOREIGN KEY (type_id) REFERENCES app.offender_manager_type(id)
 );
 
 
--- [wmt_db].app.reduction_reason definition
+-- app.reduction_reason definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.reduction_reason;
+-- DROP TABLE app.reduction_reason;
 
-CREATE TABLE [wmt_db].app.reduction_reason (
+CREATE TABLE app.reduction_reason (
 	id int IDENTITY(1,1) NOT NULL,
 	reason nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	reason_short_name nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -4930,17 +4926,17 @@ CREATE TABLE [wmt_db].app.reduction_reason (
 	months_to_expiry int NULL,
 	is_enabled bit DEFAULT 1 NOT NULL,
 	CONSTRAINT PK__reductio__3213E83F206BDFDD PRIMARY KEY (id),
-	CONSTRAINT reduction_reason_category_id_foreign FOREIGN KEY (category_id) REFERENCES [wmt_db].app.reduction_category(id)
+	CONSTRAINT reduction_reason_category_id_foreign FOREIGN KEY (category_id) REFERENCES app.reduction_category(id)
 );
 
 
--- [wmt_db].app.tasks definition
+-- app.tasks definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.tasks;
+-- DROP TABLE app.tasks;
 
-CREATE TABLE [wmt_db].app.tasks (
+CREATE TABLE app.tasks (
 	id int IDENTITY(1,1) NOT NULL,
 	submitting_agent nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	[type] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -4951,17 +4947,17 @@ CREATE TABLE [wmt_db].app.tasks (
 	status nvarchar(30) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	date_started datetime NULL,
 	CONSTRAINT PK__tasks__3213E83FB84B9CD7 PRIMARY KEY (id),
-	CONSTRAINT tasks_workload_report_id_foreign FOREIGN KEY (workload_report_id) REFERENCES [wmt_db].app.workload_report(id)
+	CONSTRAINT tasks_workload_report_id_foreign FOREIGN KEY (workload_report_id) REFERENCES app.workload_report(id)
 );
 
 
--- [wmt_db].app.team definition
+-- app.team definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.team;
+-- DROP TABLE app.team;
 
-CREATE TABLE [wmt_db].app.team (
+CREATE TABLE app.team (
 	id int IDENTITY(1,1) NOT NULL,
 	code nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	ldu_id int NOT NULL,
@@ -4969,21 +4965,21 @@ CREATE TABLE [wmt_db].app.team (
 	effective_from datetime DEFAULT getdate() NULL,
 	effective_to datetime NULL,
 	CONSTRAINT PK__team__3213E83F14D6A0F0 PRIMARY KEY (id),
-	CONSTRAINT team_ldu_id_foreign FOREIGN KEY (ldu_id) REFERENCES [wmt_db].app.ldu(id)
+	CONSTRAINT team_ldu_id_foreign FOREIGN KEY (ldu_id) REFERENCES app.ldu(id)
 );
- CREATE NONCLUSTERED INDEX idx_team_ldu_id ON [wmt_db].app.team (  ldu_id ASC  )  
+ CREATE NONCLUSTERED INDEX idx_team_ldu_id ON app.team (  ldu_id ASC  )  
 	 INCLUDE ( description ) 
 	 WITH (  PAD_INDEX = OFF ,FILLFACTOR = 100  ,SORT_IN_TEMPDB = OFF , IGNORE_DUP_KEY = OFF , STATISTICS_NORECOMPUTE = OFF , ONLINE = OFF , ALLOW_ROW_LOCKS = ON , ALLOW_PAGE_LOCKS = ON  )
 	 ON [PRIMARY ] ;
 
 
--- [wmt_db].app.user_role definition
+-- app.user_role definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.user_role;
+-- DROP TABLE app.user_role;
 
-CREATE TABLE [wmt_db].app.user_role (
+CREATE TABLE app.user_role (
 	id int IDENTITY(1,1) NOT NULL,
 	user_id int NOT NULL,
 	role_id int NOT NULL,
@@ -4991,39 +4987,39 @@ CREATE TABLE [wmt_db].app.user_role (
 	last_updated_by nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	CONSTRAINT PK__user_rol__3213E83F72D16C5F PRIMARY KEY (id),
 	CONSTRAINT user_role_user_id_unique UNIQUE (user_id),
-	CONSTRAINT user_role_role_id_foreign FOREIGN KEY (role_id) REFERENCES [wmt_db].app.roles(id),
-	CONSTRAINT user_role_user_id_foreign FOREIGN KEY (user_id) REFERENCES [wmt_db].app.users(id)
+	CONSTRAINT user_role_role_id_foreign FOREIGN KEY (role_id) REFERENCES app.roles(id),
+	CONSTRAINT user_role_user_id_foreign FOREIGN KEY (user_id) REFERENCES app.users(id)
 );
-CREATE UNIQUE NONCLUSTERED INDEX user_role_user_id_unique_1 ON [wmt_db].app.user_role (user_id);
+CREATE UNIQUE NONCLUSTERED INDEX user_role_user_id_unique_1 ON app.user_role (user_id);
 
 
--- [wmt_db].app.workload_owner definition
+-- app.workload_owner definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.workload_owner;
+-- DROP TABLE app.workload_owner;
 
-CREATE TABLE [wmt_db].app.workload_owner (
+CREATE TABLE app.workload_owner (
 	id int IDENTITY(1,1) NOT NULL,
 	offender_manager_id int NOT NULL,
 	contracted_hours decimal(8,2) NULL,
 	team_id int NOT NULL,
 	CONSTRAINT PK__workload__3213E83FEE6F2402 PRIMARY KEY (id),
-	CONSTRAINT workload_owner_offender_manager_id_foreign FOREIGN KEY (offender_manager_id) REFERENCES [wmt_db].app.offender_manager(id),
-	CONSTRAINT workload_owner_team_id_foreign FOREIGN KEY (team_id) REFERENCES [wmt_db].app.team(id)
+	CONSTRAINT workload_owner_offender_manager_id_foreign FOREIGN KEY (offender_manager_id) REFERENCES app.offender_manager(id),
+	CONSTRAINT workload_owner_team_id_foreign FOREIGN KEY (team_id) REFERENCES app.team(id)
 );
- CREATE NONCLUSTERED INDEX idx_workload_owner_team_id ON [wmt_db].app.workload_owner (  team_id ASC  )  
+ CREATE NONCLUSTERED INDEX idx_workload_owner_team_id ON app.workload_owner (  team_id ASC  )  
 	 WITH (  PAD_INDEX = OFF ,FILLFACTOR = 100  ,SORT_IN_TEMPDB = OFF , IGNORE_DUP_KEY = OFF , STATISTICS_NORECOMPUTE = OFF , ONLINE = OFF , ALLOW_ROW_LOCKS = ON , ALLOW_PAGE_LOCKS = ON  )
 	 ON [PRIMARY ] ;
 
 
--- [wmt_db].app.court_reports definition
+-- app.court_reports definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.court_reports;
+-- DROP TABLE app.court_reports;
 
-CREATE TABLE [wmt_db].app.court_reports (
+CREATE TABLE app.court_reports (
 	id int IDENTITY(1,1) NOT NULL,
 	workload_owner_id int NULL,
 	staging_id int NOT NULL,
@@ -5032,17 +5028,17 @@ CREATE TABLE [wmt_db].app.court_reports (
 	total_oral_reports int NOT NULL,
 	workload_report_id int NULL,
 	CONSTRAINT PK__court_re__3213E83F7578916C PRIMARY KEY (id),
-	CONSTRAINT court_reports_workload_owner_id_foreign FOREIGN KEY (workload_owner_id) REFERENCES [wmt_db].app.workload_owner(id)
+	CONSTRAINT court_reports_workload_owner_id_foreign FOREIGN KEY (workload_owner_id) REFERENCES app.workload_owner(id)
 );
 
 
--- [wmt_db].app.court_reports_calculations definition
+-- app.court_reports_calculations definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.court_reports_calculations;
+-- DROP TABLE app.court_reports_calculations;
 
-CREATE TABLE [wmt_db].app.court_reports_calculations (
+CREATE TABLE app.court_reports_calculations (
 	id int IDENTITY(1,1) NOT NULL,
 	workload_report_id int NOT NULL,
 	court_reports_id int NOT NULL,
@@ -5050,19 +5046,19 @@ CREATE TABLE [wmt_db].app.court_reports_calculations (
 	reduction_hours decimal(8,2) DEFAULT '0' NOT NULL,
 	contracted_hours decimal(8,2) NOT NULL,
 	CONSTRAINT PK__court_re__3213E83F461E5C19 PRIMARY KEY (id),
-	CONSTRAINT court_reports_calculations_court_reports_id_foreign FOREIGN KEY (court_reports_id) REFERENCES [wmt_db].app.court_reports(id),
-	CONSTRAINT court_reports_calculations_workload_points_id_foreign FOREIGN KEY (workload_points_id) REFERENCES [wmt_db].app.workload_points(id),
-	CONSTRAINT court_reports_calculations_workload_report_id_foreign FOREIGN KEY (workload_report_id) REFERENCES [wmt_db].app.workload_report(id)
+	CONSTRAINT court_reports_calculations_court_reports_id_foreign FOREIGN KEY (court_reports_id) REFERENCES app.court_reports(id),
+	CONSTRAINT court_reports_calculations_workload_points_id_foreign FOREIGN KEY (workload_points_id) REFERENCES app.workload_points(id),
+	CONSTRAINT court_reports_calculations_workload_report_id_foreign FOREIGN KEY (workload_report_id) REFERENCES app.workload_report(id)
 );
 
 
--- [wmt_db].app.omic_workload definition
+-- app.omic_workload definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.omic_workload;
+-- DROP TABLE app.omic_workload;
 
-CREATE TABLE [wmt_db].app.omic_workload (
+CREATE TABLE app.omic_workload (
 	id int IDENTITY(1,1) NOT NULL,
 	workload_owner_id int NULL,
 	total_cases int NOT NULL,
@@ -5089,17 +5085,17 @@ CREATE TABLE [wmt_db].app.omic_workload (
 	total_filtered_custody_cases smallint DEFAULT 0 NOT NULL,
 	total_filtered_license_cases smallint DEFAULT 0 NOT NULL,
 	CONSTRAINT PK__omic_wor__3213E83F5E0A0C30 PRIMARY KEY (id),
-	CONSTRAINT FK__omic_work__workl__42F89445 FOREIGN KEY (workload_owner_id) REFERENCES [wmt_db].app.workload_owner(id)
+	CONSTRAINT FK__omic_work__workl__42F89445 FOREIGN KEY (workload_owner_id) REFERENCES app.workload_owner(id)
 );
 
 
--- [wmt_db].app.omic_workload_points_calculations definition
+-- app.omic_workload_points_calculations definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.omic_workload_points_calculations;
+-- DROP TABLE app.omic_workload_points_calculations;
 
-CREATE TABLE [wmt_db].app.omic_workload_points_calculations (
+CREATE TABLE app.omic_workload_points_calculations (
 	id int IDENTITY(1,1) NOT NULL,
 	workload_report_id int NOT NULL,
 	workload_points_id int NOT NULL,
@@ -5116,20 +5112,20 @@ CREATE TABLE [wmt_db].app.omic_workload_points_calculations (
 	t2a_workload_points_id int NULL,
 	arms_points int DEFAULT 0 NOT NULL,
 	CONSTRAINT PK__omic_wor__3213E83FBEB87B92 PRIMARY KEY (id),
-	CONSTRAINT FK__omic_work__omic___5DAC8A81 FOREIGN KEY (omic_workload_id) REFERENCES [wmt_db].app.omic_workload(id),
-	CONSTRAINT FK__omic_work__t2a_w__5F94D2F3 FOREIGN KEY (t2a_workload_points_id) REFERENCES [wmt_db].app.workload_points(id),
-	CONSTRAINT FK__omic_work__workl__5BC4420F FOREIGN KEY (workload_report_id) REFERENCES [wmt_db].app.workload_report(id),
-	CONSTRAINT FK__omic_work__workl__5CB86648 FOREIGN KEY (workload_points_id) REFERENCES [wmt_db].app.workload_points(id)
+	CONSTRAINT FK__omic_work__omic___5DAC8A81 FOREIGN KEY (omic_workload_id) REFERENCES app.omic_workload(id),
+	CONSTRAINT FK__omic_work__t2a_w__5F94D2F3 FOREIGN KEY (t2a_workload_points_id) REFERENCES app.workload_points(id),
+	CONSTRAINT FK__omic_work__workl__5BC4420F FOREIGN KEY (workload_report_id) REFERENCES app.workload_report(id),
+	CONSTRAINT FK__omic_work__workl__5CB86648 FOREIGN KEY (workload_points_id) REFERENCES app.workload_points(id)
 );
 
 
--- [wmt_db].app.reductions definition
+-- app.reductions definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.reductions;
+-- DROP TABLE app.reductions;
 
-CREATE TABLE [wmt_db].app.reductions (
+CREATE TABLE app.reductions (
 	id int IDENTITY(1,1) NOT NULL,
 	reduction_reason_id int DEFAULT '11' NOT NULL,
 	workload_owner_id int NOT NULL,
@@ -5141,18 +5137,18 @@ CREATE TABLE [wmt_db].app.reductions (
 	updated_date datetime DEFAULT getdate() NOT NULL,
 	user_id int NULL,
 	CONSTRAINT PK__reductio__3213E83F5482A38A PRIMARY KEY (id),
-	CONSTRAINT reductions_reduction_reason_id_foreign FOREIGN KEY (reduction_reason_id) REFERENCES [wmt_db].app.reduction_reason(id),
-	CONSTRAINT reductions_workload_owner_id_foreign FOREIGN KEY (workload_owner_id) REFERENCES [wmt_db].app.workload_owner(id)
+	CONSTRAINT reductions_reduction_reason_id_foreign FOREIGN KEY (reduction_reason_id) REFERENCES app.reduction_reason(id),
+	CONSTRAINT reductions_workload_owner_id_foreign FOREIGN KEY (workload_owner_id) REFERENCES app.workload_owner(id)
 );
 
 
--- [wmt_db].app.reductions_history definition
+-- app.reductions_history definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.reductions_history;
+-- DROP TABLE app.reductions_history;
 
-CREATE TABLE [wmt_db].app.reductions_history (
+CREATE TABLE app.reductions_history (
 	id int IDENTITY(1,1) NOT NULL,
 	reduction_id int NOT NULL,
 	reduction_reason_id int DEFAULT '11' NOT NULL,
@@ -5164,18 +5160,18 @@ CREATE TABLE [wmt_db].app.reductions_history (
 	updated_date datetime DEFAULT getdate() NOT NULL,
 	user_id int NULL,
 	CONSTRAINT PK__reductio__3213E83FBFA421C7 PRIMARY KEY (id),
-	CONSTRAINT FK__reduction__reduc__2ACC04F9 FOREIGN KEY (reduction_id) REFERENCES [wmt_db].app.reductions(id),
-	CONSTRAINT FK__reduction__reduc__2CB44D6B FOREIGN KEY (reduction_reason_id) REFERENCES [wmt_db].app.reduction_reason(id)
+	CONSTRAINT FK__reduction__reduc__2ACC04F9 FOREIGN KEY (reduction_id) REFERENCES app.reductions(id),
+	CONSTRAINT FK__reduction__reduc__2CB44D6B FOREIGN KEY (reduction_reason_id) REFERENCES app.reduction_reason(id)
 );
 
 
--- [wmt_db].app.workload definition
+-- app.workload definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.workload;
+-- DROP TABLE app.workload;
 
-CREATE TABLE [wmt_db].app.workload (
+CREATE TABLE app.workload (
 	id int IDENTITY(1,1) NOT NULL,
 	workload_owner_id int NULL,
 	total_cases int NOT NULL,
@@ -5202,24 +5198,24 @@ CREATE TABLE [wmt_db].app.workload (
 	total_filtered_custody_cases smallint DEFAULT 0 NOT NULL,
 	total_filtered_license_cases smallint DEFAULT 0 NOT NULL,
 	CONSTRAINT PK__workload__3213E83F428DDEF6 PRIMARY KEY (id),
-	CONSTRAINT workload_workload_owner_id_foreign FOREIGN KEY (workload_owner_id) REFERENCES [wmt_db].app.workload_owner(id)
+	CONSTRAINT workload_workload_owner_id_foreign FOREIGN KEY (workload_owner_id) REFERENCES app.workload_owner(id)
 );
- CREATE NONCLUSTERED INDEX ix_workload_staging_id ON [wmt_db].app.workload (  staging_id ASC  )  
+ CREATE NONCLUSTERED INDEX ix_workload_staging_id ON app.workload (  staging_id ASC  )  
 	 WITH (  PAD_INDEX = OFF ,FILLFACTOR = 100  ,SORT_IN_TEMPDB = OFF , IGNORE_DUP_KEY = OFF , STATISTICS_NORECOMPUTE = OFF , ONLINE = OFF , ALLOW_ROW_LOCKS = ON , ALLOW_PAGE_LOCKS = ON  )
 	 ON [PRIMARY ] ;
- CREATE NONCLUSTERED INDEX ix_workload_workload_owner_id ON [wmt_db].app.workload (  workload_owner_id ASC  )  
+ CREATE NONCLUSTERED INDEX ix_workload_workload_owner_id ON app.workload (  workload_owner_id ASC  )  
 	 INCLUDE ( total_cases ) 
 	 WITH (  PAD_INDEX = OFF ,FILLFACTOR = 100  ,SORT_IN_TEMPDB = OFF , IGNORE_DUP_KEY = OFF , STATISTICS_NORECOMPUTE = OFF , ONLINE = OFF , ALLOW_ROW_LOCKS = ON , ALLOW_PAGE_LOCKS = ON  )
 	 ON [PRIMARY ] ;
 
 
--- [wmt_db].app.workload_points_calculations definition
+-- app.workload_points_calculations definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.workload_points_calculations;
+-- DROP TABLE app.workload_points_calculations;
 
-CREATE TABLE [wmt_db].app.workload_points_calculations (
+CREATE TABLE app.workload_points_calculations (
 	id int IDENTITY(1,1) NOT NULL,
 	workload_report_id int NOT NULL,
 	workload_points_id int NOT NULL,
@@ -5238,36 +5234,36 @@ CREATE TABLE [wmt_db].app.workload_points_calculations (
 	t2a_workload_points_id int NULL,
 	arms_points int DEFAULT 0 NOT NULL,
 	CONSTRAINT PK__workload__3213E83F963A7F76 PRIMARY KEY (id),
-	CONSTRAINT workload_points_calculations_t2a_workload_points_id_foreign FOREIGN KEY (t2a_workload_points_id) REFERENCES [wmt_db].app.workload_points(id),
-	CONSTRAINT workload_points_calculations_workload_id_foreign FOREIGN KEY (workload_id) REFERENCES [wmt_db].app.workload(id),
-	CONSTRAINT workload_points_calculations_workload_points_id_foreign FOREIGN KEY (workload_points_id) REFERENCES [wmt_db].app.workload_points(id),
-	CONSTRAINT workload_points_calculations_workload_report_id_foreign FOREIGN KEY (workload_report_id) REFERENCES [wmt_db].app.workload_report(id)
+	CONSTRAINT workload_points_calculations_t2a_workload_points_id_foreign FOREIGN KEY (t2a_workload_points_id) REFERENCES app.workload_points(id),
+	CONSTRAINT workload_points_calculations_workload_id_foreign FOREIGN KEY (workload_id) REFERENCES app.workload(id),
+	CONSTRAINT workload_points_calculations_workload_points_id_foreign FOREIGN KEY (workload_points_id) REFERENCES app.workload_points(id),
+	CONSTRAINT workload_points_calculations_workload_report_id_foreign FOREIGN KEY (workload_report_id) REFERENCES app.workload_report(id)
 );
- CREATE NONCLUSTERED INDEX idx_app_workload_points_calculations_workload_id ON [wmt_db].app.workload_points_calculations (  workload_id ASC  )  
+ CREATE NONCLUSTERED INDEX idx_app_workload_points_calculations_workload_id ON app.workload_points_calculations (  workload_id ASC  )  
 	 INCLUDE ( available_points , contracted_hours , reduction_hours , total_points ) 
 	 WITH (  PAD_INDEX = OFF ,FILLFACTOR = 100  ,SORT_IN_TEMPDB = OFF , IGNORE_DUP_KEY = OFF , STATISTICS_NORECOMPUTE = OFF , ONLINE = OFF , ALLOW_ROW_LOCKS = ON , ALLOW_PAGE_LOCKS = ON  )
 	 ON [PRIMARY ] ;
- CREATE NONCLUSTERED INDEX ix_workload_points_calculations_workload_id ON [wmt_db].app.workload_points_calculations (  workload_id ASC  )  
+ CREATE NONCLUSTERED INDEX ix_workload_points_calculations_workload_id ON app.workload_points_calculations (  workload_id ASC  )  
 	 INCLUDE ( available_points , reduction_hours , total_points ) 
 	 WITH (  PAD_INDEX = OFF ,FILLFACTOR = 100  ,SORT_IN_TEMPDB = OFF , IGNORE_DUP_KEY = OFF , STATISTICS_NORECOMPUTE = OFF , ONLINE = OFF , ALLOW_ROW_LOCKS = ON , ALLOW_PAGE_LOCKS = ON  )
 	 ON [PRIMARY ] ;
- CREATE NONCLUSTERED INDEX ix_workload_points_calculations_workload_report_id ON [wmt_db].app.workload_points_calculations (  workload_report_id ASC  )  
+ CREATE NONCLUSTERED INDEX ix_workload_points_calculations_workload_report_id ON app.workload_points_calculations (  workload_report_id ASC  )  
 	 INCLUDE ( workload_id ) 
 	 WITH (  PAD_INDEX = OFF ,FILLFACTOR = 100  ,SORT_IN_TEMPDB = OFF , IGNORE_DUP_KEY = OFF , STATISTICS_NORECOMPUTE = OFF , ONLINE = OFF , ALLOW_ROW_LOCKS = ON , ALLOW_PAGE_LOCKS = ON  )
 	 ON [PRIMARY ] ;
- CREATE NONCLUSTERED INDEX ix_workload_points_calculations_workload_report_id_l ON [wmt_db].app.workload_points_calculations (  workload_report_id ASC  )  
+ CREATE NONCLUSTERED INDEX ix_workload_points_calculations_workload_report_id_l ON app.workload_points_calculations (  workload_report_id ASC  )  
 	 INCLUDE ( available_points , reduction_hours , total_points , workload_id , workload_points_id ) 
 	 WITH (  PAD_INDEX = OFF ,FILLFACTOR = 100  ,SORT_IN_TEMPDB = OFF , IGNORE_DUP_KEY = OFF , STATISTICS_NORECOMPUTE = OFF , ONLINE = OFF , ALLOW_ROW_LOCKS = ON , ALLOW_PAGE_LOCKS = ON  )
 	 ON [PRIMARY ] ;
 
 
--- [wmt_db].app.case_details definition
+-- app.case_details definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.case_details;
+-- DROP TABLE app.case_details;
 
-CREATE TABLE [wmt_db].app.case_details (
+CREATE TABLE app.case_details (
 	id int IDENTITY(1,1) NOT NULL,
 	workload_id int NOT NULL,
 	row_type nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -5277,17 +5273,17 @@ CREATE TABLE [wmt_db].app.case_details (
 	grade_code nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	location varchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	CONSTRAINT PK__case_det__3213E83F52A26133 PRIMARY KEY (id),
-	CONSTRAINT case_details_workload_id_foreign FOREIGN KEY (workload_id) REFERENCES [wmt_db].app.workload(id)
+	CONSTRAINT case_details_workload_id_foreign FOREIGN KEY (workload_id) REFERENCES app.workload(id)
 );
 
 
--- [wmt_db].app.omic_case_details definition
+-- app.omic_case_details definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.omic_case_details;
+-- DROP TABLE app.omic_case_details;
 
-CREATE TABLE [wmt_db].app.omic_case_details (
+CREATE TABLE app.omic_case_details (
 	id int IDENTITY(1,1) NOT NULL,
 	omic_workload_id int NOT NULL,
 	row_type nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -5297,17 +5293,17 @@ CREATE TABLE [wmt_db].app.omic_case_details (
 	grade_code nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	location varchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	CONSTRAINT PK__omic_cas__3213E83F379B3B88 PRIMARY KEY (id),
-	CONSTRAINT FK__omic_case__omic___58E7D564 FOREIGN KEY (omic_workload_id) REFERENCES [wmt_db].app.omic_workload(id)
+	CONSTRAINT FK__omic_case__omic___58E7D564 FOREIGN KEY (omic_workload_id) REFERENCES app.omic_workload(id)
 );
 
 
--- [wmt_db].app.omic_tiers definition
+-- app.omic_tiers definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.omic_tiers;
+-- DROP TABLE app.omic_tiers;
 
-CREATE TABLE [wmt_db].app.omic_tiers (
+CREATE TABLE app.omic_tiers (
 	id int IDENTITY(1,1) NOT NULL,
 	omic_workload_id int NOT NULL,
 	location nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
@@ -5324,17 +5320,17 @@ CREATE TABLE [wmt_db].app.omic_tiers (
 	suspended_lifer_total int DEFAULT 0 NOT NULL,
 	total_filtered_cases smallint DEFAULT 0 NOT NULL,
 	CONSTRAINT PK__omic_tie__3213E83FB9D8C3D7 PRIMARY KEY (id),
-	CONSTRAINT FK__omic_tier__omic___4F5E6B2A FOREIGN KEY (omic_workload_id) REFERENCES [wmt_db].app.omic_workload(id)
+	CONSTRAINT FK__omic_tier__omic___4F5E6B2A FOREIGN KEY (omic_workload_id) REFERENCES app.omic_workload(id)
 );
 
 
--- [wmt_db].app.tiers definition
+-- app.tiers definition
 
 -- Drop table
 
--- DROP TABLE [wmt_db].app.tiers;
+-- DROP TABLE app.tiers;
 
-CREATE TABLE [wmt_db].app.tiers (
+CREATE TABLE app.tiers (
 	id int IDENTITY(1,1) NOT NULL,
 	workload_id int NOT NULL,
 	location nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
@@ -5351,13 +5347,13 @@ CREATE TABLE [wmt_db].app.tiers (
 	suspended_lifer_total int DEFAULT 0 NOT NULL,
 	total_filtered_cases smallint DEFAULT 0 NOT NULL,
 	CONSTRAINT PK__tiers__3213E83FF9377D21 PRIMARY KEY (id),
-	CONSTRAINT tiers_workload_id_foreign FOREIGN KEY (workload_id) REFERENCES [wmt_db].app.workload(id)
+	CONSTRAINT tiers_workload_id_foreign FOREIGN KEY (workload_id) REFERENCES app.workload(id)
 );
- CREATE NONCLUSTERED INDEX idx_app_tiers_workload_id ON [wmt_db].app.tiers (  workload_id ASC  )  
+ CREATE NONCLUSTERED INDEX idx_app_tiers_workload_id ON app.tiers (  workload_id ASC  )  
 	 INCLUDE ( overdue_terminations_total , unpaid_work_total , warrants_total ) 
 	 WITH (  PAD_INDEX = OFF ,FILLFACTOR = 100  ,SORT_IN_TEMPDB = OFF , IGNORE_DUP_KEY = OFF , STATISTICS_NORECOMPUTE = OFF , ONLINE = OFF , ALLOW_ROW_LOCKS = ON , ALLOW_PAGE_LOCKS = ON  )
 	 ON [PRIMARY ] ;
- CREATE NONCLUSTERED INDEX ix_tiers_workload_id ON [wmt_db].app.tiers (  workload_id ASC  )  
+ CREATE NONCLUSTERED INDEX ix_tiers_workload_id ON app.tiers (  workload_id ASC  )  
 	 INCLUDE ( location , overdue_terminations_total , tier_number , total_cases , unpaid_work_total , warrants_total ) 
 	 WITH (  PAD_INDEX = OFF ,FILLFACTOR = 100  ,SORT_IN_TEMPDB = OFF , IGNORE_DUP_KEY = OFF , STATISTICS_NORECOMPUTE = OFF , ONLINE = OFF , ALLOW_ROW_LOCKS = ON , ALLOW_PAGE_LOCKS = ON  )
 	 ON [PRIMARY ] ;
