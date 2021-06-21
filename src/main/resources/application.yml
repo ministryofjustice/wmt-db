@@ -17,6 +17,16 @@ spring:
     group:
       test:
         - "stdout"
+  flyway:
+    locations: classpath:db/migration
+
+  datasource:
+    url: "jdbc:sqlserver://${database.endpoint:localhost:1433}"
+    username: "${database.username:root}"
+    password: "${database.password:dev}"
+    hikari:
+      maximum-pool-size: 25
+
 
 server:
   port: 8080
