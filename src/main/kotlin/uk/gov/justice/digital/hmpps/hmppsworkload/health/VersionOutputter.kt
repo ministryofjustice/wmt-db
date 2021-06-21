@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.wmtdb.health
+package uk.gov.justice.digital.hmpps.hmppsworkload.health
 
 import org.slf4j.LoggerFactory
 import org.springframework.boot.context.event.ApplicationReadyEvent

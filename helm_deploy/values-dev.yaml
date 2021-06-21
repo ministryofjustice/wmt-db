@@ -1,11 +1,11 @@
 ---
-# Per environment values which override defaults in wmt-db/values.yaml
+# Per environment values which override defaults in hmpps-workload/values.yaml
 
 generic-service:
   replicaCount: 2
 
   ingress:
-    host: wmt-db-dev.hmpps.service.justice.gov.uk
+    host: hmpps-workload-dev.hmpps.service.justice.gov.uk
 
   env:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json

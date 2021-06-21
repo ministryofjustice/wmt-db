@@ -1,1 +1,1 @@
-rootProject.name = "wmt-db"
+rootProject.name = "hmpps-workload"

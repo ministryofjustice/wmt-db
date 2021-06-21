@@ -1,6 +1,6 @@
 {
   "role": {
-    "name": "wmt-db"
+    "name": "hmpps-workload"
   },
   "customDimensions": {
     "service.version": "${BUILD_NUMBER}"

@@ -1,10 +1,10 @@
 info.app:
-  name: Wmt Db
+  name: Hmpps Workload
   version: 1.0
 
 spring:
   application:
-    name: wmt-db
+    name: hmpps-workload
   codec:
     max-in-memory-size: 10MB
 

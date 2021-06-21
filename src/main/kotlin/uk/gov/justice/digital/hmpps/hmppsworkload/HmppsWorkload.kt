@@ -1,11 +1,11 @@
-package uk.gov.justice.digital.hmpps.wmtdb
+package uk.gov.justice.digital.hmpps.hmppsworkload
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication()
-class WmtDb
+class HmppsWorkload
 
 fun main(args: Array<String>) {
-  runApplication<WmtDb>(*args)
+  runApplication<HmppsWorkload>(*args)
 }
