@@ -1,6 +1,6 @@
 {
   "role": {
-    "name": "hmpps-template-kotlin"
+    "name": "wmt-db"
   },
   "customDimensions": {
     "service.version": "${BUILD_NUMBER}"

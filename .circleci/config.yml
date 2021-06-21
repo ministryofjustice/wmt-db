@@ -62,7 +62,7 @@ workflows:
 #          env: "preprod"
 #          context:
 #            - hmpps-common-vars
-#            - hmpps-template-kotlin-preprod
+#            - wmt-db-preprod
 #          requires:
 #            - request-preprod-approval
 #      - request-prod-approval:
@@ -75,7 +75,7 @@ workflows:
 #          slack_notification: true
 #          context:
 #            - hmpps-common-vars
-#            - hmpps-template-kotlin-prod
+#            - wmt-db-prod
 #          requires:
 #            - request-prod-approval
 

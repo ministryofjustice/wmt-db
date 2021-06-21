@@ -1,10 +1,10 @@
 info.app:
-  name: HMPPS Template Kotlin
+  name: Wmt Db
   version: 1.0
 
 spring:
   application:
-    name: hmpps-template-kotlin
+    name: wmt-db
   codec:
     max-in-memory-size: 10MB
 
