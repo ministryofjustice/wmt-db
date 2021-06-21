@@ -19,11 +19,12 @@ spring:
         - "stdout"
   flyway:
     locations: classpath:db/migration
+    mixed: true
 
   datasource:
     url: "jdbc:sqlserver://${database.endpoint:localhost:1433}"
-    username: "${database.username:root}"
-    password: "${database.password:dev}"
+    username: "${database.username:sa}"
+    password: "${database.password:yourStrong(!)Password}"
     hikari:
       maximum-pool-size: 25
 

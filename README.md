@@ -4,6 +4,14 @@ This is a skeleton project from which to create new kotlin projects from.
 
 # Instructions
 
+To run locally use docker to create a Mssql instance with the following command:
+
+```
+docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=<A Strong Password>' -p 1433:1433 -d --name wmt-db  mcr.microsoft.com/mssql/server:2019-CU11-ubuntu-20.04
+```
+
+Then execute the command `./gradlew bootRun`
+
 If this is a Digital Prison Services project then the project will be created as part of bootstrapping - 
 see https://github.com/ministryofjustice/dps-project-bootstrap.
 
