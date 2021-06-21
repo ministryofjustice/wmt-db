@@ -22,7 +22,7 @@ spring:
     mixed: true
 
   datasource:
-    url: "jdbc:sqlserver://${database.endpoint:localhost:1433}"
+    url: "jdbc:sqlserver://${database.endpoint:localhost:1433};databaseName=hmpps_workload;"
     username: "${database.username:sa}"
     password: "${database.password:yourStrong(!)Password}"
     hikari:
