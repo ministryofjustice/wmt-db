@@ -14,6 +14,8 @@ dependencies {
 
   runtimeOnly("com.zaxxer:HikariCP:3.4.5")
   runtimeOnly("org.flywaydb:flyway-core:6.5.6")
+
+  
 }
 
 tasks {

@@ -33,6 +33,8 @@ workflows:
           filters:
             tags:
               ignore: /.*/
+          slack_notification: true
+          slack_channel_name: manage_a_workforce_dev
       - hmpps/helm_lint:
           name: helm_lint
       - hmpps/build_docker:
