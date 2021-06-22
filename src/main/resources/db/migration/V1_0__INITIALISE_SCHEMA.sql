@@ -1,3 +1,5 @@
+USE wmt_db;
+GO
 CREATE SCHEMA app;
 GO
 CREATE SCHEMA staging;

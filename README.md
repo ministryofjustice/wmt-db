@@ -2,13 +2,24 @@
 
 Currently exists to deploy database changes to the hmpps-workload SQL Server
 
-# Instructions
+## Instructions
 
 To run locally use docker to create a Mssql instance with the following command:
 
-```
-docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=<A Strong Password>' -p 1433:1433 -d --name hmpps-workload  mcr.microsoft.com/mssql/server:2019-CU11-ubuntu-20.04
+```shell
+docker compose up mssql
 ```
 
-Then execute the command `./gradlew bootRun`
+Then execute the command 
+```shell
+./gradlew bootRun
+```
+
+## testing
+
+These tests are defaults from the template, and the app only serves to run the flyway scripts. This allows you to test that the scripts work locally against mssql in docker
+```shell
+docker compose up mssql
+./gradlew clean check
+```
 
