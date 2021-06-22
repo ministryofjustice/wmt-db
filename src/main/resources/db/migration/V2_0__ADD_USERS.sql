@@ -1,6 +1,5 @@
 -- users 
 
-USE wmt_db;
 CREATE LOGIN wmt_app WITH Password='yourStrong(!)Password';
 CREATE LOGIN wmt_stg WITH Password='yourStrong(!)Password';
 CREATE LOGIN wmt_wrk WITH Password='yourStrong(!)Password';
@@ -54,7 +53,7 @@ ALTER ROLE db_datareader ADD MEMBER wmt_etl;
 
 -- reference data
 
-USE wmt_db;
+-- USE wmt_db;
 
 SET IDENTITY_INSERT app.reduction_category ON;
 

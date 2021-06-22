@@ -22,7 +22,7 @@ spring:
     mixed: true
 
   datasource:
-    url: "jdbc:sqlserver://${database.endpoint:localhost:1433};databaseName=wmt_db;"
+    url: "jdbc:sqlserver://${database.endpoint:localhost:1433}"
     username: "${database.username:sa}"
     password: "${database.password:yourStrong(!)Password}"
     hikari:
