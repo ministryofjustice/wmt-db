@@ -23,9 +23,6 @@ services:
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=yourStrong(!)Password
-    volumes:
-      - "./database-setup:/dbdata"
-    entrypoint: /dbdata/entrypoint.sh
 
 networks:
   hmpps:
