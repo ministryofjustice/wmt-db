@@ -1,12 +1,12 @@
 version: 2.1
 
 orbs:
-  hmpps: ministryofjustice/hmpps@3.2
+  hmpps: ministryofjustice/hmpps@dev:6c194c7
 
 jobs:
   validate:
     executor:
-      name: hmpps/java
+      name: hmpps/mssql
       tag: "16.0"
     steps:
       - checkout

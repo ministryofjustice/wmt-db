@@ -2,7 +2,7 @@
 generic-service:
   nameOverride: hmpps-workload
 
-  replicaCount: 4
+  replicaCount: 1
 
   image:
     repository: quay.io/hmpps/hmpps-workload
@@ -10,7 +10,7 @@ generic-service:
     port: 8080
 
   ingress:
-    enabled: true
+    enabled: false
     host: app-hostname.local    # override per environment
     tlsSecretName: hmpps-workload-cert
     path: /
