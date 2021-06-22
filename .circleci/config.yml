@@ -7,7 +7,7 @@ jobs:
   validate:
     executor:
       name: hmpps/mssql
-      tag: "16.0"
+      jdk_tag: "16.0"
     steps:
       - checkout
       - restore_cache:
