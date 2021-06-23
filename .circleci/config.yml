@@ -8,9 +8,6 @@ jobs:
     executor:
       name: hmpps/java_mssql
       jdk_tag: "16.0"
-    context: hmpps-common-vars
-    slack_notification: true
-    slack_channel_name: manage_a_workforce_dev
     steps:
       - checkout
       - restore_cache:
@@ -37,6 +34,9 @@ workflows:
           filters:
             tags:
               ignore: /.*/
+          context: hmpps-common-vars
+          slack_notification: true
+          slack_channel_name: manage_a_workforce_dev
       - hmpps/helm_lint:
           name: helm_lint
       - hmpps/build_docker:
