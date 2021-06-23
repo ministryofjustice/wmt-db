@@ -28,8 +28,7 @@ jobs:
                   "fields": [
                     {
                       "type": "plain_text",
-                      "text": "*hmpps-workload validate failed*",
-                      "emoji": true
+                      "text": "hmpps-workload validate failed"
                     }
                   ]
                 }
