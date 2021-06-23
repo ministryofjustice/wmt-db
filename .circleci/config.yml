@@ -16,7 +16,9 @@ jobs:
             - gradle-
       - run:
           command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" check
-
+      - slack/notify:
+        event: fail
+        channel: manage_a_workforce_dev
       - save_cache:
           paths:
             - ~/.gradle
@@ -35,8 +37,6 @@ workflows:
             tags:
               ignore: /.*/
           context: hmpps-common-vars
-          slack_notification: true
-          slack_channel_name: manage_a_workforce_dev
       - hmpps/helm_lint:
           name: helm_lint
       - hmpps/build_docker:
