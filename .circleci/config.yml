@@ -17,8 +17,8 @@ jobs:
       - run:
           command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" check
       - slack/notify:
-        event: fail
-        channel: manage_a_workforce_dev
+          event: fail
+          channel: manage_a_workforce_dev
       - save_cache:
           paths:
             - ~/.gradle
