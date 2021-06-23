@@ -2,13 +2,15 @@ version: 2.1
 
 orbs:
   hmpps: ministryofjustice/hmpps@3.3.0
-  slack: circleci/slack@3.4.2
 
 jobs:
   validate:
     executor:
       name: hmpps/java_mssql
       jdk_tag: "16.0"
+    context: hmpps-common-vars
+    slack_notification: true
+    slack_channel_name: manage_a_workforce_dev
     steps:
       - checkout
       - restore_cache:
@@ -17,10 +19,7 @@ jobs:
             - gradle-
       - run:
           command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" check
-      - slack/status: &slack_status
-        fail_only: true
-        failure_message: "Failed job $CIRCLE_JOB"
-        include_job_number_field: false
+
       - save_cache:
           paths:
             - ~/.gradle
