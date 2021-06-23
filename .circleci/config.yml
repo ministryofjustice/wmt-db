@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   hmpps: ministryofjustice/hmpps@3.3.0
+  slack: circleci/slack@4.3.1
 
 jobs:
   validate:
@@ -19,6 +20,21 @@ jobs:
       - slack/notify:
           event: fail
           channel: manage_a_workforce_dev
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "plain_text",
+                      "text": "*hmpps-workload validate failed*",
+                      "emoji": true
+                    }
+                  ]
+                }
+              ]
+            }
       - save_cache:
           paths:
             - ~/.gradle
