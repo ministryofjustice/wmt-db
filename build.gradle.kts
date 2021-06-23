@@ -16,10 +16,6 @@ dependencies {
   runtimeOnly("org.flywaydb:flyway-core:6.5.6")
 }
 
-tasks.register("fix") {
-  dependsOn(":ktlintFormat")
-}
-
 tasks {
   compileKotlin {
     kotlinOptions {
