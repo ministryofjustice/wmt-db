@@ -5708,7 +5708,8 @@ CREATE VIEW [app].[individual_capacity_view]
     FROM app.workload_points_calculations wpc
       JOIN app.workload w ON wpc.workload_id = w.id
       JOIN app.workload_report wr ON wpc.workload_report_id = wr.id;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_individual_capacity_view] ON app.individual_capacity_view ( id, workload_report_id ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.individual_case_overview source
 
@@ -5743,7 +5744,8 @@ CREATE VIEW [app].[individual_case_overview]
     JOIN app.offender_manager_type om_type ON om_type.id = om.type_id
   WHERE wr.effective_from IS NOT NULL
     AND wr.effective_to IS NULL;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_individual_case_overview] ON app.individual_case_overview ( workload_owner_id ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.individual_case_progress_view source
 
@@ -5777,7 +5779,8 @@ CREATE VIEW [app].[individual_case_progress_view]
     , w.community_last_16_weeks
     , w.license_last_16_weeks
     , w.total_filtered_cases;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_individual_case_progress_view] ON app.individual_case_progress_view ( id ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.individual_court_reporter_overview source
 
@@ -5804,7 +5807,8 @@ CREATE VIEW [app].[individual_court_reporter_overview]
         JOIN app.workload_report wr ON wr.id = crc.workload_report_id
       WHERE wr.effective_from IS NOT NULL
       AND wr.effective_to IS NULL;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_individual_court_reporter_overview] ON app.individual_court_reporter_overview ( id ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.ldu_capacity_breakdown_view source
 
@@ -5841,7 +5845,8 @@ CREATE VIEW [app].[ldu_capacity_breakdown_view]
     WHERE wr.effective_from IS NOT NULL
       AND wr.effective_to IS NULL
     GROUP BY l.id, t.id, t.description, omt.grade_code;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_ldu_capacity_breakdown_view] ON app.ldu_capacity_breakdown_view ( link_id, grade_code ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.ldu_capacity_view source
 
@@ -5864,7 +5869,8 @@ CREATE VIEW [app].[ldu_capacity_view]
       JOIN app.ldu AS ldu ON t.ldu_id = ldu.id
       JOIN app.workload_report AS wr ON wpc.workload_report_id = wr.id
     GROUP BY ldu.id, wr.effective_from, wr.id;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_ldu_capacity_view] ON app.ldu_capacity_view ( workload_report_id, id ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.ldu_case_overview source
 
@@ -5892,7 +5898,8 @@ CREATE VIEW [app].[ldu_case_overview]
   WHERE wr.effective_from IS NOT NULL
     AND wr.effective_to IS NULL
   GROUP BY t.id, t.description, l.id;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_ldu_case_overview] ON app.ldu_case_overview ( link_id ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.ldu_case_progress_view source
 
@@ -5929,7 +5936,8 @@ CREATE VIEW [app].[team_case_progress_view]
     , w.community_last_16_weeks
     , w.license_last_16_weeks
     , w.total_filtered_cases;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_team_case_progress_view] ON app.team_case_progress_view ( workload_owner_id ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 GO
 CREATE VIEW [app].[ldu_case_progress_view]
@@ -5995,7 +6003,8 @@ CREATE VIEW [app].[ldu_caseload_view]
   WHERE wr.effective_from IS NOT NULL
       AND wr.effective_to IS NULL
   GROUP BY t.ldu_id, t.id, t.description, r.description, omt.grade_code, tr.location;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_ldu_caseload_view] ON app.ldu_caseload_view ( link_id, grade_code, location ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.ldu_court_reporter_overview source
 
@@ -6024,7 +6033,8 @@ CREATE VIEW [app].[ldu_court_reporter_overview]
     WHERE wr.effective_from IS NOT NULL
         AND wr.effective_to IS NULL
     GROUP BY l.id, t.id, t.description;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_ldu_court_reporter_overview] ON app.ldu_court_reporter_overview ( link_id ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.ldu_outstanding_reports_view source
 
@@ -6057,6 +6067,8 @@ CREATE VIEW [app].[ldu_outstanding_reports_view]
   WHERE wr.effective_from IS NOT NULL
       AND wr.effective_to IS NULL
   GROUP BY t.ldu_id, t.id, t.description, omt.grade_code;
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_ldu_outstanding_reports_view] ON app.ldu_outstanding_reports_view ( link_id, grade_code ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.reductions_notes_export_view source
 
@@ -6144,7 +6156,8 @@ CREATE VIEW [app].[national_capacity_breakdown_view]
     WHERE wr.effective_from IS NOT NULL
       AND wr.effective_to IS NULL
     GROUP BY r.id, r.description, omt.grade_code;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_national_capacity_breakdown_view] ON app.national_capacity_breakdown_view ( link_id, grade_code ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.national_capacity_view source
 
@@ -6163,7 +6176,8 @@ CREATE VIEW [app].[national_capacity_view]
       JOIN app.workload AS w ON wpc.workload_id = w.id
       JOIN app.workload_report AS wr ON wpc.workload_report_id = wr.id
     GROUP BY wr.effective_from, wr.id;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_national_capacity_view] ON app.national_capacity_view ( workload_report_id ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.national_case_overview source
 
@@ -6191,6 +6205,8 @@ CREATE VIEW [app].[national_case_overview]
   WHERE wr.effective_from IS NOT NULL
     AND wr.effective_to IS NULL
   GROUP BY r.id, r.description;
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_national_case_overview] ON app.national_case_overview ( link_id ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 
 -- app.national_case_progress_view source
@@ -6258,7 +6274,8 @@ CREATE VIEW [app].[national_caseload_view]
   WHERE wr.effective_from IS NOT NULL
       AND wr.effective_to IS NULL
   GROUP BY r.id, r.description, omt.grade_code, tr.location;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_national_caseload_view] ON app.national_caseload_view ( link_id, grade_code, location ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.national_court_reporter_overview source
 
@@ -6287,7 +6304,8 @@ CREATE VIEW [app].[national_court_reporter_overview]
     WHERE wr.effective_from IS NOT NULL
         AND wr.effective_to IS NULL
     GROUP BY r.id, r.description;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_national_court_reporter_overview] ON app.national_court_reporter_overview ( link_id ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.national_outstanding_reports_view source
 
@@ -6322,7 +6340,8 @@ CREATE VIEW [app].[national_outstanding_reports_view]
   WHERE wr.effective_from IS NOT NULL
       AND wr.effective_to IS NULL
   GROUP BY r.id, r.description, omt.grade_code;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_national_outstanding_reports_view] ON app.national_outstanding_reports_view ( link_id, grade_code ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.offender_manager_search_view source
 
@@ -6417,6 +6436,8 @@ CREATE VIEW [app].[omic_ldu_case_overview]
   WHERE wr.effective_from IS NOT NULL
     AND wr.effective_to IS NULL
   GROUP BY t.id, t.description, l.id;
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_omic_ldu_case_overview] ON app.omic_ldu_case_overview ( link_id ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 
 -- app.omic_national_case_overview source
@@ -6442,7 +6463,8 @@ CREATE VIEW [app].[omic_national_case_overview]
   WHERE wr.effective_from IS NOT NULL
     AND wr.effective_to IS NULL
   GROUP BY r.id, r.description;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_omic_national_case_overview] ON app.omic_national_case_overview ( link_id ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.omic_region_case_overview source
 
@@ -6468,7 +6490,8 @@ CREATE VIEW [app].[omic_region_case_overview]
   WHERE wr.effective_from IS NOT NULL
     AND wr.effective_to IS NULL
   GROUP BY l.id, l.description, r.id;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_omic_region_case_overview] ON app.omic_region_case_overview ( link_id ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.omic_scenario_view source
 
@@ -6623,7 +6646,8 @@ CREATE VIEW [app].[region_capacity_breakdown_view]
     WHERE wr.effective_from IS NOT NULL
       AND wr.effective_to IS NULL
     GROUP BY r.id, l.id, l.description, omt.grade_code;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_region_capacity_breakdown_view] ON app.region_capacity_breakdown_view ( link_id, grade_code ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.region_capacity_view source
 
@@ -6647,7 +6671,8 @@ CREATE VIEW [app].[region_capacity_view]
       JOIN app.region AS region ON ldu.region_id = region.id
       JOIN app.workload_report AS wr ON wpc.workload_report_id = wr.id
     GROUP BY region.id, wr.effective_from, wr.id;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_region_capacity_view] ON app.region_capacity_view ( id, workload_report_id ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.region_case_overview source
 
@@ -6676,7 +6701,8 @@ CREATE VIEW [app].[region_case_overview]
   WHERE wr.effective_from IS NOT NULL
     AND wr.effective_to IS NULL
   GROUP BY l.id, l.description, r.id;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_region_case_overview] ON app.region_case_overview ( link_id ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.region_case_progress_view source
 
@@ -6744,8 +6770,8 @@ CREATE VIEW [app].[region_caseload_view]
       JOIN app.offender_manager_type omt ON omt.id = om.type_id
   WHERE wr.effective_from IS NOT NULL
       AND wr.effective_to IS NULL
-  GROUP BY l.region_id, l.id, r.description, l.description, omt.grade_code, tr.location;
-
+  GROUP BY l.region_id, l.id, r.description, l.description, omt.grade_code, tr.location;GO
+CREATE UNIQUE CLUSTERED INDEX [idx_region_caseload_view] ON app.region_caseload_view ( link_id, grade_code, location ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.region_court_reporter_overview source
 
@@ -6775,7 +6801,8 @@ CREATE VIEW [app].[region_court_reporter_overview]
     WHERE wr.effective_from IS NOT NULL
         AND wr.effective_to IS NULL
     GROUP BY r.id, l.id, l.description;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_region_court_reporter_overview] ON app.region_court_reporter_overview ( link_id ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.region_outstanding_reports_view source
 
@@ -6809,7 +6836,8 @@ CREATE VIEW [app].[region_outstanding_reports_view]
   WHERE wr.effective_from IS NOT NULL
       AND wr.effective_to IS NULL
   GROUP BY l.region_id, l.id, l.description, omt.grade_code;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_region_outstanding_reports_view] ON app.region_outstanding_reports_view ( link_id, grade_code ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.scenario_view source
 
@@ -7019,7 +7047,8 @@ CREATE VIEW [app].[team_capacity_breakdown_view]
           JOIN app.offender_manager_type omt ON om.type_id = omt.id
         WHERE wr.effective_from IS NOT NULL
         AND wr.effective_to IS NULL;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_team_capacity_breakdown_view] ON app.team_capacity_breakdown_view ( link_id ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.team_capacity_view source
 
@@ -7041,7 +7070,8 @@ CREATE VIEW [app].[team_capacity_view]
       JOIN app.workload_report wr ON wpc.workload_report_id = wr.id
       JOIN app.team AS t ON wo.team_id = t.id
     GROUP BY t.id, wr.effective_from, wr.id;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_team_capacity_view] ON app.team_capacity_view ( workload_report_id, id ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.team_case_details_view source
 
@@ -7074,7 +7104,8 @@ CREATE VIEW [app].[team_case_details_view]
   WHERE wr.effective_from IS NOT NULL
         AND wr.effective_to IS NULL
   GROUP BY wo.team_id, wo.id, om.forename, om.surname, omt.grade_code, cd.row_type, cd.case_ref_no, cd.location, cd.tier_code, l.description, t.description;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_team_case_details_view] ON app.team_case_details_view ( id, link_id, flag, case_ref_no, location, tier_code ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.team_case_overview source
 
@@ -7102,6 +7133,8 @@ CREATE VIEW [app].[team_case_overview]
     JOIN app.offender_manager_type om_type ON om_type.id = om.type_id
   WHERE wr.effective_from IS NOT NULL
     AND wr.effective_to IS NULL;
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_team_case_overview] ON app.team_case_overview ( link_id ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.team_caseload_view source
 
@@ -7145,7 +7178,8 @@ CREATE VIEW [app].[team_caseload_view]
   WHERE wr.effective_from IS NOT NULL
       AND wr.effective_to IS NULL
   GROUP BY wo.team_id, wo.id, om.forename, om.surname, omt.grade_code, tr.location;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_team_caseload_view] ON app.team_caseload_view ( link_id, grade_code, location ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.team_court_reporter_overview source
 
@@ -7173,7 +7207,8 @@ CREATE VIEW [app].[team_court_reporter_overview]
         JOIN app.workload_report wr ON wr.id = crc.workload_report_id
     WHERE wr.effective_from IS NOT NULL
         AND wr.effective_to IS NULL;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_team_court_reporter_overview] ON app.team_court_reporter_overview ( link_id ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.team_outstanding_reports_view source
 
@@ -7206,7 +7241,8 @@ CREATE VIEW [app].[team_outstanding_reports_view]
   WHERE wr.effective_from IS NOT NULL
         AND wr.effective_to IS NULL
   GROUP BY wo.team_id, wo.id, om.forename, om.surname, omt.grade_code;
-
+GO
+CREATE UNIQUE CLUSTERED INDEX [idx_team_outstanding_reports_view] ON app.team_outstanding_reports_view ( link_id, grade_code ) WITH (PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY];
 
 -- app.team_reductions_statistics source
 
