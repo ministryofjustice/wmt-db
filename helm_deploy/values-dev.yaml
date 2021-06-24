@@ -11,6 +11,6 @@ generic-service:
     DATABASE_NAME: hmpps_workload
 
 generic-prometheus-alerts:
-# CloudPlatform AlertManager receiver to route promethues alerts to slack
-  alertSeverity: digital-prison-service-dev
+  alertSeverity: hmpps-tier
+
 
