@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   hmpps: ministryofjustice/hmpps@3.3.0
+  slack: circleci/slack@4.3.1
 
 jobs:
   validate:
@@ -16,6 +17,23 @@ jobs:
             - gradle-
       - run:
           command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" check
+      - slack/notify:
+          event: fail
+          channel: manage_a_workforce_dev
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "plain_text",
+                      "text": "hmpps-workload validate failed"
+                    }
+                  ]
+                }
+              ]
+            }
       - save_cache:
           paths:
             - ~/.gradle
@@ -33,6 +51,7 @@ workflows:
           filters:
             tags:
               ignore: /.*/
+          context: hmpps-common-vars
       - hmpps/helm_lint:
           name: helm_lint
       - hmpps/build_docker:
@@ -53,31 +72,31 @@ workflows:
             - validate
             - build_docker
             - helm_lint
-#      - request-preprod-approval:
-#          type: approval
-#          requires:
-#            - deploy_dev
-#      - hmpps/deploy_env:
-#          name: deploy_preprod
-#          env: "preprod"
-#          context:
-#            - hmpps-common-vars
-#            - hmpps-workload-preprod
-#          requires:
-#            - request-preprod-approval
-#      - request-prod-approval:
-#          type: approval
-#          requires:
-#            - deploy_preprod
-#      - hmpps/deploy_env:
-#          name: deploy_prod
-#          env: "prod"
-#          slack_notification: true
-#          context:
-#            - hmpps-common-vars
-#            - hmpps-workload-prod
-#          requires:
-#            - request-prod-approval
+    #      - request-preprod-approval:
+    #          type: approval
+    #          requires:
+    #            - deploy_dev
+    #      - hmpps/deploy_env:
+    #          name: deploy_preprod
+    #          env: "preprod"
+    #          context:
+    #            - hmpps-common-vars
+    #            - hmpps-workload-preprod
+    #          requires:
+    #            - request-preprod-approval
+    #      - request-prod-approval:
+    #          type: approval
+    #          requires:
+    #            - deploy_preprod
+    #      - hmpps/deploy_env:
+    #          name: deploy_prod
+    #          env: "prod"
+    #          slack_notification: true
+    #          context:
+    #            - hmpps-common-vars
+    #            - hmpps-workload-prod
+    #          requires:
+    #            - request-prod-approval
 
   security:
     triggers:

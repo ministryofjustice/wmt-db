@@ -2,14 +2,15 @@
 # Per environment values which override defaults in hmpps-workload/values.yaml
 
 generic-service:
-  replicaCount: 2
 
   ingress:
     host: hmpps-workload-dev.hmpps.service.justice.gov.uk
 
   env:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json
+    DATABASE_NAME: hmpps_workload
 
 generic-prometheus-alerts:
   alertSeverity: hmpps-tier
+
 
