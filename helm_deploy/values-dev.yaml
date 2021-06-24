@@ -11,8 +11,5 @@ generic-service:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json
 
 generic-prometheus-alerts:
-  alertSeverity: digital-prison-service-dev
+  alertSeverity: hmpps-tier
 
-# CloudPlatform AlertManager receiver to route promethues alerts to slack
-generic-prometheus-alerts:
-  alertSeverity: hmpps_tech_non_prod
