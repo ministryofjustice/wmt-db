@@ -47,3 +47,4 @@ generic-service:
 
 generic-prometheus-alerts:
   targetApplication: hmpps-workload
+  alertSeverity: hmpps-tier

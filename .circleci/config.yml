@@ -72,6 +72,18 @@ workflows:
             - validate
             - build_docker
             - helm_lint
+      - hmpps/deploy_env:
+          name: deploy_dev_archive
+          env: "dev_archive"
+          context: hmpps-common-vars
+          filters:
+            branches:
+              only:
+                - main
+          requires:
+            - validate
+            - build_docker
+            - helm_lint
     #      - request-preprod-approval:
     #          type: approval
     #          requires:

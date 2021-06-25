@@ -11,6 +11,6 @@ generic-service:
     DATABASE_NAME: hmpps_workload
 
 generic-prometheus-alerts:
-  alertSeverity: hmpps-tier
+  targetApplication: hmpps-workload-dev
 
 
