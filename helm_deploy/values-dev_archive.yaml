@@ -1,5 +1,6 @@
 ---
 generic-service:
+  nameOverride: hmpps-workload-archive
   ingress:
     host: hmpps-workload-dev-archive.hmpps.service.justice.gov.uk
 
