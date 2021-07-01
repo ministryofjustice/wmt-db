@@ -23,6 +23,16 @@ services:
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=yourStrong(!)Password
-
+  postgres:
+    image: postgres:11
+    networks:
+      - hmpps
+    container_name: hmpps-tier-postgres
+    restart: always
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_PASSWORD=dev
+      - POSTGRES_USER=root
 networks:
   hmpps:

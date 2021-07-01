@@ -18,13 +18,13 @@ spring:
       test:
         - "stdout"
   flyway:
-    locations: classpath:db/migration
+    locations: classpath:db/migration_{vendor}
     mixed: true
 
   datasource:
-    url: "jdbc:sqlserver://${database.endpoint:localhost:1433};databaseName=${database.name:master};"
-    username: "${database.username:sa}"
-    password: "${database.password:yourStrong(!)Password}"
+    url: "jdbc:${database.vendor:postgresql}://${database.endpoint:localhost:5432}/${database.name:postgres}"
+    username: "${database.username:root}"
+    password: "${database.password:dev}"
     hikari:
       maximum-pool-size: 25
 
