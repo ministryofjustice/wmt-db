@@ -194,7 +194,7 @@ CREATE TABLE dbo.deliverytype(
 CREATE TABLE dbo.displaysettings(
     id BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
     monthsbeforearchivingnotes BIGINT NOT NULL,
-    displayworkloadinhours NUMERIC(1,0) NOT NULL DEFAULT (0),
+    displayworkloadinhours boolean NOT NULL DEFAULT FALSE,
     pointsperhour DOUBLE PRECISION NOT NULL DEFAULT (1)
 )
         WITH (
@@ -213,7 +213,7 @@ CREATE TABLE dbo.flyway_schema_history(
     installed_by VARCHAR(100) NOT NULL,
     installed_on TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT localtimestamp(6),
     execution_time BIGINT NOT NULL,
-    success NUMERIC(1,0) NOT NULL
+    success boolean NOT NULL
 )
         WITH (
         OIDS=FALSE
@@ -248,7 +248,7 @@ CREATE TABLE dbo.fortnightly_archive_data(
 
 CREATE TABLE dbo.inactivecase(
     id BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
-    isdeleted NUMERIC(1,0) NOT NULL DEFAULT (0),
+    isdeleted boolean NOT NULL DEFAULT FALSE,
     flag VARCHAR(255),
     tier VARCHAR(255),
     crn VARCHAR(255),
@@ -276,7 +276,7 @@ CREATE TABLE dbo.logging(
 CREATE TABLE dbo.messages(
     id BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
     importantmessages TEXT NOT NULL,
-    isdeleted NUMERIC(1,0) NOT NULL DEFAULT (0),
+    isdeleted boolean NOT NULL DEFAULT FALSE,
     createdby VARCHAR(50) NOT NULL DEFAULT 'sa',
     createddate TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT localtimestamp(6)
 )
@@ -288,7 +288,7 @@ CREATE TABLE dbo.messages(
 
 CREATE TABLE dbo.msreplication_options(
     optname VARCHAR(128) NOT NULL,
-    value NUMERIC(1,0) NOT NULL,
+    value boolean NOT NULL DEFAULT FALSE,
     major_version BIGINT NOT NULL,
     minor_version BIGINT NOT NULL,
     revision BIGINT NOT NULL,
@@ -323,7 +323,7 @@ CREATE TABLE dbo.offendermanager(
     forename VARCHAR(255),
     surname VARCHAR(255),
     notes TEXT,
-    isdeleted NUMERIC(1,0) NOT NULL DEFAULT (0),
+    isdeleted boolean NOT NULL DEFAULT FALSE,
     lastupdateuserid BIGINT,
     lastupdatedatetime TIMESTAMP WITHOUT TIME ZONE
 )
@@ -336,7 +336,7 @@ CREATE TABLE dbo.offendermanager(
 CREATE TABLE dbo.offendermanagertype(
     id BIGINT NOT NULL,
     name VARCHAR(255) NOT NULL,
-    isdeleted NUMERIC(1,0) NOT NULL DEFAULT (0)
+    isdeleted boolean NOT NULL DEFAULT FALSE
 )
         WITH (
         OIDS=FALSE
@@ -351,7 +351,7 @@ CREATE TABLE dbo.organisationalunit(
     parentorganisationalunitid BIGINT,
     name VARCHAR(255) NOT NULL,
     abbreviation VARCHAR(50),
-    isdeleted NUMERIC(1,0) NOT NULL DEFAULT (0),
+    isdeleted boolean NOT NULL DEFAULT FALSE,
     lastupdateuserid BIGINT,
     lastupdatedatetime TIMESTAMP WITHOUT TIME ZONE,
     notes TEXT,
@@ -366,7 +366,7 @@ CREATE TABLE dbo.organisationalunit(
 CREATE TABLE dbo.organisationalunittype(
     id BIGINT NOT NULL,
     name VARCHAR(255) NOT NULL,
-    isdeleted NUMERIC(1,0) NOT NULL DEFAULT (0),
+    isdeleted boolean NOT NULL DEFAULT FALSE,
     parentorganisationalunittypeid BIGINT
 )
         WITH (
@@ -379,7 +379,7 @@ CREATE TABLE dbo.organisationalunitworkloadreport(
     id BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
     organisationalunitid BIGINT NOT NULL,
     workloadreportid BIGINT NOT NULL,
-    isdeleted NUMERIC(1,0) NOT NULL DEFAULT (0)
+    isdeleted boolean NOT NULL DEFAULT FALSE
 )
         WITH (
         OIDS=FALSE
@@ -410,7 +410,7 @@ CREATE TABLE dbo.requirementtype(
     createddatetime TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     modifiedbyuserid BIGINT,
     modifieddatetime TIMESTAMP WITHOUT TIME ZONE,
-    isdeleted NUMERIC(1,0) NOT NULL DEFAULT (0),
+    isdeleted boolean NOT NULL DEFAULT FALSE,
     defaultchildrequirementtypeid BIGINT
 )
         WITH (
@@ -448,7 +448,7 @@ CREATE TABLE dbo.roles(
     id BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
     code VARCHAR(50) NOT NULL,
     name TEXT NOT NULL,
-    isdeleted NUMERIC(1,0) NOT NULL DEFAULT (0)
+    isdeleted boolean NOT NULL DEFAULT FALSE
 )
         WITH (
         OIDS=FALSE
@@ -539,7 +539,7 @@ CREATE TABLE dbo.userroles(
 CREATE TABLE dbo.users(
     id BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
     username VARCHAR(255) NOT NULL,
-    isdeleted NUMERIC(1,0) NOT NULL DEFAULT (0),
+    isdeleted boolean NOT NULL DEFAULT FALSE,
     lastlogindatetime TIMESTAMP WITHOUT TIME ZONE,
     createdbyuserid BIGINT NOT NULL DEFAULT (8),
     createddatetime TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT '2014-04-29 00:00:00.000',
@@ -622,8 +622,8 @@ CREATE TABLE dbo.workload(
     sdrpoints BIGINT NOT NULL DEFAULT (0),
     sdrconversionpoints BIGINT NOT NULL DEFAULT (0),
     nominaltarget BIGINT NOT NULL DEFAULT (0),
-    currentteam NUMERIC(1,0) DEFAULT (0),
-    isdeleted NUMERIC(1,0) NOT NULL DEFAULT (0),
+    currentteam boolean DEFAULT FALSE,
+    isdeleted boolean NOT NULL DEFAULT FALSE,
     totalcasesppo BIGINT,
     paromscompletedlast30days BIGINT,
     paromsduenext30days BIGINT,
@@ -645,7 +645,7 @@ CREATE TABLE dbo.workloadpoints(
     id BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
     comtier1 NUMERIC(3,0) NOT NULL DEFAULT (0),
     comtier1cp NUMERIC(3,0) NOT NULL DEFAULT (0),
-    comtier1cpenabled NUMERIC(1,0) NOT NULL DEFAULT (0),
+    comtier1cpenabled boolean NOT NULL DEFAULT FALSE,
     comtier2 NUMERIC(3,0) NOT NULL DEFAULT (0),
     comtier3n NUMERIC(3,0) NOT NULL DEFAULT (0),
     comtier3d NUMERIC(3,0) NOT NULL DEFAULT (0),
@@ -663,10 +663,10 @@ CREATE TABLE dbo.workloadpoints(
     nominaltargetpso BIGINT NOT NULL DEFAULT (0),
     defaultcontractedhours DOUBLE PRECISION NOT NULL DEFAULT (0),
     defaultcontractedhourspso DOUBLE PRECISION NOT NULL DEFAULT (0),
-    isdeleted NUMERIC(1,0) NOT NULL DEFAULT (0),
-    comtier3denabled NUMERIC(1,0) NOT NULL,
+    isdeleted boolean NOT NULL DEFAULT FALSE,
+    comtier3denabled boolean NOT NULL DEFAULT FALSE,
     parom BIGINT NOT NULL,
-    paromenabled NUMERIC(1,0) NOT NULL DEFAULT (0),
+    paromenabled boolean NOT NULL DEFAULT FALSE,
     createdbyuserid BIGINT NOT NULL,
     createddatetime TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     commappal1 NUMERIC(3,0) NOT NULL DEFAULT (0),
@@ -686,7 +686,7 @@ CREATE TABLE dbo.workloadreport(
     id BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
     date TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     workloadpointsid BIGINT NOT NULL,
-    isdeleted NUMERIC(1,0) NOT NULL DEFAULT (0)
+    isdeleted boolean NOT NULL DEFAULT FALSE
 )
         WITH (
         OIDS=FALSE
@@ -983,7 +983,7 @@ SELECT
     LEFT OUTER JOIN (SELECT
         defaultcontractedhours, defaultcontractedhourspso
         FROM dbo.workloadpoints
-        WHERE COALESCE(isdeleted, 0) = 0
+        WHERE isdeleted = FALSE
         ORDER BY createddatetime DESC NULLS FIRST
         LIMIT 1) AS wp
         ON 1 = 1
@@ -1169,7 +1169,7 @@ SELECT
     LEFT OUTER JOIN (SELECT
         defaultcontractedhours, defaultcontractedhourspso
         FROM dbo.workloadpoints
-        WHERE COALESCE(isdeleted, 0) = 0
+        WHERE isdeleted = FALSE
         ORDER BY createddatetime DESC NULLS FIRST
         LIMIT 1) AS wp
         ON 1 = 1
@@ -1297,7 +1297,7 @@ SELECT
     LEFT OUTER JOIN (SELECT
         defaultcontractedhours, defaultcontractedhourspso
         FROM dbo.workloadpoints
-        WHERE COALESCE(isdeleted, 0) = 0
+        WHERE isdeleted = FALSE
         ORDER BY createddatetime DESC NULLS FIRST
         LIMIT 1) AS wp
         ON 1 = 1
@@ -1425,7 +1425,7 @@ SELECT
     LEFT OUTER JOIN (SELECT
         defaultcontractedhours, defaultcontractedhourspso
         FROM dbo.workloadpoints
-        WHERE COALESCE(isdeleted, 0) = 0
+        WHERE isdeleted = FALSE
         ORDER BY createddatetime DESC NULLS FIRST
         LIMIT 1) AS wp
         ON 1 = 1
@@ -1553,7 +1553,7 @@ SELECT
     LEFT OUTER JOIN (SELECT
         defaultcontractedhours, defaultcontractedhourspso
         FROM dbo.workloadpoints
-        WHERE COALESCE(isdeleted, 0) = 0
+        WHERE isdeleted = FALSE
         ORDER BY createddatetime DESC NULLS FIRST
         LIMIT 1) AS wp
         ON 1 = 1
@@ -1594,7 +1594,7 @@ AS (SELECT
     INNER JOIN dbo.organisationalunit AS trust
         ON trust.id = directorate.parentorganisationalunitid
     /* left join [Users] as U on U.Id = Directorate.LastUpdateUserId */
-    WHERE team.isdeleted = 0 AND ldu.isdeleted = 0 AND directorate.isdeleted = 0 AND trust.isdeleted = 0)
+    WHERE team.isdeleted = FALSE AND ldu.isdeleted = FALSE AND directorate.isdeleted = FALSE AND trust.isdeleted = FALSE)
 SELECT
     wr.id AS workloadreportid, wr.date AS workloadreportdate, orgunits.trustid, orgunits.directorateid, orgunits.directoratename,
     /* OrgUnits.DirectorateNotes, */
@@ -1613,7 +1613,7 @@ SELECT
     LEFT OUTER JOIN (SELECT
         defaultcontractedhours, defaultcontractedhourspso
         FROM dbo.workloadpoints
-        WHERE COALESCE(isdeleted, 0) = 0
+        WHERE isdeleted = FALSE
         ORDER BY createddatetime DESC NULLS FIRST
         LIMIT 1) AS wp
         ON 1 = 1
@@ -1628,25 +1628,25 @@ SELECT
     FROM dbo.workloadreportdirectorate AS wld
     INNER JOIN dbo.workloadreport AS wr
         ON wr.id = wld.workloadreportid
-    WHERE wr.isdeleted = 0;
+    WHERE wr.isdeleted = FALSE;
 /* dbo.DirectorateCasesHistory source */;
 
 
 
 CREATE OR REPLACE VIEW dbo.directoratecaseshistory (workloadreportid, workloadreportdate, directorateid, directoratename, activewarrants, upws, overdueterminations, totalcommcases, totalcustcases, totalcases, activecases, ordercount, capacitypercentage) AS
 SELECT
-    wr.id AS workloadreportid, wr.date AS workloadreportdate, directorateid, directoratename, SUM(activewarrants) AS activewarrants, SUM(upw) AS upws, SUM(overdueterminations) AS overdueterminations, SUM(comtier0count) + SUM(comtier1count) + (SUM(comtier1cpcount) * wp.comtier1cpenabled) + SUM(comtier2count) + SUM(comtier3count) + SUM(comtier3dcount) + SUM(comtier4count) AS totalcommcases, SUM(custier0count) + SUM(custier1count) + SUM(custier2count) + SUM(custier3count) + SUM(custier4count) AS totalcustcases, SUM(totalcases) AS totalcases, SUM(totalcases) - SUM(totalcasesinactive) AS activecases, SUM(ordercount) AS ordercount, wlo.capacitypercentage
+    wr.id AS workloadreportid, wr.date AS workloadreportdate, directorateid, directoratename, SUM(activewarrants) AS activewarrants, SUM(upw) AS upws, SUM(overdueterminations) AS overdueterminations, SUM(comtier0count) + SUM(comtier1count) + SUM(CASE WHEN wp.comtier1cpenabled THEN comtier1cpcount ELSE 0 END) + SUM(comtier2count) + SUM(comtier3count) + SUM(comtier3dcount) + SUM(comtier4count) AS totalcommcases, SUM(custier0count) + SUM(custier1count) + SUM(custier2count) + SUM(custier3count) + SUM(custier4count) AS totalcustcases, SUM(totalcases) AS totalcases, SUM(totalcases) - SUM(totalcasesinactive) AS activecases, SUM(ordercount) AS ordercount, wlo.capacitypercentage
     FROM dbo.workloadreportdirectorate AS wlo
     INNER JOIN dbo.workloadreport AS wr
         ON wr.id = wlo.workloadreportid
     LEFT OUTER JOIN (SELECT
         comtier1cpenabled
         FROM dbo.workloadpoints
-        WHERE COALESCE(isdeleted, 0) = 0
+        WHERE isdeleted = FALSE
         ORDER BY createddatetime DESC NULLS FIRST
         LIMIT 1) AS wp
         ON 1 = 1
-    WHERE wr.isdeleted = 0
+    WHERE wr.isdeleted = FALSE
     GROUP BY wr.id, wr.date, wlo.directorateid, wlo.directoratename, wlo.capacitypercentage, wp.comtier1cpenabled;
 /* dbo.WorkloadReportLDU source */;
 
@@ -1677,7 +1677,7 @@ AS (SELECT
     INNER JOIN dbo.organisationalunit AS trust
         ON trust.id = directorate.parentorganisationalunitid
     /* left join [Users] as U on U.Id = Directorate.LastUpdateUserId */
-    WHERE team.isdeleted = 0 AND ldu.isdeleted = 0 AND directorate.isdeleted = 0 AND trust.isdeleted = 0)
+    WHERE team.isdeleted = FALSE AND ldu.isdeleted = FALSE AND directorate.isdeleted = FALSE AND trust.isdeleted = FALSE)
 SELECT
     wr.id AS workloadreportid, wr.date AS workloadreportdate, orgunits.trustid, orgunits.directorateid, orgunits.lduid, orgunits.lduname, orgunits.lducode,
     /* Ldu.Notes as LduNotes, */
@@ -1702,7 +1702,7 @@ SELECT
     LEFT OUTER JOIN (SELECT
         defaultcontractedhours, defaultcontractedhourspso
         FROM dbo.workloadpoints
-        WHERE COALESCE(isdeleted, 0) = 0
+        WHERE isdeleted = FALSE
         ORDER BY createddatetime DESC NULLS FIRST
         LIMIT 1) AS wp
         ON 1 = 1
@@ -1738,25 +1738,25 @@ SELECT
     FROM dbo.workloadreportldu AS wll
     INNER JOIN dbo.workloadreport AS wr
         ON wr.id = wll.workloadreportid
-    WHERE wr.isdeleted = 0;
+    WHERE wr.isdeleted = FALSE;
 /* dbo.LDUCasesHistory source */;
 
 
 
 CREATE OR REPLACE VIEW dbo.lducaseshistory (workloadreportid, workloadreportdate, lduid, lduname, activewarrants, upws, overdueterminations, totalcommcases, totalcustcases, totalcases, activecases, ordercount, capacitypercentage, directorateid) AS
 SELECT
-    wr.id AS workloadreportid, wr.date AS workloadreportdate, lduid, lduname, SUM(activewarrants) AS activewarrants, SUM(upw) AS upws, SUM(overdueterminations) AS overdueterminations, SUM(comtier0count) + SUM(comtier1count) + (SUM(comtier1cpcount) * wp.comtier1cpenabled) + SUM(comtier2count) + SUM(comtier3count) + SUM(comtier3dcount) + SUM(comtier4count) AS totalcommcases, SUM(custier0count) + SUM(custier1count) + SUM(custier2count) + SUM(custier3count) + SUM(custier4count) AS totalcustcases, SUM(totalcases) AS totalcases, SUM(totalcases) - SUM(totalcasesinactive) AS activecases, SUM(ordercount) AS ordercount, wlo.capacitypercentage, wlo.directorateid
+    wr.id AS workloadreportid, wr.date AS workloadreportdate, lduid, lduname, SUM(activewarrants) AS activewarrants, SUM(upw) AS upws, SUM(overdueterminations) AS overdueterminations, SUM(comtier0count) + SUM(comtier1count) + SUM(CASE WHEN wp.comtier1cpenabled THEN comtier1cpcount ELSE 0 END) + SUM(comtier2count) + SUM(comtier3count) + SUM(comtier3dcount) + SUM(comtier4count) AS totalcommcases, SUM(custier0count) + SUM(custier1count) + SUM(custier2count) + SUM(custier3count) + SUM(custier4count) AS totalcustcases, SUM(totalcases) AS totalcases, SUM(totalcases) - SUM(totalcasesinactive) AS activecases, SUM(ordercount) AS ordercount, wlo.capacitypercentage, wlo.directorateid
     FROM dbo.workloadreportldu AS wlo
     INNER JOIN dbo.workloadreport AS wr
         ON wr.id = wlo.workloadreportid
     LEFT OUTER JOIN (SELECT
         comtier1cpenabled
         FROM dbo.workloadpoints
-        WHERE COALESCE(isdeleted, 0) = 0
+        WHERE isdeleted = FALSE
         ORDER BY createddatetime DESC NULLS FIRST
         LIMIT 1) AS wp
         ON 1 = 1
-    WHERE wr.isdeleted = 0
+    WHERE wr.isdeleted = FALSE
     GROUP BY wr.id, wr.date, wlo.lduid, wlo.lduname, wlo.capacitypercentage, wlo.directorateid, wp.comtier1cpenabled;
 /* dbo.MgtReportDirCapacity source */;
 
@@ -1792,7 +1792,7 @@ SELECT
         ON mth11.directorateid = dir.id AND mth11.reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL)
     LEFT OUTER JOIN dbo.capacityaveragedirectorate AS mth12
         ON mth12.directorateid = dir.id AND mth12.reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL)
-    WHERE dir.organisationalunittypeid = 2 AND dir.isdeleted = 0;
+    WHERE dir.organisationalunittypeid = 2 AND dir.isdeleted = FALSE;
 /* dbo.MgtReportLduCapacity source */;
 
 
@@ -1813,7 +1813,7 @@ SELECT
         ON mth9.lduid = ldu.id AND mth9.reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL)
     LEFT OUTER JOIN dbo.capacityaverageldu AS mth12
         ON mth12.lduid = ldu.id AND mth12.reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL)
-    WHERE ldu.organisationalunittypeid = 3 AND ldu.isdeleted = 0;
+    WHERE ldu.organisationalunittypeid = 3 AND ldu.isdeleted = FALSE;
 /* dbo.MgtReportPOCapacity source */;
 
 
@@ -2731,7 +2731,7 @@ SELECT
     FROM dbo.workloadreportofficer AS wlo
     INNER JOIN dbo.workloadreport AS wr
         ON wr.id = wlo.workloadreportid
-    WHERE wr.isdeleted = 0
+    WHERE wr.isdeleted = FALSE
     GROUP BY wr.id, wr.date, wlo.offendermanagerid, wlo.nominaltarget, wlo.offendermanagertypeid, wlo.defaultcontractedhours, wlo.defaultcontractedhourspso;
 /* dbo.OfficerCasesHistory source */;
 
@@ -2739,18 +2739,18 @@ SELECT
 
 CREATE OR REPLACE VIEW dbo.officercaseshistory (workloadreportid, workloadreportdate, offendermanagerid, offendermanagername, activewarrants, upws, overdueterminations, totalcommcases, totalcustcases, totalcases, activecases, ordercount, capacitypercentage, offendermanagertypeid) AS
 SELECT
-    wr.id AS workloadreportid, wr.date AS workloadreportdate, offendermanagerid, offendermanagername, SUM(activewarrants) AS activewarrants, SUM(upw) AS upws, SUM(overdueterminations) AS overdueterminations, SUM(comtier0) + SUM(comtier1) + (SUM(comtier1cp) * wp.comtier1cpenabled) + SUM(comtier2) + SUM(comtier3n) + SUM(comtier3d) + SUM(comtier4) AS totalcommcases, SUM(custier0) + SUM(custier1) + SUM(custier2) + SUM(custier3) + SUM(custier4) AS totalcustcases, SUM(totalcases) AS totalcases, SUM(totalcases) - SUM(totalcasesinactive) AS activecases, SUM(ordercount) AS ordercount, dbo.capacitypointsperc(dbo.availablepoints(wlo.nominaltarget, wlo.offendermanagertypeid, SUM(wlo.contractedhoursperweek), SUM(wlo.hoursreduction), wlo.defaultcontractedhours, wlo.defaultcontractedhourspso), SUM(wlo.totalpoints), SUM(wlo.sdrpoints), SUM(wlo.sdrconversionpoints), SUM(wlo.paromspoints), SUM(wlo.requirementspoints)) AS capacitypercentage, wlo.offendermanagertypeid
+    wr.id AS workloadreportid, wr.date AS workloadreportdate, offendermanagerid, offendermanagername, SUM(activewarrants) AS activewarrants, SUM(upw) AS upws, SUM(overdueterminations) AS overdueterminations, SUM(comtier0) + SUM(comtier1) + (SUM(CASE WHEN wp.comtier1cpenabled THEN comtier1cp ELSE 0 END)) + SUM(comtier2) + SUM(comtier3n) + SUM(comtier3d) + SUM(comtier4) AS totalcommcases, SUM(custier0) + SUM(custier1) + SUM(custier2) + SUM(custier3) + SUM(custier4) AS totalcustcases, SUM(totalcases) AS totalcases, SUM(totalcases) - SUM(totalcasesinactive) AS activecases, SUM(ordercount) AS ordercount, dbo.capacitypointsperc(dbo.availablepoints(wlo.nominaltarget, wlo.offendermanagertypeid, SUM(wlo.contractedhoursperweek), SUM(wlo.hoursreduction), wlo.defaultcontractedhours, wlo.defaultcontractedhourspso), SUM(wlo.totalpoints), SUM(wlo.sdrpoints), SUM(wlo.sdrconversionpoints), SUM(wlo.paromspoints), SUM(wlo.requirementspoints)) AS capacitypercentage, wlo.offendermanagertypeid
     FROM dbo.workloadreportofficer AS wlo
     INNER JOIN dbo.workloadreport AS wr
         ON wr.id = wlo.workloadreportid
     LEFT OUTER JOIN (SELECT
         comtier1cpenabled
         FROM dbo.workloadpoints
-        WHERE COALESCE(isdeleted, 0) = 0
+        WHERE isdeleted = FALSE
         ORDER BY createddatetime DESC NULLS FIRST
         LIMIT 1) AS wp
         ON 1 = 1
-    WHERE wr.isdeleted = 0
+    WHERE wr.isdeleted = FALSE
     GROUP BY wr.id, wr.date, wlo.offendermanagerid, wlo.offendermanagername, wlo.offendermanagertypeid, wlo.nominaltarget, wlo.offendermanagertypeid, wlo.defaultcontractedhours, wlo.defaultcontractedhourspso, wp.comtier1cpenabled;
 /* dbo.OrganisationalUnitInactiveCase source */;
 
@@ -4605,7 +4605,7 @@ SELECT
     FROM dbo.workloadreportdirectorate AS wl
     INNER JOIN dbo.workloadreport AS wr
         ON wr.id = wl.workloadreportid
-    WHERE wr.isdeleted = 0;
+    WHERE wr.isdeleted = FALSE;
 /* dbo.ReportingLDUCapacityHistory source */;
 
 
@@ -4616,7 +4616,7 @@ SELECT
     FROM dbo.workloadreportldu AS wl
     INNER JOIN dbo.workloadreport AS wr
         ON wr.id = wl.workloadreportid
-    WHERE wr.isdeleted = 0;
+    WHERE wr.isdeleted = FALSE;
 /* dbo.ReportingOffenderManagerCapacityHistory source */;
 
 
@@ -4629,25 +4629,25 @@ SELECT
     FROM dbo.workloadreportofficer AS wl
     INNER JOIN dbo.workloadreport AS wr
         ON wr.id = wl.workloadreportid
-    WHERE wr.isdeleted = 0;
+    WHERE wr.isdeleted = FALSE;
 /* dbo.ReportingOfficerCasesHistory source */;
 
 
 
 CREATE OR REPLACE VIEW dbo.reportingofficercaseshistory (workloadreportid, workloadreportdate, offendermanagerid, offendermanagername, activewarrants, upws, overdueterminations, totalcommcases, totalcustcases, totalcases, activecases, ordercount, capacitypercentage, directorateid, lduid, offendermanagertypeid) AS
 SELECT
-    wr.id AS workloadreportid, wr.date AS workloadreportdate, offendermanagerid, offendermanagername, SUM(activewarrants) AS activewarrants, SUM(upw) AS upws, SUM(overdueterminations) AS overdueterminations, SUM(comtier0) + SUM(comtier1) + (SUM(comtier1cp) * wp.comtier1cpenabled) + SUM(comtier2) + SUM(comtier3n) + SUM(comtier3d) + SUM(comtier4) AS totalcommcases, SUM(custier0) + SUM(custier1) + SUM(custier2) + SUM(custier3) + SUM(custier4) AS totalcustcases, SUM(totalcases) AS totalcases, SUM(totalcases) - SUM(totalcasesinactive) AS activecases, SUM(ordercount) AS ordercount, dbo.capacitypointsperc(dbo.availablepoints(wlo.nominaltarget, wlo.offendermanagertypeid, SUM(wlo.contractedhoursperweek), SUM(wlo.hoursreduction), wlo.defaultcontractedhours, wlo.defaultcontractedhourspso), SUM(wlo.totalpoints), SUM(wlo.sdrpoints), SUM(wlo.sdrconversionpoints), SUM(wlo.paromspoints), SUM(wlo.requirementspoints)) AS capacitypercentage, wlo.directorateid, wlo.lduid, wlo.offendermanagertypeid
+    wr.id AS workloadreportid, wr.date AS workloadreportdate, offendermanagerid, offendermanagername, SUM(activewarrants) AS activewarrants, SUM(upw) AS upws, SUM(overdueterminations) AS overdueterminations, SUM(comtier0) + SUM(comtier1) + (SUM(CASE WHEN wp.comtier1cpenabled THEN comtier1cp ELSE 0 END)) + SUM(comtier2) + SUM(comtier3n) + SUM(comtier3d) + SUM(comtier4) AS totalcommcases, SUM(custier0) + SUM(custier1) + SUM(custier2) + SUM(custier3) + SUM(custier4) AS totalcustcases, SUM(totalcases) AS totalcases, SUM(totalcases) - SUM(totalcasesinactive) AS activecases, SUM(ordercount) AS ordercount, dbo.capacitypointsperc(dbo.availablepoints(wlo.nominaltarget, wlo.offendermanagertypeid, SUM(wlo.contractedhoursperweek), SUM(wlo.hoursreduction), wlo.defaultcontractedhours, wlo.defaultcontractedhourspso), SUM(wlo.totalpoints), SUM(wlo.sdrpoints), SUM(wlo.sdrconversionpoints), SUM(wlo.paromspoints), SUM(wlo.requirementspoints)) AS capacitypercentage, wlo.directorateid, wlo.lduid, wlo.offendermanagertypeid
     FROM dbo.workloadreportofficer AS wlo
     INNER JOIN dbo.workloadreport AS wr
         ON wr.id = wlo.workloadreportid
     LEFT OUTER JOIN (SELECT
         comtier1cpenabled
         FROM dbo.workloadpoints
-        WHERE COALESCE(isdeleted, 0) = 0
+        WHERE isdeleted = FALSE
         ORDER BY createddatetime DESC NULLS FIRST
         LIMIT 1) AS wp
         ON 1 = 1
-    WHERE wr.isdeleted = 0
+    WHERE wr.isdeleted = FALSE
     GROUP BY wr.id, wr.date, wlo.offendermanagerid, wlo.offendermanagername, wlo.directorateid, wlo.lduid, wlo.offendermanagertypeid, wlo.nominaltarget, wlo.offendermanagertypeid, wlo.defaultcontractedhours, wlo.defaultcontractedhourspso, wp.comtier1cpenabled;
 /* dbo.WorkloadReportTeam source */;
 
@@ -4671,7 +4671,7 @@ AS (SELECT
         ON ldu.id = team.parentorganisationalunitid
     INNER JOIN dbo.organisationalunit AS directorate
         ON directorate.id = ldu.parentorganisationalunitid
-    WHERE team.isdeleted = 0 AND ldu.isdeleted = 0 AND directorate.isdeleted = 0)
+    WHERE team.isdeleted = FALSE AND ldu.isdeleted = FALSE AND directorate.isdeleted = FALSE)
 SELECT
     wr.id AS workloadreportid, wr.date AS workloadreportdate,
     /* Trust.Id as TrustId, */
@@ -4697,7 +4697,7 @@ SELECT
     LEFT OUTER JOIN (SELECT
         defaultcontractedhours, defaultcontractedhourspso
         FROM dbo.workloadpoints
-        WHERE COALESCE(isdeleted, 0) = 0
+        WHERE isdeleted = FALSE
         ORDER BY createddatetime DESC NULLS FIRST
         LIMIT 1) AS wp
         ON 1 = 1
@@ -4714,7 +4714,7 @@ SELECT
     FROM dbo.workloadreportteam AS wl
     INNER JOIN dbo.workloadreport AS wr
         ON wr.id = wl.workloadreportid
-    WHERE wr.isdeleted = 0;
+    WHERE wr.isdeleted = FALSE;
 /* dbo.TeamCapacityHistory source */;
 
 
@@ -4725,25 +4725,25 @@ SELECT
     FROM dbo.workloadreportteam AS wlt
     INNER JOIN dbo.workloadreport AS wr
         ON wr.id = wlt.workloadreportid
-    WHERE wr.isdeleted = 0;
+    WHERE wr.isdeleted = FALSE;
 /* dbo.TeamCasesHistory source */;
 
 
 
 CREATE OR REPLACE VIEW dbo.teamcaseshistory (workloadreportid, workloadreportdate, teamid, teamname, activewarrants, upws, overdueterminations, totalcommcases, totalcustcases, totalcases, activecases, ordercount, capacitypercentage, directorateid, lduid, deliverytypeid) AS
 SELECT
-    wr.id AS workloadreportid, wr.date AS workloadreportdate, teamid, teamname, SUM(activewarrants) AS activewarrants, SUM(upw) AS upws, SUM(overdueterminations) AS overdueterminations, SUM(comtier0count) + SUM(comtier1count) + (SUM(comtier1cpcount) * wp.comtier1cpenabled) + SUM(comtier2count) + SUM(comtier3count) + SUM(comtier3dcount) + SUM(comtier4count) AS totalcommcases, SUM(custier0count) + SUM(custier1count) + SUM(custier2count) + SUM(custier3count) + SUM(custier4count) AS totalcustcases, SUM(totalcases) AS totalcases, SUM(totalcases) - SUM(totalcasesinactive) AS activecases, SUM(ordercount) AS ordercount, wlo.capacitypercentage, wlo.directorateid, wlo.lduid, wlo.deliverytypeid
+    wr.id AS workloadreportid, wr.date AS workloadreportdate, teamid, teamname, SUM(activewarrants) AS activewarrants, SUM(upw) AS upws, SUM(overdueterminations) AS overdueterminations, SUM(comtier0count) + SUM(comtier1count) + SUM(CASE WHEN wp.comtier1cpenabled THEN comtier1cpcount ELSE 0 END) + SUM(comtier2count) + SUM(comtier3count) + SUM(comtier3dcount) + SUM(comtier4count) AS totalcommcases, SUM(custier0count) + SUM(custier1count) + SUM(custier2count) + SUM(custier3count) + SUM(custier4count) AS totalcustcases, SUM(totalcases) AS totalcases, SUM(totalcases) - SUM(totalcasesinactive) AS activecases, SUM(ordercount) AS ordercount, wlo.capacitypercentage, wlo.directorateid, wlo.lduid, wlo.deliverytypeid
     FROM dbo.workloadreportteam AS wlo
     INNER JOIN dbo.workloadreport AS wr
         ON wr.id = wlo.workloadreportid
     LEFT OUTER JOIN (SELECT
         comtier1cpenabled
         FROM dbo.workloadpoints
-        WHERE COALESCE(isdeleted, 0) = 0
+        WHERE isdeleted = FALSE
         ORDER BY createddatetime DESC NULLS FIRST
         LIMIT 1) AS wp
         ON 1 = 1
-    WHERE wr.isdeleted = 0
+    WHERE wr.isdeleted = FALSE
     GROUP BY wr.id, wr.date, wlo.teamid, wlo.teamname, wlo.capacitypercentage, wlo.directorateid, wlo.lduid, wp.comtier1cpenabled, wlo.deliverytypeid;
 /* dbo.TeamNote source */;
 
@@ -4788,7 +4788,7 @@ AS (SELECT
         ON directorate.id = ldu.parentorganisationalunitid
     INNER JOIN dbo.organisationalunit AS trust
         ON trust.id = directorate.parentorganisationalunitid
-    WHERE team.isdeleted = 0 AND ldu.isdeleted = 0 AND directorate.isdeleted = 0 AND trust.isdeleted = 0)
+    WHERE team.isdeleted = FALSE AND ldu.isdeleted = FALSE AND directorate.isdeleted = FALSE AND trust.isdeleted = FALSE)
 SELECT
     wr.id AS workloadreportid, wr.date AS workloadreportdate, orgunits.trustid, orgunits.trustname, SUM(dbo.getomtcasescount(1::NUMERIC(10, 0), om.offendermanagertypeid, wl.comtier1, wl.comtier1o, wl.comtier1w, wl.comtier1u, wl.custier1, wl.custier1o, wl.custier1w, wl.custier1u)) AS ompot1casescount, SUM(dbo.getomtcasescount(1::NUMERIC(10, 0), om.offendermanagertypeid, wl.comtier2, wl.comtier2o, wl.comtier2w, wl.comtier2u, wl.custier2, wl.custier2o, wl.custier2w, wl.custier2u)) AS ompot2casescount, SUM(dbo.getomt3casescount(1::NUMERIC(10, 0), om.offendermanagertypeid, wl.comtier3n, wl.comtier3no, wl.comtier3nw, wl.comtier3nu, wl.comtier3d, wl.comtier3do, wl.comtier3dw, wl.comtier3du, wl.custier3, wl.custier3o, wl.custier3w, wl.custier3u)) AS ompot3casescount, SUM(dbo.getomtcasescount(1::NUMERIC(10, 0), om.offendermanagertypeid, wl.comtier4, wl.comtier4o, wl.comtier4w, wl.comtier4u, wl.custier4, wl.custier4o, wl.custier4w, wl.custier4u)) AS ompot4casescount, SUM(dbo.getomtcasescount(2::NUMERIC(10, 0), om.offendermanagertypeid, wl.comtier1, wl.comtier1o, wl.comtier1w, wl.comtier1u, wl.custier1, wl.custier1o, wl.custier1w, wl.custier1u)) AS ompsot1casescount, SUM(dbo.getomtcasescount(2::NUMERIC(10, 0), om.offendermanagertypeid, wl.comtier2, wl.comtier2o, wl.comtier2w, wl.comtier2u, wl.custier2, wl.custier2o, wl.custier2w, wl.custier2u)) AS ompsot2casescount, SUM(dbo.getomt3casescount(2::NUMERIC(10, 0), om.offendermanagertypeid, wl.comtier3n, wl.comtier3no, wl.comtier3nw, wl.comtier3nu, wl.comtier3d, wl.comtier3do, wl.comtier3dw, wl.comtier3du, wl.custier3, wl.custier3o, wl.custier3w, wl.custier3u)) AS ompsot3casescount, SUM(dbo.getomtcasescount(2::NUMERIC(10, 0), om.offendermanagertypeid, wl.comtier4, wl.comtier4o, wl.comtier4w, wl.comtier4u, wl.custier4, wl.custier4o, wl.custier4w, wl.custier4u)) AS ompsot4casescount, SUM(wl.comtier0) AS comtier0count, SUM(wl.comtier0o) AS comtier0ocount, SUM(wl.comtier0w) AS comtier0wcount, SUM(wl.comtier0u) AS comtier0ucount, SUM(wl.comtier1) AS comtier1count, SUM(wl.comtier1cp) AS comtier1cpcount, SUM(wl.comtier1o) AS comtier1ocount, SUM(wl.comtier1w) AS comtier1wcount, SUM(wl.comtier1u) AS comtier1ucount, SUM(wl.comtier2) AS comtier2count, SUM(wl.comtier2o) AS comtier2ocount, SUM(wl.comtier2w) AS comtier2wcount, SUM(wl.comtier2u) AS comtier2ucount, SUM(wl.comtier3n) AS comtier3count, SUM(wl.comtier3no) AS comtier3ocount, SUM(wl.comtier3nw) AS comtier3wcount, SUM(wl.comtier3nu) AS comtier3ucount, SUM(wl.comtier3d) AS comtier3dcount, SUM(wl.comtier3do) AS comtier3docount, SUM(wl.comtier3dw) AS comtier3dwcount, SUM(wl.comtier3du) AS comtier3ducount, SUM(wl.comtier4) AS comtier4count, SUM(wl.comtier4o) AS comtier4ocount, SUM(wl.comtier4w) AS comtier4wcount, SUM(wl.comtier4u) AS comtier4ucount, SUM(wl.custier0) AS custier0count, SUM(wl.custier0o) AS custier0ocount, SUM(wl.custier0w) AS custier0wcount, SUM(wl.custier0u) AS custier0ucount, SUM(wl.custier1) AS custier1count, SUM(wl.custier1o) AS custier1ocount, SUM(wl.custier1w) AS custier1wcount, SUM(wl.custier1u) AS custier1ucount, SUM(wl.custier2) AS custier2count, SUM(wl.custier2o) AS custier2ocount, SUM(wl.custier2w) AS custier2wcount, SUM(wl.custier2u) AS custier2ucount, SUM(wl.custier3) AS custier3count, SUM(wl.custier3o) AS custier3ocount, SUM(wl.custier3w) AS custier3wcount, SUM(wl.custier3u) AS custier3ucount, SUM(wl.custier4) AS custier4count, SUM(wl.custier4o) AS custier4ocount, SUM(wl.custier4w) AS custier4wcount, SUM(wl.custier4u) AS custier4ucount, SUM(wl.activewarrants) AS activewarrants, SUM(wl.overdueterminations) AS overdueterminations, SUM(wl.upw) AS upw, SUM(wl.ordercount) AS ordercount, SUM(wl.monthlysdrs) AS monthlysdrs, SUM(wl.sdrduenext30days) AS sdrduenext30days, SUM(wl.sdrconversionslast30days) AS sdrconversionslast30days, SUM(wl.paromsduenext30days) AS paromsduenext30days, SUM(wl.paromscompletedlast30days) AS paromscompletedlast30days, SUM(wl.totalcases) AS totalcases, SUM(wl.totalcasesinactive) AS totalcasesinactive, SUM(wl.totalcasesppo) AS totalcasesppo, SUM(wl.commappal1) AS commappal1, SUM(wl.commappal2) AS commappal2, SUM(wl.commappal3) AS commappal3, SUM(wl.cusmappal1) AS cusmappal1, SUM(wl.cusmappal2) AS cusmappal2, SUM(wl.cusmappal3) AS cusmappal3, SUM(wl.contractedhoursperweek) AS contractedhours, SUM(wl.hoursreduction) AS reducedhours, SUM(wl.totalpoints) AS workloadpoints, SUM(wl.sdrpoints) AS sdrpoints, SUM(wl.paromspoints) AS paromspoints, SUM(wl.sdrconversionpoints) AS sdrconversionpoints, COALESCE(r.requirementspoints, 0) AS requirementspoints, COALESCE(r.requirementscount, 0) AS requirementscount, SUM(dbo.availablepoints(wl.nominaltarget, om.offendermanagertypeid, wl.contractedhoursperweek, wl.hoursreduction, wp.defaultcontractedhours, wp.defaultcontractedhourspso)) AS availablepoints, dbo.capacityom(SUM(wl.contractedhoursperweek), SUM(wl.hoursreduction)) AS capacityorgunit, dbo.capacitypoints(SUM(dbo.availablepoints(wl.nominaltarget, om.offendermanagertypeid, wl.contractedhoursperweek, wl.hoursreduction, wp.defaultcontractedhours, wp.defaultcontractedhourspso)), SUM(wl.totalpoints), SUM(wl.sdrpoints), SUM(wl.sdrconversionpoints), SUM(wl.paromspoints), COALESCE(r.requirementspoints, 0)) AS capacitypoints, dbo.capacitypointsperc(SUM(dbo.availablepoints(wl.nominaltarget, om.offendermanagertypeid, wl.contractedhoursperweek, wl.hoursreduction, wp.defaultcontractedhours, wp.defaultcontractedhourspso)), SUM(wl.totalpoints), SUM(wl.sdrpoints), SUM(wl.sdrconversionpoints), SUM(wl.paromspoints), COALESCE(r.requirementspoints, 0)) AS capacitypercentage, dbo.capacitypointsperc(SUM(dbo.availablepoints(wl.nominaltarget, om.offendermanagertypeid, wl.contractedhoursperweek, wl.hoursreduction, wp.defaultcontractedhours, wp.defaultcontractedhourspso)), SUM(wl.totalpoints), 0, 0, 0, 0) AS capacitypercentagecases, dbo.capacitypointsperc(SUM(dbo.availablepoints(wl.nominaltarget, om.offendermanagertypeid, wl.contractedhoursperweek, wl.hoursreduction, wp.defaultcontractedhours, wp.defaultcontractedhourspso)), 0, SUM(wl.sdrpoints), SUM(wl.sdrconversionpoints), SUM(wl.paromspoints), 0) AS capacitypercentagereports, dbo.capacitypointsperc(SUM(dbo.availablepoints(wl.nominaltarget, om.offendermanagertypeid, wl.contractedhoursperweek, wl.hoursreduction, wp.defaultcontractedhours, wp.defaultcontractedhourspso)), 0, 0, 0, 0, COALESCE(r.requirementspoints, 0)) AS capacitypercentagerequirements
     FROM orgunits
@@ -4803,7 +4803,7 @@ SELECT
     LEFT OUTER JOIN (SELECT
         defaultcontractedhours, defaultcontractedhourspso
         FROM dbo.workloadpoints
-        WHERE COALESCE(isdeleted, 0) = 0
+        WHERE isdeleted = FALSE
         ORDER BY createddatetime DESC NULLS FIRST
         LIMIT 1) AS wp
         ON 1 = 1
@@ -4818,25 +4818,25 @@ SELECT
     FROM dbo.workloadreporttrust AS wlt
     INNER JOIN dbo.workloadreport AS wr
         ON wr.id = wlt.workloadreportid
-    WHERE wr.isdeleted = 0;
+    WHERE wr.isdeleted = FALSE;
 /* dbo.TrustCasesHistory source */;
 
 
 
 CREATE OR REPLACE VIEW dbo.trustcaseshistory (workloadreportid, workloadreportdate, trustid, trustname, activewarrants, upws, overdueterminations, totalcommcases, totalcustcases, totalcases, activecases, ordercount) AS
 SELECT
-    wr.id AS workloadreportid, wr.date AS workloadreportdate, trustid, trustname, SUM(activewarrants) AS activewarrants, SUM(upw) AS upws, SUM(overdueterminations) AS overdueterminations, SUM(comtier0count) + SUM(comtier1count) + (SUM(comtier1cpcount) * wp.comtier1cpenabled) + SUM(comtier2count) + SUM(comtier3count) + SUM(comtier3dcount) + SUM(comtier4count) AS totalcommcases, SUM(custier0count) + SUM(custier1count) + SUM(custier2count) + SUM(custier3count) + SUM(custier4count) AS totalcustcases, SUM(totalcases) AS totalcases, SUM(totalcases) - SUM(totalcasesinactive) AS activecases, SUM(ordercount) AS ordercount
+    wr.id AS workloadreportid, wr.date AS workloadreportdate, trustid, trustname, SUM(activewarrants) AS activewarrants, SUM(upw) AS upws, SUM(overdueterminations) AS overdueterminations, SUM(comtier0count) + SUM(comtier1count) + SUM(CASE WHEN wp.comtier1cpenabled THEN comtier1cpcount ELSE 0 END) + SUM(comtier2count) + SUM(comtier3count) + SUM(comtier3dcount) + SUM(comtier4count) AS totalcommcases, SUM(custier0count) + SUM(custier1count) + SUM(custier2count) + SUM(custier3count) + SUM(custier4count) AS totalcustcases, SUM(totalcases) AS totalcases, SUM(totalcases) - SUM(totalcasesinactive) AS activecases, SUM(ordercount) AS ordercount
     FROM dbo.workloadreporttrust AS wlo
     INNER JOIN dbo.workloadreport AS wr
         ON wr.id = wlo.workloadreportid
     LEFT OUTER JOIN (SELECT
         comtier1cpenabled
         FROM dbo.workloadpoints
-        WHERE COALESCE(isdeleted, 0) = 0
+        WHERE isdeleted = FALSE
         ORDER BY createddatetime DESC NULLS FIRST
         LIMIT 1) AS wp
         ON 1 = 1
-    WHERE wr.isdeleted = 0
+    WHERE wr.isdeleted = FALSE
     GROUP BY wr.id, wr.date, wlo.trustid, wlo.trustname, wp.comtier1cpenabled;
 
 
@@ -5629,7 +5629,7 @@ CREATE TABLE staging.omic_teams(
     commtier0 VARCHAR(255),
     licencetier0 VARCHAR(255),
     custtier0 VARCHAR(255),
-    comin1st16weeks VARCHAR(255),
+    comIn1st16Weeks VARCHAR(255),
     licin1st16weeks VARCHAR(255),
     datestamp VARCHAR(255),
     vcrn_count VARCHAR(255),
@@ -5747,7 +5747,7 @@ CREATE TABLE staging.t2a(
     commtier0 VARCHAR(255),
     licencetier0 VARCHAR(255),
     custtier0 VARCHAR(255),
-    comin1st16weeks VARCHAR(255),
+    comIn1st16Weeks VARCHAR(255),
     licin1st16weeks VARCHAR(255),
     datestamp VARCHAR(255),
     vcrn_count VARCHAR(255),
@@ -5877,7 +5877,7 @@ CREATE TABLE staging.wmt_extract(
     commtier0 VARCHAR(255),
     licencetier0 VARCHAR(255),
     custtier0 VARCHAR(255),
-    comin1st16weeks VARCHAR(255),
+    comIn1st16Weeks VARCHAR(255),
     licin1st16weeks VARCHAR(255),
     datestamp VARCHAR(255),
     vcrn_count VARCHAR(255),
@@ -5968,7 +5968,7 @@ CREATE TABLE staging.wmt_extract_filtered(
     commtier0 VARCHAR(255),
     licencetier0 VARCHAR(255),
     custtier0 VARCHAR(255),
-    comin1st16weeks VARCHAR(255),
+    comIn1st16Weeks VARCHAR(255),
     licin1st16weeks VARCHAR(255),
     datestamp VARCHAR(255),
     vcrn_count VARCHAR(255),
@@ -6272,7 +6272,7 @@ CREATE TABLE app.export_file(
     file_type VARCHAR(20) NOT NULL,
     date_created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     filepath VARCHAR(250) NOT NULL,
-    is_enabled NUMERIC(1,0) DEFAULT (1)
+    is_enabled boolean DEFAULT TRUE
 )
         WITH (
         OIDS=FALSE
@@ -6454,7 +6454,7 @@ CREATE TABLE app.reduction_reason(
     allowance_percentage NUMERIC(5,2),
     max_allowance_percentage NUMERIC(5,2),
     months_to_expiry BIGINT,
-    is_enabled NUMERIC(1,0) NOT NULL DEFAULT (1)
+    is_enabled boolean NOT NULL DEFAULT TRUE
 )
         WITH (
         OIDS=FALSE
@@ -6686,13 +6686,13 @@ CREATE TABLE app.workload_points(
     weighting_o BIGINT NOT NULL,
     weighting_w BIGINT NOT NULL,
     weighting_u BIGINT NOT NULL,
-    paroms_enabled NUMERIC(1,0) NOT NULL,
+    paroms_enabled boolean NOT NULL DEFAULT FALSE,
     parom BIGINT NOT NULL,
     effective_from TIMESTAMP WITHOUT TIME ZONE DEFAULT localtimestamp(6),
     effective_to TIMESTAMP WITHOUT TIME ZONE,
     weighting_arms_lic BIGINT DEFAULT (0),
     weighting_arms_comm BIGINT DEFAULT (0),
-    is_t2a NUMERIC(1,0) NOT NULL DEFAULT (0),
+    is_t2a boolean NOT NULL DEFAULT FALSE,
     default_contracted_hours_spo NUMERIC(18,0),
     comm_tier_8 BIGINT NOT NULL DEFAULT (0),
     comm_tier_9 BIGINT NOT NULL DEFAULT (0),
