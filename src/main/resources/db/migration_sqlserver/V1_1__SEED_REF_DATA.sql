@@ -102,3 +102,11 @@ INSERT INTO app.adjustment_reason (id, contact_code, contact_description, catego
 (46, 'NGS001', 'GS Rights and Responsibilities session NS', 2, 0)
 
 SET IDENTITY_INSERT app.adjustment_reason OFF;
+
+SET IDENTITY_INSERT app.workload_points ON;
+
+INSERT INTO app.workload_points (id,comm_tier_1,comm_tier_2,comm_tier_3,comm_tier_4,comm_tier_5,comm_tier_6,comm_tier_7,comm_tier_8,comm_tier_9,comm_tier_10,comm_tier_11,comm_tier_12,comm_tier_13,comm_tier_14,comm_tier_15,comm_tier_16,cust_tier_1,cust_tier_2,cust_tier_3,cust_tier_4,cust_tier_5,cust_tier_6,cust_tier_7,cust_tier_8,cust_tier_9,cust_tier_10,cust_tier_11,cust_tier_12,cust_tier_13,cust_tier_14,cust_tier_15,cust_tier_16,lic_tier_1,lic_tier_2,lic_tier_3,lic_tier_4,lic_tier_5,lic_tier_6,lic_tier_7,lic_tier_8,lic_tier_9,lic_tier_10,lic_tier_11,lic_tier_12,lic_tier_13,lic_tier_14,lic_tier_15,lic_tier_16,user_id,sdr,sdr_conversion,nominal_target_spo,nominal_target_po,default_contracted_hours_po,default_contracted_hours_pso,weighting_o,weighting_w,weighting_u,weighting_arms_lic,weighting_arms_comm,paroms_enabled,parom,is_t2a,default_contracted_hours_spo) VALUES
+(1,206,158,146,110,146,115,102,72,79,63,50,35,51,41,29,29,75,60,59,0,59,48,47,0,30,24,23,0,17,14,13,0,219,175,163,0,161,132,119,0,77,65,52,0,51,43,31,0,0,138,65,2176,2176,37,37,0,0,100,35,69,1,120,0,0),
+(2,75,60,59,0,59,48,47,0,30,24,23,0,17,14,13,0,75,60,59,0,59,48,47,0,30,24,23,0,17,14,13,0,75,60,59,0,59,48,47,0,30,24,23,0,17,14,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0);
+
+SET IDENTITY_INSERT app.workload_points OFF;
