@@ -12,7 +12,7 @@ CREATE TABLE dbo.archive_reduction_data(
     om_name VARCHAR(511) NOT NULL,
     hours_reduced DOUBLE PRECISION NOT NULL,
     comments TEXT,
-    last_updated_date TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    last_updated_date TIMESTAMP WITH TIME ZONE NOT NULL,
     reduction_added_by VARCHAR(200)
 )
         WITH (
@@ -28,7 +28,7 @@ CREATE TABLE dbo.capacityabsoluteom(
     gt100 BIGINT NOT NULL,
     lt100 BIGINT NOT NULL,
     total DOUBLE PRECISION NOT NULL,
-    reportperiod TIMESTAMP WITHOUT TIME ZONE NOT NULL
+    reportperiod TIMESTAMP WITH TIME ZONE NOT NULL
 )
         WITH (
         OIDS=FALSE
@@ -41,7 +41,7 @@ CREATE TABLE dbo.capacityaveragedirectorate(
     directorateid BIGINT NOT NULL,
     capacity DOUBLE PRECISION NOT NULL,
     sdr BIGINT NOT NULL DEFAULT (0),
-    reportperiod TIMESTAMP WITHOUT TIME ZONE NOT NULL
+    reportperiod TIMESTAMP WITH TIME ZONE NOT NULL
 )
         WITH (
         OIDS=FALSE
@@ -55,7 +55,7 @@ CREATE TABLE dbo.capacityaverageldu(
     lduid BIGINT NOT NULL,
     capacity DOUBLE PRECISION NOT NULL,
     sdr BIGINT NOT NULL DEFAULT (0),
-    reportperiod TIMESTAMP WITHOUT TIME ZONE NOT NULL
+    reportperiod TIMESTAMP WITH TIME ZONE NOT NULL
 )
         WITH (
         OIDS=FALSE
@@ -72,7 +72,7 @@ CREATE TABLE dbo.capacityaverageom(
     gt100 BIGINT NOT NULL,
     lt100 BIGINT NOT NULL,
     total DOUBLE PRECISION NOT NULL,
-    reportperiod TIMESTAMP WITHOUT TIME ZONE NOT NULL
+    reportperiod TIMESTAMP WITH TIME ZONE NOT NULL
 )
         WITH (
         OIDS=FALSE
@@ -87,7 +87,7 @@ CREATE TABLE dbo.capacityperiodofficer(
     mincapacity BIGINT NOT NULL,
     maxcapacity BIGINT NOT NULL,
     avgcapacity BIGINT NOT NULL,
-    reportperiod TIMESTAMP WITHOUT TIME ZONE NOT NULL
+    reportperiod TIMESTAMP WITH TIME ZONE NOT NULL
 )
         WITH (
         OIDS=FALSE
@@ -103,7 +103,7 @@ CREATE TABLE dbo.caseloadofficer(
     omcountavg DOUBLE PRECISION NOT NULL,
     totalomcountabs DOUBLE PRECISION NOT NULL,
     totalomcountavg DOUBLE PRECISION NOT NULL,
-    reportperiod TIMESTAMP WITHOUT TIME ZONE NOT NULL
+    reportperiod TIMESTAMP WITH TIME ZONE NOT NULL
 )
         WITH (
         OIDS=FALSE
@@ -116,7 +116,7 @@ CREATE TABLE dbo.daily_archive_data(
     unique_identifier VARCHAR(50),
     om_id BIGINT NOT NULL,
     workload_id BIGINT NOT NULL,
-    workload_date TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    workload_date TIMESTAMP WITH TIME ZONE NOT NULL,
     om_type_id BIGINT NOT NULL,
     region_name VARCHAR(255) NOT NULL,
     grade VARCHAR(255) NOT NULL,
@@ -159,7 +159,7 @@ CREATE TABLE dbo.databaseupdatescriptlog(
     sqlscript TEXT,
     resulttypeid BIGINT NOT NULL,
     resultmessage TEXT,
-    createddate TIMESTAMP WITHOUT TIME ZONE NOT NULL
+    createddate TIMESTAMP WITH TIME ZONE NOT NULL
 )
         WITH (
         OIDS=FALSE
@@ -173,7 +173,7 @@ CREATE TABLE dbo.databaseupdateversionlog(
     svnrevisionto NUMERIC(20,0) NOT NULL,
     resulttypeid BIGINT NOT NULL,
     resultmessage TEXT,
-    createddate TIMESTAMP WITHOUT TIME ZONE NOT NULL
+    createddate TIMESTAMP WITH TIME ZONE NOT NULL
 )
         WITH (
         OIDS=FALSE
@@ -203,31 +203,13 @@ CREATE TABLE dbo.displaysettings(
 
 
 
-CREATE TABLE dbo.flyway_schema_history(
-    installed_rank BIGINT NOT NULL,
-    version VARCHAR(50),
-    description VARCHAR(200),
-    type VARCHAR(20) NOT NULL,
-    script VARCHAR(1000) NOT NULL,
-    checksum BIGINT,
-    installed_by VARCHAR(100) NOT NULL,
-    installed_on TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT localtimestamp(6),
-    execution_time BIGINT NOT NULL,
-    success boolean NOT NULL
-)
-        WITH (
-        OIDS=FALSE
-        );
-
-
-
 CREATE TABLE dbo.fortnightly_archive_data(
     id BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
     unique_identifier VARCHAR(50),
     om_id BIGINT NOT NULL,
     om_type_id BIGINT NOT NULL,
-    start_date TIMESTAMP WITHOUT TIME ZONE,
-    end_date TIMESTAMP WITHOUT TIME ZONE,
+    start_date TIMESTAMP WITH TIME ZONE,
+    end_date TIMESTAMP WITH TIME ZONE,
     ldu_name VARCHAR(255) NOT NULL,
     team_name VARCHAR(255) NOT NULL,
     om_name VARCHAR(511) NOT NULL,
@@ -265,7 +247,7 @@ CREATE TABLE dbo.logging(
     message TEXT NOT NULL,
     loggingtypeid BIGINT NOT NULL,
     createdby VARCHAR(100) NOT NULL,
-    createddate TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT localtimestamp(6)
+    createddate TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc', now())
 )
         WITH (
         OIDS=FALSE
@@ -278,7 +260,7 @@ CREATE TABLE dbo.messages(
     importantmessages TEXT NOT NULL,
     isdeleted boolean NOT NULL DEFAULT FALSE,
     createdby VARCHAR(50) NOT NULL DEFAULT 'sa',
-    createddate TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT localtimestamp(6)
+    createddate TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc', now())
 )
         WITH (
         OIDS=FALSE
@@ -306,7 +288,7 @@ CREATE TABLE dbo.note(
     organisationalunitid BIGINT,
     notes TEXT,
     lastupdateuserid BIGINT,
-    lastupdatedatetime TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT localtimestamp(6),
+    lastupdatedatetime TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc', now()),
     hoursreduced DOUBLE PRECISION NOT NULL,
     offendermanagerparentid BIGINT
 )
@@ -325,7 +307,7 @@ CREATE TABLE dbo.offendermanager(
     notes TEXT,
     isdeleted boolean NOT NULL DEFAULT FALSE,
     lastupdateuserid BIGINT,
-    lastupdatedatetime TIMESTAMP WITHOUT TIME ZONE
+    lastupdatedatetime TIMESTAMP WITH TIME ZONE
 )
         WITH (
         OIDS=FALSE
@@ -353,7 +335,7 @@ CREATE TABLE dbo.organisationalunit(
     abbreviation VARCHAR(50),
     isdeleted boolean NOT NULL DEFAULT FALSE,
     lastupdateuserid BIGINT,
-    lastupdatedatetime TIMESTAMP WITHOUT TIME ZONE,
+    lastupdatedatetime TIMESTAMP WITH TIME ZONE,
     notes TEXT,
     deliverytypeid BIGINT
 )
@@ -407,9 +389,9 @@ CREATE TABLE dbo.requirementtype(
     originalcode VARCHAR(255) NOT NULL,
     originalparentrequirementtypeid BIGINT,
     createdbyuserid BIGINT NOT NULL,
-    createddatetime TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    createddatetime TIMESTAMP WITH TIME ZONE NOT NULL,
     modifiedbyuserid BIGINT,
-    modifieddatetime TIMESTAMP WITHOUT TIME ZONE,
+    modifieddatetime TIMESTAMP WITH TIME ZONE,
     isdeleted boolean NOT NULL DEFAULT FALSE,
     defaultchildrequirementtypeid BIGINT
 )
@@ -458,8 +440,8 @@ CREATE TABLE dbo.roles(
 
 CREATE TABLE dbo.spt_fallback_db(
     xserver_name VARCHAR(30) NOT NULL,
-    xdttm_ins TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    xdttm_last_ins_upd TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    xdttm_ins TIMESTAMP WITH TIME ZONE NOT NULL,
+    xdttm_last_ins_upd TIMESTAMP WITH TIME ZONE NOT NULL,
     xfallback_dbid NUMERIC(5,0),
     name VARCHAR(30) NOT NULL,
     dbid NUMERIC(5,0) NOT NULL,
@@ -474,8 +456,8 @@ CREATE TABLE dbo.spt_fallback_db(
 
 CREATE TABLE dbo.spt_fallback_dev(
     xserver_name VARCHAR(30) NOT NULL,
-    xdttm_ins TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    xdttm_last_ins_upd TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    xdttm_ins TIMESTAMP WITH TIME ZONE NOT NULL,
+    xdttm_last_ins_upd TIMESTAMP WITH TIME ZONE NOT NULL,
     xfallback_low BIGINT,
     xfallback_drive CHAR(2),
     low BIGINT NOT NULL,
@@ -492,8 +474,8 @@ CREATE TABLE dbo.spt_fallback_dev(
 
 CREATE TABLE dbo.spt_fallback_usg(
     xserver_name VARCHAR(30) NOT NULL,
-    xdttm_ins TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    xdttm_last_ins_upd TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    xdttm_ins TIMESTAMP WITH TIME ZONE NOT NULL,
+    xdttm_last_ins_upd TIMESTAMP WITH TIME ZONE NOT NULL,
     xfallback_vstart BIGINT,
     dbid NUMERIC(5,0) NOT NULL,
     segmap BIGINT NOT NULL,
@@ -508,7 +490,7 @@ CREATE TABLE dbo.spt_fallback_usg(
 
 
 CREATE TABLE dbo.spt_monitor(
-    lastrun TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    lastrun TIMESTAMP WITH TIME ZONE NOT NULL,
     cpu_busy BIGINT NOT NULL,
     io_busy BIGINT NOT NULL,
     idle BIGINT NOT NULL,
@@ -540,11 +522,11 @@ CREATE TABLE dbo.users(
     id BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
     username VARCHAR(255) NOT NULL,
     isdeleted boolean NOT NULL DEFAULT FALSE,
-    lastlogindatetime TIMESTAMP WITHOUT TIME ZONE,
+    lastlogindatetime TIMESTAMP WITH TIME ZONE,
     createdbyuserid BIGINT NOT NULL DEFAULT (8),
-    createddatetime TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT '2014-04-29 00:00:00.000',
+    createddatetime TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT '2014-04-29 00:00:00.000',
     modifiedbyuserid BIGINT,
-    modifieddatetime TIMESTAMP WITHOUT TIME ZONE,
+    modifieddatetime TIMESTAMP WITH TIME ZONE,
     fullname VARCHAR(200)
 )
         WITH (
@@ -668,7 +650,7 @@ CREATE TABLE dbo.workloadpoints(
     parom BIGINT NOT NULL,
     paromenabled boolean NOT NULL DEFAULT FALSE,
     createdbyuserid BIGINT NOT NULL,
-    createddatetime TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    createddatetime TIMESTAMP WITH TIME ZONE NOT NULL,
     commappal1 NUMERIC(3,0) NOT NULL DEFAULT (0),
     commappal2 NUMERIC(3,0) NOT NULL DEFAULT (0),
     commappal3 NUMERIC(3,0) NOT NULL DEFAULT (0),
@@ -684,7 +666,7 @@ CREATE TABLE dbo.workloadpoints(
 
 CREATE TABLE dbo.workloadreport(
     id BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
-    date TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    date TIMESTAMP WITH TIME ZONE NOT NULL,
     workloadpointsid BIGINT NOT NULL,
     isdeleted boolean NOT NULL DEFAULT FALSE
 )
@@ -758,7 +740,7 @@ BEGIN
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE date BETWEEN dbo.getfirstdayofmonth(localtimestamp(6) + (par_months::NUMERIC || ' MONTH')::INTERVAL) AND dbo.getlastdayofmonth(localtimestamp(6) + (par_months::NUMERIC || ' MONTH')::INTERVAL)) AND offendermanagertypeid IN (1, 6)
+            WHERE date BETWEEN dbo.getfirstdayofmonth(timezone('utc', now()) + (par_months::NUMERIC || ' MONTH')::INTERVAL) AND dbo.getlastdayofmonth(timezone('utc', now()) + (par_months::NUMERIC || ' MONTH')::INTERVAL)) AND offendermanagertypeid IN (1, 6)
         GROUP BY offendermanagerid, workloadreportid), list
     AS (SELECT
         offendermanagerid, AVG(totalcases - totalcasesinactive) AS avgcaseload
@@ -794,7 +776,7 @@ BEGIN
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE date BETWEEN dbo.getfirstdayofmonth(localtimestamp(6) + (par_months::NUMERIC || ' MONTH')::INTERVAL) AND dbo.getlastdayofmonth(localtimestamp(6) + (par_months::NUMERIC || ' MONTH')::INTERVAL)) AND offendermanagertypeid IN (2, 7)
+            WHERE date BETWEEN dbo.getfirstdayofmonth(timezone('utc', now()) + (par_months::NUMERIC || ' MONTH')::INTERVAL) AND dbo.getlastdayofmonth(timezone('utc', now()) + (par_months::NUMERIC || ' MONTH')::INTERVAL)) AND offendermanagertypeid IN (2, 7)
         GROUP BY offendermanagerid, workloadreportid), list
     AS (SELECT
         offendermanagerid, AVG(totalcases - totalcasesinactive) AS avgcaseload
@@ -870,12 +852,12 @@ LANGUAGE  plpgsql;
 
 
 CREATE OR REPLACE FUNCTION dbo.getfirstdayofmonth(
-     IN par_indate TIMESTAMP WITHOUT TIME ZONE)
-RETURNS TIMESTAMP WITHOUT TIME ZONE
+     IN par_indate TIMESTAMP WITH TIME ZONE)
+RETURNS TIMESTAMP WITH TIME ZONE
 AS
 $BODY$
 DECLARE
-    var_OutDate TIMESTAMP WITHOUT TIME ZONE;
+    var_OutDate TIMESTAMP WITH TIME ZONE;
 BEGIN
     SELECT
         0 + ((DATE_PART('year', par_InDate::TIMESTAMP) - DATE_PART('year', 0::TIMESTAMP)) * 12 + (DATE_PART('month', par_InDate::TIMESTAMP) - DATE_PART('month', 0::TIMESTAMP))::NUMERIC || ' MONTH')::INTERVAL
@@ -888,12 +870,12 @@ LANGUAGE  plpgsql;
 
 
 CREATE OR REPLACE FUNCTION dbo.getlastdayofmonth(
-     IN par_indate TIMESTAMP WITHOUT TIME ZONE)
-RETURNS TIMESTAMP WITHOUT TIME ZONE
+     IN par_indate TIMESTAMP WITH TIME ZONE)
+RETURNS TIMESTAMP WITH TIME ZONE
 AS
 $BODY$
 DECLARE
-    var_OutDate TIMESTAMP WITHOUT TIME ZONE;
+    var_OutDate TIMESTAMP WITH TIME ZONE;
 BEGIN
     SELECT
         0 + ((DATE_PART('year', par_InDate::TIMESTAMP) - DATE_PART('year', 0::TIMESTAMP)) * 12 + (DATE_PART('month', par_InDate::TIMESTAMP) - DATE_PART('month', 0::TIMESTAMP)) + 1::NUMERIC || ' MONTH')::INTERVAL + (- 3::NUMERIC || ' MILLISECOND')::INTERVAL
@@ -1767,31 +1749,31 @@ SELECT
     dir.id, dir.name, mth0.capacity AS current, mth0.sdr AS currentsdr, mth1.capacity AS mth1, mth1.sdr AS mth1sdr, mth2.capacity AS mth2, mth2.sdr AS mth2sdr, mth3.capacity AS mth3, mth3.sdr AS mth3sdr, mth4.capacity AS mth4, mth4.sdr AS mth4sdr, mth5.capacity AS mth5, mth5.sdr AS mth5sdr, mth6.capacity AS mth6, mth6.sdr AS mth6sdr, mth7.capacity AS mth7, mth7.sdr AS mth7sdr, mth8.capacity AS mth8, mth8.sdr AS mth8sdr, mth9.capacity AS mth9, mth9.sdr AS mth9sdr, mth10.capacity AS mth10, mth10.sdr AS mth10sdr, mth11.capacity AS mth11, mth11.sdr AS mth11sdr, mth12.capacity AS mth12, mth12.sdr AS mth12sdr
     FROM dbo.organisationalunit AS dir
     LEFT OUTER JOIN dbo.capacityaveragedirectorate AS mth0
-        ON mth0.directorateid = dir.id AND mth0.reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)
+        ON mth0.directorateid = dir.id AND mth0.reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)
     LEFT OUTER JOIN dbo.capacityaveragedirectorate AS mth1
-        ON mth1.directorateid = dir.id AND mth1.reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL)
+        ON mth1.directorateid = dir.id AND mth1.reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL)
     LEFT OUTER JOIN dbo.capacityaveragedirectorate AS mth2
-        ON mth2.directorateid = dir.id AND mth2.reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL)
+        ON mth2.directorateid = dir.id AND mth2.reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL)
     LEFT OUTER JOIN dbo.capacityaveragedirectorate AS mth3
-        ON mth3.directorateid = dir.id AND mth3.reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL)
+        ON mth3.directorateid = dir.id AND mth3.reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL)
     LEFT OUTER JOIN dbo.capacityaveragedirectorate AS mth4
-        ON mth4.directorateid = dir.id AND mth4.reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL)
+        ON mth4.directorateid = dir.id AND mth4.reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL)
     LEFT OUTER JOIN dbo.capacityaveragedirectorate AS mth5
-        ON mth5.directorateid = dir.id AND mth5.reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL)
+        ON mth5.directorateid = dir.id AND mth5.reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL)
     LEFT OUTER JOIN dbo.capacityaveragedirectorate AS mth6
-        ON mth6.directorateid = dir.id AND mth6.reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL)
+        ON mth6.directorateid = dir.id AND mth6.reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL)
     LEFT OUTER JOIN dbo.capacityaveragedirectorate AS mth7
-        ON mth7.directorateid = dir.id AND mth7.reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL)
+        ON mth7.directorateid = dir.id AND mth7.reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL)
     LEFT OUTER JOIN dbo.capacityaveragedirectorate AS mth8
-        ON mth8.directorateid = dir.id AND mth8.reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL)
+        ON mth8.directorateid = dir.id AND mth8.reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL)
     LEFT OUTER JOIN dbo.capacityaveragedirectorate AS mth9
-        ON mth9.directorateid = dir.id AND mth9.reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL)
+        ON mth9.directorateid = dir.id AND mth9.reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL)
     LEFT OUTER JOIN dbo.capacityaveragedirectorate AS mth10
-        ON mth10.directorateid = dir.id AND mth10.reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL)
+        ON mth10.directorateid = dir.id AND mth10.reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL)
     LEFT OUTER JOIN dbo.capacityaveragedirectorate AS mth11
-        ON mth11.directorateid = dir.id AND mth11.reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL)
+        ON mth11.directorateid = dir.id AND mth11.reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL)
     LEFT OUTER JOIN dbo.capacityaveragedirectorate AS mth12
-        ON mth12.directorateid = dir.id AND mth12.reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL)
+        ON mth12.directorateid = dir.id AND mth12.reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL)
     WHERE dir.organisationalunittypeid = 2 AND dir.isdeleted = FALSE;
 /* dbo.MgtReportLduCapacity source */;
 
@@ -1804,15 +1786,15 @@ SELECT
     INNER JOIN dbo.organisationalunit AS dir
         ON dir.id = ldu.parentorganisationalunitid
     LEFT OUTER JOIN dbo.capacityaverageldu AS mth0
-        ON mth0.lduid = ldu.id AND mth0.reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)
+        ON mth0.lduid = ldu.id AND mth0.reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)
     LEFT OUTER JOIN dbo.capacityaverageldu AS mth3
-        ON mth3.lduid = ldu.id AND mth3.reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL)
+        ON mth3.lduid = ldu.id AND mth3.reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL)
     LEFT OUTER JOIN dbo.capacityaverageldu AS mth6
-        ON mth6.lduid = ldu.id AND mth6.reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL)
+        ON mth6.lduid = ldu.id AND mth6.reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL)
     LEFT OUTER JOIN dbo.capacityaverageldu AS mth9
-        ON mth9.lduid = ldu.id AND mth9.reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL)
+        ON mth9.lduid = ldu.id AND mth9.reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL)
     LEFT OUTER JOIN dbo.capacityaverageldu AS mth12
-        ON mth12.lduid = ldu.id AND mth12.reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL)
+        ON mth12.lduid = ldu.id AND mth12.reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL)
     WHERE ldu.organisationalunittypeid = 3 AND ldu.isdeleted = FALSE;
 /* dbo.MgtReportPOCapacity source */;
 
@@ -1823,136 +1805,136 @@ SELECT
     1 AS displayorder, '110% +'::TEXT AS "Capacity", (SELECT
         gt110
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS "OMCount", (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS "OMCount", (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS current, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS current, (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL)) AS mth1, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL)) AS mth1, (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL)) AS mth2, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL)) AS mth2, (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL)) AS mth3, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL)) AS mth3, (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL)) AS mth4, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL)) AS mth4, (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL)) AS mth5, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL)) AS mth5, (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL)) AS mth6, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL)) AS mth6, (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL)) AS mth7, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL)) AS mth7, (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL)) AS mth8, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL)) AS mth8, (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL)) AS mth9, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL)) AS mth9, (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL)) AS mth10, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL)) AS mth10, (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL)) AS mth11, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL)) AS mth11, (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL)) AS mth12
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL)) AS mth12
 UNION
 SELECT
     2 AS displayorder, '100% +'::TEXT, (SELECT
         gt100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS current, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS current, (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL)) AS mth1, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL)) AS mth1, (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL)) AS mth2, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL)) AS mth2, (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL)) AS mth3, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL)) AS mth3, (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL)) AS mth4, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL)) AS mth4, (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL)) AS mth5, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL)) AS mth5, (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL)) AS mth6, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL)) AS mth6, (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL)) AS mth7, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL)) AS mth7, (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL)) AS mth8, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL)) AS mth8, (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL)) AS mth9, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL)) AS mth9, (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL)) AS mth10, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL)) AS mth10, (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL)) AS mth11, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL)) AS mth11, (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL)) AS mth12
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL)) AS mth12
 UNION
 SELECT
     3 AS displayorder, '< 100%'::TEXT, (SELECT
         lt100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS current, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS current, (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL)) AS mth1, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL)) AS mth1, (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL)) AS mth2, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL)) AS mth2, (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL)) AS mth3, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL)) AS mth3, (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL)) AS mth4, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL)) AS mth4, (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL)) AS mth5, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL)) AS mth5, (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL)) AS mth6, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL)) AS mth6, (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL)) AS mth7, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL)) AS mth7, (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL)) AS mth8, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL)) AS mth8, (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL)) AS mth9, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL)) AS mth9, (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL)) AS mth10, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL)) AS mth10, (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL)) AS mth11, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL)) AS mth11, (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL)) AS mth12;
+        WHERE directorateid = 0 AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL)) AS mth12;
 /* union */
 /* select	4 as DisplayOrder, */
 /* 'Total', */
@@ -1980,7 +1962,7 @@ SELECT
     wro.workloadid, wro.lduname, wro.teamname, wro.offendermanagername, wro.contractedhoursperweek, wro.hoursreduction, wro.capacitypercentage AS currentcapacitypercentage, cpo.avgcapacity AS capacitypercentage, wro.offendermanagerupdateusername, wro.offendermanagerupdatedatetime
     FROM dbo.workloadreportofficer AS wro
     INNER JOIN dbo.capacityperiodofficer AS cpo
-        ON cpo.offendermanagerid = wro.offendermanagerid AND (avgcapacity > 110) AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)
+        ON cpo.offendermanagerid = wro.offendermanagerid AND (avgcapacity > 110) AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)
     INNER JOIN dbo.workloadreport AS wr
         ON wr.id = wro.workloadreportid
     WHERE wr.id = (SELECT
@@ -2000,9 +1982,9 @@ SELECT
             ELSE COUNT('x')
         END * 1.0
         FROM dbo.capacityperiodofficer
-        WHERE reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL))) * 100.0), 1) AS "OMPerc"
+        WHERE reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL))) * 100.0), 1) AS "OMPerc"
     FROM dbo.capacityperiodofficer
-    WHERE avgcapacity > 110 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)
+    WHERE avgcapacity > 110 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)
 UNION
 SELECT
     2, '100% +'::TEXT AS "Capacity", COUNT('x'), ROUND(((COUNT('x') / (SELECT
@@ -2011,9 +1993,9 @@ SELECT
             ELSE COUNT('x')
         END * 1.0
         FROM dbo.capacityperiodofficer
-        WHERE reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL))) * 100.0), 1)
+        WHERE reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL))) * 100.0), 1)
     FROM dbo.capacityperiodofficer
-    WHERE avgcapacity BETWEEN 100 AND 110 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)
+    WHERE avgcapacity BETWEEN 100 AND 110 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)
 UNION
 SELECT
     3, '< 100%'::TEXT AS "Capacity", COUNT('x'), ROUND(((COUNT('x') / (SELECT
@@ -2022,9 +2004,9 @@ SELECT
             ELSE COUNT('x')
         END * 1.0
         FROM dbo.capacityperiodofficer
-        WHERE reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL))) * 100.0), 1)
+        WHERE reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL))) * 100.0), 1)
     FROM dbo.capacityperiodofficer
-    WHERE avgcapacity < 100 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL);
+    WHERE avgcapacity < 100 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL);
 /* dbo.MgtReportPOCapacityPeriodList source */;
 
 
@@ -2034,7 +2016,7 @@ SELECT
     wro.workloadid, wro.lduname, wro.teamname, wro.offendermanagername, wro.contractedhoursperweek, wro.hoursreduction, wro.capacitypercentage AS currentcapacitypercentage, cpo.avgcapacity AS capacitypercentage, wro.offendermanagernotes, wro.offendermanagerupdateusername, wro.offendermanagerupdatedatetime
     FROM dbo.workloadreportofficer AS wro
     INNER JOIN dbo.capacityperiodofficer AS cpo
-        ON cpo.offendermanagerid = wro.offendermanagerid AND (mincapacity > 110 AND maxcapacity > 110) AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)
+        ON cpo.offendermanagerid = wro.offendermanagerid AND (mincapacity > 110 AND maxcapacity > 110) AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)
     INNER JOIN dbo.workloadreport AS wr
         ON wr.id = wro.workloadreportid
     WHERE wr.id = (SELECT
@@ -2051,241 +2033,241 @@ SELECT
     1 AS displayorder, '60+'::TEXT AS casecountdesc, (SELECT
         omcountavg
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS omcount, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS omcount, (SELECT
         totalomcountavg
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS omtotal, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS omtotal, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric), 1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS current, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS current, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL)) AS mth1, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL)) AS mth1, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL)) AS mth2, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL)) AS mth2, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL)) AS mth3, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL)) AS mth3, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL)) AS mth4, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL)) AS mth4, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL)) AS mth5, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL)) AS mth5, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL)) AS mth6, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL)) AS mth6, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL)) AS mth7, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL)) AS mth7, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL)) AS mth8, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL)) AS mth8, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL)) AS mth9, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL)) AS mth9, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL)) AS mth10, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL)) AS mth10, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL)) AS mth11, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL)) AS mth11, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL)) AS mth12
+        WHERE LOWER(casecountdesc) = LOWER('60+') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL)) AS mth12
 UNION
 SELECT
     2 AS displayorder, '50-59'::TEXT AS casecountdesc, (SELECT
         omcountavg
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         totalomcountavg
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL))
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL))
 UNION
 SELECT
     3 AS displayorder, '40-49'::TEXT AS casecountdesc, (SELECT
         omcountavg
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         totalomcountavg
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL))
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL))
 UNION
 SELECT
     4 AS displayorder, '30-39'::TEXT AS casecountdesc, (SELECT
         omcountavg
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         totalomcountavg
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL))
+        WHERE LOWER(casecountdesc) = LOWER('30-39') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL))
 UNION
 SELECT
     5 AS displayorder, '10-29'::TEXT AS casecountdesc, (SELECT
         omcountavg
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         totalomcountavg
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL));
+        WHERE LOWER(casecountdesc) = LOWER('10-29') AND offendermanagertypeid = 1 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL));
 /* dbo.MgtReportPSOCapacity source */;
 
 
@@ -2295,136 +2277,136 @@ SELECT
     1 AS displayorder, '110% +'::TEXT AS "Capacity", (SELECT
         gt110
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS "OMCount", (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS "OMCount", (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS current, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS current, (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL)) AS mth1, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL)) AS mth1, (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL)) AS mth2, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL)) AS mth2, (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL)) AS mth3, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL)) AS mth3, (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL)) AS mth4, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL)) AS mth4, (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL)) AS mth5, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL)) AS mth5, (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL)) AS mth6, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL)) AS mth6, (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL)) AS mth7, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL)) AS mth7, (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL)) AS mth8, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL)) AS mth8, (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL)) AS mth9, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL)) AS mth9, (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL)) AS mth10, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL)) AS mth10, (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL)) AS mth11, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL)) AS mth11, (SELECT
         ((gt110 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL)) AS mth12
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL)) AS mth12
 UNION
 SELECT
     2 AS displayorder, '100% +'::TEXT, (SELECT
         gt100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS current, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS current, (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL)) AS mth1, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL)) AS mth1, (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL)) AS mth2, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL)) AS mth2, (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL)) AS mth3, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL)) AS mth3, (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL)) AS mth4, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL)) AS mth4, (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL)) AS mth5, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL)) AS mth5, (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL)) AS mth6, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL)) AS mth6, (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL)) AS mth7, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL)) AS mth7, (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL)) AS mth8, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL)) AS mth8, (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL)) AS mth9, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL)) AS mth9, (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL)) AS mth10, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL)) AS mth10, (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL)) AS mth11, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL)) AS mth11, (SELECT
         ((gt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL)) AS mth12
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL)) AS mth12
 UNION
 SELECT
     3 AS displayorder, '< 100%'::TEXT, (SELECT
         lt100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS current, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS current, (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL)) AS mth1, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL)) AS mth1, (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL)) AS mth2, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL)) AS mth2, (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL)) AS mth3, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL)) AS mth3, (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL)) AS mth4, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL)) AS mth4, (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL)) AS mth5, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL)) AS mth5, (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL)) AS mth6, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL)) AS mth6, (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL)) AS mth7, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL)) AS mth7, (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL)) AS mth8, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL)) AS mth8, (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL)) AS mth9, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL)) AS mth9, (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL)) AS mth10, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL)) AS mth10, (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL)) AS mth11, (SELECT
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL)) AS mth11, (SELECT
         ((lt100 / total) * 100.0) / 100
         FROM dbo.capacityaverageom
-        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL)) AS mth12;
+        WHERE directorateid = 0 AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL)) AS mth12;
 /* union */
 /* select	4 as DisplayOrder, */
 /* 'Total', */
@@ -2451,241 +2433,241 @@ SELECT
     1 AS displayorder, '70+'::TEXT AS casecountdesc, (SELECT
         omcountavg
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS omcount, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS omcount, (SELECT
         totalomcountavg
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS omtotal, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS omtotal, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS current, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)) AS current, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL)) AS mth1, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL)) AS mth1, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL)) AS mth2, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL)) AS mth2, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL)) AS mth3, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL)) AS mth3, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL)) AS mth4, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL)) AS mth4, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL)) AS mth5, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL)) AS mth5, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL)) AS mth6, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL)) AS mth6, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL)) AS mth7, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL)) AS mth7, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL)) AS mth8, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL)) AS mth8, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL)) AS mth9, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL)) AS mth9, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL)) AS mth10, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL)) AS mth10, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL)) AS mth11, (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL)) AS mth11, (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL)) AS mth12
+        WHERE LOWER(casecountdesc) = LOWER('70+') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL)) AS mth12
 UNION
 SELECT
     2 AS displayorder, '60-69'::TEXT AS casecountdesc, (SELECT
         omcountavg
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         totalomcountavg
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL))
+        WHERE LOWER(casecountdesc) = LOWER('60-69') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL))
 UNION
 SELECT
     3 AS displayorder, '50-59'::TEXT AS casecountdesc, (SELECT
         omcountavg
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         totalomcountavg
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL))
+        WHERE LOWER(casecountdesc) = LOWER('50-59') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL))
 UNION
 SELECT
     4 AS displayorder, '40-49'::TEXT AS casecountdesc, (SELECT
         omcountavg
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         totalomcountavg
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL))
+        WHERE LOWER(casecountdesc) = LOWER('40-49') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL))
 UNION
 SELECT
     5 AS displayorder, '10-39'::TEXT AS casecountdesc, (SELECT
         omcountavg
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         totalomcountavg
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (0::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
+        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL)), (SELECT
         ROUND(CAST(((omcountavg / totalomcountavg) * 100) AS numeric),1)
         FROM dbo.caseloadofficer
-        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL));
+        WHERE LOWER(casecountdesc) = LOWER('10-39') AND offendermanagertypeid = 2 AND reportperiod = dbo.getfirstdayofmonth(timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL));
 /* dbo.OffenderManagerNote source */
 /* Update OffenderManagerNoteView to expose OffenderManagerParentID */;
 
@@ -2816,7 +2798,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage >= 110) AS pos1mth, (SELECT
         COUNT('x')
@@ -2824,7 +2806,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos1mthall, (SELECT
         COUNT('x')
@@ -2832,7 +2814,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage >= 110) AS pos2mth, (SELECT
         COUNT('x')
@@ -2840,7 +2822,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos2mthall, (SELECT
         COUNT('x')
@@ -2848,7 +2830,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage >= 110) AS pos3mth, (SELECT
         COUNT('x')
@@ -2856,7 +2838,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos3mthall, (SELECT
         COUNT('x')
@@ -2864,7 +2846,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage >= 110) AS pos4mth, (SELECT
         COUNT('x')
@@ -2872,7 +2854,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos4mthall, (SELECT
         COUNT('x')
@@ -2880,7 +2862,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage >= 110) AS pos5mth, (SELECT
         COUNT('x')
@@ -2888,7 +2870,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos5mthall, (SELECT
         COUNT('x')
@@ -2896,7 +2878,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage >= 110) AS pos6mth, (SELECT
         COUNT('x')
@@ -2904,7 +2886,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos6mthall, (SELECT
         COUNT('x')
@@ -2912,7 +2894,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage >= 110) AS pos7mth, (SELECT
         COUNT('x')
@@ -2920,7 +2902,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos7mthall, (SELECT
         COUNT('x')
@@ -2928,7 +2910,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage >= 110) AS pos8mth, (SELECT
         COUNT('x')
@@ -2936,7 +2918,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos8mthall, (SELECT
         COUNT('x')
@@ -2944,7 +2926,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage >= 110) AS pos9mth, (SELECT
         COUNT('x')
@@ -2952,7 +2934,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos9mthall, (SELECT
         COUNT('x')
@@ -2960,7 +2942,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage >= 110) AS pos10mth, (SELECT
         COUNT('x')
@@ -2968,7 +2950,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos10mthall, (SELECT
         COUNT('x')
@@ -2976,7 +2958,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage >= 110) AS pos11mth, (SELECT
         COUNT('x')
@@ -2984,7 +2966,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos11mthall, (SELECT
         COUNT('x')
@@ -2992,7 +2974,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage >= 110) AS pos12mth, (SELECT
         COUNT('x')
@@ -3000,7 +2982,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos12mthall
 UNION
@@ -3025,7 +3007,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage BETWEEN 100 AND 109) AS pos1mth, (SELECT
         COUNT('x')
@@ -3033,7 +3015,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos1mthall, (SELECT
         COUNT('x')
@@ -3041,7 +3023,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage BETWEEN 100 AND 109) AS pos2mth, (SELECT
         COUNT('x')
@@ -3049,7 +3031,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos2mthall, (SELECT
         COUNT('x')
@@ -3057,7 +3039,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage BETWEEN 100 AND 109) AS pos3mth, (SELECT
         COUNT('x')
@@ -3065,7 +3047,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos3mthall, (SELECT
         COUNT('x')
@@ -3073,7 +3055,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage BETWEEN 100 AND 109) AS pos4mth, (SELECT
         COUNT('x')
@@ -3081,7 +3063,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos4mthall, (SELECT
         COUNT('x')
@@ -3089,7 +3071,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage BETWEEN 100 AND 109) AS pos5mth, (SELECT
         COUNT('x')
@@ -3097,7 +3079,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos5mthall, (SELECT
         COUNT('x')
@@ -3105,7 +3087,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage BETWEEN 100 AND 109) AS pos6mth, (SELECT
         COUNT('x')
@@ -3113,7 +3095,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos6mthall, (SELECT
         COUNT('x')
@@ -3121,7 +3103,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage BETWEEN 100 AND 109) AS pos7mth, (SELECT
         COUNT('x')
@@ -3129,7 +3111,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos7mthall, (SELECT
         COUNT('x')
@@ -3137,7 +3119,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage BETWEEN 100 AND 109) AS pos8mth, (SELECT
         COUNT('x')
@@ -3145,7 +3127,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos8mthall, (SELECT
         COUNT('x')
@@ -3153,7 +3135,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage BETWEEN 100 AND 109) AS pos9mth, (SELECT
         COUNT('x')
@@ -3161,7 +3143,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos9mthall, (SELECT
         COUNT('x')
@@ -3169,7 +3151,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage BETWEEN 100 AND 109) AS pos10mth, (SELECT
         COUNT('x')
@@ -3177,7 +3159,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos10mthall, (SELECT
         COUNT('x')
@@ -3185,7 +3167,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage BETWEEN 100 AND 109) AS pos11mth, (SELECT
         COUNT('x')
@@ -3193,7 +3175,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos11mthall, (SELECT
         COUNT('x')
@@ -3201,7 +3183,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage BETWEEN 100 AND 109) AS pos12mth, (SELECT
         COUNT('x')
@@ -3209,7 +3191,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos12mthall
 UNION
@@ -3234,7 +3216,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage < 100) AS pos1mth, (SELECT
         COUNT('x')
@@ -3242,7 +3224,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos1mthall, (SELECT
         COUNT('x')
@@ -3250,7 +3232,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage < 100) AS pos2mth, (SELECT
         COUNT('x')
@@ -3258,7 +3240,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos2mthall, (SELECT
         COUNT('x')
@@ -3266,7 +3248,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage < 100) AS pos3mth, (SELECT
         COUNT('x')
@@ -3274,7 +3256,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos3mthall, (SELECT
         COUNT('x')
@@ -3282,7 +3264,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage < 100) AS pos4mth, (SELECT
         COUNT('x')
@@ -3290,7 +3272,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos4mthall, (SELECT
         COUNT('x')
@@ -3298,7 +3280,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage < 100) AS pos5mth, (SELECT
         COUNT('x')
@@ -3306,7 +3288,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos5mthall, (SELECT
         COUNT('x')
@@ -3314,7 +3296,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage < 100) AS pos6mth, (SELECT
         COUNT('x')
@@ -3322,7 +3304,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos6mthall, (SELECT
         COUNT('x')
@@ -3330,7 +3312,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage < 100) AS pos7mth, (SELECT
         COUNT('x')
@@ -3338,7 +3320,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos7mthall, (SELECT
         COUNT('x')
@@ -3346,7 +3328,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage < 100) AS pos8mth, (SELECT
         COUNT('x')
@@ -3354,7 +3336,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos8mthall, (SELECT
         COUNT('x')
@@ -3362,7 +3344,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage < 100) AS pos9mth, (SELECT
         COUNT('x')
@@ -3370,7 +3352,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos9mthall, (SELECT
         COUNT('x')
@@ -3378,7 +3360,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage < 100) AS pos10mth, (SELECT
         COUNT('x')
@@ -3386,7 +3368,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos10mthall, (SELECT
         COUNT('x')
@@ -3394,7 +3376,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage < 100) AS pos11mth, (SELECT
         COUNT('x')
@@ -3402,7 +3384,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos11mthall, (SELECT
         COUNT('x')
@@ -3410,7 +3392,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND capacitypercentage < 100) AS pos12mth, (SELECT
         COUNT('x')
@@ -3418,7 +3400,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos12mthall;
 /* dbo.QAPCapacityPSOStage1 source */;
@@ -3447,7 +3429,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage >= 110) AS psos1mth, (SELECT
         COUNT('x')
@@ -3455,7 +3437,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos1mthall, (SELECT
         COUNT('x')
@@ -3463,7 +3445,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage >= 110) AS psos2mth, (SELECT
         COUNT('x')
@@ -3471,7 +3453,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos2mthall, (SELECT
         COUNT('x')
@@ -3479,7 +3461,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage >= 110) AS psos3mth, (SELECT
         COUNT('x')
@@ -3487,7 +3469,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos3mthall, (SELECT
         COUNT('x')
@@ -3495,7 +3477,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage >= 110) AS psos4mth, (SELECT
         COUNT('x')
@@ -3503,7 +3485,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos4mthall, (SELECT
         COUNT('x')
@@ -3511,7 +3493,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage >= 110) AS psos5mth, (SELECT
         COUNT('x')
@@ -3519,7 +3501,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos5mthall, (SELECT
         COUNT('x')
@@ -3527,7 +3509,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage >= 110) AS psos6mth, (SELECT
         COUNT('x')
@@ -3535,7 +3517,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos6mthall, (SELECT
         COUNT('x')
@@ -3543,7 +3525,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage >= 110) AS psos7mth, (SELECT
         COUNT('x')
@@ -3551,7 +3533,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos7mthall, (SELECT
         COUNT('x')
@@ -3559,7 +3541,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage >= 110) AS psos8mth, (SELECT
         COUNT('x')
@@ -3567,7 +3549,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos8mthall, (SELECT
         COUNT('x')
@@ -3575,7 +3557,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage >= 110) AS psos9mth, (SELECT
         COUNT('x')
@@ -3583,7 +3565,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos9mthall, (SELECT
         COUNT('x')
@@ -3591,7 +3573,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage >= 110) AS psos10mth, (SELECT
         COUNT('x')
@@ -3599,7 +3581,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos10mthall, (SELECT
         COUNT('x')
@@ -3607,7 +3589,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage >= 110) AS psos11mth, (SELECT
         COUNT('x')
@@ -3615,7 +3597,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos11mthall, (SELECT
         COUNT('x')
@@ -3623,7 +3605,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage >= 110) AS psos12mth, (SELECT
         COUNT('x')
@@ -3631,7 +3613,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos12mthall
 UNION
@@ -3656,7 +3638,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage BETWEEN 100 AND 109) AS psos1mth, (SELECT
         COUNT('x')
@@ -3664,7 +3646,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos1mthall, (SELECT
         COUNT('x')
@@ -3672,7 +3654,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage BETWEEN 100 AND 109) AS psos2mth, (SELECT
         COUNT('x')
@@ -3680,7 +3662,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos2mthall, (SELECT
         COUNT('x')
@@ -3688,7 +3670,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage BETWEEN 100 AND 109) AS psos3mth, (SELECT
         COUNT('x')
@@ -3696,7 +3678,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos3mthall, (SELECT
         COUNT('x')
@@ -3704,7 +3686,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage BETWEEN 100 AND 109) AS psos4mth, (SELECT
         COUNT('x')
@@ -3712,7 +3694,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos4mthall, (SELECT
         COUNT('x')
@@ -3720,7 +3702,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage BETWEEN 100 AND 109) AS psos5mth, (SELECT
         COUNT('x')
@@ -3728,7 +3710,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos5mthall, (SELECT
         COUNT('x')
@@ -3736,7 +3718,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage BETWEEN 100 AND 109) AS psos6mth, (SELECT
         COUNT('x')
@@ -3744,7 +3726,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos6mthall, (SELECT
         COUNT('x')
@@ -3752,7 +3734,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage BETWEEN 100 AND 109) AS psos7mth, (SELECT
         COUNT('x')
@@ -3760,7 +3742,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos7mthall, (SELECT
         COUNT('x')
@@ -3768,7 +3750,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage BETWEEN 100 AND 109) AS psos8mth, (SELECT
         COUNT('x')
@@ -3776,7 +3758,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos8mthall, (SELECT
         COUNT('x')
@@ -3784,7 +3766,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage BETWEEN 100 AND 109) AS psos9mth, (SELECT
         COUNT('x')
@@ -3792,7 +3774,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos9mthall, (SELECT
         COUNT('x')
@@ -3800,7 +3782,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage BETWEEN 100 AND 109) AS psos10mth, (SELECT
         COUNT('x')
@@ -3808,7 +3790,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos10mthall, (SELECT
         COUNT('x')
@@ -3816,7 +3798,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage BETWEEN 100 AND 109) AS psos11mth, (SELECT
         COUNT('x')
@@ -3824,7 +3806,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos11mthall, (SELECT
         COUNT('x')
@@ -3832,7 +3814,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage BETWEEN 100 AND 109) AS psos12mth, (SELECT
         COUNT('x')
@@ -3840,7 +3822,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos12mthall
 UNION
@@ -3865,7 +3847,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage < 100) AS psos1mth, (SELECT
         COUNT('x')
@@ -3873,7 +3855,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 1::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 1::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos1mthall, (SELECT
         COUNT('x')
@@ -3881,7 +3863,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage < 100) AS psos2mth, (SELECT
         COUNT('x')
@@ -3889,7 +3871,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 2::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 2::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos2mthall, (SELECT
         COUNT('x')
@@ -3897,7 +3879,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage < 100) AS psos3mth, (SELECT
         COUNT('x')
@@ -3905,7 +3887,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos3mthall, (SELECT
         COUNT('x')
@@ -3913,7 +3895,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage < 100) AS psos4mth, (SELECT
         COUNT('x')
@@ -3921,7 +3903,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 4::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 4::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos4mthall, (SELECT
         COUNT('x')
@@ -3929,7 +3911,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage < 100) AS psos5mth, (SELECT
         COUNT('x')
@@ -3937,7 +3919,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 5::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 5::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos5mthall, (SELECT
         COUNT('x')
@@ -3945,7 +3927,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage < 100) AS psos6mth, (SELECT
         COUNT('x')
@@ -3953,7 +3935,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 6::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 6::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos6mthall, (SELECT
         COUNT('x')
@@ -3961,7 +3943,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage < 100) AS psos7mth, (SELECT
         COUNT('x')
@@ -3969,7 +3951,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 7::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 7::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos7mthall, (SELECT
         COUNT('x')
@@ -3977,7 +3959,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage < 100) AS psos8mth, (SELECT
         COUNT('x')
@@ -3985,7 +3967,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 8::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 8::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos8mthall, (SELECT
         COUNT('x')
@@ -3993,7 +3975,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage < 100) AS psos9mth, (SELECT
         COUNT('x')
@@ -4001,7 +3983,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 9::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 9::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos9mthall, (SELECT
         COUNT('x')
@@ -4009,7 +3991,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage < 100) AS psos10mth, (SELECT
         COUNT('x')
@@ -4017,7 +3999,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 10::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 10::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos10mthall, (SELECT
         COUNT('x')
@@ -4025,7 +4007,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage < 100) AS psos11mth, (SELECT
         COUNT('x')
@@ -4033,7 +4015,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 11::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 11::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos11mthall, (SELECT
         COUNT('x')
@@ -4041,7 +4023,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND capacitypercentage < 100) AS psos12mth, (SELECT
         COUNT('x')
@@ -4049,7 +4031,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos12mthall;
 /* dbo.QAPCaseloadPOStage1 source */;
@@ -4078,7 +4060,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND (totalcases - totalcasesinactive) > 60) AS pos3mths, (SELECT
         COUNT('x')
@@ -4086,7 +4068,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos3mthsall, (SELECT
         COUNT('x')
@@ -4094,7 +4076,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND (totalcases - totalcasesinactive) > 60) AS pos12mths, (SELECT
         COUNT('x')
@@ -4102,7 +4084,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)) AS pos12mthsall
 UNION
@@ -4127,7 +4109,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND (totalcases - totalcasesinactive) BETWEEN 50 AND 60), (SELECT
         COUNT('x')
@@ -4135,7 +4117,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)), (SELECT
         COUNT('x')
@@ -4143,7 +4125,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND (totalcases - totalcasesinactive) BETWEEN 50 AND 60), (SELECT
         COUNT('x')
@@ -4151,7 +4133,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6))
 UNION
@@ -4176,7 +4158,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND (totalcases - totalcasesinactive) BETWEEN 40 AND 50), (SELECT
         COUNT('x')
@@ -4184,7 +4166,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)), (SELECT
         COUNT('x')
@@ -4192,7 +4174,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND (totalcases - totalcasesinactive) BETWEEN 40 AND 50), (SELECT
         COUNT('x')
@@ -4200,7 +4182,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6))
 UNION
@@ -4225,7 +4207,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND (totalcases - totalcasesinactive) BETWEEN 30 AND 40), (SELECT
         COUNT('x')
@@ -4233,7 +4215,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)), (SELECT
         COUNT('x')
@@ -4241,7 +4223,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND (totalcases - totalcasesinactive) BETWEEN 30 AND 40), (SELECT
         COUNT('x')
@@ -4249,7 +4231,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6))
 UNION
@@ -4274,7 +4256,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND (totalcases - totalcasesinactive) < 30), (SELECT
         COUNT('x')
@@ -4282,7 +4264,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6)), (SELECT
         COUNT('x')
@@ -4290,7 +4272,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6) AND (totalcases - totalcasesinactive) < 30), (SELECT
         COUNT('x')
@@ -4298,7 +4280,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (1, 6));
 /* dbo.QAPCaseloadPOStageAvg1 source */;
@@ -4346,7 +4328,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND (totalcases - totalcasesinactive) > 80) AS psos3mths, (SELECT
         COUNT('x')
@@ -4354,7 +4336,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos3mthsall, (SELECT
         COUNT('x')
@@ -4362,7 +4344,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND (totalcases - totalcasesinactive) > 80) AS psos12mths, (SELECT
         COUNT('x')
@@ -4370,7 +4352,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)) AS psos12mthsall
 UNION
@@ -4395,7 +4377,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND (totalcases - totalcasesinactive) BETWEEN 70 AND 80), (SELECT
         COUNT('x')
@@ -4403,7 +4385,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)), (SELECT
         COUNT('x')
@@ -4411,7 +4393,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND (totalcases - totalcasesinactive) BETWEEN 70 AND 80), (SELECT
         COUNT('x')
@@ -4419,7 +4401,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7))
 UNION
@@ -4444,7 +4426,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND (totalcases - totalcasesinactive) BETWEEN 60 AND 70), (SELECT
         COUNT('x')
@@ -4452,7 +4434,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)), (SELECT
         COUNT('x')
@@ -4460,7 +4442,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND (totalcases - totalcasesinactive) BETWEEN 60 AND 70), (SELECT
         COUNT('x')
@@ -4468,7 +4450,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7))
 UNION
@@ -4493,7 +4475,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND (totalcases - totalcasesinactive) BETWEEN 50 AND 60), (SELECT
         COUNT('x')
@@ -4501,7 +4483,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)), (SELECT
         COUNT('x')
@@ -4509,7 +4491,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND (totalcases - totalcasesinactive) BETWEEN 50 AND 60), (SELECT
         COUNT('x')
@@ -4517,7 +4499,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7))
 UNION
@@ -4542,7 +4524,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND (totalcases - totalcasesinactive) < 50), (SELECT
         COUNT('x')
@@ -4550,7 +4532,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 3::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7)), (SELECT
         COUNT('x')
@@ -4558,7 +4540,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7) AND (totalcases - totalcasesinactive) < 50), (SELECT
         COUNT('x')
@@ -4566,7 +4548,7 @@ SELECT
         WHERE workloadreportid IN (SELECT
             id
             FROM dbo.workloadreport
-            WHERE localtimestamp(6) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
+            WHERE timezone('utc', now()) + (- 12::NUMERIC || ' MONTH')::INTERVAL > date
             ORDER BY date DESC NULLS FIRST
             LIMIT 1) AND offendermanagertypeid IN (2, 7));
 /* [dbo].[CalcCaseloadPSOAvg] source */;
@@ -4863,10 +4845,6 @@ SELECT
 
 -- ------------ Write CREATE-INDEX-stage scripts -----------
 
-CREATE INDEX ix_flyway_schema_history_flyway_schema_history_s_idx
-ON dbo.flyway_schema_history
-USING BTREE (success ASC);
-
 
 
 CREATE UNIQUE INDEX ix_organisationalunittype_uc_parent_1
@@ -4945,13 +4923,6 @@ ADD CONSTRAINT pk_deliverytype_631673298 PRIMARY KEY (id);
 
 ALTER TABLE dbo.displaysettings
 ADD CONSTRAINT pk_displaysettings_663673412 PRIMARY KEY (id);
-
-
-
-ALTER TABLE dbo.flyway_schema_history
-ADD CONSTRAINT flyway_schema_history_pk_311672158 PRIMARY KEY (installed_rank);
-
-
 
 ALTER TABLE dbo.fortnightly_archive_data
 ADD CONSTRAINT pk__fortnigh__3213e83ff7f3ce38_1015674666 PRIMARY KEY (id);
@@ -5581,7 +5552,7 @@ CREATE TABLE staging.knex_migrations(
     id BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
     name VARCHAR(255),
     batch BIGINT,
-    migration_time TIMESTAMP WITHOUT TIME ZONE
+    migration_time TIMESTAMP WITH TIME ZONE
 )
         WITH (
         OIDS=FALSE
@@ -6200,8 +6171,8 @@ CREATE TABLE app.adjustments(
     workload_owner_id BIGINT NOT NULL,
     points BIGINT NOT NULL,
     contact_id BIGINT,
-    effective_from TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    effective_to TIMESTAMP WITHOUT TIME ZONE,
+    effective_from TIMESTAMP WITH TIME ZONE NOT NULL,
+    effective_to TIMESTAMP WITH TIME ZONE,
     status VARCHAR(255),
     case_ref_no VARCHAR(255)
 )
@@ -6270,7 +6241,7 @@ CREATE TABLE app.court_reports_calculations(
 CREATE TABLE app.export_file(
     id BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
     file_type VARCHAR(20) NOT NULL,
-    date_created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    date_created TIMESTAMP WITH TIME ZONE NOT NULL,
     filepath VARCHAR(250) NOT NULL,
     is_enabled boolean DEFAULT TRUE
 )
@@ -6284,7 +6255,7 @@ CREATE TABLE app.knex_migrations(
     id BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
     name VARCHAR(255),
     batch BIGINT,
-    migration_time TIMESTAMP WITHOUT TIME ZONE
+    migration_time TIMESTAMP WITH TIME ZONE
 )
         WITH (
         OIDS=FALSE
@@ -6306,8 +6277,8 @@ CREATE TABLE app.ldu(
     code VARCHAR(255),
     description VARCHAR(255),
     region_id BIGINT NOT NULL,
-    effective_from TIMESTAMP WITHOUT TIME ZONE DEFAULT localtimestamp(6),
-    effective_to TIMESTAMP WITHOUT TIME ZONE
+    effective_from TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now()),
+    effective_to TIMESTAMP WITH TIME ZONE
 )
         WITH (
         OIDS=FALSE
@@ -6321,8 +6292,8 @@ CREATE TABLE app.offender_manager(
     forename VARCHAR(255),
     surname VARCHAR(255),
     type_id BIGINT NOT NULL,
-    effective_from TIMESTAMP WITHOUT TIME ZONE DEFAULT localtimestamp(6),
-    effective_to TIMESTAMP WITHOUT TIME ZONE
+    effective_from TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now()),
+    effective_to TIMESTAMP WITH TIME ZONE
 )
         WITH (
         OIDS=FALSE
@@ -6467,11 +6438,11 @@ CREATE TABLE app.reductions(
     reduction_reason_id BIGINT NOT NULL DEFAULT '11',
     workload_owner_id BIGINT NOT NULL,
     hours NUMERIC(8,1) NOT NULL,
-    effective_from TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    effective_to TIMESTAMP WITHOUT TIME ZONE,
+    effective_from TIMESTAMP WITH TIME ZONE NOT NULL,
+    effective_to TIMESTAMP WITH TIME ZONE,
     status VARCHAR(255),
     notes TEXT,
-    updated_date TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT localtimestamp(6),
+    updated_date TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc', now()),
     user_id BIGINT
 )
         WITH (
@@ -6485,11 +6456,11 @@ CREATE TABLE app.reductions_history(
     reduction_id BIGINT NOT NULL,
     reduction_reason_id BIGINT NOT NULL DEFAULT '11',
     hours NUMERIC(8,2) NOT NULL,
-    effective_from TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    effective_to TIMESTAMP WITHOUT TIME ZONE,
+    effective_from TIMESTAMP WITH TIME ZONE NOT NULL,
+    effective_to TIMESTAMP WITH TIME ZONE,
     status VARCHAR(255),
     notes TEXT,
-    updated_date TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT localtimestamp(6),
+    updated_date TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc', now()),
     user_id BIGINT
 )
         WITH (
@@ -6536,10 +6507,10 @@ CREATE TABLE app.tasks(
     type VARCHAR(255),
     additional_data TEXT,
     workload_report_id BIGINT,
-    date_created TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT localtimestamp(6),
-    date_processed TIMESTAMP WITHOUT TIME ZONE,
+    date_created TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc', now()),
+    date_processed TIMESTAMP WITH TIME ZONE,
     status VARCHAR(30),
-    date_started TIMESTAMP WITHOUT TIME ZONE
+    date_started TIMESTAMP WITH TIME ZONE
 )
         WITH (
         OIDS=FALSE
@@ -6552,8 +6523,8 @@ CREATE TABLE app.team(
     code VARCHAR(255),
     ldu_id BIGINT NOT NULL,
     description VARCHAR(255),
-    effective_from TIMESTAMP WITHOUT TIME ZONE DEFAULT localtimestamp(6),
-    effective_to TIMESTAMP WITHOUT TIME ZONE
+    effective_from TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now()),
+    effective_to TIMESTAMP WITH TIME ZONE
 )
         WITH (
         OIDS=FALSE
@@ -6588,7 +6559,7 @@ CREATE TABLE app.user_role(
     id BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
     user_id BIGINT NOT NULL,
     role_id BIGINT NOT NULL,
-    last_updated TIMESTAMP WITHOUT TIME ZONE,
+    last_updated TIMESTAMP WITH TIME ZONE,
     last_updated_by VARCHAR(255)
 )
         WITH (
@@ -6688,8 +6659,8 @@ CREATE TABLE app.workload_points(
     weighting_u BIGINT NOT NULL,
     paroms_enabled boolean NOT NULL DEFAULT FALSE,
     parom BIGINT NOT NULL,
-    effective_from TIMESTAMP WITHOUT TIME ZONE DEFAULT localtimestamp(6),
-    effective_to TIMESTAMP WITHOUT TIME ZONE,
+    effective_from TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now()),
+    effective_to TIMESTAMP WITH TIME ZONE,
     weighting_arms_lic BIGINT DEFAULT (0),
     weighting_arms_comm BIGINT DEFAULT (0),
     is_t2a boolean NOT NULL DEFAULT FALSE,
@@ -6755,8 +6726,8 @@ CREATE TABLE app.workload_points_calculations(
 
 CREATE TABLE app.workload_report(
     id BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
-    effective_from TIMESTAMP WITHOUT TIME ZONE DEFAULT localtimestamp(6),
-    effective_to TIMESTAMP WITHOUT TIME ZONE,
+    effective_from TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now()),
+    effective_to TIMESTAMP WITH TIME ZONE,
     records_total BIGINT NOT NULL DEFAULT '0',
     status VARCHAR(255),
     status_description VARCHAR(255)
@@ -6927,7 +6898,7 @@ SELECT
         ON r.reduction_reason_id = rr.id
     JOIN app.users AS u
         ON r.user_id = u.id
-    WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS NULL AND LOWER(r.status) = LOWER('ACTIVE') AND r.effective_to BETWEEN localtimestamp(6) AND localtimestamp(6) + (30::NUMERIC || ' days')::INTERVAL;
+    WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS NULL AND LOWER(r.status) = LOWER('ACTIVE') AND r.effective_to BETWEEN timezone('utc', now()) AND timezone('utc', now()) + (30::NUMERIC || ' days')::INTERVAL;
 /* app.expiring_reductions_view source */;
 
 
@@ -6958,7 +6929,7 @@ SELECT
         ON r.reduction_reason_id = rr.id
     JOIN app.users AS u
         ON r.user_id = u.id
-    WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS NULL AND LOWER(r.status) = LOWER('ACTIVE') AND r.effective_to BETWEEN localtimestamp(6) AND localtimestamp(6) + (30::NUMERIC || ' days')::INTERVAL
+    WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS NULL AND LOWER(r.status) = LOWER('ACTIVE') AND r.effective_to BETWEEN timezone('utc', now()) AND timezone('utc', now()) + (30::NUMERIC || ' days')::INTERVAL
 UNION
 SELECT
     wo.id AS workload_owner_id, team.id AS team_id, ldu.id AS ldu_id, region.id AS region_id, region.description AS region_name, ldu.description AS ldu_name, team.description AS team_name, CONCAT(om.forename, ' ', om.surname) AS name, wo.contracted_hours AS contracted_hours, rr.reason_short_name AS reduction_reason, r.id AS reduction_id, r.hours AS amount, r.effective_from AS start_date, r.effective_to AS end_date, r.status AS reduction_status, r.notes AS additional_notes, omt.grade_code AS grade_code, u.id AS user_id, u.name AS manager_responsible, 'court-reports'::TEXT AS workload_type
@@ -6985,7 +6956,7 @@ SELECT
         ON r.reduction_reason_id = rr.id
     JOIN app.users AS u
         ON r.user_id = u.id
-    WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS NULL AND LOWER(r.status) = LOWER('ACTIVE') AND r.effective_to BETWEEN localtimestamp(6) AND localtimestamp(6) + (30::NUMERIC || ' days')::INTERVAL;
+    WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS NULL AND LOWER(r.status) = LOWER('ACTIVE') AND r.effective_to BETWEEN timezone('utc', now()) AND timezone('utc', now()) + (30::NUMERIC || ' days')::INTERVAL;
 /* app.gs_export_view source */
 /* gs_export_view */;
 
