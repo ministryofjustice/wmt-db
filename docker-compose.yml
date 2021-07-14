@@ -3,7 +3,6 @@ services:
   hmpps-workload:
     build:
       context: .
-    network_mode: "host"
     container_name: hmpps-workload
     ports:
       - "8081:8080"
@@ -12,17 +11,17 @@ services:
     environment:
       - SERVER_PORT=8080
       - SPRING_PROFILES_ACTIVE=dev
-  mssql:
-    image: mcr.microsoft.com/mssql/server:2019-CU11-ubuntu-20.04
+      - DATABASE_ENDPOINT=postgres:5432
+  postgres:
+    image: postgres:11
     networks:
       - hmpps
-    container_name: hmpps-workload-mssql
+    container_name: hmpps-workload-postgres
     restart: always
     ports:
-      - '1433:1433'
+      - '5432:5432'
     environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=yourStrong(!)Password
-
+      - POSTGRES_PASSWORD=dev
+      - POSTGRES_USER=root
 networks:
   hmpps:

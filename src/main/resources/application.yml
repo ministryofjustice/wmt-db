@@ -22,9 +22,9 @@ spring:
     mixed: true
 
   datasource:
-    url: "jdbc:sqlserver://${database.endpoint:localhost:1433};databaseName=${database.name:master};"
-    username: "${database.username:sa}"
-    password: "${database.password:yourStrong(!)Password}"
+    url: "jdbc:postgresql://${database.endpoint:localhost:5432}/${database.name:postgres}"
+    username: "${database.username:root}"
+    password: "${database.password:dev}"
     hikari:
       maximum-pool-size: 25
 
