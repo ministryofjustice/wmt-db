@@ -18,11 +18,11 @@ spring:
       test:
         - "stdout"
   flyway:
-    locations: classpath:db/migration_{vendor}
+    locations: classpath:db/migration
     mixed: true
 
   datasource:
-    url: "jdbc:${database.vendor:postgresql}://${database.endpoint:localhost:5432}/${database.name:postgres}"
+    url: "jdbc:postgresql://${database.endpoint:localhost:5432}/${database.name:postgres}"
     username: "${database.username:root}"
     password: "${database.password:dev}"
     hikari:

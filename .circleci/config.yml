@@ -4,11 +4,34 @@ orbs:
   hmpps: ministryofjustice/hmpps@3.8
   slack: circleci/slack@4.3.1
 
+parameters:
+  alerts-slack-channel:
+    type: string
+    default: manage_a_workforce_dev
+
+  java-version:
+    type: string
+    default: 16.0
+  postgres_tag:
+    default: 11
+    type: string
+
+executors:
+  docker-env:
+    docker:
+      - image: cimg/openjdk:<< pipeline.parameters.java-version >>
+        environment:
+          _JAVA_OPTIONS: -Xmx256m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false -Dkotlin.compiler.execution.strategy=in-process
+      - image: postgres:<< pipeline.parameters.postgres_tag >>
+        environment:
+          - POSTGRES_PASSWORD=dev
+          - POSTGRES_USER=root
+    working_directory: ~/app
+
+
 jobs:
   validate:
-    executor:
-      name: hmpps/java_mssql
-      jdk_tag: "16.0"
+    executor: docker-env
     steps:
       - checkout
       - restore_cache:
@@ -20,20 +43,7 @@ jobs:
       - slack/notify:
           event: fail
           channel: manage_a_workforce_dev
-          custom: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "plain_text",
-                      "text": "hmpps-workload validate failed"
-                    }
-                  ]
-                }
-              ]
-            }
+          template: basic_fail_1
       - save_cache:
           paths:
             - ~/.gradle

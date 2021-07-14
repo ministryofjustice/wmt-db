@@ -1,14 +1,6 @@
 server:
   shutdown: immediate
 
-spring:
-  flyway:
-    locations: classpath:db/migration_postgresql
-    mixed: true
-  datasource:
-    url: 'jdbc:h2:mem:hmpps-workload;INIT=create domain if not exists jsonb as text;MODE=PostgreSQL;'
-    username: probation
-    password: tiering
 management.endpoint:
   health.cache.time-to-live: 0
   info.cache.time-to-live: 0
