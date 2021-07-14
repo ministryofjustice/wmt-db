@@ -8,7 +8,6 @@ generic-service:
 
   env:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json
-    DATABASE_NAME: hmpps_workload
 
 generic-prometheus-alerts:
   targetApplication: hmpps-workload-dev
