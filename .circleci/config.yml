@@ -84,6 +84,7 @@ workflows:
             - helm_lint
       - hmpps/deploy_env:
           name: deploy_dev_archive
+          type: approval
           env: "dev_archive"
           context: hmpps-common-vars
           filters:
