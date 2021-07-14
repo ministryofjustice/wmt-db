@@ -11,9 +11,9 @@ parameters:
 
   java-version:
     type: string
-    default: 16.0
+    default: "16.0"
   postgres_tag:
-    default: 11
+    default: "11"
     type: string
 
 executors:
