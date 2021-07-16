@@ -131,7 +131,6 @@ workflows:
               only:
                 - main
     jobs:
-      jobs:
       - hmpps/gradle_owasp_dependency_check:
           slack_channel: << pipeline.parameters.alerts-slack-channel >>
           context:
