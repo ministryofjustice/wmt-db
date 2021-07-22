@@ -131,7 +131,7 @@ workflows:
             - hmpps-workload-preprod
           requires:
             - request-preprod-approval
-      - request-preprod-approval:
+      - request-prod-approval:
           type: approval
           requires:
             - deploy_live_preprod
