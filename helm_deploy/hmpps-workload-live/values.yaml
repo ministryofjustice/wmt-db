@@ -1,6 +1,6 @@
 ---
 generic-service:
-  nameOverride: hmpps-workload
+  nameOverride: hmpps-workload-live
 
   replicaCount: 1
 
