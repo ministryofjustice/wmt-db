@@ -88,7 +88,7 @@ workflows:
           requires:
             - validate
             - build_docker
-            - helm_lint
+            - helm_lint-live
       - hmpps/deploy_env:
           name: deploy_history_dev
           env: "dev"
@@ -103,7 +103,7 @@ workflows:
           requires:
             - validate
             - build_docker
-            - helm_lint
+            - helm_lint-history
       - request-preprod-approval:
           type: approval
           requires:
