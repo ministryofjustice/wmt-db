@@ -103,7 +103,8 @@ workflows:
       - request-preprod-approval:
           type: approval
           requires:
-            - deploy_dev
+            - deploy_live_dev
+            - deploy_history_dev
       - hmpps/deploy_env:
           name: deploy_live_preprod
           env: "preprod"
