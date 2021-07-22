@@ -63,7 +63,11 @@ workflows:
               ignore: /.*/
           context: hmpps-common-vars
       - hmpps/helm_lint:
-          name: helm_lint
+          name: helm_lint-live
+          chart_name: hmpps-workload-live
+      - hmpps/helm_lint:
+          name: helm_lint-history
+          chart_name: hmpps-workload-history
       - hmpps/build_docker:
           name: build_docker
           filters:
@@ -71,8 +75,11 @@ workflows:
               only:
                 - main
       - hmpps/deploy_env:
-          name: deploy_dev
+          name: deploy_live_dev
           env: "dev"
+          chart_name: hmpps-workload-live
+          release_name: hmpps-workload-live
+          k8s_deployment_name: hmpps-workload-live
           context: hmpps-common-vars
           filters:
             branches:
@@ -81,11 +88,13 @@ workflows:
           requires:
             - validate
             - build_docker
-            - helm_lint
+            - helm_lint-live
       - hmpps/deploy_env:
-          name: deploy_dev_archive
-          type: approval
-          env: "dev_archive"
+          name: deploy_history_dev
+          env: "dev"
+          chart_name: hmpps-workload-history
+          release_name: hmpps-workload-history
+          k8s_deployment_name: hmpps-workload-history
           context: hmpps-common-vars
           filters:
             branches:
@@ -94,15 +103,29 @@ workflows:
           requires:
             - validate
             - build_docker
-            - helm_lint
-            - deploy_dev
+            - helm_lint-history
       - request-preprod-approval:
           type: approval
           requires:
-            - deploy_dev
+            - deploy_live_dev
+            - deploy_history_dev
       - hmpps/deploy_env:
-          name: deploy_preprod
+          name: deploy_live_preprod
           env: "preprod"
+          chart_name: hmpps-workload-live
+          release_name: hmpps-workload-live
+          k8s_deployment_name: hmpps-workload-live
+          context:
+            - hmpps-common-vars
+            - hmpps-workload-preprod
+          requires:
+            - request-preprod-approval
+      - hmpps/deploy_env:
+          name: deploy_history_preprod
+          env: "preprod"
+          chart_name: hmpps-workload-history
+          release_name: hmpps-workload-history
+          k8s_deployment_name: hmpps-workload-history
           context:
             - hmpps-common-vars
             - hmpps-workload-preprod
