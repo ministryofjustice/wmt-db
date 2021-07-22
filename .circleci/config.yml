@@ -71,8 +71,11 @@ workflows:
               only:
                 - main
       - hmpps/deploy_env:
-          name: deploy_dev
+          name: deploy_live_dev
           env: "dev"
+          chart_name: hmpps-workload-live
+          release_name: hmpps-workload-live
+          k8s_deployment_name: hmpps-workload-live
           context: hmpps-common-vars
           filters:
             branches:
@@ -83,9 +86,11 @@ workflows:
             - build_docker
             - helm_lint
       - hmpps/deploy_env:
-          name: deploy_dev_archive
-          type: approval
-          env: "dev_archive"
+          name: deploy_history_dev
+          env: "dev"
+          chart_name: hmpps-workload-history
+          release_name: hmpps-workload-history
+          k8s_deployment_name: hmpps-workload-history
           context: hmpps-common-vars
           filters:
             branches:
@@ -95,14 +100,27 @@ workflows:
             - validate
             - build_docker
             - helm_lint
-            - deploy_dev
       - request-preprod-approval:
           type: approval
           requires:
             - deploy_dev
       - hmpps/deploy_env:
-          name: deploy_preprod
+          name: deploy_live_preprod
           env: "preprod"
+          chart_name: hmpps-workload-live
+          release_name: hmpps-workload-live
+          k8s_deployment_name: hmpps-workload-live
+          context:
+            - hmpps-common-vars
+            - hmpps-workload-preprod
+          requires:
+            - request-preprod-approval
+      - hmpps/deploy_env:
+          name: deploy_history_preprod
+          env: "preprod"
+          chart_name: hmpps-workload-history
+          release_name: hmpps-workload-history
+          k8s_deployment_name: hmpps-workload-history
           context:
             - hmpps-common-vars
             - hmpps-workload-preprod
