@@ -63,7 +63,11 @@ workflows:
               ignore: /.*/
           context: hmpps-common-vars
       - hmpps/helm_lint:
-          name: helm_lint
+          name: helm_lint-live
+          chart_name: hmpps-workload-live
+      - hmpps/helm_lint:
+          name: helm_lint-history
+          chart_name: hmpps-workload-history
       - hmpps/build_docker:
           name: build_docker
           filters:
