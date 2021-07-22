@@ -5,8 +5,3 @@ generic-service:
 
   env:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.json
-
-generic-prometheus-alerts:
-  targetApplication: hmpps-workload-preprod
-
-
