@@ -131,19 +131,33 @@ workflows:
             - hmpps-workload-preprod
           requires:
             - request-preprod-approval
-    #      - request-prod-approval:
-    #          type: approval
-    #          requires:
-    #            - deploy_preprod
-    #      - hmpps/deploy_env:
-    #          name: deploy_prod
-    #          env: "prod"
-    #          slack_notification: true
-    #          context:
-    #            - hmpps-common-vars
-    #            - hmpps-workload-prod
-    #          requires:
-    #            - request-prod-approval
+      - request-preprod-approval:
+          type: approval
+          requires:
+            - deploy_live_preprod
+            - deploy_history_preprod
+      - hmpps/deploy_env:
+          name: deploy_live_prod
+          env: "prod"
+          chart_name: hmpps-workload-live
+          release_name: hmpps-workload-live
+          k8s_deployment_name: hmpps-workload-live
+          context:
+            - hmpps-common-vars
+            - hmpps-workload-prod
+          requires:
+            - request-prod-approval
+      - hmpps/deploy_env:
+          name: deploy_history_prod
+          env: "prod"
+          chart_name: hmpps-workload-history
+          release_name: hmpps-workload-history
+          k8s_deployment_name: hmpps-workload-history
+          context:
+            - hmpps-common-vars
+            - hmpps-workload-prod
+          requires:
+            - request-prod-approval
 
   security:
     triggers:
