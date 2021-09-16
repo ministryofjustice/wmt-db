@@ -36,6 +36,14 @@ generic-service:
       DATABASE_PASSWORD: "database_password"
       DATABASE_ENDPOINT: "rds_instance_endpoint"
       DATABASE_NAME: "database_name"
+    hmpps-workload-s3-extract-sqs-output:
+      HMPPS_SQS_QUEUES_EXTRACTQUEUE_ACCESS_KEY_ID: "access_key_id"
+      HMPPS_SQS_QUEUES_EXTRACTQUEUE_SECRET_ACCESS_KEY: "secret_access_key"
+      HMPPS_SQS_QUEUES_EXTRACTQUEUE_QUEUE_NAME: "sqs_name"
+    hmpps-workload-s3-extract-sqs-dl-output:
+      HMPPS_SQS_QUEUES_EXTRACTQUEUE_DLQ_ACCESS_KEY_ID: "access_key_id"
+      HMPPS_SQS_QUEUES_EXTRACTQUEUE_DLQ_SECRET_ACCESS_KEY: "secret_access_key"
+      HMPPS_SQS_QUEUES_EXTRACTQUEUE_DLQ_NAME: "sqs_name"
 
 
   allowlist:

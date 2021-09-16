@@ -10,7 +10,7 @@ configurations {
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-jdbc")
-
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:1.0.2")
   runtimeOnly("com.zaxxer:HikariCP:3.4.5")
   runtimeOnly("org.flywaydb:flyway-core:6.5.6")
   runtimeOnly("org.postgresql:postgresql")
