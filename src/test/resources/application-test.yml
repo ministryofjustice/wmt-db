@@ -4,3 +4,12 @@ server:
 management.endpoint:
   health.cache.time-to-live: 0
   info.cache.time-to-live: 0
+
+hmpps.sqs:
+  provider: localstack
+  queues:
+    extractqueue:
+      accessKeyId: foobar
+      secretAccessKey: foobar
+      queueName: hmpps_workload_s3_extract_event_queue
+      dlqName: hmpps_workload_s3_extract_event_dlq

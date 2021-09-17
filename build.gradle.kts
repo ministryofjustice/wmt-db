@@ -1,6 +1,6 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "3.3.+"
-  kotlin("plugin.spring") version "1.5.10"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "3.3.8"
+  kotlin("plugin.spring") version "1.5.21"
 }
 
 configurations {
@@ -10,10 +10,15 @@ configurations {
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-jdbc")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:1.0.2")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 
   runtimeOnly("com.zaxxer:HikariCP:3.4.5")
   runtimeOnly("org.flywaydb:flyway-core:6.5.6")
   runtimeOnly("org.postgresql:postgresql")
+
+  testImplementation("io.jsonwebtoken:jjwt:0.9.1")
+  testImplementation("com.github.tomakehurst:wiremock-standalone:2.27.2")
 }
 
 tasks {

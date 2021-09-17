@@ -2,6 +2,9 @@ info.app:
   name: Hmpps Workload
   version: 1.0
 
+hmpps:
+  sqs:
+    queueAdminRole: ROLE_QUEUE_WORKLOAD_ADMIN
 spring:
   application:
     name: hmpps-workload
@@ -27,7 +30,11 @@ spring:
     password: "${database.password:dev}"
     hikari:
       maximum-pool-size: 25
-
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${oauth.endpoint.url}/.well-known/jwks.json
 
 server:
   port: 8080
@@ -60,3 +67,6 @@ management:
     info:
       cache:
         time-to-live: 2000ms
+
+oauth:
+  endpoint.url: http://localhost:8090/auth
