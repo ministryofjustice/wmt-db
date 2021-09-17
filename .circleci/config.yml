@@ -26,6 +26,16 @@ executors:
         environment:
           - POSTGRES_PASSWORD=dev
           - POSTGRES_USER=root
+      - image: localstack/localstack:0.12.15
+        environment:
+          - SERVICES=sns,sqs
+          - DEBUG=${DEBUG- }
+          - DATA_DIR=/tmp/localstack/data
+          - DOCKER_HOST=unix:///var/run/docker.sock
+          - LAMBDA_EXECUTOR=${LAMBDA_EXECUTOR- }
+          - AWS_EXECUTION_ENV=True
+          - DEFAULT_REGION=eu-west-2
+          - TMPDIR=/private
     working_directory: ~/app
 
 
@@ -38,6 +48,12 @@ jobs:
           keys:
             - gradle-{{ checksum "build.gradle.kts" }}
             - gradle-
+      - run:
+          name: Wait for s3 to be ready
+          command: curl -4 --connect-timeout 30 --retry-connrefused --retry 20 --retry-delay 5 http://localhost:4566
+      - run:
+          name: Set up sqs queues
+          command: src/test/resources/setup-sqs.sh
       - run:
           command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" check
       - slack/notify:
