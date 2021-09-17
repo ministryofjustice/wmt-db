@@ -18,7 +18,6 @@ dependencies {
   runtimeOnly("org.postgresql:postgresql")
 
   testImplementation("io.jsonwebtoken:jjwt:0.9.1")
-  testImplementation("com.github.tomakehurst:wiremock-standalone:2.27.2")
 }
 
 tasks {
