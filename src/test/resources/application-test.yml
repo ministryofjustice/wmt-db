@@ -5,20 +5,6 @@ management.endpoint:
   health.cache.time-to-live: 0
   info.cache.time-to-live: 0
 
-spring:
-  security:
-    oauth2:
-      client:
-        registration:
-          hmpps-workload:
-            provider: hmpps-auth
-            client-id: hmpps-workload-live-client
-            client-secret: clientsecret
-            authorization-grant-type: client_credentials
-        provider:
-          hmpps-auth:
-            token-uri: ${oauth.endpoint.url}/oauth/token
-
 hmpps.sqs:
   provider: localstack
   queues:
