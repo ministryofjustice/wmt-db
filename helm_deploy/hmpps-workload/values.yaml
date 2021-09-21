@@ -1,6 +1,6 @@
 ---
 generic-service:
-  nameOverride: hmpps-workload-live
+  nameOverride: hmpps-workload
 
   replicaCount: 1
 
@@ -55,5 +55,5 @@ generic-service:
     cloudplatform-live1-3: "35.177.252.54/32"
 
 generic-prometheus-alerts:
-  targetApplication: hmpps-workload-live
+  targetApplication: hmpps-workload
   alertSeverity: hmpps-tier
