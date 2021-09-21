@@ -76,11 +76,7 @@ workflows:
               ignore: /.*/
           context: hmpps-common-vars
       - hmpps/helm_lint:
-          name: helm_lint-live
-          chart_name: hmpps-workload-live
-      - hmpps/helm_lint:
-          name: helm_lint-history
-          chart_name: hmpps-workload-history
+          name: helm_lint
       - hmpps/build_docker:
           name: build_docker
           filters:
@@ -88,11 +84,8 @@ workflows:
               only:
                 - main
       - hmpps/deploy_env:
-          name: deploy_live_dev
+          name: deploy_dev
           env: "dev"
-          chart_name: hmpps-workload-live
-          release_name: hmpps-workload-live
-          k8s_deployment_name: hmpps-workload-live
           context: hmpps-common-vars
           filters:
             branches:
@@ -101,44 +94,14 @@ workflows:
           requires:
             - validate
             - build_docker
-            - helm_lint-live
-      - hmpps/deploy_env:
-          name: deploy_history_dev
-          env: "dev"
-          chart_name: hmpps-workload-history
-          release_name: hmpps-workload-history
-          k8s_deployment_name: hmpps-workload-history
-          context: hmpps-common-vars
-          filters:
-            branches:
-              only:
-                - main
-          requires:
-            - validate
-            - build_docker
-            - helm_lint-history
+            - helm_lint
       - request-preprod-approval:
           type: approval
           requires:
-            - deploy_live_dev
-            - deploy_history_dev
+            - deploy_dev
       - hmpps/deploy_env:
-          name: deploy_live_preprod
+          name: deploy_preprod
           env: "preprod"
-          chart_name: hmpps-workload-live
-          release_name: hmpps-workload-live
-          k8s_deployment_name: hmpps-workload-live
-          context:
-            - hmpps-common-vars
-            - hmpps-workload-preprod
-          requires:
-            - request-preprod-approval
-      - hmpps/deploy_env:
-          name: deploy_history_preprod
-          env: "preprod"
-          chart_name: hmpps-workload-history
-          release_name: hmpps-workload-history
-          k8s_deployment_name: hmpps-workload-history
           context:
             - hmpps-common-vars
             - hmpps-workload-preprod
@@ -147,25 +110,10 @@ workflows:
       - request-prod-approval:
           type: approval
           requires:
-            - deploy_live_preprod
-            - deploy_history_preprod
+            - deploy_preprod
       - hmpps/deploy_env:
-          name: deploy_live_prod
+          name: deploy_prod
           env: "prod"
-          chart_name: hmpps-workload-live
-          release_name: hmpps-workload-live
-          k8s_deployment_name: hmpps-workload-live
-          context:
-            - hmpps-common-vars
-            - hmpps-workload-prod
-          requires:
-            - request-prod-approval
-      - hmpps/deploy_env:
-          name: deploy_history_prod
-          env: "prod"
-          chart_name: hmpps-workload-history
-          release_name: hmpps-workload-history
-          k8s_deployment_name: hmpps-workload-history
           context:
             - hmpps-common-vars
             - hmpps-workload-prod
