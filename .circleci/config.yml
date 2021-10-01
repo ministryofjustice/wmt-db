@@ -120,6 +120,31 @@ workflows:
           requires:
             - request-prod-approval
 
+  build-deploy-migration:
+    jobs:
+      - hmpps/build_docker:
+          name: build_migration_docker
+          image_name: "quay.io/hmpps/wmt-migration"
+          dockerfile_dir: "migration/."
+          filters:
+            branches:
+              only:
+                - main
+      - hmpps/deploy_env:
+          name: deploy_preprod
+          helm_dir: helm_deploy_cron
+          chart_name: wmt-migration
+          release_name: wmt-migration
+          k8s_deployment_name: wmt-migration
+          filters:
+            branches:
+              only:
+                - main
+          env: "preprod"
+          context:
+            - hmpps-common-vars
+            - hmpps-workload-preprod
+
   security:
     triggers:
       - schedule:

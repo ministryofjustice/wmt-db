@@ -1,0 +1,20 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: wmt-migration-cronjob
+spec:
+  schedule: "15 0 * * 1-5"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: wmt-migration
+              image: quay.io/hmpps/wmt-migration
+
+              args:
+                - /bin/sh
+                - migrationRun.sh
+          restartPolicy: Never
+  { { include "deployment.envs" . | nindent 10 } }
