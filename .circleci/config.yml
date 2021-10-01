@@ -136,6 +136,10 @@ workflows:
           chart_name: wmt-migration
           release_name: wmt-migration
           k8s_deployment_name: wmt-migration
+          filters:
+            branches:
+              only:
+                - main
           env: "preprod"
           context:
             - hmpps-common-vars
