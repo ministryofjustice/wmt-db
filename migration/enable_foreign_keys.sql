@@ -30,3 +30,5 @@ ALTER TABLE "app"."tasks" ADD CONSTRAINT "tasks_workload_report_id_foreign_30124
 ALTER TABLE "app"."reductions_history" ADD CONSTRAINT "fk__reduction__reduc__2cb44d6b_1181247263" FOREIGN KEY (reduction_reason_id) REFERENCES app.reduction_reason(id);
 ALTER TABLE "app"."reductions_history" ADD CONSTRAINT "fk__reduction__reduc__2acc04f9_1165247206" FOREIGN KEY (reduction_id) REFERENCES app.reductions(id);
 ALTER TABLE "app"."omic_case_details" ADD CONSTRAINT "fk__omic_case__omic___58e7d564_1661248973" FOREIGN KEY (omic_workload_id) REFERENCES app.omic_workload(id);
+
+call pg_reset_all_table_sequences(true);
