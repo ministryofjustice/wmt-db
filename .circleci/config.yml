@@ -141,6 +141,8 @@ workflows:
               only:
                 - main
           env: "preprod"
+          requires:
+            - build_migration_docker
           context:
             - hmpps-common-vars
             - hmpps-workload-preprod
