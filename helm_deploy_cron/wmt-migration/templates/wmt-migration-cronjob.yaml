@@ -15,5 +15,5 @@ spec:
               args:
                 - /bin/sh
                 - migrationRun.sh
-{ { include "deployment.envs" . | nindent 14 } }
           restartPolicy: Never
+{ { include "deployment.envs" . | nindent 10 } }
