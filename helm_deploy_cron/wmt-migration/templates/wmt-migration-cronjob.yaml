@@ -15,5 +15,6 @@ spec:
               args:
                 - /bin/sh
                 - migrationRun.sh
-          restartPolicy: Never
 {{ include "deployment.envs" . | nindent 14 }}
+          restartPolicy: Never
+
