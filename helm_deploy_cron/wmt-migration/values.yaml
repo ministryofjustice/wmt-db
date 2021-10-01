@@ -4,7 +4,7 @@ namespace_secrets:
   rds-live-instance-output:
     PGUSER: "database_username"
     PGPASSWORD: "database_password"
-    PGHOST: "rds_instance_endpoint"
+    PGHOST: "rds_instance_address"
     PGDATABASE: "database_name"
   dms-instance:
     AWS_ACCESS_KEY_ID: "access_key_id"
