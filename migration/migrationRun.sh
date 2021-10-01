@@ -10,7 +10,7 @@ taskStatus=$(aws dms describe-replication-tasks | jq -r '.ReplicationTasks[] | s
 
 while [[ $taskStatus != "stopped" ]];
 do
-  sleep 10s
+  sleep 30s
   taskStatus=$(aws dms describe-replication-tasks | jq -r '.ReplicationTasks[] | select(.ReplicationTaskArn == env.REPLICATION_TASK_ARN) | .Status')
   echo "DMS full load task status is: $taskStatus"
 done
