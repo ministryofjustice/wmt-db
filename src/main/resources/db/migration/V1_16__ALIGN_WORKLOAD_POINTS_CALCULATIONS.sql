@@ -1,0 +1,1 @@
+alter table app.workload_points_calculations drop column arms_points;
