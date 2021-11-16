@@ -17,7 +17,7 @@ Then execute the command
 
 ## testing
 
-These tests are defaults from the template, and the app only serves to run the flyway scripts. This allows you to test that the scripts work locally against mssql in docker
+These tests are defaults from the template, and the app only serves to run the flyway scripts. This allows you to test that the scripts work locally against postgresql in docker
 ```shell
 docker compose up -d
 ./gradlew clean check
