@@ -1,0 +1,1 @@
+update app.roles set "role" = 'Application Support' where "role" = 'System Admin';
