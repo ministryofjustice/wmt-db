@@ -22,5 +22,5 @@ RUN addgroup --gid 2000 --system appgroup && \
 
 
 USER 2000
-COPY migrationRun.sh disable_foreign_keys.sql enable_foreign_keys.sql add_maw_users.sql /
+COPY migrationRun.sh disable_foreign_keys.sql enable_foreign_keys.sql /
 CMD /bin/bash

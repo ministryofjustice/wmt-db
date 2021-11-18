@@ -17,6 +17,5 @@ done
 
 
 psql -a -q -f enable_foreign_keys.sql
-psql -a -q -f add_maw_users.sql
 
 echo "Completed"
