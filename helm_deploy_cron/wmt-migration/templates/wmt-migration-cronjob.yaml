@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: wmt-migration-cronjob
 spec:
-  schedule: "15 0 * * 1-5"
+  schedule: {{ .Values.cronjob-schedule }}
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 5
   startingDeadlineSeconds: 600
