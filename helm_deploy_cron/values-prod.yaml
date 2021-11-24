@@ -1,6 +1,6 @@
 ---
 
-cronjob-schedule: "15 0 * * 1-5"
+cronjob_schedule: "15 0 * * 1-5"
 
 namespace_secrets:
   rds-live-instance-output:
