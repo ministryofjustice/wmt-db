@@ -1,15 +1,6 @@
 ---
 
-namespace_secrets:
-  rds-live-instance-output:
-    PGUSER: "database_username"
-    PGPASSWORD: "database_password"
-    PGHOST: "rds_instance_address"
-    PGDATABASE: "database_name"
-  dms-instance:
-    AWS_ACCESS_KEY_ID: "access_key_id"
-    AWS_SECRET_ACCESS_KEY: "secret_access_key"
-    REPLICATION_TASK_ARN: "task"
+
 
 env:
   AWS_DEFAULT_REGION: "eu-west-2"
