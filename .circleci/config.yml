@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  hmpps: ministryofjustice/hmpps@3.11
+  hmpps: ministryofjustice/hmpps@3.12
   slack: circleci/slack@4.3.1
 
 parameters:
@@ -9,39 +9,10 @@ parameters:
     type: string
     default: manage_a_workforce_dev
 
-  java-version:
-    type: string
-    default: "16.0"
-  postgres_tag:
-    default: "11"
-    type: string
-
-executors:
-  docker-env:
-    docker:
-      - image: cimg/openjdk:<< pipeline.parameters.java-version >>
-        environment:
-          _JAVA_OPTIONS: -Xmx256m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false -Dkotlin.compiler.execution.strategy=in-process
-      - image: postgres:<< pipeline.parameters.postgres_tag >>
-        environment:
-          - POSTGRES_PASSWORD=dev
-          - POSTGRES_USER=root
-      - image: localstack/localstack:0.12.15
-        environment:
-          - SERVICES=sns,sqs
-          - DEBUG=${DEBUG- }
-          - DATA_DIR=/tmp/localstack/data
-          - DOCKER_HOST=unix:///var/run/docker.sock
-          - LAMBDA_EXECUTOR=${LAMBDA_EXECUTOR- }
-          - AWS_EXECUTION_ENV=True
-          - DEFAULT_REGION=eu-west-2
-          - TMPDIR=/private
-    working_directory: ~/app
-
-
 jobs:
   validate:
-    executor: docker-env
+    executor:
+      name: hmpps/java_localstack_postgres
     steps:
       - checkout
       - restore_cache:
