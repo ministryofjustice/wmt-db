@@ -1,7 +1,3 @@
-info.app:
-  name: Hmpps Workload
-  version: 1.0
-
 hmpps:
   sqs:
     queueAdminRole: ROLE_QUEUE_WORKLOAD_ADMIN
