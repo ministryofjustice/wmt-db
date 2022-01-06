@@ -1,4 +1,5 @@
 ALTER TABLE "app"."adjustments" DROP CONSTRAINT "adjustments_reason_id_foreign_07092021";
+ALTER TABLE "app"."adjustments" DROP CONSTRAINT "adjustments_workload_owner_id_foreign_06012022";
 ALTER TABLE "app"."case_details" DROP CONSTRAINT "case_details_workload_id_foreign_1613248802";
 ALTER TABLE "app"."court_reports" DROP CONSTRAINT "court_reports_workload_owner_id_foreign_557245040";
 ALTER TABLE "app"."court_reports_calculations" DROP CONSTRAINT "court_reports_calculations_court_reports_id_foreign_621245268";
