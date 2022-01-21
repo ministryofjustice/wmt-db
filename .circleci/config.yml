@@ -121,26 +121,6 @@ workflows:
           context:
             - hmpps-common-vars
             - hmpps-workload-preprod
-      - request-migration-prod-approval:
-          type: approval
-          requires:
-            - deploy_migration_preprod
-      - hmpps/deploy_env:
-          name: deploy_migration_prod
-          helm_dir: helm_deploy_cron
-          chart_name: wmt-migration
-          release_name: wmt-migration
-          k8s_deployment_name: wmt-migration
-          filters:
-            branches:
-              only:
-                - main
-          env: "prod"
-          requires:
-            - request-migration-prod-approval
-          context:
-            - hmpps-common-vars
-            - hmpps-workload-prod
 
   security:
     triggers:
