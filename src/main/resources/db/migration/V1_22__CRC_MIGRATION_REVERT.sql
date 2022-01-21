@@ -9,7 +9,7 @@ SELECT
         ON wpc.workload_report_id = wr.id
     GROUP BY wr.effective_from, wr.id;
 
-CREATE OR REPLACE VIEW app.national_caseload_view (link_id, name, region_name, grade_code, location, untiered, a3, a2, a1, a0, b3, b2, b1, b0, c3, c2, c1, c0, d3, d2, d1, d0, total_cases, count) AS
+CREATE OR REPLACE VIEW app.national_caseload_view (link_id, name, grade_code, location, untiered, a3, a2, a1, a0, b3, b2, b1, b0, c3, c2, c1, c0, d3, d2, d1, d0, total_cases, count) AS
 SELECT
     r.id AS link_id, r.description AS name, omt.grade_code, tr.location, SUM((CASE
         WHEN tr.tier_number = 0 THEN tr.total_filtered_cases
