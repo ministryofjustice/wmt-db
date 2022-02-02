@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.0.1-beta"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.0.1"
   kotlin("plugin.spring") version "1.6.10"
 }
 
@@ -15,7 +15,7 @@ dependencies {
 
   runtimeOnly("com.zaxxer:HikariCP")
   runtimeOnly("org.flywaydb:flyway-core")
-  runtimeOnly("org.postgresql:postgresql")
+  runtimeOnly("org.postgresql:postgresql:42.3.2")
 
   testImplementation("io.jsonwebtoken:jjwt:0.9.1")
 }
