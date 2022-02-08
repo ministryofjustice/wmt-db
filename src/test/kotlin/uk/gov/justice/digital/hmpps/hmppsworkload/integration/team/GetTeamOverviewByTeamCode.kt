@@ -9,7 +9,7 @@ class GetTeamOverviewByTeamCode : IntegrationTestBase() {
   fun `can get team overview of offender managers by team code`() {
     webTestClient.get()
       .uri("/team/T1/summary")
-      .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT")) }
+      .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_READ")) }
       .exchange()
       .expectStatus()
       .isOk
