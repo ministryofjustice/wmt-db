@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import javax.persistence.EntityNotFoundException
@@ -38,6 +39,19 @@ class HmppsWorkloadExceptionHandler {
           userMessage = "Entity not found: ${e.message}",
           developerMessage = e.message
       )
+      )
+  }
+
+  @ExceptionHandler(AccessDeniedException::class)
+  fun handleAccessDeniedException(e: Exception): ResponseEntity<ErrorResponse> {
+    return ResponseEntity
+      .status(HttpStatus.FORBIDDEN)
+      .body(
+        ErrorResponse(
+          status = HttpStatus.FORBIDDEN,
+          userMessage = "Access is denied",
+          developerMessage = e.message
+        )
       )
   }
 

@@ -37,4 +37,14 @@ class GetTeamOverviewByTeamCode : IntegrationTestBase() {
       .expectStatus()
       .isNotFound
   }
+
+  @Test
+  fun `must return forbidden when auth token does not contain correct role`() {
+    webTestClient.get()
+      .uri("/team/T1/summary")
+      .headers { it.authToken(roles = listOf("ROLE_RANDOM_ROLE")) }
+      .exchange()
+      .expectStatus()
+      .isForbidden
+  }
 }
