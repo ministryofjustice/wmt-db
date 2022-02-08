@@ -2,9 +2,9 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity
 
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.TeamOverview
 import javax.persistence.Column
+import javax.persistence.ColumnResult
+import javax.persistence.ConstructorResult
 import javax.persistence.Entity
-import javax.persistence.EntityResult
-import javax.persistence.FieldResult
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
@@ -16,23 +16,25 @@ import javax.persistence.Table
 
 @SqlResultSetMapping(
   name = "TeamOverviewResult",
-  entities = [
-    EntityResult(
-      entityClass = TeamOverview::class,
-      fields = [
-        FieldResult(name = "forename", column = "forename"),
-        FieldResult(name = "surname", column = "surname"),
-        FieldResult(name = "grade", column = "grade_code"),
-        FieldResult(name = "totalCommunityCases", column = "total_community_cases"),
-        FieldResult(name = "totalCustodyCases", column = "total_filtered_custody_cases"),
-        FieldResult(name = "availablePoints", column = "available_points"),
-        FieldResult(name = "totalPoints", column = "total_points")
+  classes = [
+    ConstructorResult(
+      targetClass = TeamOverview::class,
+      columns = [
+        ColumnResult(name = "forename"),
+        ColumnResult(name = "surname"),
+        ColumnResult(name = "grade_code"),
+        ColumnResult(name = "total_community_cases"),
+        ColumnResult(name = "total_filtered_custody_cases"),
+        ColumnResult(name = "available_points"),
+        ColumnResult(name = "total_points")
+
       ]
     )
   ]
 )
 @NamedNativeQuery(
   name = "TeamEntity.findByOverview",
+  resultSetMapping = "TeamOverviewResult",
   query = """SELECT
     om.forename,om.surname, om_type.grade_code AS grade_code, (w.total_filtered_community_cases + w.total_filtered_license_cases) as total_community_cases, w.total_filtered_custody_cases , wpc.available_points AS available_points, wpc.total_points AS total_points
     FROM app.workload_owner AS wo
