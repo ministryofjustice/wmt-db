@@ -10,4 +10,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.TeamOverview
 interface TeamRepository : CrudRepository<TeamEntity, Long> {
   @Query(nativeQuery = true)
   fun findByOverview(teamCode: String): List<TeamOverview>
+
+  fun existsByCode(code: String): Boolean
 }

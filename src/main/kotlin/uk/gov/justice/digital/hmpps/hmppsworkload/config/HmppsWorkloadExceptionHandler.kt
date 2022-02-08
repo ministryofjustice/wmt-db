@@ -4,16 +4,18 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import javax.persistence.EntityNotFoundException
 import javax.validation.ValidationException
 
 @RestControllerAdvice
 class HmppsWorkloadExceptionHandler {
   @ExceptionHandler(ValidationException::class)
   fun handleValidationException(e: Exception): ResponseEntity<ErrorResponse> {
-    log.info("Validation exception: {}", e.message)
+    log.error("Validation exception", e)
     return ResponseEntity
       .status(BAD_REQUEST)
       .body(
@@ -22,6 +24,20 @@ class HmppsWorkloadExceptionHandler {
           userMessage = "Validation failure: ${e.message}",
           developerMessage = e.message
         )
+      )
+  }
+
+  @ExceptionHandler(EntityNotFoundException::class)
+  fun handleEntityNotFoundException(e: Exception): ResponseEntity<ErrorResponse> {
+    log.error("Entity not found",e)
+    return ResponseEntity
+      .status(NOT_FOUND)
+      .body(
+        ErrorResponse(
+        status = NOT_FOUND,
+          userMessage = "Entity not found: ${e.message}",
+          developerMessage = e.message
+      )
       )
   }
 

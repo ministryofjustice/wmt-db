@@ -9,6 +9,12 @@ class JpaBasedTeamService(
   private val teamRepository: TeamRepository
 ) : TeamService {
 
-  override fun getTeamOverview(teamCode: String): List<TeamOverview> =
-    teamRepository.findByOverview(teamCode)
+  override fun getTeamOverview(teamCode: String): List<TeamOverview>? {
+    var overviews: List<TeamOverview>? = null
+    if(teamRepository.existsByCode(teamCode)) {
+      overviews = teamRepository.findByOverview(teamCode)
+    }
+    return overviews
+  }
+
 }

@@ -27,4 +27,14 @@ class GetTeamOverviewByTeamCode : IntegrationTestBase() {
       .jsonPath("$.offenderManagers[0].capacity")
       .isEqualTo(0.5)
   }
+
+  @Test
+  fun `must return not found when team code is not matched`() {
+    webTestClient.get()
+      .uri("/team/RANDOMCODE/summary")
+      .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_READ")) }
+      .exchange()
+      .expectStatus()
+      .isNotFound
+  }
 }
