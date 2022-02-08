@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.TeamOverview
 
 data class TeamSummary @JsonCreator constructor(
+
   val offenderManagers: List<OffenderManagerWorkload>
 ) {
   companion object {
