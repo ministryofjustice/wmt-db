@@ -23,3 +23,8 @@ docker compose up -d
 ./gradlew clean check
 ```
 
+## Code style & formatting
+```shell
+./gradlew ktlintApplyToIdea addKtlintFormatGitPreCommitHook
+```
+will apply ktlint styles to intellij and also add a pre-commit hook to format all changed kotlin files.

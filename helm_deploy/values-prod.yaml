@@ -3,6 +3,9 @@
 
 generic-service:
 
+  ingress:
+    host: hmpps-workload.hmpps.service.justice.gov.uk
+
   env:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.json
     OAUTH_ENDPOINT_URL: https://sign-in.hmpps.service.justice.gov.uk/auth
