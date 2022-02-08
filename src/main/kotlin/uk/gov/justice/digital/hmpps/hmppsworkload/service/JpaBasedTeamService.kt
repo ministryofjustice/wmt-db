@@ -11,10 +11,9 @@ class JpaBasedTeamService(
 
   override fun getTeamOverview(teamCode: String): List<TeamOverview>? {
     var overviews: List<TeamOverview>? = null
-    if(teamRepository.existsByCode(teamCode)) {
+    if (teamRepository.existsByCode(teamCode)) {
       overviews = teamRepository.findByOverview(teamCode)
     }
     return overviews
   }
-
 }

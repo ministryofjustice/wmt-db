@@ -30,15 +30,15 @@ class HmppsWorkloadExceptionHandler {
 
   @ExceptionHandler(EntityNotFoundException::class)
   fun handleEntityNotFoundException(e: Exception): ResponseEntity<ErrorResponse> {
-    log.error("Entity not found",e)
+    log.error("Entity not found", e)
     return ResponseEntity
       .status(NOT_FOUND)
       .body(
         ErrorResponse(
-        status = NOT_FOUND,
+          status = NOT_FOUND,
           userMessage = "Entity not found: ${e.message}",
           developerMessage = e.message
-      )
+        )
       )
   }
 

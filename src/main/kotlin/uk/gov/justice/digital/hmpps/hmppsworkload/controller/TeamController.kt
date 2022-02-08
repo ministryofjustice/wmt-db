@@ -21,7 +21,7 @@ class TeamController(
   @GetMapping("/team/{teamCode}/summary")
   fun getTeamSummary(@PathVariable(required = true) teamCode: String): ResponseEntity<TeamSummary> {
     val overviews = teamService.getTeamOverview(teamCode)
-    if(overviews != null) {
+    if (overviews != null) {
       return ResponseEntity.ok(TeamSummary.from(overviews))
     }
     throw EntityNotFoundException("Team not found for $teamCode")
