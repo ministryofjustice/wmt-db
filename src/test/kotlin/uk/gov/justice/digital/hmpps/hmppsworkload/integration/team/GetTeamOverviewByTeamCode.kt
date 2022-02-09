@@ -26,6 +26,8 @@ class GetTeamOverviewByTeamCode : IntegrationTestBase() {
       .isEqualTo(20)
       .jsonPath("$.offenderManagers[0].capacity")
       .isEqualTo(0.5)
+      .jsonPath("$.offenderManagers[0].code")
+      .isEqualTo("OM1")
   }
 
   @Test

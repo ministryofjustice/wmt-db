@@ -26,8 +26,8 @@ import javax.persistence.Table
         ColumnResult(name = "total_community_cases"),
         ColumnResult(name = "total_filtered_custody_cases"),
         ColumnResult(name = "available_points"),
-        ColumnResult(name = "total_points")
-
+        ColumnResult(name = "total_points"),
+        ColumnResult(name = "key")
       ]
     )
   ]
@@ -36,7 +36,7 @@ import javax.persistence.Table
   name = "TeamEntity.findByOverview",
   resultSetMapping = "TeamOverviewResult",
   query = """SELECT
-    om.forename,om.surname, om_type.grade_code AS grade_code, (w.total_filtered_community_cases + w.total_filtered_license_cases) as total_community_cases, w.total_filtered_custody_cases , wpc.available_points AS available_points, wpc.total_points AS total_points
+    om.forename,om.surname, om_type.grade_code AS grade_code, (w.total_filtered_community_cases + w.total_filtered_license_cases) as total_community_cases, w.total_filtered_custody_cases , wpc.available_points AS available_points, wpc.total_points AS total_points, om."key"
     FROM app.workload_owner AS wo
     JOIN app.team AS t
         ON wo.team_id = t.id

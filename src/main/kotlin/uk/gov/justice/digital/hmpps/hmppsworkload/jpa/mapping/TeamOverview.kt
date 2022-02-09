@@ -10,5 +10,6 @@ data class TeamOverview(
   val totalCommunityCases: BigDecimal,
   val totalCustodyCases: BigDecimal,
   val availablePoints: BigInteger,
-  val totalPoints: BigInteger
+  val totalPoints: BigInteger,
+  val code: String,
 )
