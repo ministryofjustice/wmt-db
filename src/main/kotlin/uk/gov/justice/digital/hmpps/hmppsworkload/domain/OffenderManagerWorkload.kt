@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import io.swagger.v3.oas.annotations.media.Schema
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.TeamOverview
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 data class OffenderManagerWorkload @JsonCreator constructor(
   @Schema(description = "Probation Practitioner forename", example = "John")
@@ -30,7 +31,7 @@ data class OffenderManagerWorkload @JsonCreator constructor(
         teamOverview.totalCommunityCases,
         teamOverview.totalCustodyCases,
         BigDecimal(teamOverview.totalPoints)
-          .divide(BigDecimal(teamOverview.availablePoints)).multiply(BigDecimal.valueOf(100)),
+          .divide(BigDecimal(teamOverview.availablePoints), 2, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)),
         teamOverview.code
       )
     }
