@@ -41,7 +41,7 @@ data class OffenderManagerWorkload @JsonCreator constructor(
     private fun calculateCapacity(totalPoints: BigInteger, availablePoints: BigInteger): BigDecimal {
       if (totalPoints != BigInteger.ZERO && availablePoints != BigInteger.ZERO) {
         return BigDecimal(totalPoints, MathContext(2))
-          .divide(BigDecimal(availablePoints, MathContext(2)), 2, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100))
+          .divide(BigDecimal(availablePoints, MathContext(2)), 3, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100))
       }
       return BigDecimal.ZERO
     }
