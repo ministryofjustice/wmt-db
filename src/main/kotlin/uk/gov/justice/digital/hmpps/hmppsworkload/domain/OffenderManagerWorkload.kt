@@ -30,7 +30,7 @@ data class OffenderManagerWorkload @JsonCreator constructor(
         teamOverview.totalCommunityCases,
         teamOverview.totalCustodyCases,
         BigDecimal(teamOverview.totalPoints)
-          .divide(BigDecimal(teamOverview.availablePoints)),
+          .divide(BigDecimal(teamOverview.availablePoints)).multiply(BigDecimal.valueOf(100)),
         teamOverview.code
       )
     }
