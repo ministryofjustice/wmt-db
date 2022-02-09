@@ -8,7 +8,7 @@ class GetTeamOverviewByTeamCode : IntegrationTestBase() {
   @Test
   fun `can get team overview of offender managers by team code`() {
     webTestClient.get()
-      .uri("/team/T1/summary")
+      .uri("/team/T1/offenderManagers")
       .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_READ")) }
       .exchange()
       .expectStatus()
@@ -31,7 +31,7 @@ class GetTeamOverviewByTeamCode : IntegrationTestBase() {
   @Test
   fun `must return not found when team code is not matched`() {
     webTestClient.get()
-      .uri("/team/RANDOMCODE/summary")
+      .uri("/team/RANDOMCODE/offenderManagers")
       .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_READ")) }
       .exchange()
       .expectStatus()
@@ -41,7 +41,7 @@ class GetTeamOverviewByTeamCode : IntegrationTestBase() {
   @Test
   fun `must return forbidden when auth token does not contain correct role`() {
     webTestClient.get()
-      .uri("/team/T1/summary")
+      .uri("/team/T1/offenderManagers")
       .headers { it.authToken(roles = listOf("ROLE_RANDOM_ROLE")) }
       .exchange()
       .expectStatus()

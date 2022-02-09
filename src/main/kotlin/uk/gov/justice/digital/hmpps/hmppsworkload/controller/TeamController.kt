@@ -28,7 +28,7 @@ class TeamController(
     ]
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_READ')")
-  @GetMapping("/team/{teamCode}/summary")
+  @GetMapping("/team/{teamCode}/offenderManagers")
   fun getTeamSummary(@PathVariable(required = true) teamCode: String): ResponseEntity<TeamSummary> {
     val overviews = teamService.getTeamOverview(teamCode)
     if (overviews != null) {
