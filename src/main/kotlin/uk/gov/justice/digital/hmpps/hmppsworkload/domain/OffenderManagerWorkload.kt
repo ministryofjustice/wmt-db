@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.TeamOverview
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.MathContext
+import java.math.RoundingMode
 
 data class OffenderManagerWorkload @JsonCreator constructor(
   @Schema(description = "Probation Practitioner forename", example = "John")
@@ -40,7 +41,7 @@ data class OffenderManagerWorkload @JsonCreator constructor(
     private fun calculateCapacity(totalPoints: BigInteger, availablePoints: BigInteger): BigDecimal {
       if (totalPoints != BigInteger.ZERO && availablePoints != BigInteger.ZERO) {
         return BigDecimal(totalPoints, MathContext(2))
-          .divide(BigDecimal(availablePoints, MathContext(2))).multiply(BigDecimal.valueOf(100))
+          .divide(BigDecimal(availablePoints, MathContext(2)), 2, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100))
       }
       return BigDecimal.ZERO
     }
