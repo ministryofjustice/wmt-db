@@ -1,5 +1,8 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.controller
 
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -17,6 +20,13 @@ class TeamController(
   private val teamService: TeamService
 ) {
 
+  @Operation(summary = "Retrieve Team summary by Team Code")
+  @ApiResponses(
+    value = [
+      ApiResponse(responseCode = "200", description = "OK"),
+      ApiResponse(responseCode = "404", description = "Result Not Found")
+    ]
+  )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/team/{teamCode}/summary")
   fun getTeamSummary(@PathVariable(required = true) teamCode: String): ResponseEntity<TeamSummary> {
