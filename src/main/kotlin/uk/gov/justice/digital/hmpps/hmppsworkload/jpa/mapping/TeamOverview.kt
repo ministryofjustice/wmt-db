@@ -12,4 +12,6 @@ data class TeamOverview(
   val availablePoints: BigInteger,
   val totalPoints: BigInteger,
   val code: String,
-)
+) {
+  lateinit var capacity: BigDecimal
+}
