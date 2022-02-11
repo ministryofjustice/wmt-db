@@ -30,5 +30,7 @@ class GetPotentialCapacityForOffenderManager : IntegrationTestBase() {
       .isEqualTo(50)
       .jsonPath("$.code")
       .isEqualTo("OM1")
+      .jsonPath("$.potentialCapacity")
+      .isEqualTo(61.5)
   }
 }
