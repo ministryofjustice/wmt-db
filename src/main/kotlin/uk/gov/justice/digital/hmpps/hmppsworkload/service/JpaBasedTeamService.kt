@@ -1,8 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.TeamOverview
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.TeamRepository
+import java.math.BigDecimal
 
 @Service
 class JpaBasedTeamService(
@@ -10,11 +11,12 @@ class JpaBasedTeamService(
   private val capacityCalculator: CapacityCalculator
 ) : TeamService {
 
-  override fun getTeamOverview(teamCode: String): List<TeamOverview>? {
-    var overviews: List<TeamOverview>? = null
+  override fun getTeamOverview(teamCode: String): List<OffenderManagerOverview>? {
+    var overviews: List<OffenderManagerOverview>? = null
     if (teamRepository.existsByCode(teamCode)) {
       overviews = teamRepository.findByOverview(teamCode).map {
         it.capacity = capacityCalculator.calculate(it.totalPoints, it.availablePoints)
+        it.potentialCapacity = BigDecimal.ZERO
         it
       }
     }

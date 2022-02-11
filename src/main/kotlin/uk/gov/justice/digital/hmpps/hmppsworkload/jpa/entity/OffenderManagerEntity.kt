@@ -1,39 +1,15 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity
 
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
 import javax.persistence.Column
-import javax.persistence.ColumnResult
-import javax.persistence.ConstructorResult
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
-import javax.persistence.JoinColumn
-import javax.persistence.ManyToOne
 import javax.persistence.NamedNativeQuery
-import javax.persistence.SqlResultSetMapping
 import javax.persistence.Table
 
-@SqlResultSetMapping(
-  name = "TeamOverviewResult",
-  classes = [
-    ConstructorResult(
-      targetClass = OffenderManagerOverview::class,
-      columns = [
-        ColumnResult(name = "forename"),
-        ColumnResult(name = "surname"),
-        ColumnResult(name = "grade_code"),
-        ColumnResult(name = "total_community_cases"),
-        ColumnResult(name = "total_filtered_custody_cases"),
-        ColumnResult(name = "available_points"),
-        ColumnResult(name = "total_points"),
-        ColumnResult(name = "key")
-      ]
-    )
-  ]
-)
 @NamedNativeQuery(
-  name = "TeamEntity.findByOverview",
+  name = "OffenderManagerEntity.findByOverview",
   resultSetMapping = "TeamOverviewResult",
   query = """SELECT
     om.forename,om.surname, om_type.grade_code AS grade_code, (w.total_filtered_community_cases + w.total_filtered_license_cases) as total_community_cases, w.total_filtered_custody_cases , wpc.available_points AS available_points, wpc.total_points AS total_points, om."key"
@@ -50,23 +26,22 @@ import javax.persistence.Table
         ON om.id = wo.offender_manager_id
     JOIN app.offender_manager_type AS om_type
         ON om_type.id = om.type_id
-    WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS NULL AND t.code = ?1"""
+    WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS NULL AND t.code = ?1 AND om."key" = ?2"""
 )
 @Entity
-@Table(name = "team", schema = "app")
-data class TeamEntity(
+@Table(name = "offender_manager", schema = "app")
+data class OffenderManagerEntity(
   @Id
   @Column
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   val id: Long? = null,
 
-  @Column
+  @Column(name = "key")
   val code: String,
 
   @Column
-  val description: String,
+  val forename: String,
 
-  @ManyToOne
-  @JoinColumn(name = "ldu_id")
-  val ldu: LduEntity,
+  @Column
+  val surname: String
 )

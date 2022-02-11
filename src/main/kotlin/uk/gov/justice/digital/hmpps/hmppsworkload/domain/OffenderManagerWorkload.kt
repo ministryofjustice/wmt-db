@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.domain
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import io.swagger.v3.oas.annotations.media.Schema
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.TeamOverview
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
 import java.math.BigDecimal
 
 data class OffenderManagerWorkload @JsonCreator constructor(
@@ -22,7 +22,7 @@ data class OffenderManagerWorkload @JsonCreator constructor(
   val code: String,
 ) {
   companion object {
-    fun from(teamOverview: TeamOverview): OffenderManagerWorkload {
+    fun from(teamOverview: OffenderManagerOverview): OffenderManagerWorkload {
 
       return OffenderManagerWorkload(
         teamOverview.forename,

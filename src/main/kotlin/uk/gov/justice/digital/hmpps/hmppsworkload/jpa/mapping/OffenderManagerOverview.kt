@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping
 import java.math.BigDecimal
 import java.math.BigInteger
 
-data class TeamOverview(
+data class OffenderManagerOverview(
   val forename: String,
   val surname: String,
   val grade: String,
@@ -14,4 +14,5 @@ data class TeamOverview(
   val code: String,
 ) {
   lateinit var capacity: BigDecimal
+  lateinit var potentialCapacity: BigDecimal
 }
