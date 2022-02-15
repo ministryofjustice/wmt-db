@@ -4,6 +4,6 @@ fun potentialCase() = """
   {
      "tier": "B2",
      "type": "COMMUNITY",
-     "T2A": false
+     "isT2A": false
   }
 """.trimIndent()
