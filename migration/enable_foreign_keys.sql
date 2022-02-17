@@ -24,7 +24,7 @@ ALTER TABLE "app"."court_reports_calculations" ADD CONSTRAINT "court_reports_cal
 ALTER TABLE "app"."court_reports" ADD CONSTRAINT "court_reports_workload_owner_id_foreign_557245040" FOREIGN KEY (workload_owner_id) REFERENCES app.workload_owner(id);
 ALTER TABLE "app"."case_details" ADD CONSTRAINT "case_details_workload_id_foreign_1613248802" FOREIGN KEY (workload_id) REFERENCES app.workload(id);
 ALTER TABLE "app"."adjustments" ADD CONSTRAINT "adjustments_reason_id_foreign_07092021" FOREIGN KEY (adjustment_reason_id) REFERENCES app.adjustment_reason(id);
-ALTER TABLE "app"."adjustments" ADD CONSTRAINT "adjustments_workload_owner_id_foreign_06012022" FOREIGN KEY (workload_owner_id) REFERENCES app.workload_owner (id)
+ALTER TABLE "app"."adjustments" ADD CONSTRAINT "adjustments_workload_owner_id_foreign_06012022" FOREIGN KEY (workload_owner_id) REFERENCES app.workload_owner (id);
 ALTER TABLE "app"."user_role" ADD CONSTRAINT "user_role_user_id_foreign_445244641" FOREIGN KEY (user_id) REFERENCES app.users(id);
 ALTER TABLE "app"."user_role" ADD CONSTRAINT "user_role_role_id_foreign_429244584" FOREIGN KEY (role_id) REFERENCES app.roles(id);
 ALTER TABLE "app"."tasks" ADD CONSTRAINT "tasks_workload_report_id_foreign_301244128" FOREIGN KEY (workload_report_id) REFERENCES app.workload_report(id);
