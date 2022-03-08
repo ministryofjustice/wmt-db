@@ -1,16 +1,38 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity
 
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
 import javax.persistence.Column
+import javax.persistence.ColumnResult
+import javax.persistence.ConstructorResult
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.NamedNativeQuery
+import javax.persistence.SqlResultSetMapping
 import javax.persistence.Table
 
+@SqlResultSetMapping(
+  name = "OffenderManagerOverviewResult",
+  classes = [
+    ConstructorResult(
+      targetClass = OffenderManagerOverview::class,
+      columns = [
+        ColumnResult(name = "forename"),
+        ColumnResult(name = "surname"),
+        ColumnResult(name = "grade_code"),
+        ColumnResult(name = "total_community_cases"),
+        ColumnResult(name = "total_filtered_custody_cases"),
+        ColumnResult(name = "available_points"),
+        ColumnResult(name = "total_points"),
+        ColumnResult(name = "key")
+      ]
+    )
+  ]
+)
 @NamedNativeQuery(
   name = "OffenderManagerEntity.findByOverview",
-  resultSetMapping = "TeamOverviewResult",
+  resultSetMapping = "OffenderManagerOverviewResult",
   query = """SELECT
     om.forename,om.surname, om_type.grade_code AS grade_code, (w.total_filtered_community_cases + w.total_filtered_license_cases) as total_community_cases, w.total_filtered_custody_cases , wpc.available_points AS available_points, wpc.total_points AS total_points, om."key"
     FROM app.workload_owner AS wo
