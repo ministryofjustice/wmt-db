@@ -22,4 +22,9 @@ class JpaBasedOffenderManagerService(
       it.potentialCapacity = capacityCalculator.calculate(it.totalPoints.plus(caseCalculator.getPointsForCase(potentialCase)), it.availablePoints)
       return it
     }
+
+  override fun getOverview(teamCode: String, offenderManagerCode: String): OffenderManagerOverview? = offenderManagerRepository.findByOverview(teamCode, offenderManagerCode)?.let {
+    it.capacity = capacityCalculator.calculate(it.totalPoints, it.availablePoints)
+    return it
+  }
 }

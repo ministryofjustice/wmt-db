@@ -12,6 +12,9 @@ data class OffenderManagerOverview(
   val availablePoints: BigInteger,
   val totalPoints: BigInteger,
   val code: String,
+  val teamName: String,
+  val reductionHours: BigDecimal,
+  val contractedHours: BigDecimal
 ) {
   lateinit var capacity: BigDecimal
   lateinit var potentialCapacity: BigDecimal
