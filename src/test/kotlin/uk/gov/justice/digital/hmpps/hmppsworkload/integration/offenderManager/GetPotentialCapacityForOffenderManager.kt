@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsworkload.integration.team
+package uk.gov.justice.digital.hmpps.hmppsworkload.integration.offenderManager
 
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType

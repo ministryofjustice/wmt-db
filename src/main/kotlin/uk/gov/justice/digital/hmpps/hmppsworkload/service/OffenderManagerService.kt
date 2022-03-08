@@ -9,4 +9,6 @@ interface OffenderManagerService {
     offenderManagerCode: String,
     potentialCase: PotentialCase
   ): OffenderManagerOverview?
+
+  fun getOverview(teamCode: String, offenderManagerCode: String): OffenderManagerOverview?
 }
