@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity
 
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.TeamOverview
 import javax.persistence.Column
 import javax.persistence.ColumnResult
 import javax.persistence.ConstructorResult
@@ -18,7 +18,7 @@ import javax.persistence.Table
   name = "TeamOverviewResult",
   classes = [
     ConstructorResult(
-      targetClass = OffenderManagerOverview::class,
+      targetClass = TeamOverview::class,
       columns = [
         ColumnResult(name = "forename"),
         ColumnResult(name = "surname"),
