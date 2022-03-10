@@ -40,5 +40,7 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
       .isEqualTo(500)
       .jsonPath("$.pointsRemaining")
       .isEqualTo(500)
+      .jsonPath("$.lastUpdatedOn")
+      .isEqualTo("2013-11-03T09:00:00")
   }
 }

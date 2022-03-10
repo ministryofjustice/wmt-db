@@ -13,5 +13,5 @@ VALUES((select max(id) from app.workload_owner), (select max(id) from app.worklo
 
 
 INSERT INTO app.workload_points_calculations
-(workload_report_id, workload_points_id, workload_id, total_points, sdr_points, sdr_conversion_points, paroms_points, nominal_target, available_points, contracted_hours, t2a_workload_points_id, reduction_hours)
-VALUES((select max(id) from app.workload_report), (select id from app.workload_points where is_t2a = false), (select max(id) from app.workload), 500, 0, 0, 0, 0, 1000,  37, (select id from app.workload_points where is_t2a = true), 10);
+(workload_report_id, workload_points_id, workload_id, total_points, sdr_points, sdr_conversion_points, paroms_points, nominal_target, available_points, contracted_hours, t2a_workload_points_id, reduction_hours,last_updated_on)
+VALUES((select max(id) from app.workload_report), (select id from app.workload_points where is_t2a = false), (select max(id) from app.workload), 500, 0, 0, 0, 0, 1000,  37, (select id from app.workload_points where is_t2a = true), 10,'2013-11-03 09:00:00'::timestamp);
