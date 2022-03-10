@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.time.LocalDateTime
 
 data class OffenderManagerOverview @JsonCreator constructor(
   @Schema(description = "Probation Practitioner forename", example = "John")
@@ -30,7 +31,9 @@ data class OffenderManagerOverview @JsonCreator constructor(
   @Schema(description = "Probation Practitioner total Points used", example = "1567")
   val pointsUsed: BigInteger,
   @Schema(description = "Probation Practitioner total Points remaining", example = "609")
-  val pointsRemaining: BigInteger
+  val pointsRemaining: BigInteger,
+  @Schema(description = "Last time the Capacity was updated", example = "2013-11-03T09:00:00")
+  val lastUpdatedOn: LocalDateTime?
 ) {
   companion object {
     fun from(offenderManagerOverview: OffenderManagerOverview): uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerOverview {
@@ -46,7 +49,8 @@ data class OffenderManagerOverview @JsonCreator constructor(
         offenderManagerOverview.reductionHours,
         offenderManagerOverview.availablePoints,
         offenderManagerOverview.totalPoints,
-        offenderManagerOverview.availablePoints.minus(offenderManagerOverview.totalPoints)
+        offenderManagerOverview.availablePoints.minus(offenderManagerOverview.totalPoints),
+        offenderManagerOverview.lastUpdatedOn
       )
     }
   }
