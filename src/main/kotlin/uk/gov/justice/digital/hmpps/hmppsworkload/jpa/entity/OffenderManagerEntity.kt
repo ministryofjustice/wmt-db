@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity
 
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
+import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.ColumnResult
 import javax.persistence.ConstructorResult
@@ -28,7 +29,8 @@ import javax.persistence.Table
         ColumnResult(name = "key"),
         ColumnResult(name = "description"),
         ColumnResult(name = "reduction_hours"),
-        ColumnResult(name = "contracted_hours")
+        ColumnResult(name = "contracted_hours"),
+        ColumnResult(name = "last_updated_on", type = LocalDateTime::class)
       ]
     )
   ]
@@ -37,7 +39,7 @@ import javax.persistence.Table
   name = "OffenderManagerEntity.findByOverview",
   resultSetMapping = "OffenderManagerOverviewResult",
   query = """SELECT
-    om.forename,om.surname, om_type.grade_code AS grade_code, (w.total_filtered_community_cases + w.total_filtered_license_cases) as total_community_cases, w.total_filtered_custody_cases , wpc.available_points AS available_points, wpc.total_points AS total_points, om."key", t.description, wpc.reduction_hours, wpc.contracted_hours
+    om.forename,om.surname, om_type.grade_code AS grade_code, (w.total_filtered_community_cases + w.total_filtered_license_cases) as total_community_cases, w.total_filtered_custody_cases , wpc.available_points AS available_points, wpc.total_points AS total_points, om."key", t.description, wpc.reduction_hours, wpc.contracted_hours, wpc.last_updated_on
     FROM app.workload_owner AS wo
     JOIN app.team AS t
         ON wo.team_id = t.id

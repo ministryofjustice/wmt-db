@@ -1,1 +1,1 @@
-alter table app.workload_points_calculations add column last_updated_on TIMESTAMP WITH TIME ZONE;
+alter table app.workload_points_calculations add column last_updated_on TIMESTAMP;
