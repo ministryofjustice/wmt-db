@@ -18,7 +18,7 @@ class QueueAdminTest : IntegrationTestBase() {
   fun `should allow purge with correct auth`() {
     webTestClient.put()
       .uri("/queue-admin/purge-queue/hmpps_workload_s3_extract_event_dlq")
-      .headers { it.authToken(roles = listOf("ROLE_ALLOCATION_API_QUEUE_ADMIN")) }
+      .headers { it.authToken(roles = listOf("ROLE_QUEUE_WORKLOAD_ADMIN")) }
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
