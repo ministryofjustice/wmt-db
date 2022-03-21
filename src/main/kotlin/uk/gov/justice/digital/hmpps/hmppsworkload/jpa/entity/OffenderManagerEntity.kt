@@ -30,7 +30,8 @@ import javax.persistence.Table
         ColumnResult(name = "description"),
         ColumnResult(name = "reduction_hours"),
         ColumnResult(name = "contracted_hours"),
-        ColumnResult(name = "last_updated_on", type = LocalDateTime::class)
+        ColumnResult(name = "last_updated_on", type = LocalDateTime::class),
+        ColumnResult(name = "workload_owner_id", type = Long::class)
       ]
     )
   ]
@@ -39,7 +40,7 @@ import javax.persistence.Table
   name = "OffenderManagerEntity.findByOverview",
   resultSetMapping = "OffenderManagerOverviewResult",
   query = """SELECT
-    om.forename,om.surname, om_type.grade_code AS grade_code, (w.total_filtered_community_cases + w.total_filtered_license_cases) as total_community_cases, w.total_filtered_custody_cases , wpc.available_points AS available_points, wpc.total_points AS total_points, om."key", t.description, wpc.reduction_hours, wpc.contracted_hours, wpc.last_updated_on
+    om.forename,om.surname, om_type.grade_code AS grade_code, (w.total_filtered_community_cases + w.total_filtered_license_cases) as total_community_cases, w.total_filtered_custody_cases , wpc.available_points AS available_points, wpc.total_points AS total_points, om."key", t.description, wpc.reduction_hours, wpc.contracted_hours, wpc.last_updated_on, wo.id as workload_owner_id
     FROM app.workload_owner AS wo
     JOIN app.team AS t
         ON wo.team_id = t.id

@@ -11,7 +11,7 @@ INSERT INTO app.workload
 (workload_owner_id, workload_report_id, total_filtered_community_cases, total_filtered_custody_cases, total_filtered_license_cases,  total_cases, total_community_cases, total_custody_cases, total_license_cases, monthly_sdrs, sdr_due_next_30_days, sdr_conversions_last_30_days, paroms_completed_last_30_days, paroms_due_next_30_days, license_last_16_weeks, community_last_16_weeks, arms_community_cases, arms_license_cases, staging_id, total_t2a_cases, total_t2a_community_cases, total_t2a_custody_cases, total_t2a_license_cases, total_filtered_cases)
 VALUES((select max(id) from app.workload_owner), (select max(id) from app.workload_report), 10, 20, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
-INSERT INTO app.reductions (reduction_reason_id, workload_owner_id, hours, effective_from, effective_to, status) VALUES ((select max(id) from app.reduction_reason), (select max(id) from app.workload_owner), 10, '2013-11-03 09:00:00Z'::timestamp, '2016-11-03 09:00:00Z'::timestamp, 'ACTIVE');
+INSERT INTO app.reductions (reduction_reason_id, workload_owner_id, hours, effective_from, effective_to, status) VALUES ((select max(id) from app.reduction_reason), (select max(id) from app.workload_owner), 10, now()::date + interval '1h' - interval '2 day', now()::date + interval '1h' + interval '2 day', 'ACTIVE');
 
 INSERT INTO app.workload_points_calculations
 (workload_report_id, workload_points_id, workload_id, total_points, sdr_points, sdr_conversion_points, paroms_points, nominal_target, available_points, contracted_hours, t2a_workload_points_id, reduction_hours,last_updated_on)
