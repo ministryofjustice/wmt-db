@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOve
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 data class OffenderManagerOverview @JsonCreator constructor(
   @Schema(description = "Probation Practitioner forename", example = "John")
@@ -33,7 +34,9 @@ data class OffenderManagerOverview @JsonCreator constructor(
   @Schema(description = "Probation Practitioner total Points remaining", example = "609")
   val pointsRemaining: BigInteger,
   @Schema(description = "Last time the Capacity was updated", example = "2013-11-03T09:00:00")
-  val lastUpdatedOn: LocalDateTime?
+  val lastUpdatedOn: LocalDateTime?,
+  @Schema(description = "Next time the reduction total will change", example = "2013-11-03T09:00:00")
+  val nextReductionChange: ZonedDateTime?,
 ) {
   companion object {
     fun from(offenderManagerOverview: OffenderManagerOverview): uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerOverview {
@@ -50,7 +53,8 @@ data class OffenderManagerOverview @JsonCreator constructor(
         offenderManagerOverview.availablePoints,
         offenderManagerOverview.totalPoints,
         offenderManagerOverview.availablePoints.minus(offenderManagerOverview.totalPoints),
-        offenderManagerOverview.lastUpdatedOn
+        offenderManagerOverview.lastUpdatedOn,
+        offenderManagerOverview.nextReductionChange
       )
     }
   }

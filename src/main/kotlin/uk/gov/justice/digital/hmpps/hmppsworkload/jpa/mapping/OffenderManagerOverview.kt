@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 data class OffenderManagerOverview(
   val forename: String,
@@ -16,8 +17,10 @@ data class OffenderManagerOverview(
   val teamName: String,
   val reductionHours: BigDecimal,
   val contractedHours: BigDecimal,
-  val lastUpdatedOn: LocalDateTime?
+  val lastUpdatedOn: LocalDateTime?,
+  val workloadOwnerId: Long
 ) {
   lateinit var capacity: BigDecimal
   lateinit var potentialCapacity: BigDecimal
+  lateinit var nextReductionChange: ZonedDateTime
 }

@@ -2,6 +2,12 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration.offenderManager
 
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 class GetOverviewForOffenderManager : IntegrationTestBase() {
 
@@ -42,5 +48,11 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
       .isEqualTo(500)
       .jsonPath("$.lastUpdatedOn")
       .isEqualTo("2013-11-03T09:00:00")
+      .jsonPath("$.nextReductionChange")
+      .isEqualTo(
+        ZonedDateTime.of(LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT), ZoneId.systemDefault()).plusHours(1).plusDays(2).format(
+          DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        )
+      )
   }
 }
