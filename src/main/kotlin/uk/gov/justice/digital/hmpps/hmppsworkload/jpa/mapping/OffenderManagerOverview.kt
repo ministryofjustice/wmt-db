@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping
 
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.TierCaseTotals
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.LocalDateTime
@@ -23,4 +24,5 @@ data class OffenderManagerOverview(
   lateinit var capacity: BigDecimal
   lateinit var potentialCapacity: BigDecimal
   lateinit var nextReductionChange: ZonedDateTime
+  lateinit var tierCaseTotals: TierCaseTotals
 }
