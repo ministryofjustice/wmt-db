@@ -18,3 +18,21 @@ INSERT INTO app.workload_points_calculations
 VALUES((select max(id) from app.workload_report), (select id from app.workload_points where is_t2a = false), (select max(id) from app.workload), 500, 0, 0, 0, 0, 1000,  37, (select id from app.workload_points where is_t2a = true), (select sum(hours) from app.reductions where status = 'ACTIVE' and workload_owner_id = ((select max(id) from app.workload_owner))),'2013-11-03 09:00:00'::timestamp);
 
 
+INSERT INTO app.tiers (workload_id, location, tier_number, total_filtered_cases, t2a_total_cases, overdue_terminations_total, warrants_total, unpaid_work_total, total_cases)
+VALUES ((select max(id) from app.workload), 'LICENSE', 1, 1, 1, 0, 0,0,2),
+((select max(id) from app.workload), 'COMMUNITY', 1, 1, 1, 0, 0,0,2),
+((select max(id) from app.workload), 'CUSTODY', 1, 1, 1, 0, 0,0,2),
+((select max(id) from app.workload), 'LICENSE', 6, 1, 1, 0, 0,0,2),
+((select max(id) from app.workload), 'COMMUNITY', 6, 1, 1, 0, 0,0,2),
+((select max(id) from app.workload), 'CUSTODY', 6, 1, 1, 0, 0,0,2),
+((select max(id) from app.workload), 'LICENSE', 11, 1, 1, 0, 0,0,2),
+((select max(id) from app.workload), 'COMMUNITY', 11, 1, 1, 0, 0,0,2),
+((select max(id) from app.workload), 'CUSTODY', 11, 1, 1, 0, 0,0,2),
+((select max(id) from app.workload), 'LICENSE', 14, 1, 1, 0, 0,0,2),
+((select max(id) from app.workload), 'COMMUNITY', 14, 1, 1, 0, 0,0,2),
+((select max(id) from app.workload), 'CUSTODY', 14, 1, 1, 0, 0,0,2),
+((select max(id) from app.workload), 'LICENSE', 0, 1, 1, 0, 0,0,2),
+((select max(id) from app.workload), 'COMMUNITY', 0, 1, 1, 0, 0,0,2),
+((select max(id) from app.workload), 'CUSTODY', 0, 1, 1, 0, 0,0,2);
+
+

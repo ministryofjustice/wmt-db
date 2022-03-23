@@ -54,5 +54,15 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
           DateTimeFormatter.ISO_OFFSET_DATE_TIME
         )
       )
+      .jsonPath("$.caseTotals.a")
+      .isEqualTo(6)
+      .jsonPath("$.caseTotals.b")
+      .isEqualTo(6)
+      .jsonPath("$.caseTotals.c")
+      .isEqualTo(6)
+      .jsonPath("$.caseTotals.d")
+      .isEqualTo(6)
+      .jsonPath("$.caseTotals.untiered")
+      .isEqualTo(6)
   }
 }

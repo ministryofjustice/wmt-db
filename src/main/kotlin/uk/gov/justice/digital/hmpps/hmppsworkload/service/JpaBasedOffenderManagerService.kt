@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PotentialCase
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.TierCaseTotals
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.OffenderManagerRepository
@@ -36,6 +37,10 @@ class JpaBasedOffenderManagerService(
         .filter { date -> !date.isBefore(ZonedDateTime.now()) }
         .minByOrNull { date -> date }
         ?.let { nextReductionChange -> it.nextReductionChange = nextReductionChange }
+    }
+    offenderManagerRepository.findByCaseloadTotals(it.workloadOwnerId).let { totals ->
+      it.tierCaseTotals = totals.map { total -> TierCaseTotals(total.getATotal(), total.getBTotal(), total.getCTotal(), total.getDTotal(), total.untiered) }
+        .reduce { first, second -> TierCaseTotals(first.A.add(second.A), first.B.add(second.B), first.C.add(second.C), first.D.add(second.D), first.untiered.add(second.untiered)) }
     }
     return it
   }
