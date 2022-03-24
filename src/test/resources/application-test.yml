@@ -16,3 +16,10 @@ hmpps.sqs:
       secretAccessKey: foobar
       queueName: hmpps_workload_s3_extract_event_queue
       dlqName: hmpps_workload_s3_extract_event_dlq
+
+oauth:
+  endpoint:
+    url: http://localhost:9090/auth
+    client:
+      id: client-id
+      secret: client-secret

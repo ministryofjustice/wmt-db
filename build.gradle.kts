@@ -18,11 +18,15 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-kotlin:1.6.3")
   implementation("org.springdoc:springdoc-openapi-data-rest:1.6.3")
 
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+
   runtimeOnly("com.zaxxer:HikariCP")
   runtimeOnly("org.flywaydb:flyway-core")
   runtimeOnly("org.postgresql:postgresql:42.3.2")
 
   testImplementation("io.jsonwebtoken:jjwt:0.9.1")
+  testImplementation("org.mock-server:mockserver-netty:5.12.0")
 }
 
 tasks {
