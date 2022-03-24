@@ -1,7 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration
 
 import com.microsoft.applicationinsights.core.dependencies.google.gson.Gson
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.TestInstance
 import org.mockserver.integration.ClientAndServer
 import org.mockserver.integration.ClientAndServer.startClientAndServer
 import org.mockserver.model.HttpRequest
@@ -16,9 +18,11 @@ import org.springframework.test.web.reactive.server.WebTestClient
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles("test")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class IntegrationTestBase {
 
   private var oauthMock: ClientAndServer = startClientAndServer(9090)
+  var communityApi: ClientAndServer = startClientAndServer(8092)
   private val gson: Gson = Gson()
 
   @Suppress("SpringJavaInjectionPointsAutowiringInspection")
@@ -30,8 +34,14 @@ abstract class IntegrationTestBase {
 
   @BeforeEach
   fun `setup dependent services`() {
-
+    communityApi.reset()
     setupOauth()
+  }
+
+  @AfterAll
+  fun tearDownServer() {
+    communityApi.stop()
+    oauthMock.stop()
   }
 
   internal fun HttpHeaders.authToken(roles: List<String> = emptyList()) {
