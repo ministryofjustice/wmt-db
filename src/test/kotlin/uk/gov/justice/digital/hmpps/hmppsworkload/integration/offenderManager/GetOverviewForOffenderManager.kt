@@ -65,4 +65,21 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
       .jsonPath("$.caseTotals.untiered")
       .isEqualTo(6)
   }
+
+  @Test
+  fun `can get overview for an offender manager without any reductions`() {
+    webTestClient.get()
+      .uri("/team/T1/offenderManagers/OM2")
+      .headers {
+        it.authToken(roles = listOf("ROLE_WORKLOAD_READ"))
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody()
+      .jsonPath("$.totalReductionHours")
+      .isEqualTo(0)
+      .jsonPath("$.nextReductionChange")
+      .doesNotExist()
+  }
 }
