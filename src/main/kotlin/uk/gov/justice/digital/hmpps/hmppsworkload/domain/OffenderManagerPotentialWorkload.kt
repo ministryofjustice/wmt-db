@@ -27,7 +27,7 @@ data class OffenderManagerPotentialWorkload @JsonCreator constructor(
         offenderManagerOverview.grade,
         offenderManagerOverview.capacity,
         offenderManagerOverview.code,
-        offenderManagerOverview.potentialCapacity
+        offenderManagerOverview.potentialCapacity!!
       )
     }
   }

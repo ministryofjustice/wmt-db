@@ -21,8 +21,8 @@ data class OffenderManagerOverview(
   val lastUpdatedOn: LocalDateTime?,
   val workloadOwnerId: Long
 ) {
-  lateinit var capacity: BigDecimal
-  lateinit var potentialCapacity: BigDecimal
-  lateinit var nextReductionChange: ZonedDateTime
-  lateinit var tierCaseTotals: TierCaseTotals
+  var capacity: BigDecimal = BigDecimal.ZERO
+  var potentialCapacity: BigDecimal? = null
+  var nextReductionChange: ZonedDateTime? = null
+  var tierCaseTotals: TierCaseTotals = TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)
 }
