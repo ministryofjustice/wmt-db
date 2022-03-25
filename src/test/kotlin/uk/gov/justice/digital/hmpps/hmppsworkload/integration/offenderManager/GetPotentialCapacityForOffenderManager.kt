@@ -13,7 +13,7 @@ class GetPotentialCapacityForOffenderManager : IntegrationTestBase() {
       .uri("/team/T1/offenderManagers/OM1/potentialCases")
       .bodyValue(potentialCase())
       .headers {
-        it.authToken(roles = listOf("ROLE_WORKLOAD_READ"))
+        it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
         it.contentType = MediaType.APPLICATION_JSON
       }
       .exchange()

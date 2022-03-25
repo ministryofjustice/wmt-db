@@ -27,7 +27,7 @@ class TeamController(
       ApiResponse(responseCode = "404", description = "Result Not Found")
     ]
   )
-  @PreAuthorize("hasRole('ROLE_WORKLOAD_READ')")
+  @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT')")
   @GetMapping("/team/{teamCode}/offenderManagers")
   fun getTeamSummary(@PathVariable(required = true) teamCode: String): ResponseEntity<TeamSummary> {
     val overviews = teamService.getTeamOverview(teamCode)

@@ -16,7 +16,7 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
     webTestClient.get()
       .uri("/team/T1/offenderManagers/OM1")
       .headers {
-        it.authToken(roles = listOf("ROLE_WORKLOAD_READ"))
+        it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
       }
       .exchange()
       .expectStatus()
@@ -71,7 +71,7 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
     webTestClient.get()
       .uri("/team/T1/offenderManagers/OM2")
       .headers {
-        it.authToken(roles = listOf("ROLE_WORKLOAD_READ"))
+        it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
       }
       .exchange()
       .expectStatus()
