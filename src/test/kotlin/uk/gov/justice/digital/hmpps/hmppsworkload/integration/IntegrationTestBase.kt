@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.mockserver.integration.ClientAndServer
 import org.mockserver.integration.ClientAndServer.startClientAndServer
+import org.mockserver.matchers.Times
 import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
 import org.mockserver.model.MediaType
@@ -15,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDO
 import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.teamStaffResponse
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles("test")
@@ -58,5 +60,15 @@ abstract class IntegrationTestBase {
     val response = HttpResponse.response().withContentType(MediaType.APPLICATION_JSON)
       .withBody(gson.toJson(mapOf("access_token" to "ABCDE", "token_type" to "bearer")))
     oauthMock.`when`(HttpRequest.request().withPath("/auth/oauth/token")).respond(response)
+  }
+
+  protected fun teamStaffResponse(teamCode: String) {
+    val convictionsRequest =
+      HttpRequest.request()
+        .withPath("/teams/$teamCode/staff")
+
+    communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
+      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(teamStaffResponse())
+    )
   }
 }

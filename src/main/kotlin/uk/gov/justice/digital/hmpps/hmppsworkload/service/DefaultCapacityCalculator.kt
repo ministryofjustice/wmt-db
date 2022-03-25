@@ -14,4 +14,18 @@ class DefaultCapacityCalculator : CapacityCalculator {
     }
     return BigDecimal.ZERO
   }
+
+  override fun calculateAvailablePoints(
+    availablePoints: BigDecimal,
+    currentHours: BigDecimal,
+    reductionHours: BigDecimal,
+    defaultContractedHoursForGrade: BigDecimal
+  ): BigDecimal {
+    if (currentHours != BigDecimal.ZERO && defaultContractedHoursForGrade != BigDecimal.ZERO) {
+      val availablePointsForCurrentHours = availablePoints.multiply(currentHours.divide(defaultContractedHoursForGrade))
+      val currentHoursWorked = currentHours.minus(reductionHours).divide(currentHours)
+      return availablePointsForCurrentHours.multiply(currentHoursWorked)
+    }
+    return BigDecimal.ZERO
+  }
 }

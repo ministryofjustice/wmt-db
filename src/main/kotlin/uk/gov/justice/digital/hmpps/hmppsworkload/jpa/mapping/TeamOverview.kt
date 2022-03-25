@@ -13,5 +13,6 @@ data class TeamOverview(
   val totalPoints: BigInteger,
   val code: String,
 ) {
-  lateinit var capacity: BigDecimal
+  var capacity: BigDecimal = BigDecimal.ZERO
+  var staffId: Long = -1
 }

@@ -20,6 +20,8 @@ data class OffenderManagerWorkload @JsonCreator constructor(
   val capacity: BigDecimal,
   @Schema(description = "Offender Manager Code", example = "OM1")
   val code: String,
+  @Schema(description = "StaffId", example = "1111111111")
+  val staffId: Long
 ) {
   companion object {
     fun from(teamOverview: TeamOverview): OffenderManagerWorkload {
@@ -31,7 +33,8 @@ data class OffenderManagerWorkload @JsonCreator constructor(
         teamOverview.totalCommunityCases,
         teamOverview.totalCustodyCases,
         teamOverview.capacity,
-        teamOverview.code
+        teamOverview.code,
+        teamOverview.staffId
       )
     }
   }

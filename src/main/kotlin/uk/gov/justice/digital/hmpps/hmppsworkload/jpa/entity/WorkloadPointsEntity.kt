@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity
 
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
+import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.ZonedDateTime
 import javax.persistence.Column
@@ -36,7 +37,22 @@ data class WorkloadPointsEntity(
   val effectiveTo: ZonedDateTime,
 
   @Column(name = "is_t2a")
-  val isT2A: Boolean
+  val isT2A: Boolean,
+
+  @Column(name = "default_contracted_hours_po")
+  val defaultContractedHoursPO: BigDecimal,
+
+  @Column(name = "default_contracted_hours_spo")
+  val defaultContractedHoursSPO: BigDecimal,
+
+  @Column(name = "default_contracted_hours_pso")
+  val defaultContractedHoursPSO: BigDecimal,
+
+  @Column(name = "nominal_target_spo")
+  val defaultAvailablePointsSPO: BigDecimal,
+
+  @Column(name = "nominal_target_po")
+  val defaultAvailablePointsPO: BigDecimal
 
 ) {
   fun getTierPointsMap(caseType: CaseType): Map<Tier, BigInteger> = when (caseType) {
