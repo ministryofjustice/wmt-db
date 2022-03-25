@@ -11,7 +11,7 @@ class GetTeamOverviewByTeamCode : IntegrationTestBase() {
     teamStaffResponse(teamCode)
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers")
-      .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_READ")) }
+      .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT")) }
       .exchange()
       .expectStatus()
       .isOk
@@ -54,7 +54,7 @@ class GetTeamOverviewByTeamCode : IntegrationTestBase() {
   fun `must return not found when team code is not matched`() {
     webTestClient.get()
       .uri("/team/RANDOMCODE/offenderManagers")
-      .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_READ")) }
+      .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT")) }
       .exchange()
       .expectStatus()
       .isNotFound

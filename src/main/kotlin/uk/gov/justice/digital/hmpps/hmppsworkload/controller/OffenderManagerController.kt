@@ -30,7 +30,7 @@ class OffenderManagerController(
       ApiResponse(responseCode = "404", description = "Result Not Found")
     ]
   )
-  @PreAuthorize("hasRole('ROLE_WORKLOAD_READ')")
+  @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT')")
   @PostMapping("/team/{teamCode}/offenderManagers/{offenderManagerCode}/potentialCases")
   fun getPotentialCaseCapacity(@PathVariable(required = true) teamCode: String, @PathVariable(required = true) offenderManagerCode: String, @RequestBody potentialCase: PotentialCase): OffenderManagerPotentialWorkload {
     val potentialWorkload = offenderManagerService.getPotentialWorkload(teamCode, offenderManagerCode, potentialCase)
@@ -47,7 +47,7 @@ class OffenderManagerController(
       ApiResponse(responseCode = "404", description = "Result Not Found")
     ]
   )
-  @PreAuthorize("hasRole('ROLE_WORKLOAD_READ')")
+  @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT')")
   @GetMapping("/team/{teamCode}/offenderManagers/{offenderManagerCode}")
   fun getOverview(@PathVariable(required = true) teamCode: String, @PathVariable(required = true) offenderManagerCode: String): OffenderManagerOverview {
     return offenderManagerService.getOverview(teamCode, offenderManagerCode)?.let {
