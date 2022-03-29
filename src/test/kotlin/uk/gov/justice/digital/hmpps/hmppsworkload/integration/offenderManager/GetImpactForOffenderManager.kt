@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration.offenderManager
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.request.potentialCase
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.request.impactCase
 
 class GetImpactForOffenderManager : IntegrationTestBase() {
 
@@ -14,10 +14,9 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
     staffIdResponse(staffId)
     tierCalculationResponse(crn)
     singleActiveConvictionResponse(crn)
-    // stub get active convictions
     webTestClient.post()
       .uri("/team/T1/offenderManagers/$staffId/impact")
-      .bodyValue(potentialCase())
+      .bodyValue(impactCase(crn))
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
         it.contentType = MediaType.APPLICATION_JSON
