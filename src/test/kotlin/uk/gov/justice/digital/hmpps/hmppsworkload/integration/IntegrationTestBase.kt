@@ -85,10 +85,10 @@ abstract class IntegrationTestBase {
     )
   }
 
-  protected fun staffIdResponse(staffId: Long) {
+  protected fun staffIdResponse(staffId: Long, staffCode: String) {
     val request = HttpRequest.request().withPath("/staff/staffIdentifier/$staffId")
     communityApi.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(staffByIdResponse())
+      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(staffByIdResponse(staffCode))
     )
   }
 

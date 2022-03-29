@@ -1,13 +1,21 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
 import org.springframework.stereotype.Service
+import reactor.core.publisher.Mono
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.HmppsTierApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.ImpactCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PotentialCase
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.TierCaseTotals
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadPointsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.OffenderManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.ReductionsRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadPointsRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.CaseTypeMapper
+import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.GradeMapper
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.Instant
@@ -19,7 +27,12 @@ class JpaBasedOffenderManagerService(
   private val offenderManagerRepository: OffenderManagerRepository,
   private val capacityCalculator: CapacityCalculator,
   private val caseCalculator: CaseCalculator,
-  private val reductionsRepository: ReductionsRepository
+  private val reductionsRepository: ReductionsRepository,
+  private val communityApiClient: CommunityApiClient,
+  private val gradeMapper: GradeMapper,
+  private val workloadPointsRepository: WorkloadPointsRepository,
+  private val caseTypeMapper: CaseTypeMapper,
+  private val hmppsTierApiClient: HmppsTierApiClient
 ) : OffenderManagerService {
 
   override fun getPotentialWorkload(
@@ -34,13 +47,62 @@ class JpaBasedOffenderManagerService(
     }
 
   override fun getPotentialWorkload(teamCode: String, staffId: Long, impactCase: ImpactCase): OffenderManagerOverview? {
-    return OffenderManagerOverview(
-      "", "", "", BigDecimal.ZERO, BigDecimal.ZERO, BigInteger.ZERO, BigInteger.ZERO, "", "",
-      BigDecimal.ZERO, BigDecimal.ZERO, null, -1
-    ).let {
-      it.capacity = capacityCalculator.calculate(it.totalPoints, it.availablePoints)
-      it.potentialCapacity = capacityCalculator.calculate(it.totalPoints, it.availablePoints)
-      return it
+    return Mono.zip(getOffenderManagerOverview(staffId, teamCode), getPotentialCase(impactCase.crn, impactCase.convictionId))
+      .map { results ->
+        results.t1.potentialCapacity = capacityCalculator.calculate(results.t1.totalPoints.plus(caseCalculator.getPointsForCase(results.t2)), results.t1.availablePoints)
+        results.t1
+      }.block()
+  }
+
+  private fun getPotentialCase(crn: String, convictionId: Long): Mono<PotentialCase> {
+    return Mono.zip(communityApiClient.getActiveConvictions(crn), hmppsTierApiClient.getTierByCrn(crn))
+      .map { results ->
+        val caseType = caseTypeMapper.getCaseType(results.t1, convictionId)
+        val tier = results.t2
+        PotentialCase(Tier.valueOf(tier), caseType, false)
+      }
+  }
+
+  private fun getOffenderManagerOverview(
+    staffId: Long,
+    teamCode: String
+  ) = communityApiClient.getStaffById(staffId)
+    .map { staff ->
+      val overview = offenderManagerRepository.findByOverview(teamCode, staff.staffCode)?.let {
+        it.capacity = capacityCalculator.calculate(it.totalPoints, it.availablePoints)
+        it
+      } ?: run {
+        getDefaultOffenderManagerOverview(
+          staff.staff.forenames,
+          staff.staff.surname,
+          gradeMapper.deliusToStaffGrade(staff.staffGrade?.code),
+          staff.staffCode
+        )
+      }
+      overview.potentialCapacity = capacityCalculator.calculate(overview.totalPoints, overview.availablePoints)
+      overview
+    }
+
+  fun getDefaultOffenderManagerOverview(forename: String, surname: String, grade: String, staffCode: String): OffenderManagerOverview {
+    val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
+    val defaultAvailablePoints = getDefaultPointsAvailable(workloadPoints, grade)
+    val overview = OffenderManagerOverview(forename, surname, grade, BigDecimal.ZERO, BigDecimal.ZERO, defaultAvailablePoints.toBigInteger(), BigInteger.ZERO, staffCode, "", BigDecimal.ZERO, getDefaultContractedHours(workloadPoints, grade), null, -1)
+    overview.capacity = capacityCalculator.calculate(overview.totalPoints, overview.availablePoints)
+    return overview
+  }
+
+  fun getDefaultPointsAvailable(workloadPoints: WorkloadPointsEntity, grade: String): BigDecimal {
+    return when (grade) {
+      "SPO" -> workloadPoints.defaultAvailablePointsSPO
+      else -> workloadPoints.defaultAvailablePointsPO
+    }
+  }
+
+  fun getDefaultContractedHours(workloadPoints: WorkloadPointsEntity, grade: String): BigDecimal {
+    return when (grade) {
+      "PO", "PQiP" -> workloadPoints.defaultContractedHoursPO
+      "PSO" -> workloadPoints.defaultContractedHoursPSO
+      else -> workloadPoints.defaultContractedHoursSPO
     }
   }
 

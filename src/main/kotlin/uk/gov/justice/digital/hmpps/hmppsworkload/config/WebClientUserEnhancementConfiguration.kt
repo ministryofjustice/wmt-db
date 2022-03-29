@@ -17,10 +17,12 @@ import org.springframework.security.oauth2.client.web.reactive.function.client.S
 import org.springframework.web.context.annotation.RequestScope
 import org.springframework.web.reactive.function.client.WebClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.HmppsTierApiClient
 
 @Configuration
 class WebClientUserEnhancementConfiguration(
   @Value("\${community.endpoint.url}") private val communityApiRootUri: String,
+  @Value("\${hmpps-tier.endpoint.url}") private val hmppsTierApiRootUri: String,
 ) {
 
   @Bean
@@ -35,6 +37,20 @@ class WebClientUserEnhancementConfiguration(
   @Bean
   fun communityApiClientUserEnhanced(@Qualifier("communityWebClientUserEnhancedAppScope") webClient: WebClient): CommunityApiClient {
     return CommunityApiClient(webClient)
+  }
+
+  @Bean
+  @RequestScope
+  fun hmppsTierWebClientUserEnhancedAppScope(
+    clientRegistrationRepository: ClientRegistrationRepository,
+    builder: WebClient.Builder
+  ): WebClient {
+    return getOAuthWebClient(authorizedClientManagerUserEnhanced(clientRegistrationRepository), builder, hmppsTierApiRootUri, "hmpps-tier-api")
+  }
+
+  @Bean
+  fun hmppsTierApiClientUserEnhanced(@Qualifier("hmppsTierWebClientUserEnhancedAppScope") webClient: WebClient): HmppsTierApiClient {
+    return HmppsTierApiClient(webClient)
   }
 
   private fun authorizedClientManagerUserEnhanced(clients: ClientRegistrationRepository?): OAuth2AuthorizedClientManager {

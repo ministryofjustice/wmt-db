@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses
 
-fun staffByIdResponse() = """
+fun staffByIdResponse(staffCode: String) = """
   {
     "email": "ben.doe@test.justice.gov.uk",
     "probationArea": {
@@ -60,7 +60,7 @@ fun staffByIdResponse() = """
       "forenames": "Ben",
       "surname": "Doe"
     },
-    "staffCode": "OM1",
+    "staffCode": "$staffCode",
     "staffGrade": {
       "code": "PSM",
       "description": "Some description"
