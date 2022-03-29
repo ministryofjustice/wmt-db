@@ -10,12 +10,15 @@ import org.mockserver.matchers.Times
 import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
 import org.mockserver.model.MediaType
+import org.mockserver.model.Parameter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveConvictionResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByIdResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.teamStaffResponse
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
@@ -25,6 +28,7 @@ abstract class IntegrationTestBase {
 
   private var oauthMock: ClientAndServer = startClientAndServer(9090)
   var communityApi: ClientAndServer = startClientAndServer(8092)
+  var hmppsTier: ClientAndServer = startClientAndServer(8082)
   private val gson: Gson = Gson()
 
   @Suppress("SpringJavaInjectionPointsAutowiringInspection")
@@ -37,6 +41,7 @@ abstract class IntegrationTestBase {
   @BeforeEach
   fun `setup dependent services`() {
     communityApi.reset()
+    hmppsTier.reset()
     setupOauth()
   }
 
@@ -44,6 +49,7 @@ abstract class IntegrationTestBase {
   fun tearDownServer() {
     communityApi.stop()
     oauthMock.stop()
+    hmppsTier.stop()
   }
 
   internal fun HttpHeaders.authToken(roles: List<String> = emptyList()) {
@@ -69,6 +75,30 @@ abstract class IntegrationTestBase {
 
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
       HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(teamStaffResponse())
+    )
+  }
+
+  protected fun tierCalculationResponse(crn: String) {
+    val request = HttpRequest.request().withPath("/crn/$crn/tier")
+    hmppsTier.`when`(request).respond(
+      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody("{\"tierScore\":\"B3\"}")
+    )
+  }
+
+  protected fun staffIdResponse(staffId: Long) {
+    val request = HttpRequest.request().withPath("/staff/staffIdentifier/$staffId")
+    communityApi.`when`(request, Times.exactly(1)).respond(
+      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(staffByIdResponse())
+    )
+  }
+
+  protected fun singleActiveConvictionResponse(crn: String) {
+    val convictionsRequest =
+      HttpRequest.request()
+        .withPath("/offenders/crn/$crn/convictions").withQueryStringParameter(Parameter("activeOnly", "true"))
+
+    communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
+      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(singleActiveConvictionResponse())
     )
   }
 }

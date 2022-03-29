@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.ImpactCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PotentialCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.TierCaseTotals
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
@@ -8,6 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOve
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.OffenderManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.ReductionsRepository
 import java.math.BigDecimal
+import java.math.BigInteger
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -30,6 +32,17 @@ class JpaBasedOffenderManagerService(
       it.potentialCapacity = capacityCalculator.calculate(it.totalPoints.plus(caseCalculator.getPointsForCase(potentialCase)), it.availablePoints)
       return it
     }
+
+  override fun getPotentialWorkload(teamCode: String, staffId: Long, impactCase: ImpactCase): OffenderManagerOverview? {
+    return OffenderManagerOverview(
+      "", "", "", BigDecimal.ZERO, BigDecimal.ZERO, BigInteger.ZERO, BigInteger.ZERO, "", "",
+      BigDecimal.ZERO, BigDecimal.ZERO, null, -1
+    ).let {
+      it.capacity = capacityCalculator.calculate(it.totalPoints, it.availablePoints)
+      it.potentialCapacity = capacityCalculator.calculate(it.totalPoints, it.availablePoints)
+      return it
+    }
+  }
 
   override fun getOverview(teamCode: String, offenderManagerCode: String): OffenderManagerOverview? = offenderManagerRepository.findByOverview(teamCode, offenderManagerCode)?.let {
     it.capacity = capacityCalculator.calculate(it.totalPoints, it.availablePoints)
