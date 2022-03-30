@@ -31,7 +31,7 @@ dependencies {
   runtimeOnly("org.postgresql:postgresql:42.3.3")
 
   testImplementation("io.jsonwebtoken:jjwt:0.9.1")
-  testImplementation("org.mock-server:mockserver-netty:5.11.1")
+  testImplementation("org.mock-server:mockserver-netty:5.13.0")
 }
 
 java {
