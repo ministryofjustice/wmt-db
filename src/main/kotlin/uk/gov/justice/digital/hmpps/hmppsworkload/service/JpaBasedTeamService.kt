@@ -34,6 +34,7 @@ class JpaBasedTeamService(
           staff.map {
             overviews[it.staffCode]?.let { teamOverview ->
               teamOverview.staffId = it.staffIdentifier
+              teamOverview.grade = gradeMapper.workloadToStaffGrade(teamOverview.grade)
               teamOverview
             } ?: run {
               getTeamOverviewForOffenderManagerWithoutWorkload(it.staff.forenames, it.staff.surname, gradeMapper.deliusToStaffGrade(it.staffGrade?.code), it.staffCode, it.staffIdentifier)

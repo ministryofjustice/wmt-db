@@ -19,11 +19,19 @@ fun teamStaffResponse() = """
           }
       },
       {
-          "staffCode": "OM3",
+          "staffCode": "NOWORKLOAD1",
           "staffIdentifier": 987654321,
           "staff": {
               "forenames": "Jane",
               "surname": "Doe"
+          }
+      },
+      {
+          "staffCode": "OM3",
+          "staffIdentifier": 234567891,
+          "staff": {
+              "forenames": "Billy",
+              "surname": "Smith"
           }
       }
   ]
