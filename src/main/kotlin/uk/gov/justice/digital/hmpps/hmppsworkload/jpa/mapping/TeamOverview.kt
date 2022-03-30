@@ -6,7 +6,7 @@ import java.math.BigInteger
 data class TeamOverview(
   val forename: String,
   val surname: String,
-  val grade: String,
+  var grade: String,
   val totalCommunityCases: BigDecimal,
   val totalCustodyCases: BigDecimal,
   val availablePoints: BigInteger,
