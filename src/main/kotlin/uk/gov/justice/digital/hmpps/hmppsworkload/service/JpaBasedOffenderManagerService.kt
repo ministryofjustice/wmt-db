@@ -35,17 +35,6 @@ class JpaBasedOffenderManagerService(
   private val hmppsTierApiClient: HmppsTierApiClient
 ) : OffenderManagerService {
 
-  override fun getPotentialWorkload(
-    teamCode: String,
-    offenderManagerCode: String,
-    potentialCase: PotentialCase
-  ): OffenderManagerOverview? =
-    offenderManagerRepository.findByOverview(teamCode, offenderManagerCode)?.let {
-      it.capacity = capacityCalculator.calculate(it.totalPoints, it.availablePoints)
-      it.potentialCapacity = capacityCalculator.calculate(it.totalPoints.plus(caseCalculator.getPointsForCase(potentialCase)), it.availablePoints)
-      return it
-    }
-
   override fun getPotentialWorkload(teamCode: String, staffId: Long, impactCase: ImpactCase): OffenderManagerOverview? {
     return Mono.zip(getOffenderManagerOverview(staffId, teamCode), getPotentialCase(impactCase.crn, impactCase.convictionId))
       .map { results ->
