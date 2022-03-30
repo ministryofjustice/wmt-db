@@ -70,6 +70,7 @@ class JpaBasedOffenderManagerService(
     .map { staff ->
       val overview = offenderManagerRepository.findByOverview(teamCode, staff.staffCode)?.let {
         it.capacity = capacityCalculator.calculate(it.totalPoints, it.availablePoints)
+        it.grade = gradeMapper.workloadToStaffGrade(it.grade)
         it
       } ?: run {
         getDefaultOffenderManagerOverview(
