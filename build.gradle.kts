@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.1.1"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.1.2"
   kotlin("plugin.spring") version "1.6.10"
   kotlin("plugin.jpa") version "1.6.10"
   id("io.gitlab.arturbosch.detekt").version("1.17.1")
@@ -28,7 +28,7 @@ dependencies {
 
   runtimeOnly("com.zaxxer:HikariCP")
   runtimeOnly("org.flywaydb:flyway-core")
-  runtimeOnly("org.postgresql:postgresql:42.3.2")
+  runtimeOnly("org.postgresql:postgresql:42.3.3")
 
   testImplementation("io.jsonwebtoken:jjwt:0.9.1")
   testImplementation("org.mock-server:mockserver-netty:5.11.1")
