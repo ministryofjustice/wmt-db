@@ -35,17 +35,6 @@ class JpaBasedOffenderManagerService(
   private val hmppsTierApiClient: HmppsTierApiClient
 ) : OffenderManagerService {
 
-  override fun getPotentialWorkload(
-    teamCode: String,
-    offenderManagerCode: String,
-    potentialCase: PotentialCase
-  ): OffenderManagerOverview? =
-    offenderManagerRepository.findByOverview(teamCode, offenderManagerCode)?.let {
-      it.capacity = capacityCalculator.calculate(it.totalPoints, it.availablePoints)
-      it.potentialCapacity = capacityCalculator.calculate(it.totalPoints.plus(caseCalculator.getPointsForCase(potentialCase)), it.availablePoints)
-      return it
-    }
-
   override fun getPotentialWorkload(teamCode: String, staffId: Long, impactCase: ImpactCase): OffenderManagerOverview? {
     return Mono.zip(getOffenderManagerOverview(staffId, teamCode), getPotentialCase(impactCase.crn, impactCase.convictionId))
       .map { results ->
@@ -86,8 +75,13 @@ class JpaBasedOffenderManagerService(
 
   fun getDefaultOffenderManagerOverview(forename: String, surname: String, grade: String, staffCode: String): OffenderManagerOverview {
     val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
-    val defaultAvailablePoints = getDefaultPointsAvailable(workloadPoints, grade)
-    val overview = OffenderManagerOverview(forename, surname, grade, BigDecimal.ZERO, BigDecimal.ZERO, defaultAvailablePoints.toBigInteger(), BigInteger.ZERO, staffCode, "", BigDecimal.ZERO, getDefaultContractedHours(workloadPoints, grade), null, -1)
+    val defaultAvailablePointsForGrade = getDefaultPointsAvailable(workloadPoints, grade)
+    val defaultContractedHours = getDefaultContractedHours(workloadPoints, grade)
+    val availablePoints = capacityCalculator.calculateAvailablePoints(
+      defaultAvailablePointsForGrade, defaultContractedHours,
+      BigDecimal.ZERO, defaultContractedHours
+    )
+    val overview = OffenderManagerOverview(forename, surname, grade, BigDecimal.ZERO, BigDecimal.ZERO, availablePoints.toBigInteger(), BigInteger.ZERO, staffCode, "", BigDecimal.ZERO, defaultContractedHours, null, -1)
     overview.capacity = capacityCalculator.calculate(overview.totalPoints, overview.availablePoints)
     return overview
   }
