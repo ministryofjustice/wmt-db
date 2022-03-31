@@ -50,7 +50,7 @@ class JpaBasedTeamService(
       }.block()?.orElse(null)
   }
 
-  fun getTeamOverviewForOffenderManagerWithoutWorkload(forename: String, surname: String, grade: String, staffCode: String, staffId: Long): TeamOverview {
+  fun getTeamOverviewForOffenderManagerWithoutWorkload(forename: String, surname: String, grade: String, staffCode: String, staffId: BigInteger): TeamOverview {
     val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
     val defaultAvailablePoints = getDefaultPointsAvailable(workloadPoints, grade)
     val overview = TeamOverview(forename, surname, grade, BigDecimal.ZERO, BigDecimal.ZERO, defaultAvailablePoints.toBigInteger(), BigInteger.ZERO, staffCode)

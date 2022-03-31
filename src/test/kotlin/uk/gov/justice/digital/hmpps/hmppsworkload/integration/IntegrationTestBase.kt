@@ -17,9 +17,11 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDO
 import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSummaryResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveConvictionResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByIdResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.teamStaffResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles("test")
@@ -38,11 +40,15 @@ abstract class IntegrationTestBase {
   @Autowired
   protected lateinit var jwtAuthHelper: JwtAuthHelper
 
+  @Autowired
+  protected lateinit var personManagerRepository: PersonManagerRepository
+
   @BeforeEach
   fun `setup dependent services`() {
     communityApi.reset()
     hmppsTier.reset()
     setupOauth()
+    personManagerRepository.deleteAll()
   }
 
   @AfterAll
@@ -50,6 +56,7 @@ abstract class IntegrationTestBase {
     communityApi.stop()
     oauthMock.stop()
     hmppsTier.stop()
+    personManagerRepository.deleteAll()
   }
 
   internal fun HttpHeaders.authToken(roles: List<String> = emptyList()) {
@@ -99,6 +106,15 @@ abstract class IntegrationTestBase {
 
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
       HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(singleActiveConvictionResponse())
+    )
+  }
+
+  protected fun offenderSummaryResponse(crn: String) {
+    val summaryRequest =
+      HttpRequest.request().withPath("/offenders/crn/$crn")
+
+    communityApi.`when`(summaryRequest, Times.exactly(1)).respond(
+      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(offenderSummaryResponse())
     )
   }
 }

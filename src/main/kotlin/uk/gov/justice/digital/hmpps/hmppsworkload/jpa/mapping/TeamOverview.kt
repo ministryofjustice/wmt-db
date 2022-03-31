@@ -14,5 +14,5 @@ data class TeamOverview(
   val code: String,
 ) {
   var capacity: BigDecimal = BigDecimal.ZERO
-  var staffId: Long = -1
+  var staffId: BigInteger = BigInteger.valueOf(-1)
 }

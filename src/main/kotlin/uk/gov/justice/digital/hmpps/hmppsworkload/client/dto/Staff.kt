@@ -1,9 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.client.dto
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import java.math.BigInteger
 
 data class Staff @JsonCreator constructor(
-  val staffIdentifier: Long,
+  val staffIdentifier: BigInteger,
   val staffCode: String,
   val staff: StaffName,
   val staffGrade: StaffGrade?

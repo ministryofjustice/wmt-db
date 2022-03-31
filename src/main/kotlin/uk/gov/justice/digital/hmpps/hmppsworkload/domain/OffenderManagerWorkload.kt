@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import io.swagger.v3.oas.annotations.media.Schema
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.TeamOverview
 import java.math.BigDecimal
+import java.math.BigInteger
 
 data class OffenderManagerWorkload @JsonCreator constructor(
   @Schema(description = "Probation Practitioner forename", example = "John")
@@ -21,7 +22,7 @@ data class OffenderManagerWorkload @JsonCreator constructor(
   @Schema(description = "Offender Manager Code", example = "OM1")
   val code: String,
   @Schema(description = "StaffId", example = "1111111111")
-  val staffId: Long
+  val staffId: BigInteger
 ) {
   companion object {
     fun from(teamOverview: TeamOverview): OffenderManagerWorkload {

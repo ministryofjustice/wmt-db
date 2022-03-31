@@ -5,7 +5,9 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Conviction
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
+import java.math.BigInteger
 
 class CommunityApiClient(private val webClient: WebClient) {
 
@@ -22,7 +24,7 @@ class CommunityApiClient(private val webClient: WebClient) {
       .bodyToMono(responseType)
   }
 
-  fun getStaffById(staffId: Long): Mono<Staff> {
+  fun getStaffById(staffId: BigInteger): Mono<Staff> {
     return webClient
       .get()
       .uri("/staff/staffIdentifier/$staffId")
@@ -37,6 +39,14 @@ class CommunityApiClient(private val webClient: WebClient) {
       .uri("/offenders/crn/$crn/convictions?activeOnly=true")
       .retrieve()
       .bodyToMono(responseType)
+  }
+
+  fun getSummaryByCrn(crn: String): Mono<PersonSummary> {
+    return webClient
+      .get()
+      .uri("/offenders/crn/$crn")
+      .retrieve()
+      .bodyToMono(PersonSummary::class.java)
   }
 }
 
