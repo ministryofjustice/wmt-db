@@ -23,7 +23,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 
 @Service
-class JpaBasedOffenderManagerService(
+class JpaBasedGetOffenderManagerService(
   private val offenderManagerRepository: OffenderManagerRepository,
   private val capacityCalculator: CapacityCalculator,
   private val caseCalculator: CaseCalculator,
@@ -33,9 +33,9 @@ class JpaBasedOffenderManagerService(
   private val workloadPointsRepository: WorkloadPointsRepository,
   private val caseTypeMapper: CaseTypeMapper,
   private val hmppsTierApiClient: HmppsTierApiClient
-) : OffenderManagerService {
+) : GetOffenderManagerService {
 
-  override fun getPotentialWorkload(teamCode: String, staffId: Long, impactCase: ImpactCase): OffenderManagerOverview? {
+  override fun getPotentialWorkload(teamCode: String, staffId: BigInteger, impactCase: ImpactCase): OffenderManagerOverview? {
     return Mono.zip(getOffenderManagerOverview(staffId, teamCode), getPotentialCase(impactCase.crn, impactCase.convictionId))
       .map { results ->
         results.t1.potentialCapacity = capacityCalculator.calculate(results.t1.totalPoints.plus(caseCalculator.getPointsForCase(results.t2)), results.t1.availablePoints)
@@ -53,7 +53,7 @@ class JpaBasedOffenderManagerService(
   }
 
   private fun getOffenderManagerOverview(
-    staffId: Long,
+    staffId: BigInteger,
     teamCode: String
   ) = communityApiClient.getStaffById(staffId)
     .map { staff ->
