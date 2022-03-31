@@ -12,7 +12,8 @@ import java.math.BigInteger
 @Service
 class JpaBasedSavePersonManagerService(
   private val personManagerRepository: PersonManagerRepository,
-  private val communityApiClient: CommunityApiClient
+  private val communityApiClient: CommunityApiClient,
+  private val telemetryService: TelemetryService
 ) : SavePersonManagerService {
   override fun savePersonManager(
     teamCode: String,
@@ -31,6 +32,7 @@ class JpaBasedSavePersonManagerService(
           PersonManagerEntity(crn = allocateCase.crn, staffId = results.t1.staffIdentifier, staffCode = results.t1.staffCode, teamCode = teamCode, offenderName = "${results.t2.firstName} ${results.t2.surname}", createdBy = loggedInUser)
         }.block()!!
       personManagerRepository.save(personManagerEntity)
+      telemetryService.trackPersonManagerAllocated(personManagerEntity)
       personManagerEntity
     }
 }
