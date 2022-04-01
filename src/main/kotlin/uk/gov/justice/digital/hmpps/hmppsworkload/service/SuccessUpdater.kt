@@ -3,6 +3,8 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 import com.amazonaws.services.sns.model.MessageAttributeValue
 import com.amazonaws.services.sns.model.PublishRequest
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsPersonAllocationMessage
@@ -37,6 +39,12 @@ class SuccessUpdater(
     allocationCompleteTopic.snsClient.publish(
       PublishRequest(allocationCompleteTopic.arn, objectMapper.writeValueAsString(hmppsPersonEvent))
         .withMessageAttributes(mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue(hmppsPersonEvent.eventType)))
-    )
+    ).also {
+      log.info("Published event {} to topic for CRN {} and id {}", hmppsPersonEvent.eventType, crn, allocationId)
+    }
+  }
+
+  companion object {
+    val log: Logger = LoggerFactory.getLogger(this::class.java)
   }
 }
