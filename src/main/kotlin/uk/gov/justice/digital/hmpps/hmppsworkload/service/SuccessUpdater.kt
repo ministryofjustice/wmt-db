@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsPersonAllocationMessage
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReferenceType
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingTopicException
 import java.time.ZonedDateTime
@@ -29,7 +31,8 @@ class SuccessUpdater(
       timeUpdated.format(
         DateTimeFormatter.ISO_INSTANT
       ),
-      HmppsPersonAllocationMessage(allocationId, crn)
+      HmppsPersonAllocationMessage(allocationId),
+      PersonReference(listOf(PersonReferenceType("CRN", crn)))
     )
     allocationCompleteTopic.snsClient.publish(
       PublishRequest(allocationCompleteTopic.arn, objectMapper.writeValueAsString(hmppsPersonEvent))

@@ -147,7 +147,7 @@ abstract class IntegrationTestBase {
     val personAllocationMessageType = object : TypeReference<HmppsMessage<HmppsPersonAllocationMessage>>() {}
 
     val changeEvent = objectMapper.readValue(sqsMessage.Message, personAllocationMessageType)
-    Assertions.assertEquals(crn, changeEvent.additionalInformation.crn)
+    Assertions.assertEquals(crn, changeEvent.personReference.identifiers.first { it.type == "CRN" }.value)
   }
 }
 
