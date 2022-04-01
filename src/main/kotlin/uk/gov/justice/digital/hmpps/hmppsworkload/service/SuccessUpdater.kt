@@ -29,7 +29,7 @@ class SuccessUpdater(
     val hmppsPersonEvent = HmppsMessage(
       "PERSON_MANAGER_ALLOCATED", 1, "Person allocated event", "http://dummy.com",
       timeUpdated.format(
-        DateTimeFormatter.ISO_INSTANT
+        DateTimeFormatter.ISO_OFFSET_DATE_TIME
       ),
       HmppsPersonAllocationMessage(allocationId),
       PersonReference(listOf(PersonReferenceType("CRN", crn)))
