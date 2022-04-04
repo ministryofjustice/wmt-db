@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 @Service
-@ConditionalOnProperty(prefix = "hmpps.sqs.topics.hmppsallocationcompletetopic", name = ["arn"])
+@ConditionalOnProperty("hmpps.sqs.topics.hmppsallocationcompletetopic.arn")
 class SqsSuccessUpdater(
   val hmppsQueueService: HmppsQueueService,
   val objectMapper: ObjectMapper

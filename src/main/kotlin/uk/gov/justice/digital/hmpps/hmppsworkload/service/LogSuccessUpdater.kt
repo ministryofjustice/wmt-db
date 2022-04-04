@@ -2,13 +2,14 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.context.annotation.Conditional
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.hmppsworkload.config.NoAllocationCompleteTopicCondition
 import java.time.ZonedDateTime
 import java.util.UUID
 
 @Service
-@ConditionalOnProperty(prefix = "hmpps.sqs.topics.hmppsallocationcompletetopic", name = ["arn"], matchIfMissing = true)
+@Conditional(NoAllocationCompleteTopicCondition::class)
 class LogSuccessUpdater : SuccessUpdater {
 
   override fun updatePerson(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
