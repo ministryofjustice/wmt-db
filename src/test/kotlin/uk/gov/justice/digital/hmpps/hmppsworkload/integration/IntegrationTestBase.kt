@@ -1,7 +1,11 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration
 
-import com.microsoft.applicationinsights.core.dependencies.google.gson.Gson
+import com.amazonaws.services.sqs.AmazonSQSAsync
+import com.amazonaws.services.sqs.model.PurgeQueueRequest
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.mockserver.integration.ClientAndServer
@@ -12,16 +16,21 @@ import org.mockserver.model.HttpResponse
 import org.mockserver.model.MediaType
 import org.mockserver.model.Parameter
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsPersonAllocationMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSummaryResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveConvictionResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByIdResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.teamStaffResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
+import uk.gov.justice.hmpps.sqs.HmppsQueueService
+import uk.gov.justice.hmpps.sqs.MissingQueueException
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles("test")
@@ -31,7 +40,9 @@ abstract class IntegrationTestBase {
   private var oauthMock: ClientAndServer = startClientAndServer(9090)
   var communityApi: ClientAndServer = startClientAndServer(8092)
   var hmppsTier: ClientAndServer = startClientAndServer(8082)
-  private val gson: Gson = Gson()
+
+  @Autowired
+  protected lateinit var objectMapper: ObjectMapper
 
   @Suppress("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
@@ -43,12 +54,22 @@ abstract class IntegrationTestBase {
   @Autowired
   protected lateinit var personManagerRepository: PersonManagerRepository
 
+  @Qualifier("hmppsallocationcompletequeue-sqs-client")
+  @Autowired
+  lateinit var allocationCompleteClient: AmazonSQSAsync
+
+  protected val allocationCompleteUrl by lazy { hmppsQueueService.findByQueueId("hmppsallocationcompletequeue")?.queueUrl ?: throw MissingQueueException("HmppsQueue allocationcompletequeue not found") }
+
+  @Autowired
+  protected lateinit var hmppsQueueService: HmppsQueueService
+
   @BeforeEach
   fun `setup dependent services`() {
     communityApi.reset()
     hmppsTier.reset()
     setupOauth()
     personManagerRepository.deleteAll()
+    allocationCompleteClient.purgeQueue(PurgeQueueRequest(allocationCompleteUrl))
   }
 
   @AfterAll
@@ -71,7 +92,7 @@ abstract class IntegrationTestBase {
 
   fun setupOauth() {
     val response = HttpResponse.response().withContentType(MediaType.APPLICATION_JSON)
-      .withBody(gson.toJson(mapOf("access_token" to "ABCDE", "token_type" to "bearer")))
+      .withBody(objectMapper.writeValueAsString(mapOf("access_token" to "ABCDE", "token_type" to "bearer")))
     oauthMock.`when`(HttpRequest.request().withPath("/auth/oauth/token")).respond(response)
   }
 
@@ -117,4 +138,20 @@ abstract class IntegrationTestBase {
       HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(offenderSummaryResponse())
     )
   }
+
+  protected fun expectPersonAllocationCompleteMessage(crn: String) {
+    oneMessageCurrentlyOnQueue(allocationCompleteClient, allocationCompleteUrl)
+    val message = allocationCompleteClient.receiveMessage(allocationCompleteUrl)
+
+    val sqsMessage = objectMapper.readValue(message.messages[0].body, SQSMessage::class.java)
+    val personAllocationMessageType = object : TypeReference<HmppsMessage<HmppsPersonAllocationMessage>>() {}
+
+    val changeEvent = objectMapper.readValue(sqsMessage.Message, personAllocationMessageType)
+    Assertions.assertEquals(crn, changeEvent.personReference.identifiers.first { it.type == "CRN" }.value)
+  }
 }
+
+data class SQSMessage(
+  val Message: String,
+  val MessageId: String
+)

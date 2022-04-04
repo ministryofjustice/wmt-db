@@ -13,7 +13,8 @@ import java.math.BigInteger
 class JpaBasedSavePersonManagerService(
   private val personManagerRepository: PersonManagerRepository,
   private val communityApiClient: CommunityApiClient,
-  private val telemetryService: TelemetryService
+  private val telemetryService: TelemetryService,
+  private val successUpdater: SuccessUpdater
 ) : SavePersonManagerService {
   override fun savePersonManager(
     teamCode: String,
@@ -33,6 +34,7 @@ class JpaBasedSavePersonManagerService(
         }.block()!!
       personManagerRepository.save(personManagerEntity)
       telemetryService.trackPersonManagerAllocated(personManagerEntity)
+      successUpdater.updatePerson(personManagerEntity.crn, personManagerEntity.uuid, personManagerEntity.createdDate!!)
       personManagerEntity
     }
 }

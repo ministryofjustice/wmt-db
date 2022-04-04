@@ -16,6 +16,15 @@ hmpps.sqs:
       secretAccessKey: foobar
       queueName: hmpps_workload_s3_extract_event_queue
       dlqName: hmpps_workload_s3_extract_event_dlq
+    hmppsallocationcompletequeue:
+      queueName: hmpps_allocation_complete_event_queue
+      dlqName: hmpps_allocation_complete_event_dlq
+      subscribeTopicId: hmppsallocationcompletetopic
+      subscribeFilter: '{"eventType":[ "PERSON_MANAGER_ALLOCATED"] }'
+      asyncQueueClient: true
+  topics:
+    hmppsallocationcompletetopic:
+      arn: arn:aws:sns:eu-west-2:000000000000:${random.uuid}
 community:
   endpoint:
     url: http://localhost:8092
