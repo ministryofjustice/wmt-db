@@ -121,7 +121,7 @@ class JpaBasedGetOffenderManagerService(
     communityApiClient.getStaffByCode(offenderManagerCode)
       .map { staff ->
         val cases = offenderManagerRepository.findCasesByTeamCodeAndStaffCode(teamCode, offenderManagerCode)
-        val team = staff.teams.first { team -> team.code == teamCode }
-        OffenderManagerCases.from(staff, gradeMapper.deliusToStaffGrade(staff.staffGrade?.code), team)
+        val team = staff.teams?.first { team -> team.code == teamCode }
+        OffenderManagerCases.from(staff, gradeMapper.deliusToStaffGrade(staff.staffGrade?.code), team!!)
       }.block()
 }
