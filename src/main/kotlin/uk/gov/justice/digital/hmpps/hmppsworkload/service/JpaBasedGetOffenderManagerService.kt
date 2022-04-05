@@ -5,6 +5,7 @@ import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.HmppsTierApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.ImpactCase
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerCases
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PotentialCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.TierCaseTotals
@@ -115,4 +116,12 @@ class JpaBasedGetOffenderManagerService(
     }
     return it
   }
+
+  override fun getCases(teamCode: String, offenderManagerCode: String): OffenderManagerCases? =
+    communityApiClient.getStaffByCode(offenderManagerCode)
+      .map { staff ->
+        val cases = offenderManagerRepository.findCasesByTeamCodeAndStaffCode(teamCode, offenderManagerCode)
+        val team = staff.teams?.first { team -> team.code == teamCode }
+        OffenderManagerCases.from(staff, gradeMapper.deliusToStaffGrade(staff.staffGrade?.code), team!!, cases)
+      }.block()
 }

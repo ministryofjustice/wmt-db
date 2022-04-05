@@ -7,7 +7,8 @@ data class Staff @JsonCreator constructor(
   val staffIdentifier: BigInteger,
   val staffCode: String,
   val staff: StaffName,
-  val staffGrade: StaffGrade?
+  val staffGrade: StaffGrade?,
+  val teams: List<Team>?
 )
 
 data class StaffName @JsonCreator constructor(
@@ -17,4 +18,9 @@ data class StaffName @JsonCreator constructor(
 
 data class StaffGrade @JsonCreator constructor(
   val code: String
+)
+
+data class Team @JsonCreator constructor(
+  val code: String,
+  val description: String
 )
