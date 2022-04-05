@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseAllocated
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.ImpactCase
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerCases
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerOverview
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerPotentialWorkload
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetOffenderManagerService
@@ -74,5 +75,21 @@ class OffenderManagerController(
   @PostMapping("/team/{teamCode}/offenderManagers/{staffId}/cases")
   fun allocateCaseToOffenderManager(@PathVariable(required = true) teamCode: String, @PathVariable(required = true) staffId: BigInteger, @RequestBody allocateCase: AllocateCase, authentication: Authentication): CaseAllocated {
     return CaseAllocated(savePersonManagerService.savePersonManager(teamCode, staffId, allocateCase, authentication.name).uuid)
+  }
+
+  @Operation(summary = "Retrieves all cases allocated to an Offender Manager")
+  @ApiResponses(
+    value = [
+      ApiResponse(responseCode = "200", description = "OK"),
+      ApiResponse(responseCode = "404", description = "Result Not Found")
+    ]
+  )
+  @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
+  @GetMapping("/team/{teamCode}/offenderManagers/{offenderManagerCode}/cases")
+  fun getCases(@PathVariable(required = true) teamCode: String, @PathVariable(required = true) offenderManagerCode: String): OffenderManagerCases {
+    return getOffenderManagerService.getCases(teamCode, offenderManagerCode)
+      ?: run {
+        throw EntityNotFoundException("Team $teamCode and offender manager $offenderManagerCode combination not found")
+      }
   }
 }

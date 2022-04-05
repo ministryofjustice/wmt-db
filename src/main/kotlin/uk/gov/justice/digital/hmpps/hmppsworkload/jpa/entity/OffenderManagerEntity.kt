@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity
 
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerCaseloadTotals
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
 import java.time.LocalDateTime
@@ -65,6 +66,20 @@ import javax.persistence.Table
     )
   ]
 )
+@SqlResultSetMapping(
+  name = "OffenderManagerCases",
+  classes = [
+    ConstructorResult(
+      targetClass = OffenderManagerCase::class,
+      columns = [
+        ColumnResult(name = "crn"),
+        ColumnResult(name = "tier"),
+        ColumnResult(name = "casetype"),
+        ColumnResult(name = "casecategory")
+      ]
+    )
+  ]
+)
 @NamedNativeQuery(
   name = "OffenderManagerEntity.findByOverview",
   resultSetMapping = "OffenderManagerOverviewResult",
@@ -92,6 +107,30 @@ import javax.persistence.Table
   SELECT location, untiered, a3, a2, a1, a0, b3, b2, b1, b0, c3, c2, c1, c0, d3, d2, d1, d0
   FROM app.team_caseload_view
   WHERE link_id = ?1
+"""
+)
+@NamedNativeQuery(
+  name = "OffenderManagerEntity.findCasesByTeamCodeAndStaffCode",
+  resultSetMapping = "OffenderManagerCases",
+  query = """
+  SELECT
+   c.case_ref_no AS crn, cc.category_name AS tier, rtd.row_type_full_name AS casetype, c."location" AS casecategory
+    FROM app.case_details AS c
+    JOIN app.row_type_definitions AS rtd
+        ON c.row_type = rtd.row_type
+    JOIN app.workload AS w
+        ON c.workload_id = w.id
+    JOIN app.workload_owner AS wo
+        ON w.workload_owner_id = wo.id
+    JOIN app.offender_manager AS om
+        ON wo.offender_manager_id = om.id
+    JOIN app.team AS t
+        ON wo.team_id = t.id
+    JOIN app.workload_report AS wr
+        ON w.workload_report_id = wr.id
+    JOIN app.case_category AS cc
+        ON c.tier_code = cc.category_id
+    WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS null and t.code = ?1 and om."key" = ?2
 """
 )
 @Entity

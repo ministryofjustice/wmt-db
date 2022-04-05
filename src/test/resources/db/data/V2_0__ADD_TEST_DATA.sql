@@ -35,6 +35,12 @@ VALUES ((select max(id) from app.workload), 'LICENSE', 1, 1, 1, 0, 0,0,2),
 ((select max(id) from app.workload), 'COMMUNITY', 0, 1, 1, 0, 0,0,2),
 ((select max(id) from app.workload), 'CUSTODY', 0, 1, 1, 0, 0,0,2);
 
+INSERT INTO app.case_details (workload_id, row_type, case_ref_no, tier_code, team_code, grade_code, "location")
+VALUES((select max(id) from app.workload), 'N', 'CRN1111', 11, (select max(code) from app.team), 'PSP', 'LICENSE'),
+((select max(id) from app.workload), 'N', 'CRN2222', 5, (select max(code) from app.team), 'PSM', 'CUSTODY'),
+((select max(id) from app.workload), 'N', 'CRN3333', 11, (select max(code) from app.team), 'PSM', 'COMMUNITY');
+
+
 
 INSERT INTO app.offender_manager("key", forename, surname, type_id) VALUES('OM2', 'Sally', 'Socks', 1);
 INSERT INTO app.workload_owner(offender_manager_id,contracted_hours,team_id) VALUES ((select max(id) from app.offender_manager), 37, (select max(id) from app.team));
