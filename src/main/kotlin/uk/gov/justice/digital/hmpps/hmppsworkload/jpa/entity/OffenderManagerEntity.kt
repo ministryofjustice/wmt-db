@@ -74,7 +74,6 @@ import javax.persistence.Table
       columns = [
         ColumnResult(name = "crn"),
         ColumnResult(name = "tier"),
-        ColumnResult(name = "casetype"),
         ColumnResult(name = "casecategory")
       ]
     )
@@ -114,10 +113,8 @@ import javax.persistence.Table
   resultSetMapping = "OffenderManagerCases",
   query = """
   SELECT
-   c.case_ref_no AS crn, cc.category_name AS tier, rtd.row_type_full_name AS casetype, c."location" AS casecategory
+   c.case_ref_no AS crn, cc.category_name AS tier, c."location" AS casecategory
     FROM app.case_details AS c
-    JOIN app.row_type_definitions AS rtd
-        ON c.row_type = rtd.row_type
     JOIN app.workload AS w
         ON c.workload_id = w.id
     JOIN app.workload_owner AS wo
@@ -130,7 +127,7 @@ import javax.persistence.Table
         ON w.workload_report_id = wr.id
     JOIN app.case_category AS cc
         ON c.tier_code = cc.category_id
-    WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS null and t.code = ?1 and om."key" = ?2
+    WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS null and c.row_type = 'N' and t.code = ?1 and om."key" = ?2
 """
 )
 @Entity

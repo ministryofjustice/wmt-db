@@ -122,6 +122,6 @@ class JpaBasedGetOffenderManagerService(
       .map { staff ->
         val cases = offenderManagerRepository.findCasesByTeamCodeAndStaffCode(teamCode, offenderManagerCode)
         val team = staff.teams?.first { team -> team.code == teamCode }
-        OffenderManagerCases.from(staff, gradeMapper.deliusToStaffGrade(staff.staffGrade?.code), team!!)
+        OffenderManagerCases.from(staff, gradeMapper.deliusToStaffGrade(staff.staffGrade?.code), team!!, cases)
       }.block()
 }
