@@ -26,6 +26,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsPersonAllocationMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSearchByCrnsResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSummaryResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.oneOffenderSearchByCrnsResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveConvictionResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByCodeResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByIdResponse
@@ -166,6 +167,13 @@ abstract class IntegrationTestBase {
     val request = HttpRequest.request().withPath("/crns").withBody(objectMapper.writeValueAsString(crns))
     offenderSearchApi.`when`(request, Times.exactly(1)).respond(
       HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(offenderSearchByCrnsResponse())
+    )
+  }
+
+  protected fun oneOffenderReturnedWhenSearchByCrnsResponse(crns: List<String>) {
+    val request = HttpRequest.request().withPath("/crns").withBody(objectMapper.writeValueAsString(crns))
+    offenderSearchApi.`when`(request, Times.exactly(1)).respond(
+      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(oneOffenderSearchByCrnsResponse())
     )
   }
 }

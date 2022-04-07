@@ -22,7 +22,7 @@ data class OffenderManagerCases @JsonCreator constructor(
 ) {
   companion object {
     fun from(staff: Staff, grade: String, team: Team, cases: List<OffenderManagerCase>, offenderDetails: Map<String, OffenderDetails>): OffenderManagerCases {
-      return OffenderManagerCases(staff.staff.forenames, staff.staff.surname, grade, staff.staffCode, team.description, cases.map { OffenderManagerActiveCase.from(it, offenderDetails[it.crn]!!) })
+      return OffenderManagerCases(staff.staff.forenames, staff.staff.surname, grade, staff.staffCode, team.description, cases.map { OffenderManagerActiveCase.from(it, offenderDetails[it.crn]) })
     }
   }
 }
@@ -35,13 +35,13 @@ data class OffenderManagerActiveCase(
   @Schema(description = "Case Category", example = "LICENSE")
   val caseCategory: String,
   @Schema(description = "Case forename", example = "Sally")
-  val forename: String,
-  @Schema(description = "Case forename", example = "Smith")
-  val surname: String
+  val forename: String?,
+  @Schema(description = "Case surname", example = "Smith")
+  val surname: String?
 ) {
   companion object {
-    fun from(offenderManagerCase: OffenderManagerCase, offenderDetails: OffenderDetails): OffenderManagerActiveCase {
-      return OffenderManagerActiveCase(offenderManagerCase.crn, offenderManagerCase.tier, offenderManagerCase.caseCategory, offenderDetails.firstName, offenderDetails.surname)
+    fun from(offenderManagerCase: OffenderManagerCase, offenderDetails: OffenderDetails?): OffenderManagerActiveCase {
+      return OffenderManagerActiveCase(offenderManagerCase.crn, offenderManagerCase.tier, offenderManagerCase.caseCategory, offenderDetails?.firstName, offenderDetails?.surname)
     }
   }
 }
