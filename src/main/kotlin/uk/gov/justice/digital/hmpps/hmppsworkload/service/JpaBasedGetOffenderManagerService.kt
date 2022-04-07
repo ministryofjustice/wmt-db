@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.HmppsTierApiClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.OffenderSearchApiClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.ImpactCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerCases
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PotentialCase
@@ -33,7 +35,8 @@ class JpaBasedGetOffenderManagerService(
   private val gradeMapper: GradeMapper,
   private val workloadPointsRepository: WorkloadPointsRepository,
   private val caseTypeMapper: CaseTypeMapper,
-  private val hmppsTierApiClient: HmppsTierApiClient
+  private val hmppsTierApiClient: HmppsTierApiClient,
+  private val offenderSearchApiClient: OffenderSearchApiClient
 ) : GetOffenderManagerService {
 
   override fun getPotentialWorkload(teamCode: String, staffId: BigInteger, impactCase: ImpactCase): OffenderManagerOverview? {
@@ -118,10 +121,24 @@ class JpaBasedGetOffenderManagerService(
   }
 
   override fun getCases(teamCode: String, offenderManagerCode: String): OffenderManagerCases? =
-    communityApiClient.getStaffByCode(offenderManagerCode)
-      .map { staff ->
-        val cases = offenderManagerRepository.findCasesByTeamCodeAndStaffCode(teamCode, offenderManagerCode)
-        val team = staff.teams?.first { team -> team.code == teamCode }
-        OffenderManagerCases.from(staff, gradeMapper.deliusToStaffGrade(staff.staffGrade?.code), team!!, cases)
+    offenderManagerRepository.findCasesByTeamCodeAndStaffCode(teamCode, offenderManagerCode).let { cases ->
+      Mono.zip(
+        communityApiClient.getStaffByCode(offenderManagerCode),
+        getCrnToOffenderDetails(cases.map { it.crn })
+      ).map { results ->
+        val team = results.t1.teams?.first { team -> team.code == teamCode }
+        OffenderManagerCases.from(results.t1, gradeMapper.deliusToStaffGrade(results.t1.staffGrade?.code), team!!, cases, results.t2)
       }.block()
+    }
+
+  private fun getCrnToOffenderDetails(crns: List<String>): Mono<Map<String, OffenderDetails>> {
+    return if (crns.isEmpty()) Mono.just(emptyMap()) else offenderSearchApiClient.getOffendersByCrns(crns)
+      .map { offenderDetails ->
+        offenderDetails.map { offenderDetail ->
+          {
+            offenderDetail.otherIds.crn to offenderDetail
+          }
+        }.associate { it.invoke() }
+      }
+  }
 }

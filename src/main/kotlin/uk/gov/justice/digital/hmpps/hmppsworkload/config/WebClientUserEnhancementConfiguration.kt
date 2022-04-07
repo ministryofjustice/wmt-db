@@ -18,11 +18,13 @@ import org.springframework.web.context.annotation.RequestScope
 import org.springframework.web.reactive.function.client.WebClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.HmppsTierApiClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.OffenderSearchApiClient
 
 @Configuration
 class WebClientUserEnhancementConfiguration(
   @Value("\${community.endpoint.url}") private val communityApiRootUri: String,
   @Value("\${hmpps-tier.endpoint.url}") private val hmppsTierApiRootUri: String,
+  @Value("\${offender-search.endpoint.url}") private val offenderSearchApiRootUri: String,
 ) {
 
   @Bean
@@ -32,6 +34,20 @@ class WebClientUserEnhancementConfiguration(
     builder: WebClient.Builder
   ): WebClient {
     return getOAuthWebClient(authorizedClientManagerUserEnhanced(clientRegistrationRepository), builder, communityApiRootUri, "community-api")
+  }
+
+  @Bean
+  fun offenderSearchApiClientUserEnhanced(@Qualifier("offenderSearchWebClientUserEnhancedAppScope") webClient: WebClient): OffenderSearchApiClient {
+    return OffenderSearchApiClient(webClient)
+  }
+
+  @Bean
+  @RequestScope
+  fun offenderSearchWebClientUserEnhancedAppScope(
+    clientRegistrationRepository: ClientRegistrationRepository,
+    builder: WebClient.Builder
+  ): WebClient {
+    return getOAuthWebClient(authorizedClientManagerUserEnhanced(clientRegistrationRepository), builder, offenderSearchApiRootUri, "offender-search-api")
   }
 
   @Bean
