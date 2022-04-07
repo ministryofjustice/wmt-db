@@ -31,6 +31,9 @@ community:
 hmpps-tier:
   endpoint:
     url: http://localhost:8082
+offender-search:
+  endpoint:
+    url: http://localhost:8095
 oauth:
   endpoint:
     url: http://localhost:9090/auth

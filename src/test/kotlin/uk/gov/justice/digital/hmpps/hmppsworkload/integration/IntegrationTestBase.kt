@@ -24,6 +24,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsPersonAllocationMessage
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSearchByCrnsResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSummaryResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveConvictionResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByCodeResponse
@@ -41,6 +42,7 @@ abstract class IntegrationTestBase {
   private var oauthMock: ClientAndServer = startClientAndServer(9090)
   var communityApi: ClientAndServer = startClientAndServer(8092)
   var hmppsTier: ClientAndServer = startClientAndServer(8082)
+  var offenderSearchApi: ClientAndServer = startClientAndServer(8095)
 
   @Autowired
   protected lateinit var objectMapper: ObjectMapper
@@ -68,6 +70,7 @@ abstract class IntegrationTestBase {
   fun `setup dependent services`() {
     communityApi.reset()
     hmppsTier.reset()
+    offenderSearchApi.reset()
     setupOauth()
     personManagerRepository.deleteAll()
     allocationCompleteClient.purgeQueue(PurgeQueueRequest(allocationCompleteUrl))
@@ -78,6 +81,7 @@ abstract class IntegrationTestBase {
     communityApi.stop()
     oauthMock.stop()
     hmppsTier.stop()
+    offenderSearchApi.stop()
     personManagerRepository.deleteAll()
   }
 
@@ -155,6 +159,13 @@ abstract class IntegrationTestBase {
     val request = HttpRequest.request().withPath("/staff/staffCode/$staffCode")
     communityApi.`when`(request, Times.exactly(1)).respond(
       HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(staffByCodeResponse(staffCode, teamCode))
+    )
+  }
+
+  protected fun offenderSearchByCrnsResponse(crns: List<String>) {
+    val request = HttpRequest.request().withPath("/crns").withBody(objectMapper.writeValueAsString(crns))
+    offenderSearchApi.`when`(request, Times.exactly(1)).respond(
+      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(offenderSearchByCrnsResponse())
     )
   }
 }
