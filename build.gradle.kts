@@ -20,7 +20,7 @@ dependencies {
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:1.1.3")
 
   implementation("org.springdoc:springdoc-openapi-ui:1.6.6")
-  implementation("org.springdoc:springdoc-openapi-kotlin:1.6.6")
+  implementation("org.springdoc:springdoc-openapi-kotlin:1.6.7")
   implementation("org.springdoc:springdoc-openapi-data-rest:1.6.6")
 
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
