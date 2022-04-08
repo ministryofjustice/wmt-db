@@ -22,6 +22,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.GradeMapper
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.Instant
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
@@ -66,18 +67,20 @@ class JpaBasedGetOffenderManagerService(
         it.grade = gradeMapper.workloadToStaffGrade(it.grade)
         it
       } ?: run {
+        val team = staff.teams?.first { team -> team.code == teamCode }
         getDefaultOffenderManagerOverview(
           staff.staff.forenames,
           staff.staff.surname,
           gradeMapper.deliusToStaffGrade(staff.staffGrade?.code),
-          staff.staffCode
+          staff.staffCode,
+          team!!.description
         )
       }
       overview.potentialCapacity = capacityCalculator.calculate(overview.totalPoints, overview.availablePoints)
       overview
     }
 
-  fun getDefaultOffenderManagerOverview(forename: String, surname: String, grade: String, staffCode: String): OffenderManagerOverview {
+  fun getDefaultOffenderManagerOverview(forename: String, surname: String, grade: String, staffCode: String, teamName: String): OffenderManagerOverview {
     val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
     val defaultAvailablePointsForGrade = getDefaultPointsAvailable(workloadPoints, grade)
     val defaultContractedHours = getDefaultContractedHours(workloadPoints, grade)
@@ -85,7 +88,7 @@ class JpaBasedGetOffenderManagerService(
       defaultAvailablePointsForGrade, defaultContractedHours,
       BigDecimal.ZERO, defaultContractedHours
     )
-    val overview = OffenderManagerOverview(forename, surname, grade, BigDecimal.ZERO, BigDecimal.ZERO, availablePoints.toBigInteger(), BigInteger.ZERO, staffCode, "", BigDecimal.ZERO, defaultContractedHours, null, -1)
+    val overview = OffenderManagerOverview(forename, surname, grade, BigDecimal.ZERO, BigDecimal.ZERO, availablePoints.toBigInteger(), BigInteger.ZERO, staffCode, teamName, BigDecimal.ZERO, defaultContractedHours, LocalDateTime.now(), -1)
     overview.capacity = capacityCalculator.calculate(overview.totalPoints, overview.availablePoints)
     return overview
   }
@@ -118,6 +121,18 @@ class JpaBasedGetOffenderManagerService(
         .fold(TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)) { first, second -> TierCaseTotals(first.A.add(second.A), first.B.add(second.B), first.C.add(second.C), first.D.add(second.D), first.untiered.add(second.untiered)) }
     }
     return it
+  } ?: run {
+    communityApiClient.getStaffByCode(offenderManagerCode)
+      .map { staff ->
+        val team = staff.teams?.first { team -> team.code == teamCode }
+        getDefaultOffenderManagerOverview(
+          staff.staff.forenames,
+          staff.staff.surname,
+          gradeMapper.deliusToStaffGrade(staff.staffGrade?.code),
+          staff.staffCode,
+          team!!.description
+        )
+      }.block()
   }
 
   override fun getCases(teamCode: String, offenderManagerCode: String): OffenderManagerCases? =

@@ -12,11 +12,12 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
     val staffId = 123456789L
     val crn = "CRN1"
     val staffCode = "OM1"
-    staffIdResponse(staffId, staffCode)
+    val teamCode = "T1"
+    staffIdResponse(staffId, staffCode, teamCode)
     tierCalculationResponse(crn)
     singleActiveConvictionResponse(crn)
     webTestClient.post()
-      .uri("/team/T1/offenderManagers/$staffId/impact")
+      .uri("/team/$teamCode/offenderManagers/$staffId/impact")
       .bodyValue(impactCase(crn))
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
@@ -45,11 +46,12 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
     val staffId = 123456789L
     val crn = "CRN1"
     val staffCode = "NOWORKLOAD1"
-    staffIdResponse(staffId, staffCode)
+    val teamCode = "T1"
+    staffIdResponse(staffId, staffCode, teamCode)
     tierCalculationResponse(crn)
     singleActiveConvictionResponse(crn)
     webTestClient.post()
-      .uri("/team/T1/offenderManagers/$staffId/impact")
+      .uri("/team/$teamCode/offenderManagers/$staffId/impact")
       .bodyValue(impactCase(crn))
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
@@ -78,11 +80,12 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
     val staffId = 123456789L
     val crn = "CRN1"
     val staffCode = "NOWORKLOAD1"
-    staffIdResponse(staffId, staffCode, "UNKNOWNGRADECODE")
+    val teamCode = "T1"
+    staffIdResponse(staffId, staffCode, teamCode, "UNKNOWNGRADECODE")
     tierCalculationResponse(crn)
     singleActiveConvictionResponse(crn)
     webTestClient.post()
-      .uri("/team/T1/offenderManagers/$staffId/impact")
+      .uri("/team/$teamCode/offenderManagers/$staffId/impact")
       .bodyValue(impactCase(crn))
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))

@@ -82,4 +82,56 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
       .jsonPath("$.nextReductionChange")
       .doesNotExist()
   }
+
+  @Test
+  fun `can get overview for an offender manager without workload`() {
+    val teamCode = "T1"
+    val offenderManagerCode = "NOWORKLOAD1"
+    staffCodeResponse(offenderManagerCode, teamCode)
+    webTestClient.get()
+      .uri("/team/$teamCode/offenderManagers/$offenderManagerCode")
+      .headers {
+        it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody()
+      .jsonPath("$.forename")
+      .isEqualTo("Ben")
+      .jsonPath("$.surname")
+      .isEqualTo("Doe")
+      .jsonPath("$.grade")
+      .isEqualTo("PO")
+      .jsonPath("$.capacity")
+      .isEqualTo(0)
+      .jsonPath("$.code")
+      .isEqualTo(offenderManagerCode)
+      .jsonPath("$.teamName")
+      .isEqualTo("Test Team")
+      .jsonPath("$.totalCases")
+      .isEqualTo(0)
+      .jsonPath("$.weeklyHours")
+      .isEqualTo(37)
+      .jsonPath("$.totalReductionHours")
+      .isEqualTo(0)
+      .jsonPath("$.pointsAvailable")
+      .isEqualTo(2176)
+      .jsonPath("$.pointsUsed")
+      .isEqualTo(0)
+      .jsonPath("$.pointsRemaining")
+      .isEqualTo(2176)
+      .jsonPath("$.nextReductionChange")
+      .doesNotExist()
+      .jsonPath("$.caseTotals.a")
+      .isEqualTo(0)
+      .jsonPath("$.caseTotals.b")
+      .isEqualTo(0)
+      .jsonPath("$.caseTotals.c")
+      .isEqualTo(0)
+      .jsonPath("$.caseTotals.d")
+      .isEqualTo(0)
+      .jsonPath("$.caseTotals.untiered")
+      .isEqualTo(0)
+  }
 }
