@@ -15,10 +15,11 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     val staffId = 123456789L
     val crn = "CRN1"
     val staffCode = "OM1"
-    staffIdResponse(staffId, staffCode)
+    val teamCode = "T1"
+    staffIdResponse(staffId, staffCode, teamCode)
     offenderSummaryResponse(crn)
     webTestClient.post()
-      .uri("/team/T1/offenderManagers/$staffId/cases")
+      .uri("/team/$teamCode/offenderManagers/$staffId/cases")
       .bodyValue(allocateCase(crn))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
@@ -40,7 +41,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     val crn = "CRN1"
     val staffCode = "OM1"
     val teamCode = "T1"
-    staffIdResponse(staffId.longValueExact(), staffCode)
+    staffIdResponse(staffId.longValueExact(), staffCode, teamCode)
     offenderSummaryResponse(crn)
     val storedPersonManager = PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "John Doe", createdBy = "USER1")
     personManagerRepository.save(storedPersonManager)
@@ -65,7 +66,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     val crn = "CRN1"
     val staffCode = "OM1"
     val teamCode = "T1"
-    staffIdResponse(staffId.longValueExact(), staffCode)
+    staffIdResponse(staffId.longValueExact(), staffCode, teamCode)
     offenderSummaryResponse(crn)
     personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = teamCode, offenderName = "John Doe", createdBy = "USER1"))
     webTestClient.post()

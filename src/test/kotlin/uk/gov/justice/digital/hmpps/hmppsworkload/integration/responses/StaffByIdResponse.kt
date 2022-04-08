@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses
 
-fun staffByIdResponse(staffCode: String, staffGradeCode: String) = """
+fun staffByIdResponse(staffCode: String, staffGradeCode: String, teamCode: String) = """
   {
     "email": "ben.doe@test.justice.gov.uk",
     "probationArea": {
@@ -31,7 +31,7 @@ fun staffByIdResponse(staffCode: String, staffGradeCode: String) = """
             "code": "ABC123",
             "description": "Some description"
           },
-          "code": "string",
+          "code": "$teamCode",
           "description": "string",
           "district": {
             "code": "ABC123",
@@ -72,7 +72,7 @@ fun staffByIdResponse(staffCode: String, staffGradeCode: String) = """
           "code": "ABC123",
           "description": "Some description"
         },
-        "code": "C01T04",
+        "code": "$teamCode",
         "description": "OMU A",
         "district": {
           "code": "ABC123",
