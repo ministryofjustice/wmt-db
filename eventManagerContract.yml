@@ -70,6 +70,8 @@ components:
         - staffCode
         - teamCode
         - providerCode
+        - createdBy
+        - createdDate
       type: object
       properties:
         id:
@@ -100,3 +102,9 @@ components:
           type: string
           description: Provider Code
           example: PC1
+        createdBy:
+          type: string
+          description: The name of the user who created the relationship
+        createdDate:
+          type: string
+          format: date-time
