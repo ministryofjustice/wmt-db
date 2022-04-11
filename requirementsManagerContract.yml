@@ -1,0 +1,115 @@
+openapi: 3.0.1
+info:
+  title: Workload
+  description: Offender Manager Workload
+  contact:
+    name: HMPPS Digital Studio
+    email: feedback@digital.justice.gov.uk
+  version: 2022-04-08.2089.1b5c2dc
+servers:
+  - url: https://hmpps-workload.hmpps.service.justice.gov.uk
+    description: Prod
+  - url: https://hmpps-workload-preprod.hmpps.service.justice.gov.uk
+    description: PreProd
+  - url: https://hmpps-workload-dev.hmpps.service.justice.gov.uk
+    description: Development
+  - url: http://localhost:8080
+    description: Local
+paths:
+  /allocation/requirements/{uuid}:
+    get:
+      tags:
+        - requirement-manager-controller
+      summary: Get information about the requirement manager relationship
+      operationId: requirementManagerById
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequirementManager'
+        '404':
+          description: Result Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ErrorResponse:
+      required:
+        - status
+        - userMessage
+        - developerMessage
+      type: object
+      properties:
+        status:
+          type: integer
+          description: HTTP Status Code
+          example: 404
+        userMessage:
+          type: string
+          description: User Readable message of error
+          example: Entity not found
+        developerMessage:
+          type: string
+          description: Exception message
+    RequirementManager:
+      required:
+        - id
+        - crn
+        - eventId
+        - staffId
+        - requirementId
+        - staffCode
+        - teamCode
+        - providerCode
+        - createdBy
+        - createdDate
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of the Event Manager entity
+          example: 00000000-0000-0000-0000-000000000000
+        crn:
+          type: string
+          description: CRN of person on Probation
+          example: CRN11111
+        eventId:
+          type: integer
+          description: Event Identifier
+          example: 111222333444
+        staffId:
+          type: integer
+          description: Probation Practitioner staff Id
+          example: 123456789
+        requirementId:
+          type: integer
+          description: Requirement Identifier
+          example: 555666777888
+        staffCode:
+          type: string
+          description: Probation Practitioner Code
+          example: OM123456
+        teamCode:
+          type: string
+          description: Team Code
+          example: TM56789
+        providerCode:
+          type: string
+          description: Provider Code
+          example: PC1
+        createdBy:
+          type: string
+          description: The name of the user who created the relationship
+        createdDate:
+          type: string
+          format: date-time
