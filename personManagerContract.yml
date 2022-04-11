@@ -1,0 +1,97 @@
+openapi: 3.0.1
+info:
+  title: Workload
+  description: Offender Manager Workload
+  contact:
+    name: HMPPS Digital Studio
+    email: feedback@digital.justice.gov.uk
+  version: 2022-04-08.2089.1b5c2dc
+servers:
+  - url: https://hmpps-workload.hmpps.service.justice.gov.uk
+    description: Prod
+  - url: https://hmpps-workload-preprod.hmpps.service.justice.gov.uk
+    description: PreProd
+  - url: https://hmpps-workload-dev.hmpps.service.justice.gov.uk
+    description: Development
+  - url: http://localhost:8080
+    description: Local
+paths:
+  /allocation/person/{uuid}:
+    get:
+      tags:
+        - person-manager-controller
+      summary: Get information about the person manager relationship
+      operationId: personManagerById
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonManager'
+        '404':
+          description: Result Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    PersonManager:
+      required:
+        - id
+        - crn
+        - staffId
+        - staffCode
+        - teamCode
+        - providerCode
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of the Person Manager entity
+          example: 00000000-0000-0000-0000-000000000000
+        crn:
+          type: string
+          description: CRN of person on Probation
+          example: CRN11111
+        staffId:
+          type: integer
+          description: Probation Practitioner staff Id
+          example: 123456789
+        staffCode:
+          type: string
+          description: Probation Practitioner Code
+          example: OM123456
+        teamCode:
+          type: string
+          description: Team Code
+          example: TM56789
+        providerCode:
+          type: string
+          description: Provider Code
+          example: PC1
+    ErrorResponse:
+      required:
+        - status
+        - userMessage
+        - developerMessage
+      type: object
+      properties:
+        status:
+          type: integer
+          description: HTTP Status Code
+          example: 404
+        userMessage:
+          type: string
+          description: User Readable message of error
+          example: Entity not found
+        developerMessage:
+          type: string
+          description: Exception message
