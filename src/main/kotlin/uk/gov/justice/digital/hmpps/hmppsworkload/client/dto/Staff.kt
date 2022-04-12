@@ -9,7 +9,7 @@ data class Staff @JsonCreator constructor(
   val staff: StaffName,
   val staffGrade: StaffGrade?,
   val teams: List<Team>?,
-  val probationArea: StaffProbationArea
+  val probationArea: StaffProbationArea?
 )
 
 data class StaffName @JsonCreator constructor(

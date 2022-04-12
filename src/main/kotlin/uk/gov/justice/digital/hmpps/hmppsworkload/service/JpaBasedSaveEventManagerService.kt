@@ -38,7 +38,7 @@ class JpaBasedSaveEventManagerService(
       teamCode = teamCode,
       eventId = allocateCase.eventId,
       createdBy = loggedInUser,
-      providerCode = staff.probationArea.code
+      providerCode = staff.probationArea!!.code
     )
     eventManagerRepository.save(eventManagerEntity)
     return eventManagerEntity

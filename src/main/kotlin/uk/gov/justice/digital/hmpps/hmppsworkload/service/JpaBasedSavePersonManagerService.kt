@@ -27,7 +27,7 @@ class JpaBasedSavePersonManagerService(
       }
       throw PersonManagerAlreadyAllocatedError("CRN ${allocateCase.crn} already allocated")
     } ?: run {
-      val personManagerEntity = PersonManagerEntity(crn = allocateCase.crn, staffId = staff.staffIdentifier, staffCode = staff.staffCode, teamCode = teamCode, offenderName = "${personSummary.firstName} ${personSummary.surname}", createdBy = loggedInUser, providerCode = staff.probationArea.code)
+      val personManagerEntity = PersonManagerEntity(crn = allocateCase.crn, staffId = staff.staffIdentifier, staffCode = staff.staffCode, teamCode = teamCode, offenderName = "${personSummary.firstName} ${personSummary.surname}", createdBy = loggedInUser, providerCode = staff.probationArea!!.code)
       personManagerRepository.save(personManagerEntity)
       telemetryService.trackPersonManagerAllocated(personManagerEntity)
       successUpdater.updatePerson(personManagerEntity.crn, personManagerEntity.uuid, personManagerEntity.createdDate!!)
