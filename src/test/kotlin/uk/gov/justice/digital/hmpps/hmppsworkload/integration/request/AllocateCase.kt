@@ -1,7 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.request
 
-fun allocateCase(crn: String) = """
+import java.math.BigInteger
+
+fun allocateCase(crn: String, eventId: BigInteger) = """
   {
-     "crn": "$crn"
+     "crn": "$crn",
+     "eventId": $eventId
   }
 """.trimIndent()
