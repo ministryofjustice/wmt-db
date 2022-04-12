@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.request.allocateCase
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import java.math.BigInteger
 
@@ -33,6 +34,8 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .expectBody()
       .jsonPath("$.personManagerId")
       .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
+      .jsonPath("$.eventManagerId")
+      .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
 
     expectPersonAllocationCompleteMessage(crn)
   }
@@ -47,8 +50,10 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     staffIdResponse(staffId.longValueExact(), staffCode, teamCode)
     offenderSummaryResponse(crn)
     convictionResponse(crn, eventId)
-    val storedPersonManager = PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "John Doe", createdBy = "USER1")
+    val storedPersonManager = PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1")
     personManagerRepository.save(storedPersonManager)
+    val storedEventManager = EventManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, eventId = eventId, createdBy = "USER1", providerCode = "PV1")
+    eventManagerRepository.save(storedEventManager)
     webTestClient.post()
       .uri("/team/$teamCode/offenderManagers/$staffId/cases")
       .bodyValue(allocateCase(crn, eventId))
@@ -62,6 +67,8 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .expectBody()
       .jsonPath("$.personManagerId")
       .isEqualTo(storedPersonManager.uuid.toString())
+      .jsonPath("$.eventManagerId")
+      .isEqualTo(storedEventManager.uuid.toString())
   }
 
   @Test
@@ -74,7 +81,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     staffIdResponse(staffId.longValueExact(), staffCode, teamCode)
     offenderSummaryResponse(crn)
     convictionResponse(crn, eventId)
-    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = teamCode, offenderName = "John Doe", createdBy = "USER1"))
+    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = teamCode, offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1"))
     webTestClient.post()
       .uri("/team/$teamCode/offenderManagers/$staffId/cases")
       .bodyValue(allocateCase(crn, eventId))
