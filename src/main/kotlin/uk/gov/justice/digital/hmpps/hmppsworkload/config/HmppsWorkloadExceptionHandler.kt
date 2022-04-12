@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
-import uk.gov.justice.digital.hmpps.hmppsworkload.error.PersonManagerAlreadyAllocatedError
 import javax.persistence.EntityNotFoundException
 import javax.validation.ValidationException
 
@@ -24,20 +23,6 @@ class HmppsWorkloadExceptionHandler {
         ErrorResponse(
           status = BAD_REQUEST,
           userMessage = "Validation failure: ${e.message}",
-          developerMessage = e.message
-        )
-      )
-  }
-
-  @ExceptionHandler(PersonManagerAlreadyAllocatedError::class)
-  fun handleValidationException(e: PersonManagerAlreadyAllocatedError): ResponseEntity<ErrorResponse> {
-    log.error("Person already allocated exception", e)
-    return ResponseEntity
-      .status(BAD_REQUEST)
-      .body(
-        ErrorResponse(
-          status = BAD_REQUEST,
-          userMessage = "Person already allocated failure: ${e.message}",
           developerMessage = e.message
         )
       )
