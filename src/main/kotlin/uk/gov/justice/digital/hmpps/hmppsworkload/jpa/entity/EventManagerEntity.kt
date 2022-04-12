@@ -48,5 +48,8 @@ data class EventManagerEntity(
 
   @Column
   @CreatedDate
-  var createdDate: ZonedDateTime? = null
+  var createdDate: ZonedDateTime? = null,
+
+  @Column
+  var providerCode: String
 )
