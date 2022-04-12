@@ -31,7 +31,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .expectStatus()
       .isOk
       .expectBody()
-      .jsonPath("$.id")
+      .jsonPath("$.personManagerId")
       .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
 
     expectPersonAllocationCompleteMessage(crn)
@@ -60,7 +60,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .expectStatus()
       .isOk
       .expectBody()
-      .jsonPath("$.id")
+      .jsonPath("$.personManagerId")
       .isEqualTo(storedPersonManager.uuid.toString())
   }
 
