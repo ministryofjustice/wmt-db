@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.request.allocateCase
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import java.math.BigInteger
 
@@ -51,6 +52,8 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     convictionResponse(crn, eventId)
     val storedPersonManager = PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "John Doe", createdBy = "USER1")
     personManagerRepository.save(storedPersonManager)
+    val storedEventManager = EventManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, eventId = eventId, createdBy = "USER1")
+    eventManagerRepository.save(storedEventManager)
     webTestClient.post()
       .uri("/team/$teamCode/offenderManagers/$staffId/cases")
       .bodyValue(allocateCase(crn, eventId))
@@ -64,6 +67,8 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .expectBody()
       .jsonPath("$.personManagerId")
       .isEqualTo(storedPersonManager.uuid.toString())
+      .jsonPath("$.eventManagerId")
+      .isEqualTo(storedEventManager.uuid.toString())
   }
 
   @Test

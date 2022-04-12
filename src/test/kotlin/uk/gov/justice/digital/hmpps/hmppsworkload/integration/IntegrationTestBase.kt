@@ -32,6 +32,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleAc
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByCodeResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByIdResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.teamStaffResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.EventManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
@@ -60,6 +61,9 @@ abstract class IntegrationTestBase {
   @Autowired
   protected lateinit var personManagerRepository: PersonManagerRepository
 
+  @Autowired
+  protected lateinit var eventManagerRepository: EventManagerRepository
+
   @Qualifier("hmppsallocationcompletequeue-sqs-client")
   @Autowired
   lateinit var allocationCompleteClient: AmazonSQSAsync
@@ -76,6 +80,8 @@ abstract class IntegrationTestBase {
     offenderSearchApi.reset()
     setupOauth()
     personManagerRepository.deleteAll()
+    eventManagerRepository.deleteAll()
+
     allocationCompleteClient.purgeQueue(PurgeQueueRequest(allocationCompleteUrl))
   }
 
@@ -86,6 +92,7 @@ abstract class IntegrationTestBase {
     hmppsTier.stop()
     offenderSearchApi.stop()
     personManagerRepository.deleteAll()
+    eventManagerRepository.deleteAll()
   }
 
   internal fun HttpHeaders.authToken(roles: List<String> = emptyList()) {
