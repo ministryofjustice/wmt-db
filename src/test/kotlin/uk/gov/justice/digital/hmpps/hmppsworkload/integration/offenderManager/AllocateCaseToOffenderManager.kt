@@ -33,6 +33,8 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .expectBody()
       .jsonPath("$.personManagerId")
       .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
+      .jsonPath("$.eventManagerId")
+      .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
 
     expectPersonAllocationCompleteMessage(crn)
   }
