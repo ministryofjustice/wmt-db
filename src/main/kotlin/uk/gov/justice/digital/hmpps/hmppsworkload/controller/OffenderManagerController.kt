@@ -19,7 +19,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerCases
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerOverview
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerPotentialWorkload
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetOffenderManagerService
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.SavePersonManagerService
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.SaveWorkloadService
 import java.math.BigInteger
 import javax.persistence.EntityNotFoundException
 
@@ -27,7 +27,7 @@ import javax.persistence.EntityNotFoundException
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 class OffenderManagerController(
   private val getOffenderManagerService: GetOffenderManagerService,
-  private val savePersonManagerService: SavePersonManagerService
+  private val saveWorkloadService: SaveWorkloadService
 ) {
 
   @Operation(summary = "Retrieves capacity and potential capacity if case were to be allocated")
@@ -74,7 +74,7 @@ class OffenderManagerController(
   @PreAuthorize("hasRole('ROLE_MANAGE_A_WORKFORCE_ALLOCATE')")
   @PostMapping("/team/{teamCode}/offenderManagers/{staffId}/cases")
   fun allocateCaseToOffenderManager(@PathVariable(required = true) teamCode: String, @PathVariable(required = true) staffId: BigInteger, @RequestBody allocateCase: AllocateCase, authentication: Authentication): CaseAllocated {
-    return CaseAllocated(savePersonManagerService.savePersonManager(teamCode, staffId, allocateCase, authentication.name).uuid)
+    return saveWorkloadService.saveWorkload(teamCode, staffId, allocateCase, authentication.name)
   }
 
   @Operation(summary = "Retrieves all cases allocated to an Offender Manager")

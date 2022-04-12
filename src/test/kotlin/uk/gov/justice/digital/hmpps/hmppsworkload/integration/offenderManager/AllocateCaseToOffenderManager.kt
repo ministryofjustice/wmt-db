@@ -16,11 +16,13 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     val crn = "CRN1"
     val staffCode = "OM1"
     val teamCode = "T1"
+    val eventId = BigInteger.valueOf(123456789L)
     staffIdResponse(staffId, staffCode, teamCode)
     offenderSummaryResponse(crn)
+    convictionResponse(crn, eventId)
     webTestClient.post()
       .uri("/team/$teamCode/offenderManagers/$staffId/cases")
-      .bodyValue(allocateCase(crn))
+      .bodyValue(allocateCase(crn, eventId))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
         it.contentType = MediaType.APPLICATION_JSON
@@ -29,7 +31,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .expectStatus()
       .isOk
       .expectBody()
-      .jsonPath("$.id")
+      .jsonPath("$.personManagerId")
       .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
 
     expectPersonAllocationCompleteMessage(crn)
@@ -41,13 +43,15 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     val crn = "CRN1"
     val staffCode = "OM1"
     val teamCode = "T1"
+    val eventId = BigInteger.valueOf(123456789L)
     staffIdResponse(staffId.longValueExact(), staffCode, teamCode)
     offenderSummaryResponse(crn)
+    convictionResponse(crn, eventId)
     val storedPersonManager = PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "John Doe", createdBy = "USER1")
     personManagerRepository.save(storedPersonManager)
     webTestClient.post()
       .uri("/team/$teamCode/offenderManagers/$staffId/cases")
-      .bodyValue(allocateCase(crn))
+      .bodyValue(allocateCase(crn, eventId))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
         it.contentType = MediaType.APPLICATION_JSON
@@ -56,7 +60,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .expectStatus()
       .isOk
       .expectBody()
-      .jsonPath("$.id")
+      .jsonPath("$.personManagerId")
       .isEqualTo(storedPersonManager.uuid.toString())
   }
 
@@ -66,12 +70,14 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     val crn = "CRN1"
     val staffCode = "OM1"
     val teamCode = "T1"
+    val eventId = BigInteger.valueOf(123456789L)
     staffIdResponse(staffId.longValueExact(), staffCode, teamCode)
     offenderSummaryResponse(crn)
+    convictionResponse(crn, eventId)
     personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = teamCode, offenderName = "John Doe", createdBy = "USER1"))
     webTestClient.post()
       .uri("/team/$teamCode/offenderManagers/$staffId/cases")
-      .bodyValue(allocateCase(crn))
+      .bodyValue(allocateCase(crn, eventId))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
         it.contentType = MediaType.APPLICATION_JSON

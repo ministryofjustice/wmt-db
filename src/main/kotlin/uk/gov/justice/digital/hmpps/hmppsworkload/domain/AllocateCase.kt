@@ -1,7 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.domain
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import java.math.BigInteger
 
 data class AllocateCase @JsonCreator constructor(
-  val crn: String
+  val crn: String,
+  val eventId: BigInteger
 )
