@@ -29,11 +29,14 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offender
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSummaryResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.oneOffenderSearchByCrnsResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveConvictionResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveRequirementResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveUnpaidRequirementResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByCodeResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByIdResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.teamStaffResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.EventManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.RequirementManagerRepository
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
 import java.math.BigInteger
@@ -64,6 +67,9 @@ abstract class IntegrationTestBase {
   @Autowired
   protected lateinit var eventManagerRepository: EventManagerRepository
 
+  @Autowired
+  protected lateinit var requirementManagerRepository: RequirementManagerRepository
+
   @Qualifier("hmppsallocationcompletequeue-sqs-client")
   @Autowired
   lateinit var allocationCompleteClient: AmazonSQSAsync
@@ -81,7 +87,7 @@ abstract class IntegrationTestBase {
     setupOauth()
     personManagerRepository.deleteAll()
     eventManagerRepository.deleteAll()
-
+    requirementManagerRepository.deleteAll()
     allocationCompleteClient.purgeQueue(PurgeQueueRequest(allocationCompleteUrl))
   }
 
@@ -93,6 +99,7 @@ abstract class IntegrationTestBase {
     offenderSearchApi.stop()
     personManagerRepository.deleteAll()
     eventManagerRepository.deleteAll()
+    requirementManagerRepository.deleteAll()
   }
 
   internal fun HttpHeaders.authToken(roles: List<String> = emptyList()) {
@@ -192,6 +199,24 @@ abstract class IntegrationTestBase {
 
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
       HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(convictionResponse("STFFCDE"))
+    )
+  }
+
+  protected fun singleActiveUnpaidRequirementResponse(crn: String, convictionId: BigInteger) {
+    val convictionsRequest =
+      HttpRequest.request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameter(Parameter("activeOnly", "true"))
+
+    communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
+      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(singleActiveUnpaidRequirementResponse())
+    )
+  }
+
+  protected fun singleActiveRequirementResponse(crn: String, convictionId: BigInteger, requirementId: BigInteger = BigInteger.valueOf(123456789L)) {
+    val convictionsRequest =
+      HttpRequest.request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameter(Parameter("activeOnly", "true"))
+
+    communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
+      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(singleActiveRequirementResponse(requirementId))
     )
   }
 }

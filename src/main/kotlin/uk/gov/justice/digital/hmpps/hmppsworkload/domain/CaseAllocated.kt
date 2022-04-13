@@ -5,5 +5,6 @@ import java.util.UUID
 
 data class CaseAllocated @JsonCreator constructor(
   val personManagerId: UUID,
-  val eventManagerId: UUID
+  val eventManagerId: UUID,
+  val requirementManagerIds: List<UUID>
 )
