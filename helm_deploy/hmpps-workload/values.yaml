@@ -11,7 +11,7 @@ generic-service:
 
   ingress:
     enabled: true
-    host: app-hostname.local    # override per environment
+    host: &ingressHost app-hostname.local    # override per environment
     tlsSecretName: hmpps-workload-cert
     contextColour: green
     path: /
@@ -23,7 +23,7 @@ generic-service:
     SPRING_PROFILES_ACTIVE: "stdout,logstash"
     APPLICATIONINSIGHTS_CONNECTION_STRING: "InstrumentationKey=$(APPINSIGHTS_INSTRUMENTATIONKEY)"
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.json
-    INGRESS_URL: {{ tpl .Values.generic-service.ingress.host . }}
+    INGRESS_URL: *ingressHost
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:
