@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Conviction
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ConvictionRequirements
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import java.math.BigInteger
@@ -55,6 +56,14 @@ class CommunityApiClient(private val webClient: WebClient) {
       .uri("/offenders/crn/$crn")
       .retrieve()
       .bodyToMono(PersonSummary::class.java)
+  }
+
+  fun getActiveRequirements(crn: String, convictionId: BigInteger): Mono<ConvictionRequirements> {
+    return webClient
+      .get()
+      .uri("/offenders/crn/$crn/convictions/$convictionId/requirements?activeOnly=true")
+      .retrieve()
+      .bodyToMono(ConvictionRequirements::class.java)
   }
 }
 
