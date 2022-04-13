@@ -66,6 +66,10 @@ server:
   error:
     include-message: always
 
+person:
+  manager:
+    getByIdPath: /allocation/person/{id}
+
 management:
   endpoints:
     web:
