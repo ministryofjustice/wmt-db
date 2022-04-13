@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.offenderManager
 
+import org.hamcrest.core.IsNot
 import org.hamcrest.text.MatchesPattern
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
@@ -78,7 +79,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     val requirementId = BigInteger.valueOf(567891234L)
     staffIdResponse(staffId.longValueExact(), staffCode, teamCode)
     offenderSummaryResponse(crn)
-    convictionResponse(crn, eventId)
     singleActiveRequirementResponse(crn, eventId, requirementId)
     val storedPersonManager = PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1")
     personManagerRepository.save(storedPersonManager)
@@ -106,7 +106,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   }
 
   @Test
-  fun `cannot allocate an already managed CRN to different staff member`() {
+  fun `can allocate an already managed CRN to different staff member`() {
     val staffId = BigInteger.valueOf(123456789L)
     val crn = "CRN1"
     val staffCode = "OM1"
@@ -114,9 +114,9 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     val eventId = BigInteger.valueOf(123456789L)
     staffIdResponse(staffId.longValueExact(), staffCode, teamCode)
     offenderSummaryResponse(crn)
-    convictionResponse(crn, eventId)
     singleActiveUnpaidRequirementResponse(crn, eventId)
-    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = teamCode, offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1"))
+    val storedPersonManager = PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = teamCode, offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1")
+    personManagerRepository.save(storedPersonManager)
     webTestClient.post()
       .uri("/team/$teamCode/offenderManagers/$staffId/cases")
       .bodyValue(allocateCase(crn, eventId))
@@ -126,6 +126,11 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       }
       .exchange()
       .expectStatus()
-      .isBadRequest
+      .isOk
+      .expectBody()
+      .jsonPath("$.personManagerId")
+      .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
+      .jsonPath("$.personManagerId")
+      .value(IsNot.not(storedPersonManager.uuid.toString()))
   }
 }
