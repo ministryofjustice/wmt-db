@@ -8,12 +8,13 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Conviction
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ConvictionRequirements
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffSummary
 import java.math.BigInteger
 
 class CommunityApiClient(private val webClient: WebClient) {
 
-  fun getTeamStaff(teamCode: String): Mono<List<Staff>> {
-    val responseType = object : ParameterizedTypeReference<List<Staff>>() {}
+  fun getTeamStaff(teamCode: String): Mono<List<StaffSummary>> {
+    val responseType = object : ParameterizedTypeReference<List<StaffSummary>>() {}
     return webClient
       .get()
       .uri("/teams/$teamCode/staff")
