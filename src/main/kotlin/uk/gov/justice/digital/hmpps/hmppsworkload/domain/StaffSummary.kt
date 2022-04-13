@@ -11,7 +11,7 @@ data class StaffSummary @JsonCreator constructor(
   @Schema(description = "Probation Practitioner surname", example = "Smith")
   val surname: String,
   @Schema(description = "Probation Practitioner Email", example = "PO")
-  val email: String,
+  val email: String?,
   @Schema(description = "Probation Practitioner ID")
   val id: BigInteger
 ) {
