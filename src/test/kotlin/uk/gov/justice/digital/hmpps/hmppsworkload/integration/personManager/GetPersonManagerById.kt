@@ -1,11 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.personManager
 
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import java.math.BigInteger
-import java.time.ZonedDateTime
 import java.util.UUID
 
 class GetPersonManagerById : IntegrationTestBase() {
@@ -37,10 +35,7 @@ class GetPersonManagerById : IntegrationTestBase() {
       .jsonPath("$.createdBy")
       .isEqualTo(storedPersonManager.createdBy)
       .jsonPath("$.createdDate")
-      .value<String> { createdDate ->
-        val actual = ZonedDateTime.parse(createdDate)
-        Assertions.assertTrue(actual.isEqual(storedPersonManager.createdDate))
-      }
+      .exists()
   }
 
   @Test
