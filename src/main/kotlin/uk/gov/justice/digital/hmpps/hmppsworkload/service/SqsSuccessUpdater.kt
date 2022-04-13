@@ -5,8 +5,10 @@ import com.amazonaws.services.sns.model.PublishRequest
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
+import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsPersonAllocationMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
@@ -21,7 +23,9 @@ import java.util.UUID
 @ConditionalOnProperty("hmpps.sqs.topics.hmppsallocationcompletetopic.arn")
 class SqsSuccessUpdater(
   val hmppsQueueService: HmppsQueueService,
-  val objectMapper: ObjectMapper
+  val objectMapper: ObjectMapper,
+  @Value("\${ingress.url}") private val ingressUrl: String,
+  @Value("\${person.manager.getByIdPath}") private val personManagerLookupPath: String
 ) : SuccessUpdater {
 
   private val allocationCompleteTopic by lazy {
@@ -31,7 +35,7 @@ class SqsSuccessUpdater(
 
   override fun updatePerson(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
     val hmppsPersonEvent = HmppsMessage(
-      "PERSON_MANAGER_ALLOCATED", 1, "Person allocated event", "http://dummy.com",
+      "PERSON_MANAGER_ALLOCATED", 1, "Person allocated event", UriComponentsBuilder.newInstance().scheme("https").host(ingressUrl).path(personManagerLookupPath).buildAndExpand(allocationId).toUriString(),
       timeUpdated.format(
         DateTimeFormatter.ISO_OFFSET_DATE_TIME
       ),

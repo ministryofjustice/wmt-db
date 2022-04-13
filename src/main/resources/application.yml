@@ -10,6 +10,7 @@ spring:
   jackson:
     date-format: "yyyy-MM-dd HH:mm:ss"
     default-property-inclusion: non_null
+    time-zone: "UTC"
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false
 
@@ -65,6 +66,10 @@ server:
   shutdown: graceful
   error:
     include-message: always
+
+person:
+  manager:
+    getByIdPath: /allocation/person/{id}
 
 management:
   endpoints:

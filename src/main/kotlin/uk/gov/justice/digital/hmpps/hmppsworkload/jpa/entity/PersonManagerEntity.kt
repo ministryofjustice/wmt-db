@@ -44,7 +44,7 @@ data class PersonManagerEntity(
   val offenderName: String,
 
   @Column
-  var createdBy: String? = null,
+  var createdBy: String,
 
   @Column
   @CreatedDate
