@@ -1,11 +1,12 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.personManager
 
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import java.math.BigInteger
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
+import java.time.ZonedDateTime
+import java.util.UUID
 
 class GetPersonManagerById : IntegrationTestBase() {
 
@@ -36,10 +37,21 @@ class GetPersonManagerById : IntegrationTestBase() {
       .jsonPath("$.createdBy")
       .isEqualTo(storedPersonManager.createdBy)
       .jsonPath("$.createdDate")
-      .isEqualTo(
-        storedPersonManager.createdDate!!.withZoneSameInstant(ZoneOffset.UTC).format(
-          DateTimeFormatter.ISO_OFFSET_DATE_TIME
-        )
-      )
+      .value<String> { createdDate ->
+        val actual = ZonedDateTime.parse(createdDate)
+        Assertions.assertTrue(actual.isEqual(storedPersonManager.createdDate))
+      }
+  }
+
+  @Test
+  fun `not found returned when getting person manager from uuid which does not exist`() {
+    webTestClient.get()
+      .uri("/allocation/person/${UUID.randomUUID()}")
+      .headers {
+        it.authToken(roles = listOf("ROLE_WORKLOAD_READ"))
+      }
+      .exchange()
+      .expectStatus()
+      .isNotFound
   }
 }
