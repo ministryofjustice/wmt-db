@@ -12,4 +12,5 @@ generic-service:
     COMMUNITY_ENDPOINT_URL: https://community-api-secure.test.delius.probation.hmpps.dsd.io/secure
     HMPPS_TIER_ENDPOINT_URL: https://hmpps-tier-dev.hmpps.service.justice.gov.uk
     OFFENDER_SEARCH_ENDPOINT_URL: https://probation-offender-search-dev.hmpps.service.justice.gov.uk
+    INGRESS_URL: *ingressHost
 
