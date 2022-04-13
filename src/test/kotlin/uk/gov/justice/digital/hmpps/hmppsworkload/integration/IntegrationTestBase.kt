@@ -24,7 +24,6 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsPersonAllocationMessage
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.convictionResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSearchByCrnsResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSummaryResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.oneOffenderSearchByCrnsResponse
@@ -190,15 +189,6 @@ abstract class IntegrationTestBase {
     val request = HttpRequest.request().withPath("/crns").withBody(objectMapper.writeValueAsString(crns))
     offenderSearchApi.`when`(request, Times.exactly(1)).respond(
       HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(oneOffenderSearchByCrnsResponse())
-    )
-  }
-
-  protected fun convictionResponse(crn: String, convictionId: BigInteger) {
-    val convictionsRequest =
-      HttpRequest.request().withPath("/offenders/crn/$crn/convictions/$convictionId")
-
-    communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(convictionResponse("STFFCDE"))
     )
   }
 
