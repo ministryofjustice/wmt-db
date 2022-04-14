@@ -16,6 +16,10 @@ class LogSuccessUpdater : SuccessUpdater {
     log.info("crn {} with allocationId {} updated at {}", crn, allocationId, timeUpdated)
   }
 
+  override fun updateEvent(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
+    log.info("crn {} with allocationId {} updated at {}", crn, allocationId, timeUpdated)
+  }
+
   companion object {
     val log: Logger = LoggerFactory.getLogger(this::class.java)
   }
