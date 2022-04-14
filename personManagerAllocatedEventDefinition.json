@@ -1,5 +1,5 @@
 {
-  "eventType": "PERSON_MANAGER_ALLOCATED",
+  "eventType": "person.manager.allocated",
   "version": 1,
   "description": "Person allocated event",
   "detailUrl": "https://{hmpps_workload_url}/allocation/person/{allocationId}",
