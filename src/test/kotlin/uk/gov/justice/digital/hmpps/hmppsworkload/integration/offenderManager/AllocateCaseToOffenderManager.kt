@@ -41,7 +41,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .jsonPath("$.requirementManagerIds[0]")
       .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
 
-    expectPersonAllocationCompleteMessage(crn)
+    expectWorkloadAllocationCompleteMessages(crn)
   }
 
   @Test

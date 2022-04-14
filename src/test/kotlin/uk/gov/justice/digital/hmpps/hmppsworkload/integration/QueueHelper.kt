@@ -6,15 +6,19 @@ import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
 
 fun oneMessageCurrentlyOnQueue(client: AmazonSQSAsync, queueUrl: String) {
+  numberOfMessagesCurrentlyOnQueue(client, queueUrl, 1)
+}
+
+fun numberOfMessagesCurrentlyOnQueue(client: AmazonSQSAsync, queueUrl: String, count: Int) {
   await untilCallTo {
     getNumberOfMessagesCurrentlyOnQueue(
       client,
       queueUrl
     )
-  } matches { it == 1 }
+  } matches { it == count }
 }
 
-private fun getNumberOfMessagesCurrentlyOnQueue(client: AmazonSQSAsync, queueUrl: String): Int? {
+fun getNumberOfMessagesCurrentlyOnQueue(client: AmazonSQSAsync, queueUrl: String): Int? {
   val queueAttributes = client.getQueueAttributes(queueUrl, listOf("ApproximateNumberOfMessages"))
   return queueAttributes.attributes["ApproximateNumberOfMessages"]?.toInt()
 }
