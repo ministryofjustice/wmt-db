@@ -160,8 +160,8 @@ abstract class IntegrationTestBase {
     )
   }
 
-  protected fun expectPersonAndEventAllocationCompleteMessage(crn: String) {
-    numberOfMessagesCurrentlyOnQueue(allocationCompleteClient, allocationCompleteUrl, 2)
+  protected fun expectWorkloadAllocationCompleteMessages(crn: String) {
+    numberOfMessagesCurrentlyOnQueue(allocationCompleteClient, allocationCompleteUrl, 3)
     val changeEvents = getAllAllocationMessages()
     changeEvents.forEach { changeEvent ->
       Assertions.assertEquals(crn, changeEvent.personReference.identifiers.first { it.type == "CRN" }.value)
