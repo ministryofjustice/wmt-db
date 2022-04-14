@@ -8,7 +8,11 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RequirementManagerE
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.RequirementManagerRepository
 
 @Service
-class JpaBasedSaveRequirementManagerService(private val requirementManagerRepository: RequirementManagerRepository) : SaveRequirementManagerService {
+class JpaBasedSaveRequirementManagerService(
+  private val requirementManagerRepository: RequirementManagerRepository,
+  private val telemetryService: TelemetryService,
+  private val successUpdater: SuccessUpdater
+) : SaveRequirementManagerService {
 
   override fun saveRequirementManagers(
     teamCode: String,
@@ -50,6 +54,8 @@ class JpaBasedSaveRequirementManagerService(private val requirementManagerReposi
       providerCode = staff.probationArea!!.code
     )
     requirementManagerRepository.save(requirementManagerEntity)
+    telemetryService.trackRequirementManagerAllocated(requirementManagerEntity)
+    successUpdater.updateRequirement(requirementManagerEntity.crn, requirementManagerEntity.uuid, requirementManagerEntity.createdDate!!)
     return requirementManagerEntity
   }
 }

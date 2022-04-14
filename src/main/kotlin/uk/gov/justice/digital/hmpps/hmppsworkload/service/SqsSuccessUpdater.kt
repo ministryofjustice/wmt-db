@@ -26,7 +26,8 @@ class SqsSuccessUpdater(
   val objectMapper: ObjectMapper,
   @Value("\${ingress.url}") private val ingressUrl: String,
   @Value("\${person.manager.getByIdPath}") private val personManagerLookupPath: String,
-  @Value("\${event.manager.getByIdPath}") private val eventManagerLookupPath: String
+  @Value("\${event.manager.getByIdPath}") private val eventManagerLookupPath: String,
+  @Value("\${requirement.manager.getByIdPath}") private val requirementManagerLookupPath: String
 ) : SuccessUpdater {
 
   private val allocationCompleteTopic by lazy {
@@ -67,6 +68,23 @@ class SqsSuccessUpdater(
         .withMessageAttributes(mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue(hmppsEventAllocatedEvent.eventType)))
     ).also {
       log.info("Published event {} to topic for CRN {} and id {}", hmppsEventAllocatedEvent.eventType, crn, allocationId)
+    }
+  }
+
+  override fun updateRequirement(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
+    val hmppsRequirementAllocatedEvent = HmppsMessage(
+      "requirement.manager.allocated", 1, "Requirement allocated event", generateDetailsUri(eventManagerLookupPath, allocationId),
+      timeUpdated.format(
+        DateTimeFormatter.ISO_OFFSET_DATE_TIME
+      ),
+      HmppsAllocationMessage(allocationId),
+      PersonReference(listOf(PersonReferenceType("CRN", crn)))
+    )
+    allocationCompleteTopic.snsClient.publish(
+      PublishRequest(allocationCompleteTopic.arn, objectMapper.writeValueAsString(hmppsRequirementAllocatedEvent))
+        .withMessageAttributes(mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue(hmppsRequirementAllocatedEvent.eventType)))
+    ).also {
+      log.info("Published event {} to topic for CRN {} and id {}", hmppsRequirementAllocatedEvent.eventType, crn, allocationId)
     }
   }
 

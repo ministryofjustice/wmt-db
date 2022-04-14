@@ -171,6 +171,9 @@ abstract class IntegrationTestBase {
 
     val numberOfEventAllocationMessages = changeEvents.count { it.eventType == "event.manager.allocated" }
     Assertions.assertEquals(1, numberOfEventAllocationMessages)
+
+    val numberOfRequirementAllocationMessages = changeEvents.count { it.eventType == "requirement.manager.allocated" }
+    Assertions.assertEquals(1, numberOfRequirementAllocationMessages)
   }
 
   private fun getAllAllocationMessages(): List<HmppsMessage<HmppsAllocationMessage>> {
