@@ -166,7 +166,7 @@ abstract class IntegrationTestBase {
     changeEvents.forEach { changeEvent ->
       Assertions.assertEquals(crn, changeEvent.personReference.identifiers.first { it.type == "CRN" }.value)
     }
-    val numberOfPersonAllocationMessages = changeEvents.count { it.eventType == "PERSON_MANAGER_ALLOCATED" }
+    val numberOfPersonAllocationMessages = changeEvents.count { it.eventType == "person.manager.allocated" }
     Assertions.assertEquals(1, numberOfPersonAllocationMessages)
 
     val numberOfEventAllocationMessages = changeEvents.count { it.eventType == "event.manager.allocated" }
