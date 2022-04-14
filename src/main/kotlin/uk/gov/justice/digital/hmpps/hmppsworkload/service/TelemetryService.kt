@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RequirementManagerEntity
 
 @Component
 class TelemetryService(@Autowired private val telemetryClient: TelemetryClient) {
@@ -34,6 +35,20 @@ class TelemetryService(@Autowired private val telemetryClient: TelemetryClient) 
         "providerCode" to eventManagerEntity.providerCode,
         "staffId" to eventManagerEntity.staffId.toString(10),
         "eventId" to eventManagerEntity.eventId.toString(10)
+      )
+    )
+  }
+
+  fun trackRequirementManagerAllocated(requirementManagerEntity: RequirementManagerEntity) {
+    trackEvent(
+      TelemetryEventType.REQUIREMENT_MANAGER_ALLOCATED,
+      mapOf(
+        "crn" to requirementManagerEntity.crn,
+        "teamCode" to requirementManagerEntity.teamCode,
+        "providerCode" to requirementManagerEntity.providerCode,
+        "staffId" to requirementManagerEntity.staffId.toString(10),
+        "eventId" to requirementManagerEntity.eventId.toString(10),
+        "requirementId" to requirementManagerEntity.requirementId.toString(10)
       )
     )
   }
