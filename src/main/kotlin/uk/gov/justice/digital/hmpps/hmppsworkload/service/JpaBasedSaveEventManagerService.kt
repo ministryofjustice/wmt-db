@@ -8,7 +8,9 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.EventManagerRep
 
 @Service
 class JpaBasedSaveEventManagerService(
-  private val eventManagerRepository: EventManagerRepository
+  private val eventManagerRepository: EventManagerRepository,
+  private val telemetryService: TelemetryService,
+  private val successUpdater: SuccessUpdater
 ) : SaveEventManagerService {
 
   override fun saveEventManager(
@@ -41,6 +43,8 @@ class JpaBasedSaveEventManagerService(
       providerCode = staff.probationArea!!.code
     )
     eventManagerRepository.save(eventManagerEntity)
+    telemetryService.trackEventManagerAllocated(eventManagerEntity)
+    successUpdater.updateEvent(eventManagerEntity.crn, eventManagerEntity.uuid, eventManagerEntity.createdDate!!)
     return eventManagerEntity
   }
 }

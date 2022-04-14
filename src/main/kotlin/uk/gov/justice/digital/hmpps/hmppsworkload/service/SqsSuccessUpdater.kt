@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import org.springframework.web.util.UriComponentsBuilder
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsAllocationMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsPersonAllocationMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReferenceType
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
@@ -25,7 +25,8 @@ class SqsSuccessUpdater(
   val hmppsQueueService: HmppsQueueService,
   val objectMapper: ObjectMapper,
   @Value("\${ingress.url}") private val ingressUrl: String,
-  @Value("\${person.manager.getByIdPath}") private val personManagerLookupPath: String
+  @Value("\${person.manager.getByIdPath}") private val personManagerLookupPath: String,
+  @Value("\${event.manager.getByIdPath}") private val eventManagerLookupPath: String
 ) : SuccessUpdater {
 
   private val allocationCompleteTopic by lazy {
@@ -35,11 +36,11 @@ class SqsSuccessUpdater(
 
   override fun updatePerson(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
     val hmppsPersonEvent = HmppsMessage(
-      "PERSON_MANAGER_ALLOCATED", 1, "Person allocated event", UriComponentsBuilder.newInstance().scheme("https").host(ingressUrl).path(personManagerLookupPath).buildAndExpand(allocationId).toUriString(),
+      "PERSON_MANAGER_ALLOCATED", 1, "Person allocated event", generateDetailsUri(personManagerLookupPath, allocationId),
       timeUpdated.format(
         DateTimeFormatter.ISO_OFFSET_DATE_TIME
       ),
-      HmppsPersonAllocationMessage(allocationId),
+      HmppsAllocationMessage(allocationId),
       PersonReference(listOf(PersonReferenceType("CRN", crn)))
     )
     allocationCompleteTopic.snsClient.publish(
@@ -47,6 +48,25 @@ class SqsSuccessUpdater(
         .withMessageAttributes(mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue(hmppsPersonEvent.eventType)))
     ).also {
       log.info("Published event {} to topic for CRN {} and id {}", hmppsPersonEvent.eventType, crn, allocationId)
+    }
+  }
+
+  private fun generateDetailsUri(path: String, allocationId: UUID): String = UriComponentsBuilder.newInstance().scheme("https").host(ingressUrl).path(path).buildAndExpand(allocationId).toUriString()
+
+  override fun updateEvent(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
+    val hmppsEventAllocatedEvent = HmppsMessage(
+      "event.manager.allocated", 1, "Event allocated event", generateDetailsUri(eventManagerLookupPath, allocationId),
+      timeUpdated.format(
+        DateTimeFormatter.ISO_OFFSET_DATE_TIME
+      ),
+      HmppsAllocationMessage(allocationId),
+      PersonReference(listOf(PersonReferenceType("CRN", crn)))
+    )
+    allocationCompleteTopic.snsClient.publish(
+      PublishRequest(allocationCompleteTopic.arn, objectMapper.writeValueAsString(hmppsEventAllocatedEvent))
+        .withMessageAttributes(mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue(hmppsEventAllocatedEvent.eventType)))
+    ).also {
+      log.info("Published event {} to topic for CRN {} and id {}", hmppsEventAllocatedEvent.eventType, crn, allocationId)
     }
   }
 

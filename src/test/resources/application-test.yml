@@ -20,7 +20,7 @@ hmpps.sqs:
       queueName: hmpps_allocation_complete_event_queue
       dlqName: hmpps_allocation_complete_event_dlq
       subscribeTopicId: hmppsallocationcompletetopic
-      subscribeFilter: '{"eventType":[ "PERSON_MANAGER_ALLOCATED"] }'
+      subscribeFilter: '{"eventType":[ "PERSON_MANAGER_ALLOCATED", "event.manager.allocated"] }'
       asyncQueueClient: true
   topics:
     hmppsallocationcompletetopic:

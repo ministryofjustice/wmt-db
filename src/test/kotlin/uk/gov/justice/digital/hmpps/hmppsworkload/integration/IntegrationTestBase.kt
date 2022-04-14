@@ -22,8 +22,8 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDO
 import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsAllocationMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsPersonAllocationMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSearchByCrnsResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSummaryResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.oneOffenderSearchByCrnsResponse
@@ -160,15 +160,32 @@ abstract class IntegrationTestBase {
     )
   }
 
-  protected fun expectPersonAllocationCompleteMessage(crn: String) {
-    oneMessageCurrentlyOnQueue(allocationCompleteClient, allocationCompleteUrl)
-    val message = allocationCompleteClient.receiveMessage(allocationCompleteUrl)
+  protected fun expectPersonAndEventAllocationCompleteMessage(crn: String) {
+    numberOfMessagesCurrentlyOnQueue(allocationCompleteClient, allocationCompleteUrl, 2)
+    val changeEvents = getAllAllocationMessages()
+    changeEvents.forEach { changeEvent ->
+      Assertions.assertEquals(crn, changeEvent.personReference.identifiers.first { it.type == "CRN" }.value)
+    }
+    val numberOfPersonAllocationMessages = changeEvents.count { it.eventType == "PERSON_MANAGER_ALLOCATED" }
+    Assertions.assertEquals(1, numberOfPersonAllocationMessages)
 
-    val sqsMessage = objectMapper.readValue(message.messages[0].body, SQSMessage::class.java)
-    val personAllocationMessageType = object : TypeReference<HmppsMessage<HmppsPersonAllocationMessage>>() {}
+    val numberOfEventAllocationMessages = changeEvents.count { it.eventType == "event.manager.allocated" }
+    Assertions.assertEquals(1, numberOfEventAllocationMessages)
+  }
 
-    val changeEvent = objectMapper.readValue(sqsMessage.Message, personAllocationMessageType)
-    Assertions.assertEquals(crn, changeEvent.personReference.identifiers.first { it.type == "CRN" }.value)
+  private fun getAllAllocationMessages(): List<HmppsMessage<HmppsAllocationMessage>> {
+    val messages = ArrayList<HmppsMessage<HmppsAllocationMessage>>()
+    while (getNumberOfMessagesCurrentlyOnQueue(allocationCompleteClient, allocationCompleteUrl) != 0) {
+      val message = allocationCompleteClient.receiveMessage(allocationCompleteUrl)
+      messages.addAll(
+        message.messages.map {
+          val sqsMessage = objectMapper.readValue(it.body, SQSMessage::class.java)
+          val personAllocationMessageType = object : TypeReference<HmppsMessage<HmppsAllocationMessage>>() {}
+          objectMapper.readValue(sqsMessage.Message, personAllocationMessageType)
+        }
+      )
+    }
+    return messages
   }
 
   protected fun staffCodeResponse(staffCode: String, teamCode: String) {
