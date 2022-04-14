@@ -75,6 +75,10 @@ event:
   manager:
     getByIdPath: /allocation/event/{id}
 
+requirement:
+  manager:
+    getByIdPath: /allocation/requirements/{id}
+
 management:
   endpoints:
     web:

@@ -9,16 +9,16 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.EventManagerDetails
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetEventManager
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.RequirementManagerDetails
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetRequirementManager
 import java.util.UUID
 import javax.persistence.EntityNotFoundException
 
 @RestController
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
-class EventManagerController(private val getEventManager: GetEventManager) {
+class RequirementManagerController(private val getRequirementManager: GetRequirementManager) {
 
-  @Operation(summary = "Get Event Manager by ID")
+  @Operation(summary = "Get Requirement Manager by ID")
   @ApiResponses(
     value = [
       ApiResponse(responseCode = "200", description = "OK"),
@@ -26,9 +26,9 @@ class EventManagerController(private val getEventManager: GetEventManager) {
     ]
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
-  @GetMapping("\${event.manager.getByIdPath}")
-  fun getEventManagerById(@PathVariable(required = true) id: UUID): EventManagerDetails =
-    getEventManager.findById(id)?.let { eventManagerEntity -> EventManagerDetails.from(eventManagerEntity) } ?: run {
+  @GetMapping("\${requirement.manager.getByIdPath}")
+  fun getRequirementManagerById(@PathVariable(required = true) id: UUID): RequirementManagerDetails =
+    getRequirementManager.findById(id)?.let { requirementManagerEntity -> RequirementManagerDetails.from(requirementManagerEntity) } ?: run {
       throw EntityNotFoundException("Event Manager not found for id $id")
     }
 }
