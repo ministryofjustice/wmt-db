@@ -44,7 +44,7 @@ data class EventManagerEntity(
   val teamCode: String,
 
   @Column
-  var createdBy: String? = null,
+  var createdBy: String,
 
   @Column
   @CreatedDate

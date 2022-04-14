@@ -71,6 +71,10 @@ person:
   manager:
     getByIdPath: /allocation/person/{id}
 
+event:
+  manager:
+    getByIdPath: /allocation/event/{id}
+
 management:
   endpoints:
     web:

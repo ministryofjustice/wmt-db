@@ -9,16 +9,16 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PersonManagerDetails
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetPersonManager
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.EventManagerDetails
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetEventManager
 import java.util.UUID
 import javax.persistence.EntityNotFoundException
 
 @RestController
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
-class PersonManagerController(private val getPersonManager: GetPersonManager) {
+class EventManagerController(private val getEventManager: GetEventManager) {
 
-  @Operation(summary = "Get Person Manager by ID")
+  @Operation(summary = "Get Event Manager by ID")
   @ApiResponses(
     value = [
       ApiResponse(responseCode = "200", description = "OK"),
@@ -26,9 +26,9 @@ class PersonManagerController(private val getPersonManager: GetPersonManager) {
     ]
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
-  @GetMapping("\${person.manager.getByIdPath}")
-  fun getPersonManagerById(@PathVariable(required = true) id: UUID): PersonManagerDetails =
-    getPersonManager.findById(id)?.let { personManagerEntity -> PersonManagerDetails.from(personManagerEntity) } ?: run {
-      throw EntityNotFoundException("Person Manager not found for id $id")
+  @GetMapping("\${event.manager.getByIdPath}")
+  fun getPersonManagerById(@PathVariable(required = true) id: UUID): EventManagerDetails =
+    getEventManager.findById(id)?.let { eventManagerEntity -> EventManagerDetails.from(eventManagerEntity) } ?: run {
+      throw EntityNotFoundException("Event Manager not found for id $id")
     }
 }
