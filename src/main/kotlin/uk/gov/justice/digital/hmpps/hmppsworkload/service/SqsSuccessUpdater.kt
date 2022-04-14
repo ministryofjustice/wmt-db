@@ -73,7 +73,7 @@ class SqsSuccessUpdater(
 
   override fun updateRequirement(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
     val hmppsRequirementAllocatedEvent = HmppsMessage(
-      "requirement.manager.allocated", 1, "Requirement allocated event", generateDetailsUri(eventManagerLookupPath, allocationId),
+      "requirement.manager.allocated", 1, "Requirement allocated event", generateDetailsUri(requirementManagerLookupPath, allocationId),
       timeUpdated.format(
         DateTimeFormatter.ISO_OFFSET_DATE_TIME
       ),
