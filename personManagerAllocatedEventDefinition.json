@@ -1,0 +1,15 @@
+{
+  "eventType": "PERSON_MANAGER_ALLOCATED",
+  "version": 1,
+  "description": "Person allocated event",
+  "detailUrl": "https://{hmpps_workload_url}/allocation/person/{allocationId}",
+  "occurredAt": "{createdDate}",
+  "additionalInformation": {
+    "allocationId": "{allocationId}"
+  },
+  "personReference": {
+    "identifiers": [
+      {"type": "CRN", "value":"{crn}"}
+    ]
+  }
+}
