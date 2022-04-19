@@ -130,6 +130,28 @@ import javax.persistence.Table
     WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS null and c.row_type = 'N' and t.code = ?1 and om."key" = ?2
 """
 )
+@NamedNativeQuery(
+  name = "OffenderManagerEntity.findCaseByTeamCodeAndStaffCodeAndCrn",
+  resultSetMapping = "OffenderManagerCases",
+  query = """
+  SELECT
+   c.case_ref_no AS crn, cc.category_name AS tier, c."location" AS casecategory
+    FROM app.case_details AS c
+    JOIN app.workload AS w
+        ON c.workload_id = w.id
+    JOIN app.workload_owner AS wo
+        ON w.workload_owner_id = wo.id
+    JOIN app.offender_manager AS om
+        ON wo.offender_manager_id = om.id
+    JOIN app.team AS t
+        ON wo.team_id = t.id
+    JOIN app.workload_report AS wr
+        ON w.workload_report_id = wr.id
+    JOIN app.case_category AS cc
+        ON c.tier_code = cc.category_id
+    WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS null and c.row_type = 'N' and t.code = ?1 and om."key" = ?2 and c.case_ref_no = ?3
+"""
+)
 @Entity
 @Table(name = "offender_manager", schema = "app")
 data class OffenderManagerEntity(

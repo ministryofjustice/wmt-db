@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.HmppsTierApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.OffenderSearchApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderDetails
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.ImpactCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerCases
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PotentialCase
@@ -43,7 +44,8 @@ class JpaBasedGetOffenderManagerService(
   override fun getPotentialWorkload(teamCode: String, staffId: BigInteger, impactCase: ImpactCase): OffenderManagerOverview? {
     return Mono.zip(getOffenderManagerOverview(staffId, teamCode), getPotentialCase(impactCase.crn, impactCase.convictionId))
       .map { results ->
-        results.t1.potentialCapacity = capacityCalculator.calculate(results.t1.totalPoints.plus(caseCalculator.getPointsForCase(results.t2)), results.t1.availablePoints)
+        val currentCaseImpact = getCurrentCasePoints(teamCode, results.t1.code, impactCase.crn)
+        results.t1.potentialCapacity = capacityCalculator.calculate(results.t1.totalPoints.minus(currentCaseImpact).plus(caseCalculator.getPointsForCase(results.t2)), results.t1.availablePoints)
         results.t1
       }.block()
   }
@@ -56,6 +58,10 @@ class JpaBasedGetOffenderManagerService(
         PotentialCase(Tier.valueOf(tier), caseType, false)
       }
   }
+
+  private fun getCurrentCasePoints(teamCode: String, staffCode: String, crn: String): BigInteger = offenderManagerRepository.findCaseByTeamCodeAndStaffCodeAndCrn(teamCode, staffCode, crn)?.let { currentCase ->
+    return caseCalculator.getPointsForCase(PotentialCase(Tier.valueOf(currentCase.tier), CaseType.valueOf(currentCase.caseCategory), false))
+  } ?: BigInteger.ZERO
 
   private fun getOffenderManagerOverview(
     staffId: BigInteger,
