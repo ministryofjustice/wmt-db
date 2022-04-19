@@ -42,6 +42,40 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
   }
 
   @Test
+  fun `must not change capacity if case already allocated to the officer and is classified the same`() {
+    val staffId = 123456789L
+    val crn = "CRN2222"
+    val staffCode = "OM1"
+    val teamCode = "T1"
+    staffIdResponse(staffId, staffCode, teamCode)
+    tierCalculationResponse(crn)
+    singleActiveConvictionResponse(crn)
+    webTestClient.post()
+      .uri("/team/$teamCode/offenderManagers/$staffId/impact")
+      .bodyValue(impactCase(crn))
+      .headers {
+        it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
+        it.contentType = MediaType.APPLICATION_JSON
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody()
+      .jsonPath("$.forename")
+      .isEqualTo("Ben")
+      .jsonPath("$.surname")
+      .isEqualTo("Doe")
+      .jsonPath("$.grade")
+      .isEqualTo("PO")
+      .jsonPath("$.capacity")
+      .isEqualTo(50)
+      .jsonPath("$.code")
+      .isEqualTo(staffCode)
+      .jsonPath("$.potentialCapacity")
+      .isEqualTo(50)
+  }
+
+  @Test
   fun `can get impact for an offender manager without workload`() {
     val staffId = 123456789L
     val crn = "CRN1"
