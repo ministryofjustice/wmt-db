@@ -22,7 +22,7 @@ class JpaBasedTeamService(
   private val workloadPointsRepository: WorkloadPointsRepository
 ) : TeamService {
 
-  override fun getTeamOverview(teamCode: String): List<TeamOverview>? {
+  override fun getTeamOverview(teamCode: String, grades: List<String>?): List<TeamOverview>? {
     return communityApiClient
       .getTeamStaff(teamCode)
       .map { staff ->
@@ -39,6 +39,8 @@ class JpaBasedTeamService(
             } ?: run {
               getTeamOverviewForOffenderManagerWithoutWorkload(it.staff.forenames, it.staff.surname, gradeMapper.deliusToStaffGrade(it.staffGrade?.code), it.staffCode, it.staffIdentifier)
             }
+          }.filter {
+            grades == null || grades.contains(it.grade)
           }
         )
       }
