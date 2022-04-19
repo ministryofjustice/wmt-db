@@ -53,6 +53,37 @@ class GetTeamOverviewByTeamCode : IntegrationTestBase() {
   }
 
   @Test
+  fun `can filter officers by grade`() {
+    val teamCode = "T1"
+    teamStaffResponse(teamCode)
+    webTestClient.get()
+      .uri("/team/$teamCode/offenderManagers?grades=PO,PQiP")
+      .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT")) }
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody()
+      .jsonPath("$.offenderManagers[0].forename")
+      .isEqualTo("Ben")
+      .jsonPath("$.offenderManagers[0].surname")
+      .isEqualTo("Doe")
+      .jsonPath("$.offenderManagers[0].grade")
+      .isEqualTo("PO")
+      .jsonPath("$.offenderManagers[0].totalCommunityCases")
+      .isEqualTo(15)
+      .jsonPath("$.offenderManagers[0].totalCustodyCases")
+      .isEqualTo(20)
+      .jsonPath("$.offenderManagers[0].capacity")
+      .isEqualTo(50)
+      .jsonPath("$.offenderManagers[0].code")
+      .isEqualTo("OM1")
+      .jsonPath("$.offenderManagers[0].staffId")
+      .isEqualTo(123456789)
+      .jsonPath("$.offenderManagers[2].grade")
+      .isEqualTo("PQiP")
+  }
+
+  @Test
   fun `must return not found when team code is not matched`() {
     webTestClient.get()
       .uri("/team/RANDOMCODE/offenderManagers")
