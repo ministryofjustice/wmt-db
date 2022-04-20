@@ -31,3 +31,30 @@ docker compose up -d
 ./gradlew ktlintApplyToIdea addKtlintFormatGitPreCommitHook
 ```
 will apply ktlint styles to intellij and also add a pre-commit hook to format all changed kotlin files.
+
+## Events Published
+
+Once a CRN and Conviction is allocated to a new officer in a team the following event types are emitted:
+* person.manager.allocated
+* event.manager.allocated
+* requirement.manager.allocated
+
+with the following structure:
+
+```json
+{
+  "eventType": "{event_type}",
+  "version": 1,
+  "description": "{description}",
+  "detailUrl": "https://{hmpps_workload_url}/allocation/person/{allocationId}",
+  "occurredAt": "{createdDate}",
+  "additionalInformation": {
+    "allocationId": "{allocationId}"
+  },
+  "personReference": {
+    "identifiers": [
+      {"type": "CRN", "value":"{crn}"}
+    ]
+  }
+}
+```
