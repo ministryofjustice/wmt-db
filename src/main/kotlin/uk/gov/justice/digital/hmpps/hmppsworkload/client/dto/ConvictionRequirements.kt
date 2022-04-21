@@ -9,9 +9,13 @@ data class ConvictionRequirements @JsonCreator constructor(
 
 data class ConvictionRequirement @JsonCreator constructor(
   val requirementTypeMainCategory: RequirementCategory,
-  val requirementId: BigInteger
+  val requirementTypeSubCategory: RequirementCategory,
+  val requirementId: BigInteger,
+  val length: BigInteger,
+  val lengthUnit: String
 )
 
 data class RequirementCategory @JsonCreator constructor(
-  val code: String
+  val code: String,
+  val description: String
 )
