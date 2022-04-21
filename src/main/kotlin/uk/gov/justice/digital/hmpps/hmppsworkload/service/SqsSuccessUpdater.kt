@@ -37,7 +37,7 @@ class SqsSuccessUpdater(
 
   override fun updatePerson(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
     val hmppsPersonEvent = HmppsMessage(
-      "person.manager.allocated", 1, "Person allocated event", generateDetailsUri(personManagerLookupPath, allocationId),
+      "person.community.manager.allocated", 1, "Person allocated event", generateDetailsUri(personManagerLookupPath, allocationId),
       timeUpdated.format(
         DateTimeFormatter.ISO_OFFSET_DATE_TIME
       ),

@@ -35,7 +35,7 @@ will apply ktlint styles to intellij and also add a pre-commit hook to format al
 ## Events Published
 
 Once a CRN and Conviction is allocated to a new officer in a team the following event types are emitted:
-* person.manager.allocated
+* person.community.manager.allocated
 * event.manager.allocated
 * requirement.manager.allocated
 
