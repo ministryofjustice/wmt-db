@@ -4,12 +4,16 @@ import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Contact
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Conviction
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ConvictionRequirements
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffSummary
 import java.math.BigInteger
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Optional
 
 class CommunityApiClient(private val webClient: WebClient) {
 
@@ -30,6 +34,14 @@ class CommunityApiClient(private val webClient: WebClient) {
     return webClient
       .get()
       .uri("/staff/staffIdentifier/$staffId")
+      .retrieve()
+      .bodyToMono(Staff::class.java)
+  }
+
+  fun getStaffByUsername(username: String): Mono<Staff> {
+    return webClient
+      .get()
+      .uri("/staff/username/$username")
       .retrieve()
       .bodyToMono(Staff::class.java)
   }
@@ -66,6 +78,36 @@ class CommunityApiClient(private val webClient: WebClient) {
       .retrieve()
       .bodyToMono(ConvictionRequirements::class.java)
   }
+
+  fun getInductionContacts(crn: String, contactDateFrom: LocalDate): Mono<List<Contact>> {
+    val responseType = object : ParameterizedTypeReference<List<Contact>>() {}
+    val contactDateFromQuery = contactDateFrom.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+    return webClient
+      .get()
+      .uri("/offenders/crn/$crn/contact-summary/inductions?contactDateFrom=$contactDateFromQuery")
+      .retrieve()
+      .bodyToMono(responseType)
+  }
+
+  fun getConviction(crn: String, convictionId: BigInteger): Mono<Optional<Conviction>> {
+    return webClient
+      .get()
+      .uri("/offenders/crn/$crn/convictions/$convictionId")
+      .retrieve()
+      .onStatus(
+        { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
+        { Mono.error(MissingConvictionError("No conviction found for $crn and convictionId $convictionId")) }
+      )
+      .bodyToMono(Conviction::class.java)
+      .map { Optional.of(it) }
+      .onErrorResume { ex ->
+        when (ex) {
+          is MissingConvictionError -> Mono.just(Optional.empty())
+          else -> Mono.error(ex)
+        }
+      }
+  }
 }
 
+private class MissingConvictionError(msg: String) : RuntimeException(msg)
 class MissingTeamError(msg: String) : RuntimeException(msg)
