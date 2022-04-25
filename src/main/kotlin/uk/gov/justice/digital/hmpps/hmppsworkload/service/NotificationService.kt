@@ -16,6 +16,7 @@ interface NotificationService {
     convictionId: BigInteger,
     allocateCase: AllocateCase,
     allocatingOfficerUsername: String,
-    teamCode: String
+    teamCode: String,
+    token: String
   )
 }

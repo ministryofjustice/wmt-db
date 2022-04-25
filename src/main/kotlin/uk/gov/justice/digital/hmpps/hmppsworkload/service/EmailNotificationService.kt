@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.AssessRisksNeedsApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.HmppsTierApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Contact
@@ -21,6 +22,7 @@ import java.math.BigInteger
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.Locale
 
 @Service
 class EmailNotificationService(
@@ -30,7 +32,8 @@ class EmailNotificationService(
   private val hmppsTierApiClient: HmppsTierApiClient,
   private val gradeMapper: GradeMapper,
   private val caseTypeMapper: CaseTypeMapper,
-  private val dateMapper: DateMapper
+  private val dateMapper: DateMapper,
+  private val assessRisksNeedsApiClient: AssessRisksNeedsApiClient
 ) : NotificationService {
 
   override fun notifyAllocation(
@@ -41,11 +44,12 @@ class EmailNotificationService(
     convictionId: BigInteger,
     allocateCase: AllocateCase,
     allocatingOfficerUsername: String,
-    teamCode: String
+    teamCode: String,
+    token: String
   ) {
     val convictions = communityApiClient.getActiveConvictions(crn).block()!!
     val conviction = convictions.first { it.convictionId == convictionId }
-    Mono.zip(communityApiClient.getInductionContacts(crn, conviction.sentence!!.startDate), hmppsTierApiClient.getTierByCrn(crn), communityApiClient.getStaffByUsername(allocatingOfficerUsername)).map { results ->
+    Mono.zip(communityApiClient.getInductionContacts(crn, conviction.sentence!!.startDate), hmppsTierApiClient.getTierByCrn(crn), communityApiClient.getStaffByUsername(allocatingOfficerUsername), assessRisksNeedsApiClient.getRiskSummary(crn, token)).map { results ->
 
       val parameters = mapOf(
         "case_name" to "${personSummary.firstName} ${personSummary.surname}",
@@ -58,7 +62,9 @@ class EmailNotificationService(
         "order" to mapOrder(conviction.sentence),
         "requirements" to mapRequirements(requirements),
         "tier" to results.t2,
-        // "rosh" to
+        "rosh" to results.t4.map { riskSummary ->
+          capitalize(riskSummary.overallRiskLevel)
+        }.orElse(null),
         // "rsrLevel" to
         // "rsrPercentage" to
         // "ogrsLevel" to
@@ -89,6 +95,12 @@ class EmailNotificationService(
         return "Their induction has not been booked and is due on ${inductionDueDate.format(DateTimeFormatter.ISO_LOCAL_DATE)}"
       }
     }
+  }
+
+  private fun capitalize(value: String?): String? = value?.replaceFirstChar {
+    if (it.isLowerCase()) it.titlecase(
+      Locale.getDefault()
+    ) else it.toString()
   }
 
   private fun mapOrder(sentence: Sentence) = "${sentence.description} (${sentence.originalLength} ${sentence.originalLengthUnits})"
