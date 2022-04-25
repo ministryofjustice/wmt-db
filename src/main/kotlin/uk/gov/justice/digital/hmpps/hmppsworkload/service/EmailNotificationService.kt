@@ -5,16 +5,21 @@ import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.HmppsTierApiClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Contact
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ConvictionRequirement
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Offence
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Sentence
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
+import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.CaseTypeMapper
 import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.GradeMapper
 import uk.gov.service.notify.NotificationClientApi
 import java.math.BigInteger
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 @Service
 class EmailNotificationService(
@@ -22,7 +27,8 @@ class EmailNotificationService(
   @Value("\${application.notify.allocation.template}") private val allocationTemplateId: String,
   private val communityApiClient: CommunityApiClient,
   private val hmppsTierApiClient: HmppsTierApiClient,
-  private val gradeMapper: GradeMapper
+  private val gradeMapper: GradeMapper,
+  private val caseTypeMapper: CaseTypeMapper
 ) : NotificationService {
 
   override fun notifyAllocation(
@@ -61,6 +67,24 @@ class EmailNotificationService(
         "allocatingOfficerTeam" to results.t3.teams?.find { team -> team.code == teamCode }?.description
       )
       notificationClient.sendEmail(allocationTemplateId, allocatedOfficer.email!!, parameters, null)
+    }
+  }
+
+  private fun mapInductionAppointment(appointments: List<Contact>, caseType: CaseType, sentenceStartDate: LocalDate): String {
+    return when (caseType) {
+      CaseType.CUSTODY -> "No induction appointment is needed"
+      else -> {
+        val mostRecentAppointment = appointments.maxByOrNull { it.contactStart }
+        if (mostRecentAppointment != null) {
+          return if (ChronoUnit.DAYS.between(mostRecentAppointment.contactStart, sentenceStartDate) >= 0) {
+            "Their induction has been booked and is due on ${mostRecentAppointment.contactStart.format(DateTimeFormatter.ISO_LOCAL_DATE)}"
+          } else {
+            "Their induction is overdue and was due on ${mostRecentAppointment.contactStart.format(DateTimeFormatter.ISO_LOCAL_DATE)}"
+          }
+        }
+
+        return ""
+      }
     }
   }
 

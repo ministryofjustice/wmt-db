@@ -59,5 +59,6 @@ data class WorkloadPointsEntity(
     CaseType.CUSTODY -> custodyTierPoints.asMap()
     CaseType.LICENSE -> licenseTierPoints.asMap()
     CaseType.COMMUNITY -> communityTierPoints.asMap()
+    else -> emptyMap()
   }
 }

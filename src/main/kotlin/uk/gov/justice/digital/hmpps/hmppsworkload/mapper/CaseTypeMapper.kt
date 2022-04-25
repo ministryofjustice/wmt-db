@@ -9,8 +9,8 @@ class CaseTypeMapper(
   private val caseTypeRules: List<CaseTypeRule>
 ) {
   fun getCaseType(activeConvictions: List<Conviction>, convictionId: Long): CaseType {
-    val allConvictionTypes = activeConvictions.mapNotNull { conviction ->
-      convictionToCaseType(conviction)?.let { caseType ->
+    val allConvictionTypes = activeConvictions.map { conviction ->
+      convictionToCaseType(conviction).let { caseType ->
         {
           conviction.convictionId to caseType
         }
@@ -23,8 +23,8 @@ class CaseTypeMapper(
     return caseType
   }
 
-  fun convictionToCaseType(conviction: Conviction): CaseType? {
-    var caseType: CaseType? = null
+  fun convictionToCaseType(conviction: Conviction): CaseType {
+    var caseType: CaseType = CaseType.UNKNOWN
     for (caseTypeRule in caseTypeRules) {
       if (caseTypeRule.isCaseType(conviction.sentence!!.sentenceType.code, conviction.custody?.status?.code)) {
         caseType = caseTypeRule.getCaseType()
