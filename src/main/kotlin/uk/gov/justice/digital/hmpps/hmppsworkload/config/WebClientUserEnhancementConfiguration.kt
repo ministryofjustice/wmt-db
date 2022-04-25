@@ -25,6 +25,7 @@ class WebClientUserEnhancementConfiguration(
   @Value("\${community.endpoint.url}") private val communityApiRootUri: String,
   @Value("\${hmpps-tier.endpoint.url}") private val hmppsTierApiRootUri: String,
   @Value("\${offender-search.endpoint.url}") private val offenderSearchApiRootUri: String,
+  @Value("\${bank-holiday-api.endpoint.url:https://www.gov.uk}") private val bankholidayApiRootUri: String
 ) {
 
   @Bean
@@ -105,4 +106,7 @@ class WebClientUserEnhancementConfiguration(
       .apply(oauth2Client.oauth2Configuration())
       .build()
   }
+
+  @Bean
+  fun bankHolidayApiWebClient(builder: WebClient.Builder): WebClient = builder.baseUrl(bankholidayApiRootUri).build()
 }

@@ -27,6 +27,7 @@ dependencies {
 
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+  implementation("uk.gov.service.notify:notifications-java-client:3.17.3-RELEASE")
 
   runtimeOnly("com.zaxxer:HikariCP")
   runtimeOnly("org.flywaydb:flyway-core")
@@ -35,6 +36,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt:0.9.1")
   testImplementation("org.mock-server:mockserver-netty:5.13.2")
   testImplementation("org.awaitility:awaitility-kotlin:4.2.0")
+  testImplementation("io.mockk:mockk:1.12.3")
 }
 
 java {

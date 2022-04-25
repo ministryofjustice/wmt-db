@@ -50,7 +50,7 @@ class JpaBasedGetOffenderManagerService(
       }.block()
   }
 
-  private fun getPotentialCase(crn: String, convictionId: Long): Mono<PotentialCase> {
+  private fun getPotentialCase(crn: String, convictionId: BigInteger): Mono<PotentialCase> {
     return Mono.zip(communityApiClient.getActiveConvictions(crn), hmppsTierApiClient.getTierByCrn(crn))
       .map { results ->
         val caseType = caseTypeMapper.getCaseType(results.t1, convictionId)
