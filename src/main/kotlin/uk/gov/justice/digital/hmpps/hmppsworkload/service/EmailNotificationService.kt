@@ -20,12 +20,12 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.CaseTypeMapper
 import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.DateMapper
 import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.GradeMapper
 import uk.gov.service.notify.NotificationClientApi
-import java.math.BigInteger
+import uk.gov.service.notify.SendEmailResponse
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import java.util.Locale
 import java.util.Optional
 
 @Service
@@ -44,25 +44,23 @@ class EmailNotificationService(
     allocatedOfficer: Staff,
     personSummary: PersonSummary,
     requirements: List<ConvictionRequirement>,
-    crn: String,
-    convictionId: BigInteger,
     allocateCase: AllocateCase,
     allocatingOfficerUsername: String,
     teamCode: String,
     token: String
-  ) {
-    val convictions = communityApiClient.getAllConvictions(crn).map { convictions ->
+  ): Mono<SendEmailResponse> {
+    val convictions = communityApiClient.getAllConvictions(allocateCase.crn).map { convictions ->
       convictions.groupBy { it.active }
     }.blockOptional().orElse(emptyMap())
     val activeConvictions = convictions.getOrDefault(true, emptyList())
-    val conviction = activeConvictions.first { it.convictionId == convictionId }
-    Mono.zip(
-      communityApiClient.getInductionContacts(crn, conviction.sentence!!.startDate),
-      hmppsTierApiClient.getTierByCrn(crn),
+    val conviction = activeConvictions.first { it.convictionId == allocateCase.eventId }
+    return Mono.zip(
+      communityApiClient.getInductionContacts(allocateCase.crn, conviction.sentence!!.startDate),
+      hmppsTierApiClient.getTierByCrn(allocateCase.crn),
       communityApiClient.getStaffByUsername(allocatingOfficerUsername),
-      assessRisksNeedsApiClient.getRiskSummary(crn, token),
-      assessRisksNeedsApiClient.getRiskPredictors(crn, token),
-      communityApiClient.getAssessment(crn)
+      assessRisksNeedsApiClient.getRiskSummary(allocateCase.crn, token),
+      assessRisksNeedsApiClient.getRiskPredictors(allocateCase.crn, token),
+      communityApiClient.getAssessment(allocateCase.crn)
     ).map { results ->
       val latestRiskPredictor = Optional.ofNullable(
         results.t5.filter { riskPredictor -> riskPredictor.rsrScoreLevel != null && riskPredictor.rsrPercentageScore != null }
@@ -70,11 +68,11 @@ class EmailNotificationService(
       )
       val parameters = mapOf(
         "case_name" to "${personSummary.firstName} ${personSummary.surname}",
-        "crn" to crn,
+        "crn" to allocateCase.crn,
         "officer_name" to "${allocatedOfficer.staff.forenames} ${allocatedOfficer.staff.surname}",
         "court_name" to conviction.courtAppearance!!.courtName,
         "sentence_date" to conviction.courtAppearance.appearanceDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
-        "induction_statement" to mapInductionAppointment(results.t1, caseTypeMapper.getCaseType(activeConvictions, convictionId), conviction.sentence.startDate),
+        "induction_statement" to mapInductionAppointment(results.t1, caseTypeMapper.getCaseType(activeConvictions, allocateCase.eventId), conviction.sentence.startDate),
         "offences" to mapOffences(conviction.offences!!),
         "order" to mapOrder(conviction.sentence),
         "requirements" to mapRequirements(requirements),
@@ -115,7 +113,7 @@ class EmailNotificationService(
       else -> {
         val mostRecentAppointment = appointments.maxByOrNull { it.contactStart }
         if (mostRecentAppointment != null) {
-          return if (ChronoUnit.DAYS.between(mostRecentAppointment.contactStart, sentenceStartDate) >= 0) {
+          return if (ChronoUnit.DAYS.between(sentenceStartDate.atStartOfDay(ZoneId.systemDefault()), mostRecentAppointment.contactStart) >= 0) {
             "Their induction has been booked and is due on ${mostRecentAppointment.contactStart.format(DateTimeFormatter.ISO_LOCAL_DATE)}"
           } else {
             "Their induction is overdue and was due on ${mostRecentAppointment.contactStart.format(DateTimeFormatter.ISO_LOCAL_DATE)}"
@@ -127,10 +125,11 @@ class EmailNotificationService(
     }
   }
 
-  private fun capitalize(value: String?): String? = value?.replaceFirstChar {
-    if (it.isLowerCase()) it.titlecase(
-      Locale.getDefault()
-    ) else it.toString()
+  private fun capitalize(value: String?): String? = value?.let {
+    if (it.isNotEmpty() && it.isNotBlank()) {
+      return it[0].uppercase() + it.substring(1).lowercase()
+    }
+    return it
   }
 
   private fun mapOrder(sentence: Sentence) = "${sentence.description} (${sentence.originalLength} ${sentence.originalLengthUnits})"
