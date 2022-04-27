@@ -7,6 +7,7 @@ import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Contact
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Conviction
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ConvictionRequirements
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderAssessment
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffSummary
@@ -63,6 +64,16 @@ class CommunityApiClient(private val webClient: WebClient) {
       .bodyToMono(responseType)
   }
 
+  fun getAllConvictions(crn: String): Mono<List<Conviction>> {
+    val responseType = object : ParameterizedTypeReference<List<Conviction>>() {}
+
+    return webClient
+      .get()
+      .uri("/offenders/crn/$crn/convictions")
+      .retrieve()
+      .bodyToMono(responseType)
+  }
+
   fun getSummaryByCrn(crn: String): Mono<PersonSummary> {
     return webClient
       .get()
@@ -89,25 +100,25 @@ class CommunityApiClient(private val webClient: WebClient) {
       .bodyToMono(responseType)
   }
 
-  fun getConviction(crn: String, convictionId: BigInteger): Mono<Optional<Conviction>> {
+  fun getAssessment(crn: String): Mono<Optional<OffenderAssessment>> {
     return webClient
       .get()
-      .uri("/offenders/crn/$crn/convictions/$convictionId")
+      .uri("/offenders/crn/$crn/assessments")
       .retrieve()
       .onStatus(
         { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
-        { Mono.error(MissingConvictionError("No conviction found for $crn and convictionId $convictionId")) }
+        { Mono.error(MissingOffenderAssessmentError("No offender assessment found for $crn")) }
       )
-      .bodyToMono(Conviction::class.java)
+      .bodyToMono(OffenderAssessment::class.java)
       .map { Optional.of(it) }
       .onErrorResume { ex ->
         when (ex) {
-          is MissingConvictionError -> Mono.just(Optional.empty())
+          is MissingOffenderAssessmentError -> Mono.just(Optional.empty())
           else -> Mono.error(ex)
         }
       }
   }
 }
 
-private class MissingConvictionError(msg: String) : RuntimeException(msg)
 class MissingTeamError(msg: String) : RuntimeException(msg)
+private class MissingOffenderAssessmentError(msg: String) : RuntimeException(msg)
