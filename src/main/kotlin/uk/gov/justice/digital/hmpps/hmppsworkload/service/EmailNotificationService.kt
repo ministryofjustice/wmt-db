@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
@@ -31,8 +32,8 @@ import java.util.Optional
 class EmailNotificationService(
   private val notificationClient: NotificationClientApi,
   @Value("\${application.notify.allocation.template}") private val allocationTemplateId: String,
-  private val communityApiClient: CommunityApiClient,
-  private val hmppsTierApiClient: HmppsTierApiClient,
+  @Qualifier("communityApiClient") private val communityApiClient: CommunityApiClient,
+  @Qualifier("hmppsTierApiClient") private val hmppsTierApiClient: HmppsTierApiClient,
   private val gradeMapper: GradeMapper,
   private val caseTypeMapper: CaseTypeMapper,
   private val dateMapper: DateMapper,
