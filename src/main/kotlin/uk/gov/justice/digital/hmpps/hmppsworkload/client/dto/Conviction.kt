@@ -7,6 +7,7 @@ import java.time.LocalDateTime
 data class Conviction @JsonCreator constructor(
   val sentence: Sentence?,
   val custody: Custody?,
+  val active: Boolean,
   val convictionId: BigInteger,
   val courtAppearance: CourtAppearance?,
   val offences: List<Offence>?

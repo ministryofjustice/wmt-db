@@ -1,17 +1,27 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.offenderManager
 
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
+import io.mockk.verify
 import org.hamcrest.core.IsNot
 import org.hamcrest.text.MatchesPattern
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
+import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.request.allocateCase
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.emailResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RequirementManagerEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.NotificationService
+import uk.gov.service.notify.SendEmailResponse
 import java.math.BigInteger
 
 class AllocateCaseToOffenderManager : IntegrationTestBase() {
+
+  @MockkBean
+  private lateinit var notificationService: NotificationService
 
   @Test
   fun `can allocate CRN to Offender`() {
@@ -23,6 +33,12 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     staffIdResponse(staffId, staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveRequirementResponse(crn, eventId)
+
+    every { notificationService.notifyAllocation(any(), any(), any(), any(), any(), teamCode, any()) } returns Mono.just(
+      SendEmailResponse(
+        emailResponse()
+      )
+    )
     webTestClient.post()
       .uri("/team/$teamCode/offenderManagers/$staffId/cases")
       .bodyValue(allocateCase(crn, eventId))
@@ -42,6 +58,8 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
 
     expectWorkloadAllocationCompleteMessages(crn)
+
+    verify(exactly = 1) { notificationService.notifyAllocation(any(), any(), any(), any(), any(), teamCode, any()) }
   }
 
   @Test
@@ -54,6 +72,11 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     staffIdResponse(staffId, staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveUnpaidRequirementResponse(crn, eventId)
+    every { notificationService.notifyAllocation(any(), any(), any(), any(), any(), teamCode, any()) } returns Mono.just(
+      SendEmailResponse(
+        emailResponse()
+      )
+    )
     webTestClient.post()
       .uri("/team/$teamCode/offenderManagers/$staffId/cases")
       .bodyValue(allocateCase(crn, eventId))
@@ -86,6 +109,11 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     eventManagerRepository.save(storedEventManager)
     val storedRequirementManager = RequirementManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, eventId = eventId, requirementId = requirementId, createdBy = "USER1", providerCode = "PV1")
     requirementManagerRepository.save(storedRequirementManager)
+    every { notificationService.notifyAllocation(any(), any(), any(), any(), any(), teamCode, any()) } returns Mono.just(
+      SendEmailResponse(
+        emailResponse()
+      )
+    )
     webTestClient.post()
       .uri("/team/$teamCode/offenderManagers/$staffId/cases")
       .bodyValue(allocateCase(crn, eventId))
@@ -117,6 +145,11 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     singleActiveUnpaidRequirementResponse(crn, eventId)
     val storedPersonManager = PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = teamCode, offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1")
     personManagerRepository.save(storedPersonManager)
+    every { notificationService.notifyAllocation(any(), any(), any(), any(), any(), teamCode, any()) } returns Mono.just(
+      SendEmailResponse(
+        emailResponse()
+      )
+    )
     webTestClient.post()
       .uri("/team/$teamCode/offenderManagers/$staffId/cases")
       .bodyValue(allocateCase(crn, eventId))

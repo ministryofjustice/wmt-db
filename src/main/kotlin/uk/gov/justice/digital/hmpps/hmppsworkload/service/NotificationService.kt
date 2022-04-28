@@ -1,10 +1,11 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
+import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ConvictionRequirement
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
-import java.math.BigInteger
+import uk.gov.service.notify.SendEmailResponse
 
 interface NotificationService {
 
@@ -12,10 +13,9 @@ interface NotificationService {
     allocatedOfficer: Staff,
     personSummary: PersonSummary,
     requirements: List<ConvictionRequirement>,
-    crn: String,
-    convictionId: BigInteger,
     allocateCase: AllocateCase,
     allocatingOfficerUsername: String,
-    teamCode: String
-  )
+    teamCode: String,
+    token: String
+  ): Mono<SendEmailResponse>
 }

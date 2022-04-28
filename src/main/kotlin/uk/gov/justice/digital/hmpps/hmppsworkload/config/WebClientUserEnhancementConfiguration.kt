@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.InMemoryOAuth2AuthorizedClientService
@@ -25,7 +26,8 @@ class WebClientUserEnhancementConfiguration(
   @Value("\${community.endpoint.url}") private val communityApiRootUri: String,
   @Value("\${hmpps-tier.endpoint.url}") private val hmppsTierApiRootUri: String,
   @Value("\${offender-search.endpoint.url}") private val offenderSearchApiRootUri: String,
-  @Value("\${bank-holiday-api.endpoint.url:https://www.gov.uk}") private val bankholidayApiRootUri: String
+  @Value("\${bank-holiday-api.endpoint.url:https://www.gov.uk}") private val bankholidayApiRootUri: String,
+  @Value("\${assess-risks-needs.endpoint.url}") private val assessRisksNeedsApiRootUri: String,
 ) {
 
   @Bean
@@ -37,6 +39,7 @@ class WebClientUserEnhancementConfiguration(
     return getOAuthWebClient(authorizedClientManagerUserEnhanced(clientRegistrationRepository), builder, communityApiRootUri, "community-api")
   }
 
+  @Primary
   @Bean
   fun offenderSearchApiClientUserEnhanced(@Qualifier("offenderSearchWebClientUserEnhancedAppScope") webClient: WebClient): OffenderSearchApiClient {
     return OffenderSearchApiClient(webClient)
@@ -51,6 +54,7 @@ class WebClientUserEnhancementConfiguration(
     return getOAuthWebClient(authorizedClientManagerUserEnhanced(clientRegistrationRepository), builder, offenderSearchApiRootUri, "offender-search-api")
   }
 
+  @Primary
   @Bean
   fun communityApiClientUserEnhanced(@Qualifier("communityWebClientUserEnhancedAppScope") webClient: WebClient): CommunityApiClient {
     return CommunityApiClient(webClient)
@@ -65,6 +69,7 @@ class WebClientUserEnhancementConfiguration(
     return getOAuthWebClient(authorizedClientManagerUserEnhanced(clientRegistrationRepository), builder, hmppsTierApiRootUri, "hmpps-tier-api")
   }
 
+  @Primary
   @Bean
   fun hmppsTierApiClientUserEnhanced(@Qualifier("hmppsTierWebClientUserEnhancedAppScope") webClient: WebClient): HmppsTierApiClient {
     return HmppsTierApiClient(webClient)
@@ -109,4 +114,7 @@ class WebClientUserEnhancementConfiguration(
 
   @Bean
   fun bankHolidayApiWebClient(builder: WebClient.Builder): WebClient = builder.baseUrl(bankholidayApiRootUri).build()
+
+  @Bean
+  fun assessRiskNeedsApiWebClient(builder: WebClient.Builder): WebClient = builder.baseUrl(assessRisksNeedsApiRootUri).build()
 }
