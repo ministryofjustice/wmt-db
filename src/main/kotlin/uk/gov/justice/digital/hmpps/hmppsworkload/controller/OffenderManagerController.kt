@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.controller
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
@@ -73,8 +75,16 @@ class OffenderManagerController(
   )
   @PreAuthorize("hasRole('ROLE_MANAGE_A_WORKFORCE_ALLOCATE')")
   @PostMapping("/team/{teamCode}/offenderManagers/{staffId}/cases")
-  fun allocateCaseToOffenderManager(@PathVariable(required = true) teamCode: String, @PathVariable(required = true) staffId: BigInteger, @RequestBody allocateCase: AllocateCase, authentication: Authentication): CaseAllocated {
-    return saveWorkloadService.saveWorkload(teamCode, staffId, allocateCase, authentication.name)
+  fun allocateCaseToOffenderManager(
+    @PathVariable(required = true) teamCode: String,
+    @PathVariable(required = true) staffId: BigInteger,
+    @RequestBody allocateCase: AllocateCase,
+    authentication: Authentication,
+    @RequestHeader(
+      HttpHeaders.AUTHORIZATION
+    ) authToken: String
+  ): CaseAllocated {
+    return saveWorkloadService.saveWorkload(teamCode, staffId, allocateCase, authentication.name, authToken)
   }
 
   @Operation(summary = "Retrieves all cases allocated to an Offender Manager")

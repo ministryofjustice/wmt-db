@@ -6,5 +6,5 @@ import java.math.BigInteger
 
 interface SaveWorkloadService {
 
-  fun saveWorkload(teamCode: String, staffId: BigInteger, allocateCase: AllocateCase, loggedInUser: String): CaseAllocated
+  fun saveWorkload(teamCode: String, staffId: BigInteger, allocateCase: AllocateCase, loggedInUser: String, authToken: String): CaseAllocated
 }
