@@ -35,8 +35,10 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     singleActiveRequirementResponse(crn, eventId)
 
     every { notificationService.notifyAllocation(any(), any(), any(), any(), any(), teamCode, any()) } returns Mono.just(
-      SendEmailResponse(
-        emailResponse()
+      listOf(
+        SendEmailResponse(
+          emailResponse()
+        )
       )
     )
     webTestClient.post()
@@ -73,8 +75,10 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     offenderSummaryResponse(crn)
     singleActiveUnpaidRequirementResponse(crn, eventId)
     every { notificationService.notifyAllocation(any(), any(), any(), any(), any(), teamCode, any()) } returns Mono.just(
-      SendEmailResponse(
-        emailResponse()
+      listOf(
+        SendEmailResponse(
+          emailResponse()
+        )
       )
     )
     webTestClient.post()
@@ -110,8 +114,10 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     val storedRequirementManager = RequirementManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, eventId = eventId, requirementId = requirementId, createdBy = "USER1", providerCode = "PV1")
     requirementManagerRepository.save(storedRequirementManager)
     every { notificationService.notifyAllocation(any(), any(), any(), any(), any(), teamCode, any()) } returns Mono.just(
-      SendEmailResponse(
-        emailResponse()
+      listOf(
+        SendEmailResponse(
+          emailResponse()
+        )
       )
     )
     webTestClient.post()
@@ -146,8 +152,10 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     val storedPersonManager = PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = teamCode, offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1")
     personManagerRepository.save(storedPersonManager)
     every { notificationService.notifyAllocation(any(), any(), any(), any(), any(), teamCode, any()) } returns Mono.just(
-      SendEmailResponse(
-        emailResponse()
+      listOf(
+        SendEmailResponse(
+          emailResponse()
+        )
       )
     )
     webTestClient.post()

@@ -17,5 +17,5 @@ interface NotificationService {
     allocatingOfficerUsername: String,
     teamCode: String,
     token: String
-  ): Mono<SendEmailResponse>
+  ): Mono<List<SendEmailResponse>>
 }

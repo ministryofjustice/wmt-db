@@ -48,7 +48,7 @@ class EmailNotificationService(
     allocatingOfficerUsername: String,
     teamCode: String,
     token: String
-  ): Mono<SendEmailResponse> {
+  ): Mono<List<SendEmailResponse>> {
     val convictions = communityApiClient.getAllConvictions(allocateCase.crn).map { convictions ->
       convictions.groupBy { it.active }
     }.blockOptional().orElse(emptyMap())
@@ -90,7 +90,9 @@ class EmailNotificationService(
         "allocatingOfficerGrade" to gradeMapper.deliusToStaffGrade(results.t3.staffGrade?.code),
         "allocatingOfficerTeam" to results.t3.teams?.find { team -> team.code == teamCode }?.description
       )
-      notificationClient.sendEmail(allocationTemplateId, allocatedOfficer.email!!, parameters, null)
+      val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
+      emailTo.add(allocatedOfficer.email!!)
+      emailTo.map { email -> notificationClient.sendEmail(allocationTemplateId, email, parameters, null) }
     }
   }
 
