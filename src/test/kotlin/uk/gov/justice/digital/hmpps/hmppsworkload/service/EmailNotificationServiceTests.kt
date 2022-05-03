@@ -87,7 +87,7 @@ class EmailNotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, null)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"
@@ -103,7 +103,7 @@ class EmailNotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, null)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"
@@ -120,7 +120,7 @@ class EmailNotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, null)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"
@@ -137,7 +137,7 @@ class EmailNotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, null)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"
@@ -167,7 +167,7 @@ class EmailNotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, null)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"
@@ -197,7 +197,7 @@ class EmailNotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, null)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"
@@ -216,7 +216,7 @@ class EmailNotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, null)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"
@@ -250,7 +250,7 @@ class EmailNotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, null)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"
@@ -284,7 +284,7 @@ class EmailNotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, null)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"
@@ -322,7 +322,7 @@ class EmailNotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, null)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"
@@ -354,7 +354,7 @@ class EmailNotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, null)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"
@@ -386,7 +386,7 @@ class EmailNotificationServiceTests {
       BigInteger.TEN, BigInteger.ONE, "Year"
     )
     val requirements = listOf(requirement)
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, null)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"
@@ -403,7 +403,7 @@ class EmailNotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, null)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"
@@ -423,7 +423,7 @@ class EmailNotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, null)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"
@@ -443,7 +443,7 @@ class EmailNotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, null)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"
@@ -464,7 +464,7 @@ class EmailNotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, null)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"
@@ -485,7 +485,7 @@ class EmailNotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, null)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"
@@ -506,7 +506,7 @@ class EmailNotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, null)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"
@@ -527,7 +527,7 @@ class EmailNotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, null)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"
@@ -548,7 +548,7 @@ class EmailNotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, null)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"
@@ -569,7 +569,7 @@ class EmailNotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, null)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"
@@ -590,7 +590,7 @@ class EmailNotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, null)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"
@@ -708,5 +708,23 @@ class EmailNotificationServiceTests {
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
     Assertions.assertEquals(team.description, parameters.captured["allocatingOfficerTeam"])
+  }
+
+  @Test
+  fun `must email all addresses supplied`() {
+    val personSummary = PersonSummary("John", "Doe")
+    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val requirements = emptyList<ConvictionRequirement>()
+    val firstEmail = "first@email.com"
+    val secondEmail = "second@email.com"
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, null, listOf(firstEmail, secondEmail))
+    val allocatingOfficerUsername = "ALLOCATOR"
+    val teamCode = "TM1"
+    val token = "token"
+
+    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, teamCode, token).block()
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, any(), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, firstEmail, any(), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, secondEmail, any(), isNull()) }
   }
 }
