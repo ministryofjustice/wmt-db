@@ -49,50 +49,51 @@ class EmailNotificationService(
     teamCode: String,
     token: String
   ): Mono<List<SendEmailResponse>> {
-    val convictions = communityApiClient.getAllConvictions(allocateCase.crn).map { convictions ->
+    return communityApiClient.getAllConvictions(allocateCase.crn).map { convictions ->
       convictions.groupBy { it.active }
-    }.blockOptional().orElse(emptyMap())
-    val activeConvictions = convictions.getOrDefault(true, emptyList())
-    val conviction = activeConvictions.first { it.convictionId == allocateCase.eventId }
-    return Mono.zip(
-      communityApiClient.getInductionContacts(allocateCase.crn, conviction.sentence!!.startDate),
-      hmppsTierApiClient.getTierByCrn(allocateCase.crn),
-      communityApiClient.getStaffByUsername(allocatingOfficerUsername),
-      assessRisksNeedsApiClient.getRiskSummary(allocateCase.crn, token),
-      assessRisksNeedsApiClient.getRiskPredictors(allocateCase.crn, token),
-      communityApiClient.getAssessment(allocateCase.crn)
-    ).map { results ->
-      val latestRiskPredictor = Optional.ofNullable(
-        results.t5.filter { riskPredictor -> riskPredictor.rsrScoreLevel != null && riskPredictor.rsrPercentageScore != null }
-          .maxByOrNull { riskPredictor -> riskPredictor.completedDate ?: LocalDateTime.MIN }
-      )
-      val parameters = mapOf(
-        "case_name" to "${personSummary.firstName} ${personSummary.surname}",
-        "crn" to allocateCase.crn,
-        "officer_name" to "${allocatedOfficer.staff.forenames} ${allocatedOfficer.staff.surname}",
-        "court_name" to conviction.courtAppearance!!.courtName,
-        "sentence_date" to conviction.courtAppearance.appearanceDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
-        "induction_statement" to mapInductionAppointment(results.t1, caseTypeMapper.getCaseType(activeConvictions, allocateCase.eventId), conviction.sentence.startDate),
-        "offences" to mapOffences(conviction.offences!!),
-        "order" to mapOrder(conviction.sentence),
-        "requirements" to mapRequirements(requirements),
-        "tier" to results.t2,
-        "rosh" to results.t4.map { riskSummary ->
-          capitalize(riskSummary.overallRiskLevel)
-        }.orElse(null),
-        "rsrLevel" to latestRiskPredictor.map { riskPredictor -> capitalize(riskPredictor.rsrScoreLevel) }.orElse(null),
-        "rsrPercentage" to latestRiskPredictor.map { riskPredictor -> riskPredictor.rsrPercentageScore }.orElse(null),
-        "ogrsLevel" to results.t6.map { assessment -> assessment.ogrsScore?.let { orgsScoreToLevel(it.toInt()) } }.orElse(null),
-        "ogrsPercentage" to results.t6.map { assessment -> assessment.ogrsScore }.orElse(null),
-        "previousConvictions" to convictions[false]?.let { mapConvictionsToOffenceDescription(it) },
-        "notes" to allocateCase.instructions,
-        "allocatingOfficerName" to "${results.t3.staff.forenames} ${results.t3.staff.surname}",
-        "allocatingOfficerGrade" to gradeMapper.deliusToStaffGrade(results.t3.staffGrade?.code),
-        "allocatingOfficerTeam" to results.t3.teams?.find { team -> team.code == teamCode }?.description
-      )
-      val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
-      emailTo.add(allocatedOfficer.email!!)
-      emailTo.map { email -> notificationClient.sendEmail(allocationTemplateId, email, parameters, null) }
+    }.flatMap { convictions ->
+      val activeConvictions = convictions.getOrDefault(true, emptyList())
+      val conviction = activeConvictions.first { it.convictionId == allocateCase.eventId }
+      Mono.zip(
+        communityApiClient.getInductionContacts(allocateCase.crn, conviction.sentence!!.startDate),
+        hmppsTierApiClient.getTierByCrn(allocateCase.crn),
+        communityApiClient.getStaffByUsername(allocatingOfficerUsername),
+        assessRisksNeedsApiClient.getRiskSummary(allocateCase.crn, token),
+        assessRisksNeedsApiClient.getRiskPredictors(allocateCase.crn, token),
+        communityApiClient.getAssessment(allocateCase.crn)
+      ).map { results ->
+        val latestRiskPredictor = Optional.ofNullable(
+          results.t5.filter { riskPredictor -> riskPredictor.rsrScoreLevel != null && riskPredictor.rsrPercentageScore != null }
+            .maxByOrNull { riskPredictor -> riskPredictor.completedDate ?: LocalDateTime.MIN }
+        )
+        val parameters = mapOf(
+          "case_name" to "${personSummary.firstName} ${personSummary.surname}",
+          "crn" to allocateCase.crn,
+          "officer_name" to "${allocatedOfficer.staff.forenames} ${allocatedOfficer.staff.surname}",
+          "court_name" to conviction.courtAppearance!!.courtName,
+          "sentence_date" to conviction.courtAppearance.appearanceDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
+          "induction_statement" to mapInductionAppointment(results.t1, caseTypeMapper.getCaseType(activeConvictions, allocateCase.eventId), conviction.sentence.startDate),
+          "offences" to mapOffences(conviction.offences!!),
+          "order" to mapOrder(conviction.sentence),
+          "requirements" to mapRequirements(requirements),
+          "tier" to results.t2,
+          "rosh" to results.t4.map { riskSummary ->
+            capitalize(riskSummary.overallRiskLevel)
+          }.orElse(null),
+          "rsrLevel" to latestRiskPredictor.map { riskPredictor -> capitalize(riskPredictor.rsrScoreLevel) }.orElse(null),
+          "rsrPercentage" to latestRiskPredictor.map { riskPredictor -> riskPredictor.rsrPercentageScore }.orElse(null),
+          "ogrsLevel" to results.t6.map { assessment -> assessment.ogrsScore?.let { orgsScoreToLevel(it.toInt()) } }.orElse(null),
+          "ogrsPercentage" to results.t6.map { assessment -> assessment.ogrsScore }.orElse(null),
+          "previousConvictions" to convictions[false]?.let { mapConvictionsToOffenceDescription(it) },
+          "notes" to allocateCase.instructions,
+          "allocatingOfficerName" to "${results.t3.staff.forenames} ${results.t3.staff.surname}",
+          "allocatingOfficerGrade" to gradeMapper.deliusToStaffGrade(results.t3.staffGrade?.code),
+          "allocatingOfficerTeam" to results.t3.teams?.find { team -> team.code == teamCode }?.description
+        )
+        val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
+        emailTo.add(allocatedOfficer.email!!)
+        emailTo.map { email -> notificationClient.sendEmail(allocationTemplateId, email, parameters, null) }
+      }
     }
   }
 

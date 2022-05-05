@@ -25,12 +25,12 @@ class DefaultSaveWorkloadService(
     authToken: String
   ): CaseAllocated {
     return Mono.zip(communityApiClient.getStaffById(staffId), communityApiClient.getSummaryByCrn(allocateCase.crn), communityApiClient.getActiveRequirements(allocateCase.crn, allocateCase.eventId))
-      .map { results ->
+      .flatMap { results ->
         val personManagerId = savePersonManagerService.savePersonManager(teamCode, results.t1, allocateCase, loggedInUser, results.t2).uuid
         val eventManagerId = saveEventManagerService.saveEventManager(teamCode, results.t1, allocateCase, loggedInUser).uuid
         val requirementManagerIds = saveRequirementManagerService.saveRequirementManagers(teamCode, results.t1, allocateCase, loggedInUser, results.t3.requirements)
         notificationService.notifyAllocation(results.t1, results.t2, results.t3.requirements, allocateCase, loggedInUser, teamCode, authToken)
-        CaseAllocated(personManagerId, eventManagerId, requirementManagerIds.map { it.uuid })
+          .map { CaseAllocated(personManagerId, eventManagerId, requirementManagerIds.map { it.uuid }) }
       }.block()!!
   }
 }
