@@ -79,11 +79,11 @@ class EmailNotificationService(
           "tier" to results.t2,
           "rosh" to results.t4.map { riskSummary ->
             capitalize(riskSummary.overallRiskLevel)
-          }.orElse(null),
-          "rsrLevel" to latestRiskPredictor.map { riskPredictor -> capitalize(riskPredictor.rsrScoreLevel) }.orElse(null),
-          "rsrPercentage" to latestRiskPredictor.map { riskPredictor -> riskPredictor.rsrPercentageScore }.orElse(null),
-          "ogrsLevel" to results.t6.map { assessment -> assessment.ogrsScore?.let { orgsScoreToLevel(it.toInt()) } }.orElse(null),
-          "ogrsPercentage" to results.t6.map { assessment -> assessment.ogrsScore }.orElse(null),
+          }.orElse("Score Unavailable"),
+          "rsrLevel" to latestRiskPredictor.map { riskPredictor -> capitalize(riskPredictor.rsrScoreLevel) }.orElse("Score Unavailable"),
+          "rsrPercentage" to latestRiskPredictor.map { riskPredictor -> riskPredictor.rsrPercentageScore.toString() }.orElse("Score Unavailable"),
+          "ogrsLevel" to results.t6.map { assessment -> assessment.ogrsScore?.let { orgsScoreToLevel(it.toInt()) } }.orElse("Score Unavailable"),
+          "ogrsPercentage" to results.t6.map { assessment -> assessment.ogrsScore.toString() }.orElse("Score Unavailable"),
           "previousConvictions" to convictions[false]?.let { mapConvictionsToOffenceDescription(it) },
           "notes" to allocateCase.instructions,
           "allocatingOfficerName" to "${results.t3.staff.forenames} ${results.t3.staff.surname}",

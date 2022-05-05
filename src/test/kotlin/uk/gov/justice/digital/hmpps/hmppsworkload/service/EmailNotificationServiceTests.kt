@@ -477,7 +477,7 @@ class EmailNotificationServiceTests {
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
-    Assertions.assertEquals(riskPredictor.rsrPercentageScore, parameters.captured["rsrPercentage"])
+    Assertions.assertEquals(riskPredictor.rsrPercentageScore.toString(), parameters.captured["rsrPercentage"])
   }
 
   @Test
@@ -498,7 +498,7 @@ class EmailNotificationServiceTests {
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
-    Assertions.assertEquals(offenderAssessment.ogrsScore, parameters.captured["ogrsPercentage"])
+    Assertions.assertEquals(offenderAssessment.ogrsScore.toString(), parameters.captured["ogrsPercentage"])
   }
 
   @Test
