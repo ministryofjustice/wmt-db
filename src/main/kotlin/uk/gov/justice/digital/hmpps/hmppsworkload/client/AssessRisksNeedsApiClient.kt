@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.client
 
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.ParameterizedTypeReference
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
@@ -17,7 +18,7 @@ class AssessRisksNeedsApiClient(@Qualifier("assessRiskNeedsApiWebClient")private
     return webClient
       .get()
       .uri("/risks/crn/$crn/summary")
-      .headers { it.setBearerAuth(token) }
+      .header(HttpHeaders.AUTHORIZATION, token)
       .retrieve()
       .onStatus(
         { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
@@ -38,7 +39,7 @@ class AssessRisksNeedsApiClient(@Qualifier("assessRiskNeedsApiWebClient")private
     return webClient
       .get()
       .uri("/risks/crn/$crn/predictors/rsr/history")
-      .headers { it.setBearerAuth(token) }
+      .header(HttpHeaders.AUTHORIZATION, token)
       .retrieve()
       .onStatus(
         { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
