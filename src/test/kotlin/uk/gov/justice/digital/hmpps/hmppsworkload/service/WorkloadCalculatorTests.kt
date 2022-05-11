@@ -38,8 +38,8 @@ class WorkloadCalculatorTests {
     val workloadPoints = mockWorkloadPoints(isT2A = false)
     val numberOfT2aCases = 10
     val numberOfCases = 5
-    val t2aCases = (1..numberOfT2aCases).map { Case(Tier.B2, CaseType.COMMUNITY, true) }
-    val cases = (1..numberOfCases).map { Case(Tier.C1, CaseType.CUSTODY, false) }
+    val t2aCases = (1..numberOfT2aCases).map { Case(Tier.B2, CaseType.COMMUNITY, true, "CRNCOM$it") }
+    val cases = (1..numberOfCases).map { Case(Tier.C1, CaseType.CUSTODY, false, "CRNCUST$it") }
     val result = workloadCalculator.getWorkloadPoints(t2aCases + cases, emptyList(), emptyList(), emptyList())
     val t2aExpectedWorkloadPoints = t2aWorkloadPoints.communityTierPoints.B2Points.multiply(numberOfT2aCases.toBigInteger())
     val casesExpectedWorkloadPoints = workloadPoints.custodyTierPoints.C1Points.multiply(numberOfCases.toBigInteger())

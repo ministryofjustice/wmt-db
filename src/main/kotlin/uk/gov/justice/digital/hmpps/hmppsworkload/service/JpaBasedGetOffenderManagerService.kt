@@ -55,12 +55,12 @@ class JpaBasedGetOffenderManagerService(
       .map { results ->
         val caseType = caseTypeMapper.getCaseType(results.t1, convictionId)
         val tier = results.t2
-        Case(Tier.valueOf(tier), caseType, false)
+        Case(Tier.valueOf(tier), caseType, false, crn)
       }
   }
 
   private fun getCurrentCasePoints(teamCode: String, staffCode: String, crn: String): BigInteger = offenderManagerRepository.findCaseByTeamCodeAndStaffCodeAndCrn(teamCode, staffCode, crn)?.let { currentCase ->
-    return caseCalculator.getPointsForCase(Case(Tier.valueOf(currentCase.tier), CaseType.valueOf(currentCase.caseCategory), false))
+    return caseCalculator.getPointsForCase(Case(Tier.valueOf(currentCase.tier), CaseType.valueOf(currentCase.caseCategory), false, crn))
   } ?: BigInteger.ZERO
 
   private fun getOffenderManagerOverview(

@@ -13,7 +13,12 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadPointsR
 import java.math.BigInteger
 
 class DefaultWorkloadCalculator(private val workloadPointsRepository: WorkloadPointsRepository) : WorkloadCalculator {
-  override fun getWorkloadPoints(cases: List<Case>, courtReports: List<CourtReport>, institutionalReports: List<InstitutionalReport>, assessments: List<Assessment>): BigInteger {
+  override fun getWorkloadPoints(
+    cases: List<Case>,
+    courtReports: List<CourtReport>,
+    institutionalReports: List<InstitutionalReport>,
+    assessments: List<Assessment>
+  ): BigInteger {
     val t2aWorkloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(true)
     val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
 
