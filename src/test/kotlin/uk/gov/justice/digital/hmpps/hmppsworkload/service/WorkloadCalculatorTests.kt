@@ -8,6 +8,8 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CourtReport
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CourtReportType
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.InstitutionalReport
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.InstitutionalReportType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CommunityTierPoints
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CustodyTierPoints
@@ -24,18 +26,13 @@ class WorkloadCalculatorTests {
 
   @Test
   fun `must sum all cases depending on their tier, category and whether they are T2A or not`() {
-    val communityTierPoints = generateCommunityTierPoints()
-    val licenseTierPoints = generateLicenseTierPoints()
-    val custodyTierPoints = generateCustodyTierPoints()
-    val t2aWorkloadPoints = WorkloadPointsEntity(null, communityTierPoints, licenseTierPoints, custodyTierPoints, ZonedDateTime.now(), ZonedDateTime.now(), true, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigInteger.ZERO, BigInteger.ZERO)
-    val workloadPoints = WorkloadPointsEntity(null, communityTierPoints, licenseTierPoints, custodyTierPoints, ZonedDateTime.now(), ZonedDateTime.now(), true, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigInteger.ZERO, BigInteger.ZERO)
-    every { workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(true) } returns t2aWorkloadPoints
-    every { workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false) } returns workloadPoints
+    val t2aWorkloadPoints = mockWorkloadPoints(isT2A = true)
+    val workloadPoints = mockWorkloadPoints(isT2A = false)
     val numberOfT2aCases = 10
     val numberOfCases = 5
     val t2aCases = (1..numberOfT2aCases).map { Case(Tier.B2, CaseType.COMMUNITY, true) }
     val cases = (1..numberOfCases).map { Case(Tier.C1, CaseType.CUSTODY, false) }
-    val result = workloadCalculator.getWorkloadPoints(t2aCases + cases, emptyList())
+    val result = workloadCalculator.getWorkloadPoints(t2aCases + cases, emptyList(), emptyList())
     val t2aExpectedWorkloadPoints = t2aWorkloadPoints.communityTierPoints.B2Points.multiply(numberOfT2aCases.toBigInteger())
     val casesExpectedWorkloadPoints = workloadPoints.custodyTierPoints.C1Points.multiply(numberOfCases.toBigInteger())
     Assertions.assertEquals(t2aExpectedWorkloadPoints.add(casesExpectedWorkloadPoints), result)
@@ -45,21 +42,70 @@ class WorkloadCalculatorTests {
   fun `must sum all court reports`() {
     val standardCourtReportWeighting = BigInteger.TEN
     val fastCourtReportWeighting = BigInteger.TWO
-    val t2aWorkloadPoints = WorkloadPointsEntity(null, generateCommunityTierPoints(), generateLicenseTierPoints(), generateCustodyTierPoints(), ZonedDateTime.now(), ZonedDateTime.now(), true, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigInteger.ZERO, BigInteger.ZERO)
-    val workloadPoints = WorkloadPointsEntity(null, generateCommunityTierPoints(), generateLicenseTierPoints(), generateCustodyTierPoints(), ZonedDateTime.now(), ZonedDateTime.now(), true, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, standardCourtReportWeighting, fastCourtReportWeighting)
-    every { workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(true) } returns t2aWorkloadPoints
-    every { workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false) } returns workloadPoints
+    mockWorkloadPoints(isT2A = true)
+    mockWorkloadPoints(standardCourtReportWeighting = standardCourtReportWeighting, fastCourtReportWeighting = fastCourtReportWeighting, isT2A = false)
     val numberOfStandardCourtReports = 7
     val numberOfFastCourtReports = 12
     val standardCourtReports = (1..numberOfStandardCourtReports).map { CourtReport(CourtReportType.STANDARD) }
     val fastCourtReports = (1..numberOfFastCourtReports).map { CourtReport(CourtReportType.FAST) }
 
-    val result = workloadCalculator.getWorkloadPoints(emptyList(), standardCourtReports + fastCourtReports)
+    val result = workloadCalculator.getWorkloadPoints(emptyList(), standardCourtReports + fastCourtReports, emptyList())
 
     val expectedStandardCourtReportPoints = standardCourtReportWeighting.multiply(numberOfStandardCourtReports.toBigInteger())
     val expectedFastCourtReportPoints = fastCourtReportWeighting.multiply(numberOfFastCourtReports.toBigInteger())
 
     Assertions.assertEquals(expectedStandardCourtReportPoints.add(expectedFastCourtReportPoints), result)
+  }
+
+  @Test
+  fun `must sum all institutional reports which require a parole report`() {
+    val paroleReportWeighting = BigInteger.TEN
+    val paroleEnabled = true
+    mockWorkloadPoints(isT2A = true)
+    mockWorkloadPoints(isT2A = false, paroleReportWeighting = paroleReportWeighting, paroleEnabled = paroleEnabled)
+
+    val numberOfParoleReports = 15
+    val numberOfOtherReports = 6
+
+    val paroleReports = (1..numberOfParoleReports).map { InstitutionalReport(InstitutionalReportType.PAROLE_REPORT) }
+    val otherReports = (1..numberOfOtherReports).map { InstitutionalReport(InstitutionalReportType.OTHER) }
+
+    val result = workloadCalculator.getWorkloadPoints(emptyList(), emptyList(), paroleReports + otherReports)
+
+    Assertions.assertEquals(paroleReportWeighting.multiply(numberOfParoleReports.toBigInteger()), result)
+  }
+
+  @Test
+  fun `total of institutional reports must be zero when not enabled`() {
+    val paroleReportWeighting = BigInteger.TEN
+    val paroleEnabled = false
+    mockWorkloadPoints(isT2A = true)
+    mockWorkloadPoints(isT2A = false, paroleReportWeighting = paroleReportWeighting, paroleEnabled = paroleEnabled)
+
+    val numberOfParoleReports = 15
+    val numberOfOtherReports = 6
+
+    val paroleReports = (1..numberOfParoleReports).map { InstitutionalReport(InstitutionalReportType.PAROLE_REPORT) }
+    val otherReports = (1..numberOfOtherReports).map { InstitutionalReport(InstitutionalReportType.OTHER) }
+
+    val result = workloadCalculator.getWorkloadPoints(emptyList(), emptyList(), paroleReports + otherReports)
+
+    Assertions.assertEquals(BigInteger.ZERO, result)
+  }
+
+  private fun mockWorkloadPoints(
+    communityTierPoints: CommunityTierPoints = generateCommunityTierPoints(),
+    licenseTierPoints: LicenseTierPoints = generateLicenseTierPoints(),
+    custodyTierPoints: CustodyTierPoints = generateCustodyTierPoints(),
+    standardCourtReportWeighting: BigInteger = BigInteger.ZERO,
+    fastCourtReportWeighting: BigInteger = BigInteger.ZERO,
+    isT2A: Boolean = false,
+    paroleReportWeighting: BigInteger = BigInteger.ZERO,
+    paroleEnabled: Boolean = true
+  ): WorkloadPointsEntity {
+    val workloadPoints = WorkloadPointsEntity(null, communityTierPoints, licenseTierPoints, custodyTierPoints, ZonedDateTime.now(), ZonedDateTime.now(), isT2A, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, standardCourtReportWeighting, fastCourtReportWeighting, paroleReportWeighting, paroleEnabled)
+    every { workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(isT2A) } returns workloadPoints
+    return workloadPoints
   }
 
   private fun generateCommunityTierPoints() = CommunityTierPoints(BigInteger.TEN, BigInteger.TEN, BigInteger.TEN, BigInteger.TEN, BigInteger.TEN, BigInteger.TEN, BigInteger.TEN, BigInteger.TEN, BigInteger.TEN, BigInteger.TEN, BigInteger.TEN, BigInteger.TEN, BigInteger.TEN, BigInteger.TEN, BigInteger.TEN, BigInteger.TEN)

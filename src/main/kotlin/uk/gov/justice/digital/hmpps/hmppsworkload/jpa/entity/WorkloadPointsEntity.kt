@@ -58,7 +58,13 @@ data class WorkloadPointsEntity(
   val standardCourtReportPoints: BigInteger,
 
   @Column(name = "sdr_conversion")
-  val fastCourtReportPoints: BigInteger
+  val fastCourtReportPoints: BigInteger,
+
+  @Column(name = "parom")
+  val paroleReportWeighting: BigInteger,
+
+  @Column(name = "paroms_enabled")
+  val paroleReportWeightingEnabled: Boolean
 
 ) {
   fun getTierPointsMap(caseType: CaseType): Map<Tier, BigInteger> = when (caseType) {
