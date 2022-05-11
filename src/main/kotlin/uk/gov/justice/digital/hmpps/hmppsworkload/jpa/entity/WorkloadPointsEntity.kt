@@ -34,7 +34,7 @@ data class WorkloadPointsEntity(
   val effectiveFrom: ZonedDateTime,
 
   @Column(name = "effective_to")
-  val effectiveTo: ZonedDateTime,
+  val effectiveTo: ZonedDateTime?,
 
   @Column(name = "is_t2a")
   val isT2A: Boolean,
@@ -52,7 +52,25 @@ data class WorkloadPointsEntity(
   val defaultAvailablePointsSPO: BigDecimal,
 
   @Column(name = "nominal_target_po")
-  val defaultAvailablePointsPO: BigDecimal
+  val defaultAvailablePointsPO: BigDecimal,
+
+  @Column(name = "sdr")
+  val standardCourtReportPoints: BigInteger,
+
+  @Column(name = "sdr_conversion")
+  val fastCourtReportPoints: BigInteger,
+
+  @Column(name = "parom")
+  val paroleReportWeighting: BigInteger,
+
+  @Column(name = "paroms_enabled")
+  val paroleReportWeightingEnabled: Boolean,
+
+  @Column(name = "weighting_arms_lic")
+  val licenseARMAssessmentWeighting: BigInteger,
+
+  @Column(name = "weighting_arms_comm")
+  val communityARMAssessmentWeighting: BigInteger
 
 ) {
   fun getTierPointsMap(caseType: CaseType): Map<Tier, BigInteger> = when (caseType) {
