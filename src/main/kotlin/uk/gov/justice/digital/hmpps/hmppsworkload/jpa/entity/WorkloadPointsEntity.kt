@@ -64,7 +64,13 @@ data class WorkloadPointsEntity(
   val paroleReportWeighting: BigInteger,
 
   @Column(name = "paroms_enabled")
-  val paroleReportWeightingEnabled: Boolean
+  val paroleReportWeightingEnabled: Boolean,
+
+  @Column(name = "weighting_arms_lic")
+  val licenseARMAssessmentWeighting: BigInteger,
+
+  @Column(name = "weighting_arms_comm")
+  val communityARMAssessmentWeighting: BigInteger
 
 ) {
   fun getTierPointsMap(caseType: CaseType): Map<Tier, BigInteger> = when (caseType) {
