@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Assessment
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AssessmentType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Contact
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CourtReport
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CourtReportType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.InstitutionalReport
@@ -30,6 +31,7 @@ class WorkloadCalculatorTests {
   @BeforeEach
   fun setup() {
     mockWorkloadPoints(isT2A = true)
+    mockWorkloadPoints(isT2A = false)
   }
 
   @Test
@@ -40,7 +42,7 @@ class WorkloadCalculatorTests {
     val numberOfCases = 5
     val t2aCases = (1..numberOfT2aCases).map { Case(Tier.B2, CaseType.COMMUNITY, true, "CRNCOM$it") }
     val cases = (1..numberOfCases).map { Case(Tier.C1, CaseType.CUSTODY, false, "CRNCUST$it") }
-    val result = workloadCalculator.getWorkloadPoints(t2aCases + cases, emptyList(), emptyList(), emptyList())
+    val result = workloadCalculator.getWorkloadPoints(t2aCases + cases, emptyList(), emptyList(), emptyList(), emptyList(), emptyMap())
     val t2aExpectedWorkloadPoints = t2aWorkloadPoints.communityTierPoints.B2Points.multiply(numberOfT2aCases.toBigInteger())
     val casesExpectedWorkloadPoints = workloadPoints.custodyTierPoints.C1Points.multiply(numberOfCases.toBigInteger())
     Assertions.assertEquals(t2aExpectedWorkloadPoints.add(casesExpectedWorkloadPoints), result)
@@ -56,7 +58,7 @@ class WorkloadCalculatorTests {
     val standardCourtReports = (1..numberOfStandardCourtReports).map { CourtReport(CourtReportType.STANDARD) }
     val fastCourtReports = (1..numberOfFastCourtReports).map { CourtReport(CourtReportType.FAST) }
 
-    val result = workloadCalculator.getWorkloadPoints(emptyList(), standardCourtReports + fastCourtReports, emptyList(), emptyList())
+    val result = workloadCalculator.getWorkloadPoints(emptyList(), standardCourtReports + fastCourtReports, emptyList(), emptyList(), emptyList(), emptyMap())
 
     val expectedStandardCourtReportPoints = standardCourtReportWeighting.multiply(numberOfStandardCourtReports.toBigInteger())
     val expectedFastCourtReportPoints = fastCourtReportWeighting.multiply(numberOfFastCourtReports.toBigInteger())
@@ -76,7 +78,7 @@ class WorkloadCalculatorTests {
     val paroleReports = (1..numberOfParoleReports).map { InstitutionalReport(InstitutionalReportType.PAROLE_REPORT) }
     val otherReports = (1..numberOfOtherReports).map { InstitutionalReport(InstitutionalReportType.OTHER) }
 
-    val result = workloadCalculator.getWorkloadPoints(emptyList(), emptyList(), paroleReports + otherReports, emptyList())
+    val result = workloadCalculator.getWorkloadPoints(emptyList(), emptyList(), paroleReports + otherReports, emptyList(), emptyList(), emptyMap())
 
     Assertions.assertEquals(paroleReportWeighting.multiply(numberOfParoleReports.toBigInteger()), result)
   }
@@ -93,7 +95,7 @@ class WorkloadCalculatorTests {
     val paroleReports = (1..numberOfParoleReports).map { InstitutionalReport(InstitutionalReportType.PAROLE_REPORT) }
     val otherReports = (1..numberOfOtherReports).map { InstitutionalReport(InstitutionalReportType.OTHER) }
 
-    val result = workloadCalculator.getWorkloadPoints(emptyList(), emptyList(), paroleReports + otherReports, emptyList())
+    val result = workloadCalculator.getWorkloadPoints(emptyList(), emptyList(), paroleReports + otherReports, emptyList(), emptyList(), emptyMap())
 
     Assertions.assertEquals(BigInteger.ZERO, result)
   }
@@ -113,12 +115,57 @@ class WorkloadCalculatorTests {
     val communityArmAssessments = (1..numberOfCommunityArmAssessments).map { Assessment(AssessmentType.ARMS, CaseType.COMMUNITY) }
     val otherAssessments = (1..numberOfOtherArmAssessments).map { Assessment(AssessmentType.OTHER, CaseType.UNKNOWN) }
 
-    val result = workloadCalculator.getWorkloadPoints(emptyList(), emptyList(), emptyList(), licenseArmAssessments + communityArmAssessments + otherAssessments)
+    val result = workloadCalculator.getWorkloadPoints(emptyList(), emptyList(), emptyList(), licenseArmAssessments + communityArmAssessments + otherAssessments, emptyList(), emptyMap())
 
     val expectedLicensePointsTotal = licenseARMAssessmentWeighting.multiply(numberOfLicenseArmAssessments.toBigInteger())
     val expectedCommunityPointsTotal = communityARMAssessmentWeighting.multiply(numberOfCommunityArmAssessments.toBigInteger())
 
     Assertions.assertEquals(expectedLicensePointsTotal.add(expectedCommunityPointsTotal), result)
+  }
+
+  @Test
+  fun `must sum all contacts which occurred on cases outside of case management`() {
+    val contactReasonWeightings = mapOf("CONTACT1" to BigInteger.TEN, "CONTACT2" to BigInteger.TWO)
+
+    val numberOfContactOneContacts = 5
+    val numberOfContactTwoContacts = 10
+
+    val contactOneContacts = (1..numberOfContactOneContacts).map { Contact("CRNONE$it", "CONTACT1") }
+    val contactTwoContacts = (1..numberOfContactTwoContacts).map { Contact("CRNTWO$it", "CONTACT2") }
+
+    val result = workloadCalculator.getWorkloadPoints(emptyList(), emptyList(), emptyList(), emptyList(), contactOneContacts + contactTwoContacts, contactReasonWeightings)
+
+    val expectedContactOnePointsTotal = contactReasonWeightings["CONTACT1"]!!.multiply(numberOfContactOneContacts.toBigInteger())
+    val expectedContactTwoPointsTotal = contactReasonWeightings["CONTACT2"]!!.multiply(numberOfContactTwoContacts.toBigInteger())
+
+    Assertions.assertEquals(expectedContactOnePointsTotal.add(expectedContactTwoPointsTotal), result)
+  }
+
+  @Test
+  fun `must not count contacts where the contact reason does not have a weighting`() {
+    val contactReasonWeightings = mapOf("CONTACT1" to BigInteger.TEN, "CONTACT2" to BigInteger.TWO)
+
+    val unknownContacts = (1..5).map { Contact("CRNUNKNOWN$it", "ANUNKNOWNCONTACTTYPE") }
+
+    val result = workloadCalculator.getWorkloadPoints(emptyList(), emptyList(), emptyList(), emptyList(), unknownContacts, contactReasonWeightings)
+
+    Assertions.assertEquals(BigInteger.ZERO, result)
+  }
+
+  @Test
+  fun `contacts which occur within case management must not be counted`() {
+    val managedCrn = "CRN1111"
+    val contactReasonWeightings = mapOf("CONTACT1" to BigInteger.TEN, "CONTACT2" to BigInteger.TWO)
+
+    val workloadPoints = mockWorkloadPoints(isT2A = false)
+
+    val cases = listOf(Case(Tier.B2, CaseType.COMMUNITY, false, managedCrn))
+
+    val contacts = listOf(Contact(managedCrn, "CONTACT1"), Contact(managedCrn, "CONTACT2"))
+
+    val result = workloadCalculator.getWorkloadPoints(cases, emptyList(), emptyList(), emptyList(), contacts, contactReasonWeightings)
+
+    Assertions.assertEquals(workloadPoints.communityTierPoints.B2Points, result)
   }
 
   private fun mockWorkloadPoints(

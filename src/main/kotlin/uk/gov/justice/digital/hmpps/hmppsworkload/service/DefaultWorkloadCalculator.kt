@@ -4,6 +4,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Assessment
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AssessmentType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Contact
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CourtReport
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CourtReportType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.InstitutionalReport
@@ -17,7 +18,9 @@ class DefaultWorkloadCalculator(private val workloadPointsRepository: WorkloadPo
     cases: List<Case>,
     courtReports: List<CourtReport>,
     institutionalReports: List<InstitutionalReport>,
-    assessments: List<Assessment>
+    assessments: List<Assessment>,
+    contacts: List<Contact>,
+    contactTypeWeightings: Map<String, BigInteger>
   ): BigInteger {
     val t2aWorkloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(true)
     val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
@@ -26,7 +29,9 @@ class DefaultWorkloadCalculator(private val workloadPointsRepository: WorkloadPo
     val courtReportTotal = calculateCourtReportPointsTotal(courtReports, workloadPoints)
     val institutionalReportTotal = calculateInstitutionalReportPointsTotal(institutionalReports, workloadPoints)
     val assessmentTotal = calculateAssessmentPointsTotal(assessments, workloadPoints)
-    return casePointTotal.add(courtReportTotal).add(institutionalReportTotal).add(assessmentTotal)
+    val contactTotal = calculateContactPointsTotal(contacts, contactTypeWeightings, cases.map { it.crn }.toSet())
+
+    return casePointTotal.add(courtReportTotal).add(institutionalReportTotal).add(assessmentTotal).add(contactTotal)
   }
 
   private fun calculateCaseTierPointsTotal(cases: List<Case>, t2aWorkloadPoints: WorkloadPointsEntity, workloadPoints: WorkloadPointsEntity): BigInteger = cases.map { case ->
@@ -68,6 +73,14 @@ class DefaultWorkloadCalculator(private val workloadPointsRepository: WorkloadPo
         }
       }
       AssessmentType.OTHER -> BigInteger.ZERO
+    }
+  }.fold(BigInteger.ZERO) { first, second -> first.add(second) }
+
+  private fun calculateContactPointsTotal(contacts: List<Contact>, contactTypeWeightings: Map<String, BigInteger>, managedCrns: Set<String>): BigInteger = contacts.map { contact ->
+    if (managedCrns.contains(contact.crn)) {
+      BigInteger.ZERO
+    } else {
+      contactTypeWeightings.getOrDefault(contact.typeCode, BigInteger.ZERO)
     }
   }.fold(BigInteger.ZERO) { first, second -> first.add(second) }
 }
