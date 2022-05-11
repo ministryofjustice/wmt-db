@@ -6,10 +6,10 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.HmppsTierApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.OffenderSearchApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderDetails
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.ImpactCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerCases
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PotentialCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.TierCaseTotals
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
@@ -50,17 +50,17 @@ class JpaBasedGetOffenderManagerService(
       }.block()
   }
 
-  private fun getPotentialCase(crn: String, convictionId: BigInteger): Mono<PotentialCase> {
+  private fun getPotentialCase(crn: String, convictionId: BigInteger): Mono<Case> {
     return Mono.zip(communityApiClient.getActiveConvictions(crn), hmppsTierApiClient.getTierByCrn(crn))
       .map { results ->
         val caseType = caseTypeMapper.getCaseType(results.t1, convictionId)
         val tier = results.t2
-        PotentialCase(Tier.valueOf(tier), caseType, false)
+        Case(Tier.valueOf(tier), caseType, false)
       }
   }
 
   private fun getCurrentCasePoints(teamCode: String, staffCode: String, crn: String): BigInteger = offenderManagerRepository.findCaseByTeamCodeAndStaffCodeAndCrn(teamCode, staffCode, crn)?.let { currentCase ->
-    return caseCalculator.getPointsForCase(PotentialCase(Tier.valueOf(currentCase.tier), CaseType.valueOf(currentCase.caseCategory), false))
+    return caseCalculator.getPointsForCase(Case(Tier.valueOf(currentCase.tier), CaseType.valueOf(currentCase.caseCategory), false))
   } ?: BigInteger.ZERO
 
   private fun getOffenderManagerOverview(
