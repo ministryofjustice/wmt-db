@@ -36,6 +36,10 @@ class GetPersonManagerById : IntegrationTestBase() {
       .isEqualTo(storedPersonManager.createdBy)
       .jsonPath("$.createdDate")
       .exists()
+      .jsonPath("$.crn")
+      .isEqualTo(storedPersonManager.crn)
+      .jsonPath("$.personName")
+      .isEqualTo(storedPersonManager.offenderName)
   }
 
   @Test
