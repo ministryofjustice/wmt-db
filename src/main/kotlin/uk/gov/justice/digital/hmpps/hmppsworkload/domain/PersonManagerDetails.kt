@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.domain
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import io.swagger.v3.oas.annotations.media.Schema
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import java.math.BigInteger
 import java.time.ZonedDateTime
@@ -25,10 +26,18 @@ data class PersonManagerDetails @JsonCreator constructor(
   @Schema(description = "crn")
   val crn: String,
   @Schema(description = "personName")
-  val personName: String
+  val personName: String,
+  @Schema(description = "Staff Grade")
+  val staffGrade: String?,
+  @Schema(description = "Staff Email")
+  val staffEmail: String?,
+  @Schema(description = "Staff Forename")
+  val staffForename: String?,
+  @Schema(description = "Staff Surname")
+  val staffSurname: String?
 ) {
   companion object {
-    fun from(personManagerEntity: PersonManagerEntity): PersonManagerDetails {
+    fun from(personManagerEntity: PersonManagerEntity, grade: String?, staff: Staff?): PersonManagerDetails {
       return PersonManagerDetails(
         personManagerEntity.uuid,
         personManagerEntity.staffId,
@@ -38,7 +47,11 @@ data class PersonManagerDetails @JsonCreator constructor(
         personManagerEntity.createdBy,
         personManagerEntity.createdDate!!,
         personManagerEntity.crn,
-        personManagerEntity.offenderName
+        personManagerEntity.offenderName,
+        grade,
+        staff?.email,
+        staff?.staff?.forenames,
+        staff?.staff?.surname
       )
     }
   }
