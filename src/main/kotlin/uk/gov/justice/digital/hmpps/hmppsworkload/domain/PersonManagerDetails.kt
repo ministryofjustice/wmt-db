@@ -21,11 +21,25 @@ data class PersonManagerDetails @JsonCreator constructor(
   @Schema(description = "Username of who created")
   val createdBy: String,
   @Schema(description = "Created date")
-  val createdDate: ZonedDateTime
+  val createdDate: ZonedDateTime,
+  @Schema(description = "crn")
+  val crn: String,
+  @Schema(description = "personName")
+  val personName: String
 ) {
   companion object {
     fun from(personManagerEntity: PersonManagerEntity): PersonManagerDetails {
-      return PersonManagerDetails(personManagerEntity.uuid, personManagerEntity.staffId, personManagerEntity.staffCode, personManagerEntity.teamCode, personManagerEntity.providerCode, personManagerEntity.createdBy, personManagerEntity.createdDate!!)
+      return PersonManagerDetails(
+        personManagerEntity.uuid,
+        personManagerEntity.staffId,
+        personManagerEntity.staffCode,
+        personManagerEntity.teamCode,
+        personManagerEntity.providerCode,
+        personManagerEntity.createdBy,
+        personManagerEntity.createdDate!!,
+        personManagerEntity.crn,
+        personManagerEntity.offenderName
+      )
     }
   }
 }
