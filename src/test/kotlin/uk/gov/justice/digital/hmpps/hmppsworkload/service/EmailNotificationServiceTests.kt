@@ -61,7 +61,7 @@ class EmailNotificationServiceTests {
         Conviction(
           Sentence(
             SentenceType("", ""),
-            BigInteger.ONE, "Minutes", "Description", LocalDate.now()
+            BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
           ),
           null, true, BigInteger.TEN,
           CourtAppearance(
@@ -145,7 +145,7 @@ class EmailNotificationServiceTests {
     val activeConviction = Conviction(
       Sentence(
         SentenceType("", ""),
-        BigInteger.ONE, "Minutes", "Description", LocalDate.now()
+        BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
       ),
       null, true, BigInteger.TEN,
       CourtAppearance(
@@ -175,7 +175,7 @@ class EmailNotificationServiceTests {
     val activeConviction = Conviction(
       Sentence(
         SentenceType("", ""),
-        BigInteger.ONE, "Minutes", "Description", LocalDate.now()
+        BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
       ),
       null, true, BigInteger.TEN,
       CourtAppearance(
@@ -228,7 +228,7 @@ class EmailNotificationServiceTests {
     val activeConviction = Conviction(
       Sentence(
         SentenceType("", ""),
-        BigInteger.ONE, "Minutes", "Description", LocalDate.now()
+        BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
       ),
       null, true, BigInteger.TEN,
       CourtAppearance(
@@ -262,7 +262,7 @@ class EmailNotificationServiceTests {
     val activeConviction = Conviction(
       Sentence(
         SentenceType("", ""),
-        BigInteger.ONE, "Minutes", "Description", LocalDate.now()
+        BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
       ),
       null, true, BigInteger.TEN,
       CourtAppearance(
@@ -296,7 +296,7 @@ class EmailNotificationServiceTests {
     val activeConviction = Conviction(
       Sentence(
         SentenceType("", ""),
-        BigInteger.ONE, "Minutes", "Description", LocalDate.now()
+        BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
       ),
       null, true, BigInteger.TEN,
       CourtAppearance(
@@ -332,7 +332,7 @@ class EmailNotificationServiceTests {
     val activeConviction = Conviction(
       Sentence(
         SentenceType("", ""),
-        BigInteger.ONE, "Minutes", "Description", LocalDate.now()
+        BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
       ),
       null, true, BigInteger.TEN,
       CourtAppearance(
@@ -359,7 +359,7 @@ class EmailNotificationServiceTests {
     val teamCode = "TM1"
     val token = "token"
 
-    val sentence = Sentence(SentenceType("", ""), BigInteger.ONE, "Minutes", "Setence Descrption", LocalDate.now())
+    val sentence = Sentence(SentenceType("", ""), BigInteger.ONE, "Minutes", "Sentence Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null)
 
     val activeConviction = Conviction(
       sentence, null, true, BigInteger.TEN,
@@ -598,7 +598,7 @@ class EmailNotificationServiceTests {
     val activeConviction = Conviction(
       Sentence(
         SentenceType("", ""),
-        BigInteger.ONE, "Minutes", "Description", LocalDate.now()
+        BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
       ),
       null, true, BigInteger.TEN,
       CourtAppearance(
@@ -612,7 +612,7 @@ class EmailNotificationServiceTests {
     val previousConvictions = Conviction(
       Sentence(
         SentenceType("", ""),
-        BigInteger.ONE, "Minutes", "Description", LocalDate.now()
+        BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
       ),
       null, false, BigInteger.TWO,
       CourtAppearance(
