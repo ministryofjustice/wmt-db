@@ -1,8 +1,8 @@
 version: 2.1
 
 orbs:
-  hmpps: ministryofjustice/hmpps@3.14
-  slack: circleci/slack@4.3.1
+  hmpps: ministryofjustice/hmpps@5.1
+  slack: circleci/slack@4.4.2
 
 parameters:
   alerts-slack-channel:
@@ -13,6 +13,9 @@ jobs:
   validate:
     executor:
       name: hmpps/java_localstack_postgres
+      jdk_tag: "16.0"
+      localstack_tag: "0.14.1"
+      postgres_tag: "11"
     steps:
       - checkout
       - restore_cache:
@@ -52,7 +55,7 @@ workflows:
           context: hmpps-common-vars
       - hmpps/helm_lint:
           name: helm_lint
-      - hmpps/build_docker:
+      - hmpps/build_multiplatform_docker:
           name: build_docker
           filters:
             branches:
@@ -97,7 +100,7 @@ workflows:
 
   build-deploy-migration:
     jobs:
-      - hmpps/build_docker:
+      - hmpps/build_multiplatform_docker:
           name: build_migration_docker
           image_name: "quay.io/hmpps/wmt-migration"
           dockerfile_dir: "migration/."
