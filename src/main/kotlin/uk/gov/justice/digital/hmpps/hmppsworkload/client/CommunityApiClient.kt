@@ -42,7 +42,7 @@ class CommunityApiClient(private val webClient: WebClient) {
   fun getStaffByUsername(username: String): Mono<Staff> {
     return webClient
       .get()
-      .uri("/staff/username/$username")
+      .uri("/staff/username/\${username}", username)
       .retrieve()
       .bodyToMono(Staff::class.java)
   }
