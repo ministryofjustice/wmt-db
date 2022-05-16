@@ -37,7 +37,9 @@ data class OffenderManagerOverview @JsonCreator constructor(
   val lastUpdatedOn: LocalDateTime?,
   @Schema(description = "Next time the reduction total will change", example = "2013-11-03T09:00:00")
   val nextReductionChange: ZonedDateTime?,
-  val caseTotals: TierCaseTotals
+  val caseTotals: TierCaseTotals,
+  @Schema(description = "Probation Practitioner parole reports due in the next 30 days", example = "5")
+  val paroleReportsDue: BigInteger
 ) {
   companion object {
     fun from(offenderManagerOverview: OffenderManagerOverview): uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerOverview {
@@ -56,7 +58,8 @@ data class OffenderManagerOverview @JsonCreator constructor(
         offenderManagerOverview.availablePoints.minus(offenderManagerOverview.totalPoints),
         offenderManagerOverview.lastUpdatedOn,
         offenderManagerOverview.nextReductionChange,
-        offenderManagerOverview.tierCaseTotals
+        offenderManagerOverview.tierCaseTotals,
+        offenderManagerOverview.paroleReportsDue
       )
     }
   }

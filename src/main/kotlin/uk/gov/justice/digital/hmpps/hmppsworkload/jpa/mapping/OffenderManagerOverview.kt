@@ -19,7 +19,8 @@ data class OffenderManagerOverview(
   val reductionHours: BigDecimal,
   val contractedHours: BigDecimal,
   val lastUpdatedOn: LocalDateTime?,
-  val workloadOwnerId: Long
+  val workloadOwnerId: Long,
+  val paroleReportsDue: BigInteger
 ) {
   var capacity: BigDecimal = BigDecimal.ZERO
   var potentialCapacity: BigDecimal? = null

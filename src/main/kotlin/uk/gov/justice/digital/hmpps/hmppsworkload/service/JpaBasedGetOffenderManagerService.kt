@@ -94,7 +94,7 @@ class JpaBasedGetOffenderManagerService(
       defaultAvailablePointsForGrade, defaultContractedHours,
       BigDecimal.ZERO, defaultContractedHours
     )
-    val overview = OffenderManagerOverview(forename, surname, grade, BigDecimal.ZERO, BigDecimal.ZERO, availablePoints.toBigInteger(), BigInteger.ZERO, staffCode, teamName, BigDecimal.ZERO, defaultContractedHours, LocalDateTime.now(), -1)
+    val overview = OffenderManagerOverview(forename, surname, grade, BigDecimal.ZERO, BigDecimal.ZERO, availablePoints.toBigInteger(), BigInteger.ZERO, staffCode, teamName, BigDecimal.ZERO, defaultContractedHours, LocalDateTime.now(), -1, BigInteger.ZERO)
     overview.capacity = capacityCalculator.calculate(overview.totalPoints, overview.availablePoints)
     return overview
   }
