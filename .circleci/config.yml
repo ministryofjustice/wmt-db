@@ -55,7 +55,7 @@ workflows:
           context: hmpps-common-vars
       - hmpps/helm_lint:
           name: helm_lint
-      - hmpps/build_multiplatform_docker:
+      - hmpps/build_docker:
           name: build_docker
           filters:
             branches:
@@ -100,7 +100,7 @@ workflows:
 
   build-deploy-migration:
     jobs:
-      - hmpps/build_multiplatform_docker:
+      - hmpps/build_docker:
           name: build_migration_docker
           image_name: "quay.io/hmpps/wmt-migration"
           dockerfile_dir: "migration/."
