@@ -67,6 +67,8 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
       .isEqualTo(6)
       .jsonPath("$.caseTotals.untiered")
       .isEqualTo(6)
+      .jsonPath("$.paroleReportsDue")
+      .isEqualTo(5)
   }
 
   @Test
