@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadPointsEntit
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.OffenderManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.ReductionsRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.SentenceRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadPointsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.CaseTypeMapper
 import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.GradeMapper
@@ -26,6 +27,7 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 
 @Service
 class JpaBasedGetOffenderManagerService(
@@ -38,7 +40,8 @@ class JpaBasedGetOffenderManagerService(
   private val workloadPointsRepository: WorkloadPointsRepository,
   private val caseTypeMapper: CaseTypeMapper,
   private val hmppsTierApiClient: HmppsTierApiClient,
-  private val offenderSearchApiClient: OffenderSearchApiClient
+  private val offenderSearchApiClient: OffenderSearchApiClient,
+  private val sentenceRepository: SentenceRepository
 ) : GetOffenderManagerService {
 
   override fun getPotentialWorkload(teamCode: String, staffId: BigInteger, impactCase: ImpactCase): OffenderManagerOverview? {
@@ -126,6 +129,20 @@ class JpaBasedGetOffenderManagerService(
       it.tierCaseTotals = totals.map { total -> TierCaseTotals(total.getATotal(), total.getBTotal(), total.getCTotal(), total.getDTotal(), total.untiered) }
         .fold(TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)) { first, second -> TierCaseTotals(first.A.add(second.A), first.B.add(second.B), first.C.add(second.C), first.D.add(second.D), first.untiered.add(second.untiered)) }
     }
+
+    offenderManagerRepository.findCasesByTeamCodeAndStaffCode(teamCode, offenderManagerCode).let { cases ->
+      val crns = cases.map { case -> case.crn }
+      val next30DaysDate = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS).plusDays(30L)
+      sentenceRepository.findByCrnInAndExpectedEndDateGreaterThanEqualAndTerminatedDateIsNull(crns, ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS)).let { sentences ->
+        val casesToEndInNext30Days = sentences
+          .groupBy { sentence -> sentence.crn }
+          .mapValues { sentence -> sentence.value.maxOf { it.expectedEndDate } }
+          .filter { sentence -> sentence.value.isEqual(next30DaysDate) || !sentence.value.isAfter(next30DaysDate) }
+          .count()
+        it.caseEndDue = casesToEndInNext30Days.toBigInteger()
+      }
+    }
+
     return it
   } ?: run {
     communityApiClient.getStaffByCode(offenderManagerCode)

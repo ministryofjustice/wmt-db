@@ -26,4 +26,5 @@ data class OffenderManagerOverview(
   var potentialCapacity: BigDecimal? = null
   var nextReductionChange: ZonedDateTime? = null
   var tierCaseTotals: TierCaseTotals = TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)
+  var caseEndDue = BigInteger.ZERO
 }
