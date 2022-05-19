@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration
 
+import com.amazonaws.services.sqs.AmazonSQS
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model.PurgeQueueRequest
 import com.fasterxml.jackson.core.type.TypeReference
@@ -36,6 +37,8 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.teamStaf
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.EventManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.RequirementManagerRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.SentenceRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.listener.HmppsOffenderEvent
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
 import java.math.BigInteger
@@ -69,17 +72,29 @@ abstract class IntegrationTestBase {
   @Autowired
   protected lateinit var requirementManagerRepository: RequirementManagerRepository
 
+  @Autowired
+  protected lateinit var sentenceRepository: SentenceRepository
+
   @Qualifier("hmppsallocationcompletequeue-sqs-client")
   @Autowired
   lateinit var allocationCompleteClient: AmazonSQSAsync
 
   protected val allocationCompleteUrl by lazy { hmppsQueueService.findByQueueId("hmppsallocationcompletequeue")?.queueUrl ?: throw MissingQueueException("HmppsQueue allocationcompletequeue not found") }
 
+  private val hmppsOffenderQueue by lazy { hmppsQueueService.findByQueueId("hmppsoffenderqueue") ?: throw MissingQueueException("HmppsQueue hmppsoffenderqueue not found") }
+  private val hmppsOffenderTopic by lazy { hmppsQueueService.findByTopicId("hmppsoffendertopic") ?: throw MissingQueueException("HmppsTopic hmppsoffendertopic not found") }
+
+  private val hmppsOffenderSqsDlqClient by lazy { hmppsOffenderQueue.sqsDlqClient as AmazonSQS }
+  protected val hmppsOffenderSqsClient by lazy { hmppsOffenderQueue.sqsClient }
+
+  protected val hmppsOffenderSnsClient by lazy { hmppsOffenderTopic.snsClient }
+  protected val hmppsOffenderTopicArn by lazy { hmppsOffenderTopic.arn }
+
   @Autowired
   protected lateinit var hmppsQueueService: HmppsQueueService
 
   @BeforeEach
-  fun `setup dependent services`() {
+  fun setupDependentServices() {
     communityApi.reset()
     hmppsTier.reset()
     offenderSearchApi.reset()
@@ -87,7 +102,10 @@ abstract class IntegrationTestBase {
     personManagerRepository.deleteAll()
     eventManagerRepository.deleteAll()
     requirementManagerRepository.deleteAll()
+    sentenceRepository.deleteAll()
     allocationCompleteClient.purgeQueue(PurgeQueueRequest(allocationCompleteUrl))
+    hmppsOffenderSqsClient.purgeQueue(PurgeQueueRequest(hmppsOffenderQueue.queueUrl))
+    hmppsOffenderSqsDlqClient.purgeQueue(PurgeQueueRequest(hmppsOffenderQueue.dlqUrl))
   }
 
   @AfterAll
@@ -99,6 +117,7 @@ abstract class IntegrationTestBase {
     personManagerRepository.deleteAll()
     eventManagerRepository.deleteAll()
     requirementManagerRepository.deleteAll()
+    sentenceRepository.deleteAll()
   }
 
   internal fun HttpHeaders.authToken(roles: List<String> = emptyList()) {
@@ -110,6 +129,18 @@ abstract class IntegrationTestBase {
       )
     )
   }
+
+  protected fun countMessagesOnOffenderEventQueue(): Int =
+    hmppsOffenderSqsClient.getQueueAttributes(hmppsOffenderQueue.queueUrl, listOf("ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible"))
+      .let { (it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0) }
+
+  protected fun countMessagesOnOffenderEventDeadLetterQueue(): Int =
+    hmppsOffenderSqsDlqClient.getQueueAttributes(hmppsOffenderQueue.dlqUrl, listOf("ApproximateNumberOfMessages"))
+      .let { it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0 }
+
+  protected fun offenderEvent(crn: String, sentenceId: BigInteger) = HmppsOffenderEvent(crn, sentenceId)
+
+  protected fun jsonString(any: Any) = objectMapper.writeValueAsString(any) as String
 
   fun setupOauth() {
     val response = HttpResponse.response().withContentType(MediaType.APPLICATION_JSON)
@@ -145,6 +176,16 @@ abstract class IntegrationTestBase {
     val convictionsRequest =
       HttpRequest.request()
         .withPath("/offenders/crn/$crn/convictions").withQueryStringParameter(Parameter("activeOnly", "true"))
+
+    communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
+      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(singleActiveConvictionResponse())
+    )
+  }
+
+  protected fun singleActiveConvictionResponseForAllConvictions(crn: String) {
+    val convictionsRequest =
+      HttpRequest.request()
+        .withPath("/offenders/crn/$crn/convictions")
 
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
       HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(singleActiveConvictionResponse())
