@@ -132,14 +132,14 @@ class JpaBasedGetOffenderManagerService(
 
     offenderManagerRepository.findCasesByTeamCodeAndStaffCode(teamCode, offenderManagerCode).let { cases ->
       val crns = cases.map { case -> case.crn }
-      val next30DaysDate = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS).plusDays(28L)
+      val dueEndDate = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS).plusDays(28L)
       sentenceRepository.findByCrnInAndExpectedEndDateGreaterThanEqualAndTerminatedDateIsNull(crns, ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS)).let { sentences ->
-        val casesToEndInNext30Days = sentences
+        val casesDueToEnd = sentences
           .groupBy { sentence -> sentence.crn }
           .mapValues { sentence -> sentence.value.maxOf { it.expectedEndDate } }
-          .filter { sentence -> sentence.value.isEqual(next30DaysDate) || !sentence.value.isAfter(next30DaysDate) }
+          .filter { sentence -> sentence.value.isEqual(dueEndDate) || !sentence.value.isAfter(dueEndDate) }
           .count()
-        it.caseEndDue = casesToEndInNext30Days.toBigInteger()
+        it.caseEndDue = casesDueToEnd.toBigInteger()
       }
     }
 
