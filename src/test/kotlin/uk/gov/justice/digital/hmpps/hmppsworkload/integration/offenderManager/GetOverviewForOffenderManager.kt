@@ -2,6 +2,8 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration.offenderManager
 
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.SentenceEntity
+import java.math.BigInteger
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -14,6 +16,10 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can get overview for an offender manager`() {
+    val sentenceWithin30Days = SentenceEntity(null, BigInteger.TEN, "CRN3333", ZonedDateTime.now().minusMonths(2L), ZonedDateTime.now().plusDays(15L), null, "SP")
+    sentenceRepository.save(sentenceWithin30Days)
+    val sentenceAfter30Days = SentenceEntity(null, BigInteger.ONE, "CRN2222", ZonedDateTime.now().minusMonths(2L), ZonedDateTime.now().plusDays(45L), null, "SC")
+    sentenceRepository.save(sentenceAfter30Days)
     webTestClient.get()
       .uri("/team/T1/offenderManagers/OM1")
       .headers {
@@ -69,6 +75,8 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
       .isEqualTo(6)
       .jsonPath("$.paroleReportsDue")
       .isEqualTo(5)
+      .jsonPath("$.caseEndDue")
+      .isEqualTo(1)
   }
 
   @Test
