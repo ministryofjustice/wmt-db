@@ -37,6 +37,7 @@ class OffenderEventListenerTests : IntegrationTestBase() {
     Assertions.assertEquals(LocalDate.of(2019, 11, 17).atStartOfDay(ZoneId.systemDefault()), sentence.startDate)
     Assertions.assertEquals(LocalDate.of(2020, 5, 16).atStartOfDay(ZoneId.systemDefault()), sentence.expectedEndDate)
     Assertions.assertEquals("SC", sentence.sentenceTypeCode)
+    Assertions.assertEquals(LocalDate.of(2020, 6, 23).atStartOfDay(ZoneId.systemDefault()), sentence.expectedReleaseDate)
   }
 
   @Test
@@ -44,7 +45,10 @@ class OffenderEventListenerTests : IntegrationTestBase() {
     val crn = "J678910"
     val sentenceId = BigInteger.valueOf(2500278160L)
     singleActiveConvictionResponseForAllConvictions(crn)
-    val savedSentence = SentenceEntity(null, sentenceId, crn, LocalDate.of(2019, 11, 17).atStartOfDay(ZoneId.systemDefault()), LocalDate.of(2020, 5, 16).atStartOfDay(ZoneId.systemDefault()), null, "SC")
+    val savedSentence = SentenceEntity(
+      null, sentenceId, crn, LocalDate.of(2019, 11, 17).atStartOfDay(ZoneId.systemDefault()), LocalDate.of(2020, 5, 16).atStartOfDay(ZoneId.systemDefault()), null, "SC",
+      LocalDate.of(2020, 6, 23).atStartOfDay(ZoneId.systemDefault())
+    )
     sentenceRepository.save(savedSentence)
 
     hmppsOffenderSnsClient.publish(

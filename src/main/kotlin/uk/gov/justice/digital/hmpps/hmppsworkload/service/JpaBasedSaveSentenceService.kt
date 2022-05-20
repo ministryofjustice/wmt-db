@@ -15,24 +15,26 @@ class JpaBasedSaveSentenceService(
 ) : SaveSentenceService {
 
   override fun saveSentence(crn: String, sentenceId: BigInteger) {
-    val sentence = communityApiClient.getAllConvictions(crn).map { convictions ->
-      convictions.first { conviction -> conviction.sentence?.sentenceId == sentenceId }.sentence
+    val conviction = communityApiClient.getAllConvictions(crn).map { convictions ->
+      convictions.first { conviction -> conviction.sentence?.sentenceId == sentenceId }
     }.block()!!
 
     val sentenceToSave = sentenceRepository.findBySentenceId(sentenceId) ?: SentenceEntity(
       null,
-      sentence.sentenceId,
+      conviction.sentence!!.sentenceId,
       crn,
-      sentence.startDate.atStartOfDay(ZoneId.systemDefault()),
-      sentence.expectedSentenceEndDate.atStartOfDay(ZoneId.systemDefault()),
-      sentence.terminationDate?.atStartOfDay(ZoneId.systemDefault()),
-      sentence.sentenceType.code
+      conviction.sentence.startDate.atStartOfDay(ZoneId.systemDefault()),
+      conviction.sentence.expectedSentenceEndDate.atStartOfDay(ZoneId.systemDefault()),
+      conviction.sentence.terminationDate?.atStartOfDay(ZoneId.systemDefault()),
+      conviction.sentence.sentenceType.code,
+      conviction.custody?.keyDates?.expectedReleaseDate?.atStartOfDay(ZoneId.systemDefault())
     )
 
-    sentenceToSave.startDate = sentence.startDate.atStartOfDay(ZoneId.systemDefault())
-    sentenceToSave.expectedEndDate = sentence.expectedSentenceEndDate.atStartOfDay(ZoneId.systemDefault())
-    sentenceToSave.terminatedDate = sentence.terminationDate?.atStartOfDay(ZoneId.systemDefault())
-    sentenceToSave.sentenceTypeCode = sentence.sentenceType.code
+    sentenceToSave.startDate = conviction.sentence!!.startDate.atStartOfDay(ZoneId.systemDefault())
+    sentenceToSave.expectedEndDate = conviction.sentence.expectedSentenceEndDate.atStartOfDay(ZoneId.systemDefault())
+    sentenceToSave.terminatedDate = conviction.sentence.terminationDate?.atStartOfDay(ZoneId.systemDefault())
+    sentenceToSave.sentenceTypeCode = conviction.sentence.sentenceType.code
+    sentenceToSave.expectedReleaseDate = conviction.custody?.keyDates?.expectedReleaseDate?.atStartOfDay(ZoneId.systemDefault())
 
     sentenceRepository.save(sentenceToSave)
   }
