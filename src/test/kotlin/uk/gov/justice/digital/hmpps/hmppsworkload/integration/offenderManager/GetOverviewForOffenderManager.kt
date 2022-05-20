@@ -16,9 +16,9 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can get overview for an offender manager`() {
-    val sentenceWithin30Days = SentenceEntity(null, BigInteger.TEN, "CRN3333", ZonedDateTime.now().minusMonths(2L), ZonedDateTime.now().plusDays(15L), null, "SP")
+    val sentenceWithin30Days = SentenceEntity(null, BigInteger.TEN, "CRN3333", ZonedDateTime.now().minusMonths(2L), ZonedDateTime.now().plusDays(15L), null, "SP", null)
     sentenceRepository.save(sentenceWithin30Days)
-    val sentenceAfter30Days = SentenceEntity(null, BigInteger.ONE, "CRN2222", ZonedDateTime.now().minusMonths(2L), ZonedDateTime.now().plusDays(45L), null, "SC")
+    val sentenceAfter30Days = SentenceEntity(null, BigInteger.ONE, "CRN2222", ZonedDateTime.now().minusMonths(2L), ZonedDateTime.now().plusDays(45L), null, "SC", ZonedDateTime.now().plusDays(15L))
     sentenceRepository.save(sentenceAfter30Days)
     webTestClient.get()
       .uri("/team/T1/offenderManagers/OM1")
