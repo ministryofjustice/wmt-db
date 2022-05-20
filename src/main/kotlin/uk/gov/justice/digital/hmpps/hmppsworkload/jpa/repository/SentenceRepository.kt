@@ -10,4 +10,6 @@ interface SentenceRepository : CrudRepository<SentenceEntity, Long> {
   fun findBySentenceId(sentenceId: BigInteger): SentenceEntity?
 
   fun findByCrnInAndExpectedEndDateGreaterThanEqualAndTerminatedDateIsNull(crns: List<String>, endDateAfter: ZonedDateTime): List<SentenceEntity>
+
+  fun findByCrnInAndExpectedReleaseDateGreaterThanEqualAndTerminatedDateIsNull(crns: List<String>, endDateAfter: ZonedDateTime): List<SentenceEntity>
 }

@@ -77,6 +77,8 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
       .isEqualTo(5)
       .jsonPath("$.caseEndDue")
       .isEqualTo(1)
+      .jsonPath("$.releasesDue")
+      .isEqualTo(1)
   }
 
   @Test

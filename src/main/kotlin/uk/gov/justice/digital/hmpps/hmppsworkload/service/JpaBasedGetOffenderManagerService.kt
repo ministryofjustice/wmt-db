@@ -141,6 +141,14 @@ class JpaBasedGetOffenderManagerService(
           .count()
         it.caseEndDue = casesDueToEnd.toBigInteger()
       }
+      sentenceRepository.findByCrnInAndExpectedReleaseDateGreaterThanEqualAndTerminatedDateIsNull(crns, ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS)).let { sentences ->
+        val releasesDueToEnd = sentences
+          .groupBy { sentence -> sentence.crn }
+          .mapValues { sentence -> sentence.value.maxOf { it.expectedReleaseDate ?: ZonedDateTime.ofInstant(Instant.EPOCH, ZoneId.systemDefault()) } }
+          .filter { sentence -> sentence.value.isEqual(dueEndDate) || !sentence.value.isAfter(dueEndDate) }
+          .count()
+        it.releasesDue = releasesDueToEnd.toBigInteger()
+      }
     }
 
     return it
