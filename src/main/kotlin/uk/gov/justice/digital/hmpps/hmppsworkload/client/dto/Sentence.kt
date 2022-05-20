@@ -11,7 +11,7 @@ data class Sentence @JsonCreator constructor(
   val description: String,
   val startDate: LocalDate,
   val sentenceId: BigInteger,
-  val expectedSentenceEndDate: LocalDate,
+  val expectedSentenceEndDate: LocalDate?,
   val terminationDate: LocalDate?
 )
 

@@ -24,14 +24,14 @@ class JpaBasedSaveSentenceService(
       conviction.sentence!!.sentenceId,
       crn,
       conviction.sentence.startDate.atStartOfDay(ZoneId.systemDefault()),
-      conviction.sentence.expectedSentenceEndDate.atStartOfDay(ZoneId.systemDefault()),
+      conviction.sentence.expectedSentenceEndDate?.atStartOfDay(ZoneId.systemDefault()) ?: conviction.sentence.startDate.atStartOfDay(ZoneId.systemDefault()),
       conviction.sentence.terminationDate?.atStartOfDay(ZoneId.systemDefault()),
       conviction.sentence.sentenceType.code,
       conviction.custody?.keyDates?.expectedReleaseDate?.atStartOfDay(ZoneId.systemDefault())
     )
 
     sentenceToSave.startDate = conviction.sentence!!.startDate.atStartOfDay(ZoneId.systemDefault())
-    sentenceToSave.expectedEndDate = conviction.sentence.expectedSentenceEndDate.atStartOfDay(ZoneId.systemDefault())
+    sentenceToSave.expectedEndDate = conviction.sentence.expectedSentenceEndDate?.atStartOfDay(ZoneId.systemDefault()) ?: conviction.sentence.startDate.atStartOfDay(ZoneId.systemDefault())
     sentenceToSave.terminatedDate = conviction.sentence.terminationDate?.atStartOfDay(ZoneId.systemDefault())
     sentenceToSave.sentenceTypeCode = conviction.sentence.sentenceType.code
     sentenceToSave.expectedReleaseDate = conviction.custody?.keyDates?.expectedReleaseDate?.atStartOfDay(ZoneId.systemDefault())
