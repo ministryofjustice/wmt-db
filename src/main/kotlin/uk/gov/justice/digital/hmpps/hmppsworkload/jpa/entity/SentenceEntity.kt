@@ -33,6 +33,9 @@ data class SentenceEntity(
   var terminatedDate: ZonedDateTime?,
 
   @Column
-  var sentenceTypeCode: String
+  var sentenceTypeCode: String,
+
+  @Column
+  var expectedReleaseDate: ZonedDateTime?
 
 )

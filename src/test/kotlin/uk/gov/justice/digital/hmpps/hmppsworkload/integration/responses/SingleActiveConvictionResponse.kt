@@ -66,7 +66,9 @@ fun singleActiveConvictionResponse() = """
                     "description": "Prison"
                 }
             },
-            "keyDates": {},
+            "keyDates": {
+              "expectedReleaseDate": "2020-06-23"
+            },
             "status": {
                 "code": "A",
                 "description": "Sentenced - In Custody"
