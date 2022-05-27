@@ -14,3 +14,8 @@ generic-service:
     OFFENDER_SEARCH_ENDPOINT_URL: https://probation-offender-search.hmpps.service.justice.gov.uk
     INGRESS_URL: *ingressHost
     ASSESS_RISKS_NEEDS_ENDPOINT_URL: https://assess-risks-and-needs.hmpps.service.justice.gov.uk
+
+  allowlist:
+    delius-prod-1: "52.56.115.146/32"
+    delius-prod-2: "35.178.104.253/32"
+    delius-prod-3: "35.177.47.45/32"
