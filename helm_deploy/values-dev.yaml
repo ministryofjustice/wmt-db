@@ -15,3 +15,11 @@ generic-service:
     INGRESS_URL: *ingressHost
     ASSESS_RISKS_NEEDS_ENDPOINT_URL: https://assess-risks-and-needs-dev.hmpps.service.justice.gov.uk
 
+  allowlist:
+    delius-dev-1: "35.178.19.203/32"
+    delius-dev-2: "35.177.67.41/32"
+    delius-dev-3: "35.178.40.151/32"
+    delius-test-1: "35.176.126.163/32"
+    delius-test-2: "35.178.162.73/32"
+    delius-test-3: "52.56.195.113/32"
+
