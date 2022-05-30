@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import java.math.BigInteger
+import java.time.ZonedDateTime
 
 class GetTeamOverviewByTeamCode : IntegrationTestBase() {
 
@@ -14,6 +15,12 @@ class GetTeamOverviewByTeamCode : IntegrationTestBase() {
 
     val storedPersonManager = PersonManagerEntity(crn = "CRN1", staffId = BigInteger.valueOf(123456789L), staffCode = "OM1", teamCode = "T1", offenderName = "John Doe", createdBy = "USER1", providerCode = "R1")
     personManagerRepository.save(storedPersonManager)
+
+    val movedPersonManager = PersonManagerEntity(crn = "CRN3", staffId = BigInteger.valueOf(123456789L), staffCode = "OM1", teamCode = "T1", offenderName = "John Doe", createdBy = "USER1", providerCode = "R1", createdDate = ZonedDateTime.now().minusDays(5L))
+    personManagerRepository.save(movedPersonManager)
+
+    val newPersonManager = PersonManagerEntity(crn = "CRN3", staffId = BigInteger.valueOf(56789321L), staffCode = "OM2", teamCode = "T1", offenderName = "John Doe", createdBy = "USER2", providerCode = "R1", createdDate = ZonedDateTime.now().minusDays(2L))
+    personManagerRepository.save(newPersonManager)
 
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers")
