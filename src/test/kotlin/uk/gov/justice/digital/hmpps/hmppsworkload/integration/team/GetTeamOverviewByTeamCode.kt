@@ -2,6 +2,8 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration.team
 
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
+import java.math.BigInteger
 
 class GetTeamOverviewByTeamCode : IntegrationTestBase() {
 
@@ -9,6 +11,10 @@ class GetTeamOverviewByTeamCode : IntegrationTestBase() {
   fun `can get team overview of offender managers by team code`() {
     val teamCode = "T1"
     teamStaffResponse(teamCode)
+
+    val storedPersonManager = PersonManagerEntity(crn = "CRN1", staffId = BigInteger.valueOf(123456789L), staffCode = "OM1", teamCode = "T1", offenderName = "John Doe", createdBy = "USER1", providerCode = "R1")
+    personManagerRepository.save(storedPersonManager)
+
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers")
       .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT")) }
@@ -32,6 +38,8 @@ class GetTeamOverviewByTeamCode : IntegrationTestBase() {
       .isEqualTo("OM1")
       .jsonPath("$.offenderManagers[0].staffId")
       .isEqualTo(123456789)
+      .jsonPath("$.offenderManagers[0].totalCasesInLastWeek")
+      .isEqualTo(1)
       .jsonPath("$.offenderManagers[2].forename")
       .isEqualTo("Jane")
       .jsonPath("$.offenderManagers[2].surname")

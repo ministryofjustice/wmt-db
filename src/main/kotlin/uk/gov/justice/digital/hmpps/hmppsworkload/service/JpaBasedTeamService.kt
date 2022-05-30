@@ -6,11 +6,14 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.MissingTeamError
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadPointsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.TeamOverview
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.TeamRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadPointsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.GradeMapper
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Optional
 
 @Service
@@ -19,7 +22,8 @@ class JpaBasedTeamService(
   private val capacityCalculator: CapacityCalculator,
   private val communityApiClient: CommunityApiClient,
   private val gradeMapper: GradeMapper,
-  private val workloadPointsRepository: WorkloadPointsRepository
+  private val workloadPointsRepository: WorkloadPointsRepository,
+  private val personManagerRepository: PersonManagerRepository
 ) : TeamService {
 
   override fun getTeamOverview(teamCode: String, grades: List<String>?): List<TeamOverview>? {
@@ -30,6 +34,10 @@ class JpaBasedTeamService(
           it.capacity = capacityCalculator.calculate(it.totalPoints, it.availablePoints)
           it.code
         }
+        val caseCountAfter = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).minusDays(7L)
+        val caseCounts = personManagerRepository.findByTeamCodeAndCreatedDateGreaterThanEqual(teamCode, caseCountAfter)
+          .groupBy { it.staffCode }
+          .mapValues { countEntry -> countEntry.value.size }
         Optional.of(
           staff.map {
             overviews[it.staffCode]?.let { teamOverview ->
@@ -41,6 +49,9 @@ class JpaBasedTeamService(
             }
           }.filter {
             grades == null || grades.contains(it.grade)
+          }.map {
+            it.casesInLastWeek = caseCounts.getOrDefault(it.code, 0).toBigInteger()
+            it
           }
         )
       }
