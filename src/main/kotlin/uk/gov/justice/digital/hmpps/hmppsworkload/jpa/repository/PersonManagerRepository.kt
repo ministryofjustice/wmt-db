@@ -11,5 +11,4 @@ interface PersonManagerRepository : CrudRepository<PersonManagerEntity, Long> {
   fun findByUuid(id: UUID): PersonManagerEntity?
   @Query(nativeQuery = true)
   fun findByTeamCodeAndCreatedDateGreaterThanEqualLatest(teamCode: String, createdDate: ZonedDateTime): List<PersonManagerEntity>
-
 }
