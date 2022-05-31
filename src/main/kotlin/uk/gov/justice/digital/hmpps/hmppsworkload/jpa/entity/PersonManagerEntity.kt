@@ -4,8 +4,18 @@ import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.math.BigInteger
 import java.time.ZonedDateTime
-import java.util.*
-import javax.persistence.*
+import java.util.UUID
+import javax.persistence.Column
+import javax.persistence.ColumnResult
+import javax.persistence.ConstructorResult
+import javax.persistence.Entity
+import javax.persistence.EntityListeners
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
+import javax.persistence.NamedNativeQuery
+import javax.persistence.SqlResultSetMapping
+import javax.persistence.Table
 
 @SqlResultSetMapping(
   name = "PersonManagerEntity",
