@@ -66,3 +66,5 @@ dist
 ecr.repo
 /dps-gradle-spring-boot-suppressions.xml
 .editorconfig
+/helm_deploy/hmpps-workload/charts/*
+/helm_deploy/hmpps-workload/Chart.lock

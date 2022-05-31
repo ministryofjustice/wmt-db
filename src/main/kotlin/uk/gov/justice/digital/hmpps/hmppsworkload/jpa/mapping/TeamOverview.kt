@@ -15,4 +15,5 @@ data class TeamOverview(
 ) {
   var capacity: BigDecimal = BigDecimal.ZERO
   var staffId: BigInteger = BigInteger.valueOf(-1)
+  var casesInLastWeek: BigInteger = BigInteger.ZERO
 }
