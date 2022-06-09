@@ -34,6 +34,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleAc
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByCodeResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByIdResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.teamStaffResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.EventManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.RequirementManagerRepository
@@ -70,6 +71,9 @@ abstract class IntegrationTestBase {
   protected lateinit var eventManagerRepository: EventManagerRepository
 
   @Autowired
+  protected lateinit var caseDetailsRepository: CaseDetailsRepository
+
+  @Autowired
   protected lateinit var requirementManagerRepository: RequirementManagerRepository
 
   @Autowired
@@ -103,6 +107,7 @@ abstract class IntegrationTestBase {
     eventManagerRepository.deleteAll()
     requirementManagerRepository.deleteAll()
     sentenceRepository.deleteAll()
+    caseDetailsRepository.deleteAll()
     allocationCompleteClient.purgeQueue(PurgeQueueRequest(allocationCompleteUrl))
     hmppsOffenderSqsClient.purgeQueue(PurgeQueueRequest(hmppsOffenderQueue.queueUrl))
     hmppsOffenderSqsDlqClient.purgeQueue(PurgeQueueRequest(hmppsOffenderQueue.dlqUrl))

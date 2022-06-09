@@ -6,20 +6,23 @@ import org.slf4j.LoggerFactory
 import org.springframework.jms.annotation.JmsListener
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.SaveCaseDetailsService
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.SaveSentenceService
 import java.math.BigInteger
 
 @Component
 class OffenderEventListener(
   private val objectMapper: ObjectMapper,
-  private val saveSentenceService: SaveSentenceService
+  private val saveSentenceService: SaveSentenceService,
+  private val saveCaseDetailsService: SaveCaseDetailsService
 ) {
 
   @JmsListener(destination = "hmppsoffenderqueue", containerFactory = "hmppsQueueContainerFactoryProxy")
   fun processMessage(rawMessage: String) {
-    val case = getCase(rawMessage)
-    log.info("received offender event for crn: {}", case.crn)
-    saveSentenceService.saveSentence(case.crn, case.sourceId)
+    val (crn, sourceId) = getCase(rawMessage)
+    log.info("received offender event for crn: {}", crn)
+    saveSentenceService.saveSentence(crn, sourceId)
+    saveCaseDetailsService.save(crn)
   }
 
   @MessageExceptionHandler()

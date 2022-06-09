@@ -18,7 +18,7 @@ class CaseTypeMapper(
       }
     }.associate { it.invoke() }
     var caseType = allConvictionTypes.getValue(convictionId)
-    if (caseType == CaseType.LICENSE && allConvictionTypes.containsValue(CaseType.CUSTODY)) {
+    if (allConvictionTypes.containsValue(CaseType.CUSTODY)) {
       caseType = CaseType.CUSTODY
     }
     return caseType
