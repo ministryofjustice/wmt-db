@@ -42,6 +42,36 @@ class OffenderEventListenerTests : IntegrationTestBase() {
     Assertions.assertEquals(Tier.B3, caseDetail.tier)
     Assertions.assertNotNull(caseDetail.createdDate)
   }
+
+  @Test
+  fun `must save case details only when new sentence event`() {
+    val crn = "J678910"
+    val sentenceId = BigInteger.valueOf(2500278160L)
+    singleActiveConvictionResponseForAllConvictions(crn)
+    singleActiveConvictionResponse(crn)
+    tierCalculationResponse(crn)
+    singleActiveConvictionResponseForAllConvictions(crn)
+    singleActiveConvictionResponse(crn)
+    tierCalculationResponse(crn)
+
+    hmppsOffenderSnsClient.publish(
+      PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn, sentenceId))).withMessageAttributes(
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED"))
+      )
+    )
+    hmppsOffenderSnsClient.publish(
+      PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn, sentenceId))).withMessageAttributes(
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED"))
+      )
+    )
+
+    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+
+    val count = caseDetailsRepository.count()
+
+    Assertions.assertEquals(1, count)
+  }
+
   @Test
   fun `must save sentence when processing new sentence event`() {
     val crn = "J678910"
