@@ -30,11 +30,9 @@ class SaveCaseDetailsService(
     val tier = Tier.valueOf(hmppsTierApiClient.getTierByCrn(crn).block())
     val case = CaseDetailsEntity(crn = crn, type = caseType, tier = tier)
 
-    val foundCase = caseDetailsRepository.findFirstByCrnOrderByCreatedDateDesc(crn).firstOrNull()
+    val foundCase = caseDetailsRepository.findFirstByCrnOrderByCreatedDateDesc(crn)
 
-    if ((foundCase != null) && ((foundCase.tier != case.tier) || (foundCase.type != case.type))) {
-      caseDetailsRepository.save(case)
-    } else if (foundCase == null) {
+    if (foundCase == null || ((foundCase.tier != case.tier) || (foundCase.type != case.type))) {
       caseDetailsRepository.save(case)
     }
   }
