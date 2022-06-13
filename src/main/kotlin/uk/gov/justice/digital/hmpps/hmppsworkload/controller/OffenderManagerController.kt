@@ -84,6 +84,7 @@ class OffenderManagerController(
       HttpHeaders.AUTHORIZATION
     ) authToken: String
   ): CaseAllocated {
+    // update case details here, use app scoped clients
     return saveWorkloadService.saveWorkload(teamCode, staffId, allocateCase, authentication.name, authToken)
   }
 

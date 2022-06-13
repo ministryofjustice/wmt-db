@@ -21,14 +21,6 @@ class SaveCaseDetailsService(
     val caseType = caseTypeMapper.getCaseType(convictions, convictions.first().convictionId)
     val tier = Tier.valueOf(hmppsTierApiClient.getTierByCrn(crn).block())
     val case = CaseDetailsEntity(crn = crn, type = caseType, tier = tier)
-    caseDetailsRepository.save(case)
-  }
-
-  fun update(crn: String) {
-    val convictions = communityApiClient.getActiveConvictions(crn).block()
-    val caseType = caseTypeMapper.getCaseType(convictions, convictions.first().convictionId)
-    val tier = Tier.valueOf(hmppsTierApiClient.getTierByCrn(crn).block())
-    val case = CaseDetailsEntity(crn = crn, type = caseType, tier = tier)
 
     val foundCase = caseDetailsRepository.findFirstByCrnOrderByCreatedDateDesc(crn)
 
