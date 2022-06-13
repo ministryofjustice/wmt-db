@@ -24,13 +24,13 @@ class SaveCaseDetailsService(
 
     val currentCase = caseDetailsRepository.findFirstByCrnOrderByCreatedDateDesc(crn)
 
-    if (currentCase == null || caseHasChanged(currentCase, case)) {
+    if (caseHasChanged(currentCase, case)) {
       caseDetailsRepository.save(case)
     }
   }
 
   private fun caseHasChanged(
-    currentCase: CaseDetailsEntity,
+    currentCase: CaseDetailsEntity?,
     case: CaseDetailsEntity
-  ) = (currentCase.tier != case.tier || currentCase.type != case.type)
+  ) = (currentCase?.tier != case.tier || currentCase.type != case.type)
 }
