@@ -22,10 +22,15 @@ class SaveCaseDetailsService(
     val tier = Tier.valueOf(hmppsTierApiClient.getTierByCrn(crn).block())
     val case = CaseDetailsEntity(crn = crn, type = caseType, tier = tier)
 
-    val foundCase = caseDetailsRepository.findFirstByCrnOrderByCreatedDateDesc(crn)
+    val currentCase = caseDetailsRepository.findFirstByCrnOrderByCreatedDateDesc(crn)
 
-    if (foundCase == null || ((foundCase.tier != case.tier) || (foundCase.type != case.type))) {
+    if (currentCase == null || caseHasChanged(currentCase, case)) {
       caseDetailsRepository.save(case)
     }
   }
+
+  private fun caseHasChanged(
+    currentCase: CaseDetailsEntity,
+    case: CaseDetailsEntity
+  ) = (currentCase.tier != case.tier || currentCase.type != case.type)
 }
