@@ -26,7 +26,12 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @MockkBean
   private lateinit var notificationService: NotificationService
-  val crn = "CRN1"
+  private val crn = "CRN1"
+  private val staffId = BigInteger.valueOf(123456789L)
+
+  private val staffCode = "OM1"
+  private val teamCode = "T1"
+  private val eventId = BigInteger.valueOf(123456789L)
   @BeforeEach
   fun setupApiCalls() {
     singleActiveConvictionResponseForAllConvictions(crn)
@@ -36,11 +41,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can allocate CRN to Offender`() {
-    val staffId = 123456789L
-
-    val staffCode = "OM1"
-    val teamCode = "T1"
-    val eventId = BigInteger.valueOf(123456789L)
     staffIdResponse(staffId, staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveRequirementResponse(crn, eventId)
@@ -77,11 +77,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `do not allocate active unpaid requirements`() {
-    val staffId = 123456789L
-
-    val staffCode = "OM1"
-    val teamCode = "T1"
-    val eventId = BigInteger.valueOf(123456789L)
     staffIdResponse(staffId, staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveUnpaidRequirementResponse(crn, eventId)
@@ -109,13 +104,8 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can allocate an already managed CRN to same staff member`() {
-    val staffId = BigInteger.valueOf(123456789L)
-
-    val staffCode = "OM1"
-    val teamCode = "T1"
-    val eventId = BigInteger.valueOf(123456789L)
     val requirementId = BigInteger.valueOf(567891234L)
-    staffIdResponse(staffId.longValueExact(), staffCode, teamCode)
+    staffIdResponse(staffId, staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveRequirementResponse(crn, eventId, requirementId)
     val storedPersonManager = PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1")
@@ -152,12 +142,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can allocate an already managed CRN to different staff member`() {
-    val staffId = BigInteger.valueOf(123456789L)
-
-    val staffCode = "OM1"
-    val teamCode = "T1"
-    val eventId = BigInteger.valueOf(123456789L)
-    staffIdResponse(staffId.longValueExact(), staffCode, teamCode)
+    staffIdResponse(staffId, staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveUnpaidRequirementResponse(crn, eventId)
     val storedPersonManager = PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = teamCode, offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1")
@@ -188,12 +173,8 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `saves case details on allocation`() {
-    val staffId = BigInteger.valueOf(123456789L)
 
-    val staffCode = "OM1"
-    val teamCode = "T1"
-    val eventId = BigInteger.valueOf(123456789L)
-    staffIdResponse(staffId.longValueExact(), staffCode, teamCode)
+    staffIdResponse(staffId, staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveUnpaidRequirementResponse(crn, eventId)
     val storedPersonManager = PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = teamCode, offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1")
