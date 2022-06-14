@@ -8,6 +8,7 @@ import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.springframework.data.repository.findByIdOrNull
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
@@ -68,8 +69,8 @@ class OffenderEventListenerTests : IntegrationTestBase() {
 
     Assertions.assertEquals(1, count)
 
-    val caseDetail = caseDetailsRepository.findByCrn(crn)
-    Assertions.assertEquals(Tier.C3, caseDetail!!.tier)
+    val caseDetail = caseDetailsRepository.findByIdOrNull(crn)!!
+    Assertions.assertEquals(Tier.C3, caseDetail.tier)
   }
 
   @Test
