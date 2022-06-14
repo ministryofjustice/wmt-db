@@ -10,20 +10,19 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CourtReportType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.InstitutionalReport
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.InstitutionalReportType
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadPointsEntity
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadPointsRepository
 import java.math.BigInteger
 
-class DefaultWorkloadCalculator(private val workloadPointsRepository: WorkloadPointsRepository) : WorkloadCalculator {
+class DefaultWorkloadCalculator : WorkloadCalculator {
   override fun getWorkloadPoints(
     cases: List<Case>,
     courtReports: List<CourtReport>,
     institutionalReports: List<InstitutionalReport>,
     assessments: List<Assessment>,
     contacts: List<Contact>,
-    contactTypeWeightings: Map<String, BigInteger>
+    contactTypeWeightings: Map<String, BigInteger>,
+    t2aWorkloadPoints: WorkloadPointsEntity,
+    workloadPoints: WorkloadPointsEntity
   ): BigInteger {
-    val t2aWorkloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(true)
-    val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
 
     val casePointTotal = calculateCaseTierPointsTotal(cases, t2aWorkloadPoints, workloadPoints)
     val courtReportTotal = calculateCourtReportPointsTotal(courtReports, workloadPoints)
