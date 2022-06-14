@@ -42,11 +42,40 @@ class OffenderEventListenerTests : IntegrationTestBase() {
     Assertions.assertEquals(Tier.B3, caseDetail.tier)
     Assertions.assertNotNull(caseDetail.createdDate)
   }
+
+  @Test
+  fun `only save case details if they have changed`() {
+    val crn = "J678910"
+    val sentenceId = BigInteger.valueOf(2500278160L)
+    singleActiveConvictionResponseForAllConvictions(crn)
+    singleActiveConvictionResponse(crn)
+    tierCalculationResponse(crn)
+    singleActiveConvictionResponseForAllConvictions(crn)
+    singleActiveConvictionResponse(crn)
+    tierCalculationResponse(crn)
+
+    val sentenceChangedEvent =
+      PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn, sentenceId))).withMessageAttributes(
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED"))
+      )
+
+    hmppsOffenderSnsClient.publish(sentenceChangedEvent)
+    hmppsOffenderSnsClient.publish(sentenceChangedEvent)
+
+    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+
+    val count = caseDetailsRepository.count()
+
+    Assertions.assertEquals(1, count)
+  }
+
   @Test
   fun `must save sentence when processing new sentence event`() {
     val crn = "J678910"
     val sentenceId = BigInteger.valueOf(2500278160L)
     singleActiveConvictionResponseForAllConvictions(crn)
+    singleActiveConvictionResponse(crn)
+    tierCalculationResponse(crn)
 
     hmppsOffenderSnsClient.publish(
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn, sentenceId))).withMessageAttributes(
@@ -67,10 +96,12 @@ class OffenderEventListenerTests : IntegrationTestBase() {
   }
 
   @Test
-  fun `must only save one instance of sentence if multiple events come through`() {
+  fun `do not update sentence if it has not changed`() {
     val crn = "J678910"
     val sentenceId = BigInteger.valueOf(2500278160L)
     singleActiveConvictionResponseForAllConvictions(crn)
+    singleActiveConvictionResponse(crn)
+    tierCalculationResponse(crn)
     val savedSentence = SentenceEntity(
       null, sentenceId, crn, LocalDate.of(2019, 11, 17).atStartOfDay(ZoneId.systemDefault()), LocalDate.of(2020, 5, 16).atStartOfDay(ZoneId.systemDefault()), null, "SC",
       LocalDate.of(2020, 6, 23).atStartOfDay(ZoneId.systemDefault())

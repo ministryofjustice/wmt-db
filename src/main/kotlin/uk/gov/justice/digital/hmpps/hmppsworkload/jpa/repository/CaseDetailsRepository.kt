@@ -6,5 +6,5 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsId
 
 interface CaseDetailsRepository : CrudRepository<CaseDetailsEntity, CaseDetailsId> {
 
-  fun findFirstByCrnOrderByCreatedDateDesc(crn: String): List<CaseDetailsEntity>
+  fun findFirstByCrnOrderByCreatedDateDesc(crn: String): CaseDetailsEntity?
 }

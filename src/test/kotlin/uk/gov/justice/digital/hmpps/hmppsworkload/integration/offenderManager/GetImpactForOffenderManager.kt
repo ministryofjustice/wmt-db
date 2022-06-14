@@ -4,12 +4,13 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.request.impactCase
+import java.math.BigInteger
 
 class GetImpactForOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can get impact for an offender manager with workload`() {
-    val staffId = 123456789L
+    val staffId = BigInteger.valueOf(123456789L)
     val crn = "CRN1"
     val staffCode = "OM1"
     val teamCode = "T1"
@@ -43,7 +44,7 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `must not change capacity if case already allocated to the officer and is classified the same`() {
-    val staffId = 123456789L
+    val staffId = BigInteger.valueOf(123456789L)
     val crn = "CRN2222"
     val staffCode = "OM1"
     val teamCode = "T1"
@@ -77,7 +78,7 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can get impact for an offender manager without workload`() {
-    val staffId = 123456789L
+    val staffId = BigInteger.valueOf(123456789L)
     val crn = "CRN1"
     val staffCode = "NOWORKLOAD1"
     val teamCode = "T1"
@@ -111,7 +112,7 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can get impact for an offender manager without a grade and a workload`() {
-    val staffId = 123456789L
+    val staffId = BigInteger.valueOf(123456789L)
     val crn = "CRN1"
     val staffCode = "NOWORKLOAD1"
     val teamCode = "T1"
