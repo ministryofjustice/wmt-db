@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.HmppsTierApiClient
@@ -22,7 +23,7 @@ class SaveCaseDetailsService(
     val convictions = communityApiClient.getActiveConvictions(crn).block()!!
     val caseType = caseTypeMapper.getCaseType(convictions, convictions.first().convictionId)
     val tier = Tier.valueOf(hmppsTierApiClient.getTierByCrn(crn).block()!!)
-    val case = caseDetailsRepository.findByCrn(crn) ?: CaseDetailsEntity(crn = crn, type = caseType, tier = tier)
+    val case = caseDetailsRepository.findByIdOrNull(crn) ?: CaseDetailsEntity(crn = crn, type = caseType, tier = tier)
     case.type = caseType
     case.tier = tier
     caseDetailsRepository.save(case)
