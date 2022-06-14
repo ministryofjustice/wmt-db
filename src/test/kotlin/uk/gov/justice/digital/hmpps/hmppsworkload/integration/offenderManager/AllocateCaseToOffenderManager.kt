@@ -202,6 +202,5 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     Assertions.assertEquals(crn, caseDetail.crn)
     Assertions.assertEquals(CaseType.CUSTODY, caseDetail.type)
     Assertions.assertEquals(Tier.B3, caseDetail.tier)
-    Assertions.assertNotNull(caseDetail.createdDate)
   }
 }
