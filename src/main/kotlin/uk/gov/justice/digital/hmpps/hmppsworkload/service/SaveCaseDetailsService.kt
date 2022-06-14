@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.CaseTypeMapper
+import javax.transaction.Transactional
 
 @Service
 class SaveCaseDetailsService(
@@ -16,21 +17,14 @@ class SaveCaseDetailsService(
   @Qualifier("hmppsTierApiClient") private val hmppsTierApiClient: HmppsTierApiClient,
   private val caseDetailsRepository: CaseDetailsRepository
 ) {
+  @Transactional
   fun save(crn: String) {
     val convictions = communityApiClient.getActiveConvictions(crn).block()!!
     val caseType = caseTypeMapper.getCaseType(convictions, convictions.first().convictionId)
     val tier = Tier.valueOf(hmppsTierApiClient.getTierByCrn(crn).block()!!)
-    val case = CaseDetailsEntity(crn = crn, type = caseType, tier = tier)
-
-    val currentCase = caseDetailsRepository.findFirstByCrnOrderByCreatedDateDesc(crn)
-
-    if (caseHasChanged(currentCase, case)) {
-      caseDetailsRepository.save(case)
-    }
+    val case = caseDetailsRepository.findByCrn(crn) ?: CaseDetailsEntity(crn = crn, type = caseType, tier = tier)
+    case.type = caseType
+    case.tier = tier
+    caseDetailsRepository.save(case)
   }
-
-  private fun caseHasChanged(
-    currentCase: CaseDetailsEntity?,
-    case: CaseDetailsEntity
-  ) = (currentCase?.tier != case.tier || currentCase.type != case.type)
 }
