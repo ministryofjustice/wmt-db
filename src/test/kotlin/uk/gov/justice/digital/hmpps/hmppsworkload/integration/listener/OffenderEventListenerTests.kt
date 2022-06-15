@@ -12,6 +12,7 @@ import org.springframework.data.repository.findByIdOrNull
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.SentenceEntity
 import java.math.BigInteger
 import java.time.LocalDate
@@ -71,6 +72,52 @@ class OffenderEventListenerTests : IntegrationTestBase() {
 
     val caseDetail = caseDetailsRepository.findByIdOrNull(crn)!!
     Assertions.assertEquals(Tier.C3, caseDetail.tier)
+  }
+
+  @Test
+  fun `case details not saved if no active convictions exist`() {
+    val crn = "J678910"
+    val sentenceId = BigInteger.valueOf(2500278160L)
+    singleInactiveConvictionsResponse(crn)
+    noConvictionsResponse(crn)
+
+    val sentenceChangedEvent =
+      PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn, sentenceId))).withMessageAttributes(
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED"))
+      )
+
+    hmppsOffenderSnsClient.publish(sentenceChangedEvent)
+
+    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+
+    Assertions.assertEquals(0, countMessagesOnOffenderEventDeadLetterQueue())
+    val count = caseDetailsRepository.count()
+
+    Assertions.assertEquals(0, count)
+  }
+
+  @Test
+  fun `case details deleted if no active convictions exist`() {
+    val crn = "J678910"
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.C1, CaseType.COMMUNITY))
+
+    val sentenceId = BigInteger.valueOf(2500278160L)
+    singleInactiveConvictionsResponse(crn)
+    noConvictionsResponse(crn)
+
+    val sentenceChangedEvent =
+      PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn, sentenceId))).withMessageAttributes(
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED"))
+      )
+
+    hmppsOffenderSnsClient.publish(sentenceChangedEvent)
+
+    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+
+    Assertions.assertEquals(0, countMessagesOnOffenderEventDeadLetterQueue())
+    val count = caseDetailsRepository.count()
+
+    Assertions.assertEquals(0, count)
   }
 
   @Test
