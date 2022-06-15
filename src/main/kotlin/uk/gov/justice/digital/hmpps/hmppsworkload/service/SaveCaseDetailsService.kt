@@ -23,11 +23,13 @@ class SaveCaseDetailsService(
     val convictions = communityApiClient.getActiveConvictions(crn).block()!!
     convictions.firstOrNull()?.let { conviction ->
       val caseType = caseTypeMapper.getCaseType(convictions, conviction.convictionId)
-      val tier = Tier.valueOf(hmppsTierApiClient.getTierByCrn(crn).block()!!)
-      val case = caseDetailsRepository.findByIdOrNull(crn) ?: CaseDetailsEntity(crn = crn, type = caseType, tier = tier)
-      case.type = caseType
-      case.tier = tier
-      caseDetailsRepository.save(case)
+      hmppsTierApiClient.getTierByCrn(crn).block()?.let {
+        val tier = Tier.valueOf(it)
+        val case = caseDetailsRepository.findByIdOrNull(crn) ?: CaseDetailsEntity(crn = crn, type = caseType, tier = tier)
+        case.type = caseType
+        case.tier = tier
+        caseDetailsRepository.save(case)
+      }
     } ?: caseDetailsRepository.findByIdOrNull(crn)?.let { caseDetailsRepository.delete(it) }
   }
 }

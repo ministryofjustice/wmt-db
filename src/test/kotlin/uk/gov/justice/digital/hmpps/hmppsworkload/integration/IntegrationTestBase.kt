@@ -172,6 +172,13 @@ abstract class IntegrationTestBase {
     )
   }
 
+  protected fun tierCalculationNotFoundResponse(crn: String) {
+    val request = HttpRequest.request().withPath("/crn/$crn/tier")
+    hmppsTier.`when`(request, Times.exactly(1)).respond(
+      HttpResponse.response().withStatusCode(404)
+    )
+  }
+
   protected fun staffIdResponse(staffId: BigInteger, staffCode: String, teamCode: String, staffGradeCode: String = "PSM") {
     val request = HttpRequest.request().withPath("/staff/staffIdentifier/$staffId")
     communityApi.`when`(request, Times.exactly(1)).respond(

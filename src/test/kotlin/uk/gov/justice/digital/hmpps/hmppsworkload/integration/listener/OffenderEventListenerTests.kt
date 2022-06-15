@@ -45,6 +45,27 @@ class OffenderEventListenerTests : IntegrationTestBase() {
   }
 
   @Test
+  fun `do not write case details if there is no tier`() {
+    val crn = "J678910"
+    val sentenceId = BigInteger.valueOf(2500278160L)
+    singleActiveConvictionResponseForAllConvictions(crn)
+    singleActiveConvictionResponse(crn)
+    tierCalculationNotFoundResponse(crn)
+    hmppsOffenderSnsClient.publish(
+      PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn, sentenceId))).withMessageAttributes(
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED"))
+      )
+    )
+
+    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+    await untilCallTo { countMessagesOnOffenderEventDeadLetterQueue() } matches { it == 0 }
+
+    val caseCount = caseDetailsRepository.count()
+
+    Assertions.assertEquals(0, caseCount)
+  }
+
+  @Test
   fun `must save case details when processing new sentence event`() {
     val crn = "J678910"
     val sentenceId = BigInteger.valueOf(2500278160L)
