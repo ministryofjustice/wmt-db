@@ -25,6 +25,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsAllocationMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.convictionNoSentenceResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSearchByCrnsResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSummaryResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.oneOffenderSearchByCrnsResponse
@@ -185,6 +186,15 @@ abstract class IntegrationTestBase {
 
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
       HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(singleActiveConvictionResponse())
+    )
+  }
+
+  protected fun convictionWithNoSentenceResponse(crn: String) {
+    val convictionsRequest =
+      HttpRequest.request().withPath("/offenders/crn/$crn/convictions").withQueryStringParameter(Parameter("activeOnly", "true"))
+
+    communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
+      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(convictionNoSentenceResponse())
     )
   }
 

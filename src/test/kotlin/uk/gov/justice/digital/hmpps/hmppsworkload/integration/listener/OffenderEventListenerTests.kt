@@ -21,6 +21,30 @@ import java.time.ZoneId
 class OffenderEventListenerTests : IntegrationTestBase() {
 
   @Test
+  fun `case type is unknown if there is no sentence`() {
+    val crn = "J678910"
+    val sentenceId = BigInteger.valueOf(2500278160L)
+    singleActiveConvictionResponseForAllConvictions(crn)
+    convictionWithNoSentenceResponse(crn)
+    tierCalculationResponse(crn)
+    hmppsOffenderSnsClient.publish(
+      PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn, sentenceId))).withMessageAttributes(
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED"))
+      )
+    )
+
+    await untilCallTo {
+      caseDetailsRepository.count()
+    } matches { it!! > 0 }
+
+    val caseDetail = caseDetailsRepository.findAll().first()
+
+    Assertions.assertEquals(crn, caseDetail.crn)
+    Assertions.assertEquals(CaseType.UNKNOWN, caseDetail.type)
+    Assertions.assertEquals(Tier.B3, caseDetail.tier)
+  }
+
+  @Test
   fun `must save case details when processing new sentence event`() {
     val crn = "J678910"
     val sentenceId = BigInteger.valueOf(2500278160L)
