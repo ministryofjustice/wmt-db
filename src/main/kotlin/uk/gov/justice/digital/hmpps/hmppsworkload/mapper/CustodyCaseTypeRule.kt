@@ -9,7 +9,6 @@ class CustodyCaseTypeRule : CaseTypeRule {
   private val custodialStatusCodes = setOf("A", "C", "D", "R", "I", "AT")
   private val custodialSentenceCodes = setOf("SC", "NC")
 
-  override fun isCaseType(sentenceTypeCode: String?, custodialStatusCode: String?): Boolean = custodialSentenceCodes.contains(sentenceTypeCode) && custodialStatusCodes.contains(custodialStatusCode)
-
-  override fun getCaseType(): CaseType = CaseType.CUSTODY
+  override fun isCaseType(sentenceTypeCode: String?, custodialStatusCode: String?): CaseType? =
+    if (custodialSentenceCodes.contains(sentenceTypeCode) && custodialStatusCodes.contains(custodialStatusCode)) CaseType.CUSTODY else null
 }

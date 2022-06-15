@@ -26,9 +26,7 @@ class CaseTypeMapper(
 
   fun convictionToCaseType(conviction: Conviction): CaseType {
     for (caseTypeRule in caseTypeRules) {
-      if (caseTypeRule.isCaseType(conviction.sentence?.sentenceType?.code, conviction.custody?.status?.code)) {
-        return caseTypeRule.getCaseType()
-      }
+      caseTypeRule.isCaseType(conviction.sentence?.sentenceType?.code, conviction.custody?.status?.code)?.let { return it }
     }
     return CaseType.UNKNOWN
   }

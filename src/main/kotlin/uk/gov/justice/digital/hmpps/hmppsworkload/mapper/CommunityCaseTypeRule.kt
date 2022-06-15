@@ -8,7 +8,6 @@ class CommunityCaseTypeRule : CaseTypeRule {
 
   private val communitySentenceCodes = setOf("SP", "NP")
 
-  override fun isCaseType(sentenceTypeCode: String?, custodialStatusCode: String?): Boolean = communitySentenceCodes.contains(sentenceTypeCode)
-
-  override fun getCaseType(): CaseType = CaseType.COMMUNITY
+  override fun isCaseType(sentenceTypeCode: String?, custodialStatusCode: String?): CaseType? =
+    if (communitySentenceCodes.contains(sentenceTypeCode)) CaseType.COMMUNITY else null
 }
