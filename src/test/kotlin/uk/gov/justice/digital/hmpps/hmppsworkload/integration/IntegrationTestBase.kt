@@ -26,6 +26,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsAllocationMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.convictionNoSentenceResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.notFoundTierResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSearchByCrnsResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSummaryResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.oneOffenderSearchByCrnsResponse
@@ -175,7 +176,7 @@ abstract class IntegrationTestBase {
   protected fun tierCalculationNotFoundResponse(crn: String) {
     val request = HttpRequest.request().withPath("/crn/$crn/tier")
     hmppsTier.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.response().withStatusCode(404)
+      HttpResponse.notFoundResponse().withContentType(MediaType.APPLICATION_JSON).withBody(notFoundTierResponse())
     )
   }
 

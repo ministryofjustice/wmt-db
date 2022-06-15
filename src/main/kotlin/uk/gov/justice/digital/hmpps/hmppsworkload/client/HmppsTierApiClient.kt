@@ -14,13 +14,21 @@ class HmppsTierApiClient(private val webClient: WebClient) {
     .retrieve()
     .onStatus(
       { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
-      { Mono.empty() }
+      { Mono.error(MissingTierError("No tier found for $crn")) }
     )
     .bodyToMono(TierDto::class.java)
     .map { it.tierScore }
+    .onErrorResume { ex ->
+      when (ex) {
+        is MissingTierError -> Mono.empty()
+        else -> Mono.error(ex)
+      }
+    }
 }
 
 private data class TierDto @JsonCreator constructor(
   @JsonProperty("tierScore")
   val tierScore: String
 )
+
+private class MissingTierError(msg: String) : RuntimeException(msg)
