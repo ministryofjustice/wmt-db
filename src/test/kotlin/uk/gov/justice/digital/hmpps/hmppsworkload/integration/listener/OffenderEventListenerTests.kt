@@ -8,6 +8,7 @@ import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.springframework.data.repository.findByIdOrNull
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
@@ -40,19 +41,19 @@ class OffenderEventListenerTests : IntegrationTestBase() {
     Assertions.assertEquals(crn, caseDetail.crn)
     Assertions.assertEquals(CaseType.CUSTODY, caseDetail.type)
     Assertions.assertEquals(Tier.B3, caseDetail.tier)
-    Assertions.assertNotNull(caseDetail.createdDate)
   }
 
   @Test
-  fun `only save case details if they have changed`() {
+  fun `only save latest case details if they have changed`() {
     val crn = "J678910"
     val sentenceId = BigInteger.valueOf(2500278160L)
     singleActiveConvictionResponseForAllConvictions(crn)
     singleActiveConvictionResponse(crn)
     tierCalculationResponse(crn)
+
     singleActiveConvictionResponseForAllConvictions(crn)
     singleActiveConvictionResponse(crn)
-    tierCalculationResponse(crn)
+    tierCalculationResponse(crn, Tier.C3.name)
 
     val sentenceChangedEvent =
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn, sentenceId))).withMessageAttributes(
@@ -67,6 +68,9 @@ class OffenderEventListenerTests : IntegrationTestBase() {
     val count = caseDetailsRepository.count()
 
     Assertions.assertEquals(1, count)
+
+    val caseDetail = caseDetailsRepository.findByIdOrNull(crn)!!
+    Assertions.assertEquals(Tier.C3, caseDetail.tier)
   }
 
   @Test

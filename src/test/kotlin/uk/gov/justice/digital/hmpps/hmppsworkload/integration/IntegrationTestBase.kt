@@ -163,10 +163,10 @@ abstract class IntegrationTestBase {
     )
   }
 
-  protected fun tierCalculationResponse(crn: String) {
+  protected fun tierCalculationResponse(crn: String, tier: String = "B3") {
     val request = HttpRequest.request().withPath("/crn/$crn/tier")
-    hmppsTier.`when`(request).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody("{\"tierScore\":\"B3\"}")
+    hmppsTier.`when`(request, Times.exactly(1)).respond(
+      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody("{\"tierScore\":\"${tier}\"}")
     )
   }
 
