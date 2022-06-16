@@ -15,20 +15,20 @@ class TierCalculationEventListener(
 
   @JmsListener(destination = "tiercalcqueue", containerFactory = "hmppsQueueContainerFactoryProxy")
   fun processMessage(rawMessage: String) {
-    val (crn, sourceId) = getCase(rawMessage)
-    log.info("received offender event for crn: {}", crn)
+    val crn = getCrn(rawMessage)
+    log.info("received tier calculation for crn: {}", crn)
     saveCaseDetailsService.save(crn)
   }
 
   @MessageExceptionHandler()
   fun errorHandler(e: Exception, msg: String) {
-    log.warn("Failed to process sentence change with CRN ${getCase(msg).crn} with error: ${e.message}")
+    log.warn("Failed to process sentence change with CRN ${getCrn(msg)} with error: ${e.message}")
     throw e
   }
 
-  private fun getCase(rawMessage: String): HmppsOffenderEvent {
+  private fun getCrn(rawMessage: String): String {
     val (message) = objectMapper.readValue(rawMessage, SQSMessage::class.java)
-    return objectMapper.readValue(message, HmppsOffenderEvent::class.java)
+    return objectMapper.readValue(message, TierCalculationEvent::class.java).crn
   }
 
   companion object {

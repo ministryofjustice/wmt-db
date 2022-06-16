@@ -92,11 +92,19 @@ abstract class IntegrationTestBase {
   private val domainEventsTopic by lazy { hmppsQueueService.findByTopicId("hmmppsdomaintopic") ?: throw MissingQueueException("HmppsTopic hmmppsdomaintopic not found") }
   private val offenderEventTopic by lazy { hmppsQueueService.findByTopicId("hmppsoffendertopic") ?: throw MissingQueueException("HmppsTopic hmppsoffendertopic not found") }
 
+  private val hmppsDomainQueue by lazy { hmppsQueueService.findByQueueId("tiercalcqueue") ?: throw MissingQueueException("HmppsQueue tiercalcqueue not found") }
+
   private val hmppsOffenderSqsDlqClient by lazy { hmppsOffenderQueue.sqsDlqClient as AmazonSQS }
   protected val hmppsOffenderSqsClient by lazy { hmppsOffenderQueue.sqsClient }
 
   protected val hmppsOffenderSnsClient by lazy { offenderEventTopic.snsClient }
   protected val hmppsOffenderTopicArn by lazy { offenderEventTopic.arn }
+
+  protected val hmppsDomainSnsClient by lazy { domainEventsTopic.snsClient }
+  protected val hmppsDomainTopicArn by lazy { domainEventsTopic.arn }
+
+  private val hmppsDomainSqsDlqClient by lazy { hmppsDomainQueue.sqsDlqClient as AmazonSQS }
+  protected val hmppsDomainSqsClient by lazy { hmppsDomainQueue.sqsClient }
 
   @Autowired
   protected lateinit var hmppsQueueService: HmppsQueueService
@@ -115,6 +123,9 @@ abstract class IntegrationTestBase {
     allocationCompleteClient.purgeQueue(PurgeQueueRequest(allocationCompleteUrl))
     hmppsOffenderSqsClient.purgeQueue(PurgeQueueRequest(hmppsOffenderQueue.queueUrl))
     hmppsOffenderSqsDlqClient.purgeQueue(PurgeQueueRequest(hmppsOffenderQueue.dlqUrl))
+
+    hmppsDomainSqsClient.purgeQueue(PurgeQueueRequest(hmppsDomainQueue.queueUrl))
+    hmppsDomainSqsDlqClient.purgeQueue(PurgeQueueRequest(hmppsDomainQueue.dlqUrl))
   }
 
   @AfterAll
