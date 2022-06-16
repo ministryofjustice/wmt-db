@@ -20,7 +20,7 @@ import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 @Service
-@ConditionalOnProperty("hmpps.sqs.topics.hmppsallocationcompletetopic.arn")
+@ConditionalOnProperty("hmpps.sqs.topics.hmmppsdomaintopic.arn")
 class SqsSuccessUpdater(
   val hmppsQueueService: HmppsQueueService,
   val objectMapper: ObjectMapper,
@@ -31,8 +31,8 @@ class SqsSuccessUpdater(
 ) : SuccessUpdater {
 
   private val allocationCompleteTopic by lazy {
-    hmppsQueueService.findByTopicId("hmppsallocationcompletetopic")
-      ?: throw MissingTopicException("hmppsallocationcompletetopic not found")
+    hmppsQueueService.findByTopicId("hmmppsdomaintopic")
+      ?: throw MissingTopicException("hmmppsdomaintopic not found")
   }
 
   override fun updatePerson(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {

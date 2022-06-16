@@ -89,13 +89,14 @@ abstract class IntegrationTestBase {
   protected val allocationCompleteUrl by lazy { hmppsQueueService.findByQueueId("hmppsallocationcompletequeue")?.queueUrl ?: throw MissingQueueException("HmppsQueue allocationcompletequeue not found") }
 
   private val hmppsOffenderQueue by lazy { hmppsQueueService.findByQueueId("hmppsoffenderqueue") ?: throw MissingQueueException("HmppsQueue hmppsoffenderqueue not found") }
-  private val hmppsOffenderTopic by lazy { hmppsQueueService.findByTopicId("hmppsoffendertopic") ?: throw MissingQueueException("HmppsTopic hmppsoffendertopic not found") }
+  private val domainEventsTopic by lazy { hmppsQueueService.findByTopicId("hmmppsdomaintopic") ?: throw MissingQueueException("HmppsTopic hmmppsdomaintopic not found") }
+  private val offenderEventTopic by lazy { hmppsQueueService.findByTopicId("hmppsoffendertopic") ?: throw MissingQueueException("HmppsTopic hmppsoffendertopic not found") }
 
   private val hmppsOffenderSqsDlqClient by lazy { hmppsOffenderQueue.sqsDlqClient as AmazonSQS }
   protected val hmppsOffenderSqsClient by lazy { hmppsOffenderQueue.sqsClient }
 
-  protected val hmppsOffenderSnsClient by lazy { hmppsOffenderTopic.snsClient }
-  protected val hmppsOffenderTopicArn by lazy { hmppsOffenderTopic.arn }
+  protected val hmppsOffenderSnsClient by lazy { offenderEventTopic.snsClient }
+  protected val hmppsOffenderTopicArn by lazy { offenderEventTopic.arn }
 
   @Autowired
   protected lateinit var hmppsQueueService: HmppsQueueService
