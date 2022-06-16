@@ -6,6 +6,6 @@ import org.springframework.context.annotation.ConfigurationCondition
 
 class NoAllocationCompleteTopicCondition : NoneNestedConditions(ConfigurationCondition.ConfigurationPhase.PARSE_CONFIGURATION) {
 
-  @ConditionalOnProperty("hmpps.sqs.topics.hmppsallocationcompletetopic.arn")
+  @ConditionalOnProperty("hmpps.sqs.topics.hmmppsdomaintopic.arn")
   class AllocationCompleteCondition
 }
