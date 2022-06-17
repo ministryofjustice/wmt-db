@@ -631,6 +631,37 @@ class EmailNotificationServiceTests {
   }
 
   @Test
+  fun `must provide default previous convictions when only active convictions exist`() {
+    val personSummary = PersonSummary("John", "Doe")
+    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val requirements = emptyList<ConvictionRequirement>()
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
+    val allocatingOfficerUsername = "ALLOCATOR"
+    val teamCode = "TM1"
+    val token = "token"
+
+    val activeConviction = Conviction(
+      Sentence(
+        SentenceType("", ""),
+        BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
+      ),
+      null, true, BigInteger.TEN,
+      CourtAppearance(
+        LocalDateTime.now(), "Court 1"
+      ),
+      emptyList()
+    )
+
+    every { communityApiClient.getAllConvictions(any()) } returns Mono.just(listOf(activeConviction))
+
+    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, teamCode, token)
+      .block()
+    val parameters = slot<MutableMap<String, Any>>()
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    Assertions.assertEquals(listOf("N/A"), parameters.captured["previousConvictions"])
+  }
+
+  @Test
   fun `must add notes when they exist`() {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")

@@ -53,6 +53,7 @@ class EmailNotificationService(
       convictions.groupBy { it.active }
     }.flatMap { convictions ->
       val activeConvictions = convictions.getOrDefault(true, emptyList())
+      val previousConvictions = Optional.ofNullable(convictions[false])
       val conviction = activeConvictions.first { it.convictionId == allocateCase.eventId }
       Mono.zip(
         communityApiClient.getInductionContacts(allocateCase.crn, conviction.sentence!!.startDate),
@@ -84,7 +85,7 @@ class EmailNotificationService(
           "rsrPercentage" to latestRiskPredictor.map { riskPredictor -> riskPredictor.rsrPercentageScore?.toString() }.orElse("N/A"),
           "ogrsLevel" to results.t6.map { assessment -> assessment.ogrsScore?.let { orgsScoreToLevel(it.toInt()) } }.orElse("Score Unavailable"),
           "ogrsPercentage" to results.t6.map { assessment -> assessment.ogrsScore?.toString() }.orElse("N/A"),
-          "previousConvictions" to convictions[false]?.let { mapConvictionsToOffenceDescription(it) },
+          "previousConvictions" to previousConvictions.map { mapConvictionsToOffenceDescription(it) }.orElse(listOf("N/A")),
           "notes" to allocateCase.instructions,
           "allocatingOfficerName" to "${results.t3.staff.forenames} ${results.t3.staff.surname}",
           "allocatingOfficerGrade" to gradeMapper.deliusToStaffGrade(results.t3.staffGrade?.code),
