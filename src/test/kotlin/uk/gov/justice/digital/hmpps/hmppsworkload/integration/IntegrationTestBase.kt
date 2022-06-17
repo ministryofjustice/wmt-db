@@ -25,6 +25,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsAllocationMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.bankHolidayJsonResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.convictionNoSentenceResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.notFoundTierResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSearchByCrnsResponse
@@ -56,6 +57,11 @@ abstract class IntegrationTestBase {
   var communityApi: ClientAndServer = startClientAndServer(8092)
   var hmppsTier: ClientAndServer = startClientAndServer(8082)
   var offenderSearchApi: ClientAndServer = startClientAndServer(8095)
+  var bankHolidayApi: ClientAndServer = startClientAndServer(8093)
+
+  init {
+    bankHolidayResponse()
+  }
 
   @Autowired
   protected lateinit var objectMapper: ObjectMapper
@@ -111,9 +117,11 @@ abstract class IntegrationTestBase {
 
   @BeforeEach
   fun setupDependentServices() {
+
     communityApi.reset()
     hmppsTier.reset()
     offenderSearchApi.reset()
+    bankHolidayApi.reset()
     setupOauth()
     personManagerRepository.deleteAll()
     eventManagerRepository.deleteAll()
@@ -133,6 +141,7 @@ abstract class IntegrationTestBase {
     communityApi.stop()
     oauthMock.stop()
     hmppsTier.stop()
+    bankHolidayApi.stop()
     offenderSearchApi.stop()
     personManagerRepository.deleteAll()
     eventManagerRepository.deleteAll()
@@ -161,6 +170,15 @@ abstract class IntegrationTestBase {
   protected fun offenderEvent(crn: String, sentenceId: BigInteger) = HmppsOffenderEvent(crn, sentenceId)
 
   protected fun jsonString(any: Any) = objectMapper.writeValueAsString(any) as String
+
+  private final fun bankHolidayResponse() {
+    val bankHolidayRequest = HttpRequest.request()
+      .withPath("/bank-holidays.json")
+
+    bankHolidayApi.`when`(bankHolidayRequest, Times.exactly(1)).respond(
+      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(bankHolidayJsonResponse())
+    )
+  }
 
   fun setupOauth() {
     val response = HttpResponse.response().withContentType(MediaType.APPLICATION_JSON)
