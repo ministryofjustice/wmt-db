@@ -6,13 +6,13 @@ import java.time.LocalDate
 
 data class Sentence @JsonCreator constructor(
   val sentenceType: SentenceType,
-  val originalLength: BigInteger?,
-  val originalLengthUnits: String?,
+  val originalLength: BigInteger? = null,
+  val originalLengthUnits: String? = null,
   val description: String,
   val startDate: LocalDate,
   val sentenceId: BigInteger,
-  val expectedSentenceEndDate: LocalDate?,
-  val terminationDate: LocalDate?
+  val expectedSentenceEndDate: LocalDate? = null,
+  val terminationDate: LocalDate? = null
 )
 
 data class SentenceType @JsonCreator constructor(

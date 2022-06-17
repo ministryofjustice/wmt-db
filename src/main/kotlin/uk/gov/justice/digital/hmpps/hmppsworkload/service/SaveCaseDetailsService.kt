@@ -22,7 +22,7 @@ class SaveCaseDetailsService(
   fun save(crn: String) {
     val convictions = communityApiClient.getActiveConvictions(crn).block()!!
     convictions.firstOrNull()?.let { conviction ->
-      val caseType = caseTypeMapper.getCaseType(convictions, conviction.convictionId)
+      val caseType = caseTypeMapper.getCaseType(convictions)
       hmppsTierApiClient.getTierByCrn(crn).block()?.let {
         val tier = Tier.valueOf(it)
         val case = caseDetailsRepository.findByIdOrNull(crn) ?: CaseDetailsEntity(crn = crn, type = caseType, tier = tier)

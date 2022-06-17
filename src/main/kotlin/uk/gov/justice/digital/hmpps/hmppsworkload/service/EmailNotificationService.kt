@@ -73,7 +73,7 @@ class EmailNotificationService(
           "officer_name" to "${allocatedOfficer.staff.forenames} ${allocatedOfficer.staff.surname}",
           "court_name" to conviction.courtAppearance!!.courtName,
           "sentence_date" to conviction.courtAppearance.appearanceDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
-          "induction_statement" to mapInductionAppointment(results.t1, caseTypeMapper.getCaseType(activeConvictions, allocateCase.eventId), conviction.sentence.startDate),
+          "induction_statement" to mapInductionAppointment(results.t1, caseTypeMapper.getCaseType(activeConvictions), conviction.sentence.startDate),
           "offences" to mapOffences(conviction.offences!!),
           "order" to mapOrder(conviction.sentence),
           "requirements" to mapRequirements(requirements),

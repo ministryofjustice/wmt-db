@@ -77,7 +77,7 @@ class EmailNotificationServiceTests {
     every { assessRisksNeedsApiClient.getRiskSummary(any(), any()) } returns Mono.just(Optional.empty())
     every { assessRisksNeedsApiClient.getRiskPredictors(any(), any()) } returns Mono.just(emptyList())
     every { communityApiClient.getAssessment(any()) } returns Mono.just(Optional.empty())
-    every { caseTypeMapper.getCaseType(any(), any()) } returns CaseType.CUSTODY
+    every { caseTypeMapper.getCaseType(any()) } returns CaseType.CUSTODY
     every { gradeMapper.deliusToStaffGrade(any()) } returns ""
     every { notificationClient.sendEmail(any(), any(), any(), any()) } returns SendEmailResponse(emailResponse())
   }
@@ -202,7 +202,7 @@ class EmailNotificationServiceTests {
     val teamCode = "TM1"
     val token = "token"
 
-    every { caseTypeMapper.getCaseType(any(), any()) } returns CaseType.CUSTODY
+    every { caseTypeMapper.getCaseType(any()) } returns CaseType.CUSTODY
 
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, teamCode, token)
       .block()
@@ -221,7 +221,7 @@ class EmailNotificationServiceTests {
     val teamCode = "TM1"
     val token = "token"
 
-    every { caseTypeMapper.getCaseType(any(), any()) } returns CaseType.COMMUNITY
+    every { caseTypeMapper.getCaseType(any()) } returns CaseType.COMMUNITY
     val appointment = Contact(ZonedDateTime.now().plusDays(5L))
     every { communityApiClient.getInductionContacts(any(), any()) } returns Mono.just(listOf(appointment))
 
@@ -255,7 +255,7 @@ class EmailNotificationServiceTests {
     val teamCode = "TM1"
     val token = "token"
 
-    every { caseTypeMapper.getCaseType(any(), any()) } returns CaseType.COMMUNITY
+    every { caseTypeMapper.getCaseType(any()) } returns CaseType.COMMUNITY
     val appointment = Contact(ZonedDateTime.now().minusDays(5L))
     every { communityApiClient.getInductionContacts(any(), any()) } returns Mono.just(listOf(appointment))
 
@@ -289,7 +289,7 @@ class EmailNotificationServiceTests {
     val teamCode = "TM1"
     val token = "token"
 
-    every { caseTypeMapper.getCaseType(any(), any()) } returns CaseType.COMMUNITY
+    every { caseTypeMapper.getCaseType(any()) } returns CaseType.COMMUNITY
 
     every { communityApiClient.getInductionContacts(any(), any()) } returns Mono.just(emptyList())
 
