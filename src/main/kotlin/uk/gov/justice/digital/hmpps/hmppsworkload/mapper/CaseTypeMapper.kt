@@ -9,22 +9,14 @@ class CaseTypeMapper(
   private val caseTypeRules: List<CaseTypeRule>
 ) {
   fun getCaseType(activeConvictions: List<Conviction>): CaseType {
-    val allConvictionTypes = activeConvictions.map { conviction ->
-      convictionToCaseType(conviction).let { caseType ->
-        {
-          conviction.convictionId to caseType
-        }
-      }
-    }.associate { it.invoke() }
-
-    val convictionIdFirst = activeConvictions.sortedByDescending { it.sentence?.expectedSentenceEndDate }
-      .first().convictionId
-
-    var caseType = allConvictionTypes.getValue(convictionIdFirst)
-    if (allConvictionTypes.containsValue(CaseType.CUSTODY)) {
-      caseType = CaseType.CUSTODY
+    return if (activeConvictions.any { convictionToCaseType(it) == CaseType.CUSTODY }) {
+      CaseType.CUSTODY
+    } else {
+      convictionToCaseType(
+        activeConvictions.sortedByDescending { it.sentence?.expectedSentenceEndDate }
+          .first()
+      )
     }
-    return caseType
   }
 
   fun convictionToCaseType(conviction: Conviction): CaseType {
