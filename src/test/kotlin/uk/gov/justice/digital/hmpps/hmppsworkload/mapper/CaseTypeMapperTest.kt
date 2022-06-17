@@ -39,4 +39,25 @@ class CaseTypeMapperTest {
 
     assertEquals(CaseType.COMMUNITY, caseTypeActual)
   }
+
+  @Test
+  fun `when there is a conviction with no sentence use the conviction with a sentence`() {
+
+    val sentenceCommunity = Sentence(
+      sentenceType = SentenceType(code = "SP", description = "COMMUNITY"),
+      description = "communityDesc", startDate = LocalDate.now(), sentenceId = BigInteger.ONE,
+      expectedSentenceEndDate = LocalDate.now().plusDays(20)
+    )
+
+    val convictionCommunity = Conviction(sentenceCommunity, active = true, convictionId = BigInteger.ONE)
+    val convictionNoSentence = Conviction(
+      null, custody = Custody(CustodyStatus("LicenseCode"), null),
+      active = true, convictionId = BigInteger.TEN
+    )
+
+    val caseTypeActual = CaseTypeMapper(listOf(CustodyCaseTypeRule(), CommunityCaseTypeRule(), LicenseCaseTypeRule()))
+      .getCaseType(listOf(convictionCommunity, convictionNoSentence))
+
+    assertEquals(CaseType.COMMUNITY, caseTypeActual)
+  }
 }
