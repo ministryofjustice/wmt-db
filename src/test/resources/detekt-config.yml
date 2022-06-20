@@ -46,6 +46,8 @@ complexity:
 naming:
   EnumNaming:
     active: false
+  ConstructorParameterNaming:
+    active: false
 
 performance:
   SpreadOperator:
