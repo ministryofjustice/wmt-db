@@ -7,10 +7,10 @@ import io.mockk.verify
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.data.repository.findByIdOrNull
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.AssessRisksNeedsApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.HmppsTierApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Contact
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Conviction
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ConvictionRequirement
@@ -29,8 +29,10 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffName
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Team
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.emailResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.CaseTypeMapper
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.DateMapper
 import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.GradeMapper
 import uk.gov.service.notify.NotificationClientApi
@@ -46,13 +48,15 @@ import java.util.Optional
 class EmailNotificationServiceTests {
   private val notificationClient = mockk<NotificationClientApi>()
   private val communityApiClient = mockk<CommunityApiClient>()
-  private val hmppsTierApiClient = mockk<HmppsTierApiClient>()
+  private val hmppsCaseDetailsRepo = mockk<CaseDetailsRepository>()
   private val gradeMapper = mockk<GradeMapper>()
-  private val caseTypeMapper = mockk<CaseTypeMapper>()
   private val dateMapper = mockk<DateMapper>()
   private val assessRisksNeedsApiClient = mockk<AssessRisksNeedsApiClient>()
   private val templateId = "templateId"
-  private val notificationService = EmailNotificationService(notificationClient, templateId, communityApiClient, hmppsTierApiClient, gradeMapper, caseTypeMapper, dateMapper, assessRisksNeedsApiClient)
+  private val notificationService = EmailNotificationService(
+    notificationClient, templateId, communityApiClient,
+    gradeMapper, dateMapper, assessRisksNeedsApiClient, hmppsCaseDetailsRepo
+  )
 
   @BeforeEach
   fun setup() {
@@ -72,14 +76,13 @@ class EmailNotificationServiceTests {
       )
     )
     every { communityApiClient.getInductionContacts(any(), any()) } returns Mono.just(emptyList())
-    every { hmppsTierApiClient.getTierByCrn(any()) } returns Mono.just("A1")
     every { communityApiClient.getStaffByUsername(any()) } returns Mono.just(Staff(BigInteger.ONE, "ALLOCATOR1", StaffName("Alli", "Cator"), null, null, null, "all1@cat0r.com"))
     every { assessRisksNeedsApiClient.getRiskSummary(any(), any()) } returns Mono.just(Optional.empty())
     every { assessRisksNeedsApiClient.getRiskPredictors(any(), any()) } returns Mono.just(emptyList())
     every { communityApiClient.getAssessment(any()) } returns Mono.just(Optional.empty())
-    every { caseTypeMapper.getCaseType(any()) } returns CaseType.CUSTODY
     every { gradeMapper.deliusToStaffGrade(any()) } returns ""
     every { notificationClient.sendEmail(any(), any(), any(), any()) } returns SendEmailResponse(emailResponse())
+    every { hmppsCaseDetailsRepo.findByIdOrNull(any()) } returns CaseDetailsEntity("", Tier.B3, CaseType.CUSTODY)
   }
 
   @Test
@@ -202,8 +205,6 @@ class EmailNotificationServiceTests {
     val teamCode = "TM1"
     val token = "token"
 
-    every { caseTypeMapper.getCaseType(any()) } returns CaseType.CUSTODY
-
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, teamCode, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
@@ -221,7 +222,7 @@ class EmailNotificationServiceTests {
     val teamCode = "TM1"
     val token = "token"
 
-    every { caseTypeMapper.getCaseType(any()) } returns CaseType.COMMUNITY
+    every { hmppsCaseDetailsRepo.findByIdOrNull(any()) } returns CaseDetailsEntity("", Tier.B3, CaseType.COMMUNITY)
     val appointment = Contact(ZonedDateTime.now().plusDays(5L))
     every { communityApiClient.getInductionContacts(any(), any()) } returns Mono.just(listOf(appointment))
 
@@ -255,7 +256,7 @@ class EmailNotificationServiceTests {
     val teamCode = "TM1"
     val token = "token"
 
-    every { caseTypeMapper.getCaseType(any()) } returns CaseType.COMMUNITY
+    every { hmppsCaseDetailsRepo.findByIdOrNull(any()) } returns CaseDetailsEntity("", Tier.B3, CaseType.COMMUNITY)
     val appointment = Contact(ZonedDateTime.now().minusDays(5L))
     every { communityApiClient.getInductionContacts(any(), any()) } returns Mono.just(listOf(appointment))
 
@@ -289,7 +290,7 @@ class EmailNotificationServiceTests {
     val teamCode = "TM1"
     val token = "token"
 
-    every { caseTypeMapper.getCaseType(any()) } returns CaseType.COMMUNITY
+    every { hmppsCaseDetailsRepo.findByIdOrNull(any()) } returns CaseDetailsEntity("", Tier.B3, CaseType.COMMUNITY)
 
     every { communityApiClient.getInductionContacts(any(), any()) } returns Mono.just(emptyList())
 
@@ -409,13 +410,12 @@ class EmailNotificationServiceTests {
     val token = "token"
 
     val tier = "B3"
-    every { hmppsTierApiClient.getTierByCrn(any()) } returns Mono.just(tier)
 
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, teamCode, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
-    Assertions.assertEquals(tier, parameters.captured["tier"])
+    Assertions.assertEquals(Tier.B3, parameters.captured["tier"])
   }
 
   @Test
