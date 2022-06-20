@@ -9,6 +9,7 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
+import org.mockserver.configuration.Configuration
 import org.mockserver.integration.ClientAndServer
 import org.mockserver.integration.ClientAndServer.startClientAndServer
 import org.mockserver.matchers.Times
@@ -16,6 +17,7 @@ import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
 import org.mockserver.model.MediaType
 import org.mockserver.model.Parameter
+import org.slf4j.event.Level
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.SpringBootTest
@@ -53,11 +55,11 @@ import java.math.BigInteger
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class IntegrationTestBase {
 
-  private var oauthMock: ClientAndServer = startClientAndServer(9090)
-  var communityApi: ClientAndServer = startClientAndServer(8092)
-  var hmppsTier: ClientAndServer = startClientAndServer(8082)
-  var offenderSearchApi: ClientAndServer = startClientAndServer(8095)
-  var bankHolidayApi: ClientAndServer = startClientAndServer(8093)
+  private var oauthMock: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 9090)
+  var communityApi: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8092)
+  var hmppsTier: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8082)
+  var offenderSearchApi: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8095)
+  var bankHolidayApi: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8093)
 
   init {
     bankHolidayResponse()
