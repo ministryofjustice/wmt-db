@@ -2,21 +2,25 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration.offenderManager
 
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.request.impactCase
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import java.math.BigInteger
 
 class GetImpactForOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can get impact for an offender manager with workload`() {
+
     val staffId = BigInteger.valueOf(123456789L)
     val crn = "CRN1"
     val staffCode = "OM1"
     val teamCode = "T1"
     staffIdResponse(staffId, staffCode, teamCode)
-    tierCalculationResponse(crn)
-    singleActiveConvictionResponse(crn)
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY))
+
     webTestClient.post()
       .uri("/team/$teamCode/offenderManagers/$staffId/impact")
       .bodyValue(impactCase(crn))
@@ -49,8 +53,7 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
     val staffCode = "OM1"
     val teamCode = "T1"
     staffIdResponse(staffId, staffCode, teamCode)
-    tierCalculationResponse(crn)
-    singleActiveConvictionResponse(crn)
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY))
     webTestClient.post()
       .uri("/team/$teamCode/offenderManagers/$staffId/impact")
       .bodyValue(impactCase(crn))
@@ -83,8 +86,7 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
     val staffCode = "NOWORKLOAD1"
     val teamCode = "T1"
     staffIdResponse(staffId, staffCode, teamCode)
-    tierCalculationResponse(crn)
-    singleActiveConvictionResponse(crn)
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY))
     webTestClient.post()
       .uri("/team/$teamCode/offenderManagers/$staffId/impact")
       .bodyValue(impactCase(crn))
@@ -117,8 +119,7 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
     val staffCode = "NOWORKLOAD1"
     val teamCode = "T1"
     staffIdResponse(staffId, staffCode, teamCode, "UNKNOWNGRADECODE")
-    tierCalculationResponse(crn)
-    singleActiveConvictionResponse(crn)
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY))
     webTestClient.post()
       .uri("/team/$teamCode/offenderManagers/$staffId/impact")
       .bodyValue(impactCase(crn))

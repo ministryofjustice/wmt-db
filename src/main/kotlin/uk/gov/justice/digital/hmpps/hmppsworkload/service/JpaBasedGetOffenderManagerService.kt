@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.HmppsTierApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.OffenderSearchApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
@@ -15,11 +14,11 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.TierCaseTotals
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadPointsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.OffenderManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.ReductionsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.SentenceRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadPointsRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.CaseTypeMapper
 import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.GradeMapper
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -38,28 +37,28 @@ class JpaBasedGetOffenderManagerService(
   private val communityApiClient: CommunityApiClient,
   private val gradeMapper: GradeMapper,
   private val workloadPointsRepository: WorkloadPointsRepository,
-  private val caseTypeMapper: CaseTypeMapper,
-  private val hmppsTierApiClient: HmppsTierApiClient,
   private val offenderSearchApiClient: OffenderSearchApiClient,
-  private val sentenceRepository: SentenceRepository
+  private val sentenceRepository: SentenceRepository,
+  private val caseDetailsRepository: CaseDetailsRepository
 ) : GetOffenderManagerService {
 
   override fun getPotentialWorkload(teamCode: String, staffId: BigInteger, impactCase: ImpactCase): OffenderManagerOverview? {
-    return Mono.zip(getOffenderManagerOverview(staffId, teamCode), getPotentialCase(impactCase.crn))
-      .map { results ->
-        val currentCaseImpact = getCurrentCasePoints(teamCode, results.t1.code, impactCase.crn)
-        results.t1.potentialCapacity = capacityCalculator.calculate(results.t1.totalPoints.minus(currentCaseImpact).plus(caseCalculator.getPointsForCase(results.t2)), results.t1.availablePoints)
-        results.t1
+    return getOffenderManagerOverview(staffId, teamCode)
+      .map { overview ->
+        val currentCaseImpact = getCurrentCasePoints(teamCode, overview.code, impactCase.crn)
+        overview.potentialCapacity = capacityCalculator.calculate(
+          overview.totalPoints.minus(currentCaseImpact)
+            .plus(caseCalculator.getPointsForCase(getPotentialCase(crn = impactCase.crn))),
+          overview.availablePoints
+        )
+        overview
       }.block()
   }
 
-  private fun getPotentialCase(crn: String): Mono<Case> {
-    return Mono.zip(communityApiClient.getActiveConvictions(crn), hmppsTierApiClient.getTierByCrn(crn))
-      .map { results ->
-        val caseType = caseTypeMapper.getCaseType(results.t1)
-        val tier = results.t2
-        Case(Tier.valueOf(tier), caseType, false, crn)
-      }
+  private fun getPotentialCase(crn: String): Case {
+    return caseDetailsRepository.findById(crn)
+      .map { Case(tier = it.tier, type = it.type, crn = crn) }
+      .get()
   }
 
   private fun getCurrentCasePoints(teamCode: String, staffCode: String, crn: String): BigInteger = offenderManagerRepository.findCaseByTeamCodeAndStaffCodeAndCrn(teamCode, staffCode, crn)?.let { currentCase ->
