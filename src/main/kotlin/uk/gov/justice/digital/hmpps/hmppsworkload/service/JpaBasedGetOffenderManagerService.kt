@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
@@ -56,9 +57,8 @@ class JpaBasedGetOffenderManagerService(
   }
 
   private fun getPotentialCase(crn: String): Case {
-    return caseDetailsRepository.findById(crn)
-      .map { Case(tier = it.tier, type = it.type, crn = crn) }
-      .get()
+    return caseDetailsRepository.findByIdOrNull(crn)!!
+      .let { Case(tier = it.tier, type = it.type, crn = crn) }
   }
 
   private fun getCurrentCasePoints(teamCode: String, staffCode: String, crn: String): BigInteger = offenderManagerRepository.findCaseByTeamCodeAndStaffCodeAndCrn(teamCode, staffCode, crn)?.let { currentCase ->
