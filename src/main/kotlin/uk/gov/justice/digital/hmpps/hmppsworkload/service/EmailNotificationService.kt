@@ -2,11 +2,11 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.AssessRisksNeedsApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.HmppsTierApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Contact
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Conviction
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ConvictionRequirement
@@ -16,7 +16,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Sentence
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
-import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.CaseTypeMapper
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.DateMapper
 import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.GradeMapper
 import uk.gov.service.notify.NotificationClientApi
@@ -33,11 +33,10 @@ class EmailNotificationService(
   private val notificationClient: NotificationClientApi,
   @Value("\${application.notify.allocation.template}") private val allocationTemplateId: String,
   @Qualifier("communityApiClient") private val communityApiClient: CommunityApiClient,
-  @Qualifier("hmppsTierApiClient") private val hmppsTierApiClient: HmppsTierApiClient,
   private val gradeMapper: GradeMapper,
-  private val caseTypeMapper: CaseTypeMapper,
   private val dateMapper: DateMapper,
-  private val assessRisksNeedsApiClient: AssessRisksNeedsApiClient
+  private val assessRisksNeedsApiClient: AssessRisksNeedsApiClient,
+  private val caseDetailsRepository: CaseDetailsRepository
 ) : NotificationService {
 
   override fun notifyAllocation(
@@ -57,14 +56,13 @@ class EmailNotificationService(
       val conviction = activeConvictions.first { it.convictionId == allocateCase.eventId }
       Mono.zip(
         communityApiClient.getInductionContacts(allocateCase.crn, conviction.sentence!!.startDate),
-        hmppsTierApiClient.getTierByCrn(allocateCase.crn),
         communityApiClient.getStaffByUsername(allocatingOfficerUsername),
         assessRisksNeedsApiClient.getRiskSummary(allocateCase.crn, token),
         assessRisksNeedsApiClient.getRiskPredictors(allocateCase.crn, token),
         communityApiClient.getAssessment(allocateCase.crn)
       ).map { results ->
         val latestRiskPredictor = Optional.ofNullable(
-          results.t5.filter { riskPredictor -> riskPredictor.rsrScoreLevel != null && riskPredictor.rsrPercentageScore != null }
+          results.t4.filter { riskPredictor -> riskPredictor.rsrScoreLevel != null && riskPredictor.rsrPercentageScore != null }
             .maxByOrNull { riskPredictor -> riskPredictor.completedDate ?: LocalDateTime.MIN }
         )
         val parameters = mapOf(
@@ -73,23 +71,23 @@ class EmailNotificationService(
           "officer_name" to "${allocatedOfficer.staff.forenames} ${allocatedOfficer.staff.surname}",
           "court_name" to conviction.courtAppearance!!.courtName,
           "sentence_date" to conviction.courtAppearance.appearanceDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
-          "induction_statement" to mapInductionAppointment(results.t1, caseTypeMapper.getCaseType(activeConvictions), conviction.sentence.startDate),
+          "induction_statement" to mapInductionAppointment(results.t1, caseDetailsRepository.findByIdOrNull(allocateCase.crn)!!.type, conviction.sentence.startDate),
           "offences" to mapOffences(conviction.offences!!),
           "order" to mapOrder(conviction.sentence),
           "requirements" to mapRequirements(requirements),
-          "tier" to results.t2,
-          "rosh" to results.t4.map { riskSummary ->
+          "tier" to caseDetailsRepository.findByIdOrNull(allocateCase.crn)!!.tier,
+          "rosh" to results.t3.map { riskSummary ->
             capitalize(riskSummary.overallRiskLevel)
           }.orElse("Score Unavailable"),
           "rsrLevel" to latestRiskPredictor.map { riskPredictor -> capitalize(riskPredictor.rsrScoreLevel) }.orElse("Score Unavailable"),
           "rsrPercentage" to latestRiskPredictor.map { riskPredictor -> riskPredictor.rsrPercentageScore?.toString() }.orElse("N/A"),
-          "ogrsLevel" to results.t6.map { assessment -> assessment.ogrsScore?.let { orgsScoreToLevel(it.toInt()) } }.orElse("Score Unavailable"),
-          "ogrsPercentage" to results.t6.map { assessment -> assessment.ogrsScore?.toString() }.orElse("N/A"),
+          "ogrsLevel" to results.t5.map { assessment -> assessment.ogrsScore?.let { orgsScoreToLevel(it.toInt()) } }.orElse("Score Unavailable"),
+          "ogrsPercentage" to results.t5.map { assessment -> assessment.ogrsScore?.toString() }.orElse("N/A"),
           "previousConvictions" to previousConvictions.map { mapConvictionsToOffenceDescription(it) }.orElse(listOf("N/A")),
           "notes" to allocateCase.instructions,
-          "allocatingOfficerName" to "${results.t3.staff.forenames} ${results.t3.staff.surname}",
-          "allocatingOfficerGrade" to gradeMapper.deliusToStaffGrade(results.t3.staffGrade?.code),
-          "allocatingOfficerTeam" to results.t3.teams?.find { team -> team.code == teamCode }?.description
+          "allocatingOfficerName" to "${results.t2.staff.forenames} ${results.t2.staff.surname}",
+          "allocatingOfficerGrade" to gradeMapper.deliusToStaffGrade(results.t2.staffGrade?.code),
+          "allocatingOfficerTeam" to results.t2.teams?.find { team -> team.code == teamCode }?.description
         )
         val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
         emailTo.add(allocatedOfficer.email!!)
