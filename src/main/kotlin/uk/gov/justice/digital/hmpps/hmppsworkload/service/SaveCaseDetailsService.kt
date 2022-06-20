@@ -5,6 +5,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.HmppsTierApiClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
@@ -21,15 +22,15 @@ class SaveCaseDetailsService(
   @Transactional
   fun save(crn: String) {
     val convictions = communityApiClient.getActiveConvictions(crn).block()!!
-    convictions.firstOrNull()?.let { conviction ->
-      val caseType = caseTypeMapper.getCaseType(convictions, conviction.convictionId)
-      hmppsTierApiClient.getTierByCrn(crn).block()?.let {
+    caseTypeMapper.getCaseType(convictions).takeUnless { it == CaseType.UNKNOWN }?.let { caseType ->
+      hmppsTierApiClient.getTierByCrn(crn).map {
         val tier = Tier.valueOf(it)
-        val case = caseDetailsRepository.findByIdOrNull(crn) ?: CaseDetailsEntity(crn = crn, type = caseType, tier = tier)
+        val case =
+          caseDetailsRepository.findByIdOrNull(crn) ?: CaseDetailsEntity(crn = crn, type = caseType, tier = tier)
         case.type = caseType
         case.tier = tier
-        caseDetailsRepository.save(case)
-      }
+        case
+      }.block()?.let { caseDetailsRepository.save(it) }
     } ?: caseDetailsRepository.findByIdOrNull(crn)?.let { caseDetailsRepository.delete(it) }
   }
 }

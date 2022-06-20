@@ -45,7 +45,7 @@ class JpaBasedGetOffenderManagerService(
 ) : GetOffenderManagerService {
 
   override fun getPotentialWorkload(teamCode: String, staffId: BigInteger, impactCase: ImpactCase): OffenderManagerOverview? {
-    return Mono.zip(getOffenderManagerOverview(staffId, teamCode), getPotentialCase(impactCase.crn, impactCase.convictionId))
+    return Mono.zip(getOffenderManagerOverview(staffId, teamCode), getPotentialCase(impactCase.crn))
       .map { results ->
         val currentCaseImpact = getCurrentCasePoints(teamCode, results.t1.code, impactCase.crn)
         results.t1.potentialCapacity = capacityCalculator.calculate(results.t1.totalPoints.minus(currentCaseImpact).plus(caseCalculator.getPointsForCase(results.t2)), results.t1.availablePoints)
@@ -53,10 +53,10 @@ class JpaBasedGetOffenderManagerService(
       }.block()
   }
 
-  private fun getPotentialCase(crn: String, convictionId: BigInteger): Mono<Case> {
+  private fun getPotentialCase(crn: String): Mono<Case> {
     return Mono.zip(communityApiClient.getActiveConvictions(crn), hmppsTierApiClient.getTierByCrn(crn))
       .map { results ->
-        val caseType = caseTypeMapper.getCaseType(results.t1, convictionId)
+        val caseType = caseTypeMapper.getCaseType(results.t1)
         val tier = results.t2
         Case(Tier.valueOf(tier), caseType, false, crn)
       }

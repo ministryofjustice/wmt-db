@@ -33,15 +33,12 @@ class OffenderEventListenerTests : IntegrationTestBase() {
       )
     )
 
-    await untilCallTo {
-      caseDetailsRepository.count()
-    } matches { it!! > 0 }
+    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+    await untilCallTo { countMessagesOnOffenderEventDeadLetterQueue() } matches { it == 0 }
 
-    val caseDetail = caseDetailsRepository.findAll().first()
+    val caseCount = caseDetailsRepository.count()
 
-    Assertions.assertEquals(crn, caseDetail.crn)
-    Assertions.assertEquals(CaseType.UNKNOWN, caseDetail.type)
-    Assertions.assertEquals(Tier.B3, caseDetail.tier)
+    Assertions.assertEquals(0, caseCount)
   }
 
   @Test
