@@ -6,8 +6,8 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 @Service
 class CommunityCaseTypeRule : CaseTypeRule {
 
-  private val communitySentenceCodes = setOf("SP", "NP")
+  private val communitySentenceCode = "SP"
 
   override fun isCaseType(sentenceTypeCode: String?, custodialStatusCode: String?): CaseType? =
-    if (communitySentenceCodes.contains(sentenceTypeCode)) CaseType.COMMUNITY else null
+    if (communitySentenceCode == sentenceTypeCode) CaseType.COMMUNITY else null
 }
