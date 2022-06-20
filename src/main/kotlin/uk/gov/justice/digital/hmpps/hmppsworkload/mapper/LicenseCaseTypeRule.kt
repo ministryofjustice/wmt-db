@@ -7,8 +7,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 class LicenseCaseTypeRule : CaseTypeRule {
 
   private val custodialStatusCodes = setOf("A", "C", "D", "R", "I", "AT")
-  private val custodialSentenceCodes = setOf("SC", "NC")
 
   override fun isCaseType(sentenceTypeCode: String?, custodialStatusCode: String?): CaseType? =
-    if (custodialSentenceCodes.contains(sentenceTypeCode) && !custodialStatusCodes.contains(custodialStatusCode)) CaseType.LICENSE else null
+    if ("SC" == sentenceTypeCode && !custodialStatusCodes.contains(custodialStatusCode)) CaseType.LICENSE else null
 }
