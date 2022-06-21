@@ -748,7 +748,7 @@ class EmailNotificationServiceTests {
     val requirements = emptyList<ConvictionRequirement>()
     val firstEmail = "first@email.com"
     val secondEmail = "second@email.com"
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, null, listOf(firstEmail, secondEmail))
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, "instructions", listOf(firstEmail, secondEmail))
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"

@@ -15,7 +15,8 @@ import org.mockserver.integration.ClientAndServer.startClientAndServer
 import org.mockserver.matchers.Times
 import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
-import org.mockserver.model.MediaType
+import org.mockserver.model.HttpStatusCode
+import org.mockserver.model.MediaType.APPLICATION_JSON
 import org.mockserver.model.Parameter
 import org.slf4j.event.Level
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,17 +29,22 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsAllocationMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.bankHolidayJsonResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.communityApiAssessmentResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.convictionNoSentenceResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.notFoundTierResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSearchByCrnsResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSummaryResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.oneOffenderSearchByCrnsResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveConvictionResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveInductionResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveRequirementResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveUnpaidRequirementResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleInactiveConvictionResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByCodeResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByIdResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByUserNameResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.successfulRiskPredictorResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.successfulRiskSummaryResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.teamStaffResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.EventManagerRepository
@@ -60,6 +66,7 @@ abstract class IntegrationTestBase {
   var hmppsTier: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8082)
   var offenderSearchApi: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8095)
   var bankHolidayApi: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8093)
+  var assessRisksNeedsApi: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8085)
 
   init {
     bankHolidayResponse()
@@ -124,6 +131,7 @@ abstract class IntegrationTestBase {
     hmppsTier.reset()
     offenderSearchApi.reset()
     bankHolidayApi.reset()
+    assessRisksNeedsApi.reset()
     setupOauth()
     personManagerRepository.deleteAll()
     eventManagerRepository.deleteAll()
@@ -145,6 +153,7 @@ abstract class IntegrationTestBase {
     hmppsTier.stop()
     bankHolidayApi.stop()
     offenderSearchApi.stop()
+    assessRisksNeedsApi.stop()
     personManagerRepository.deleteAll()
     eventManagerRepository.deleteAll()
     requirementManagerRepository.deleteAll()
@@ -178,12 +187,12 @@ abstract class IntegrationTestBase {
       .withPath("/bank-holidays.json")
 
     bankHolidayApi.`when`(bankHolidayRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(bankHolidayJsonResponse())
+      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(bankHolidayJsonResponse())
     )
   }
 
   fun setupOauth() {
-    val response = HttpResponse.response().withContentType(MediaType.APPLICATION_JSON)
+    val response = HttpResponse.response().withContentType(APPLICATION_JSON)
       .withBody(objectMapper.writeValueAsString(mapOf("access_token" to "ABCDE", "token_type" to "bearer")))
     oauthMock.`when`(HttpRequest.request().withPath("/auth/oauth/token")).respond(response)
   }
@@ -194,28 +203,68 @@ abstract class IntegrationTestBase {
         .withPath("/teams/$teamCode/staff")
 
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(teamStaffResponse())
+      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(teamStaffResponse())
     )
   }
 
   protected fun tierCalculationResponse(crn: String, tier: String = "B3") {
     val request = HttpRequest.request().withPath("/crn/$crn/tier")
     hmppsTier.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody("{\"tierScore\":\"${tier}\"}")
+      HttpResponse.response().withContentType(APPLICATION_JSON).withBody("{\"tierScore\":\"${tier}\"}")
+    )
+  }
+
+  protected fun riskSummaryResponse(crn: String) {
+    val request = HttpRequest.request().withPath("/risks/crn/$crn/summary")
+    assessRisksNeedsApi.`when`(request, Times.exactly(1)).respond(
+      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(successfulRiskSummaryResponse())
+    )
+  }
+
+  protected fun riskPredictorResponse(crn: String) {
+    val request = HttpRequest.request().withPath("/risks/crn/$crn/predictors/rsr/history")
+    assessRisksNeedsApi.`when`(request, Times.exactly(1)).respond(
+      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(successfulRiskPredictorResponse())
+    )
+  }
+
+  protected fun assessmentCommunityApiResponse(crn: String) {
+    val ogrsRequest =
+      HttpRequest.request().withPath("/offenders/crn/$crn/assessments")
+
+    communityApi.`when`(ogrsRequest, Times.exactly(1)).respond(
+      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(communityApiAssessmentResponse())
+    )
+  }
+  protected fun riskSummaryErrorResponse(crn: String) {
+    val request = HttpRequest.request().withPath("/risks/crn/$crn/summary")
+    assessRisksNeedsApi.`when`(request, Times.exactly(1)).respond(
+      HttpResponse.response().withStatusCode(HttpStatusCode.INTERNAL_SERVER_ERROR_500.code()).withContentType(
+        APPLICATION_JSON
+      ).withBody("{}")
     )
   }
 
   protected fun tierCalculationNotFoundResponse(crn: String) {
     val request = HttpRequest.request().withPath("/crn/$crn/tier")
     hmppsTier.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.notFoundResponse().withContentType(MediaType.APPLICATION_JSON).withBody(notFoundTierResponse())
+      HttpResponse.notFoundResponse().withContentType(APPLICATION_JSON).withBody(notFoundTierResponse())
+    )
+  }
+
+  protected fun singleActiveInductionResponse(crn: String) {
+    val inductionRequest =
+      HttpRequest.request().withPath("/offenders/crn/$crn/contact-summary/inductions")
+
+    communityApi.`when`(inductionRequest, Times.exactly(1)).respond(
+      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(singleActiveInductionResponse())
     )
   }
 
   protected fun staffIdResponse(staffId: BigInteger, staffCode: String, teamCode: String, staffGradeCode: String = "PSM") {
     val request = HttpRequest.request().withPath("/staff/staffIdentifier/$staffId")
     communityApi.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(staffByIdResponse(staffCode, staffGradeCode, teamCode))
+      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(staffByIdResponse(staffCode, staffGradeCode, teamCode))
     )
   }
 
@@ -225,7 +274,7 @@ abstract class IntegrationTestBase {
         .withPath("/offenders/crn/$crn/convictions").withQueryStringParameter(Parameter("activeOnly", "true"))
 
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(singleActiveConvictionResponse())
+      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(singleActiveConvictionResponse())
     )
   }
 
@@ -234,7 +283,7 @@ abstract class IntegrationTestBase {
       HttpRequest.request().withPath("/offenders/crn/$crn/convictions").withQueryStringParameter(Parameter("activeOnly", "true"))
 
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(convictionNoSentenceResponse())
+      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(convictionNoSentenceResponse())
     )
   }
 
@@ -243,7 +292,7 @@ abstract class IntegrationTestBase {
       HttpRequest.request().withPath("/offenders/crn/$crn/convictions").withQueryStringParameter(Parameter("activeOnly", "true"))
 
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody("[]")
+      HttpResponse.response().withContentType(APPLICATION_JSON).withBody("[]")
     )
   }
 
@@ -253,7 +302,7 @@ abstract class IntegrationTestBase {
         .withPath("/offenders/crn/$crn/convictions")
 
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(singleActiveConvictionResponse())
+      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(singleActiveConvictionResponse())
     )
   }
 
@@ -261,7 +310,7 @@ abstract class IntegrationTestBase {
     val convictionsRequest =
       HttpRequest.request().withPath("/offenders/crn/$crn/convictions")
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(singleInactiveConvictionResponse())
+      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(singleInactiveConvictionResponse())
     )
   }
 
@@ -270,7 +319,7 @@ abstract class IntegrationTestBase {
       HttpRequest.request().withPath("/offenders/crn/$crn")
 
     communityApi.`when`(summaryRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(offenderSummaryResponse())
+      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(offenderSummaryResponse())
     )
   }
 
@@ -308,21 +357,28 @@ abstract class IntegrationTestBase {
   protected fun staffCodeResponse(staffCode: String, teamCode: String) {
     val request = HttpRequest.request().withPath("/staff/staffCode/$staffCode")
     communityApi.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(staffByCodeResponse(staffCode, teamCode))
+      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(staffByCodeResponse(staffCode, teamCode))
+    )
+  }
+
+  protected fun staffUserNameResponse(userName: String) {
+    val request = HttpRequest.request().withPath("/staff/username/$userName")
+    communityApi.`when`(request, Times.exactly(1)).respond(
+      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(staffByUserNameResponse(userName))
     )
   }
 
   protected fun offenderSearchByCrnsResponse(crns: List<String>) {
     val request = HttpRequest.request().withPath("/crns").withBody(objectMapper.writeValueAsString(crns))
     offenderSearchApi.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(offenderSearchByCrnsResponse())
+      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(offenderSearchByCrnsResponse())
     )
   }
 
   protected fun oneOffenderReturnedWhenSearchByCrnsResponse(crns: List<String>) {
     val request = HttpRequest.request().withPath("/crns").withBody(objectMapper.writeValueAsString(crns))
     offenderSearchApi.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(oneOffenderSearchByCrnsResponse())
+      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(oneOffenderSearchByCrnsResponse())
     )
   }
 
@@ -331,7 +387,7 @@ abstract class IntegrationTestBase {
       HttpRequest.request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameter(Parameter("activeOnly", "true"))
 
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(singleActiveUnpaidRequirementResponse())
+      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(singleActiveUnpaidRequirementResponse())
     )
   }
 
@@ -340,7 +396,7 @@ abstract class IntegrationTestBase {
       HttpRequest.request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameter(Parameter("activeOnly", "true"))
 
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(singleActiveRequirementResponse(requirementId))
+      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(singleActiveRequirementResponse(requirementId))
     )
   }
 }

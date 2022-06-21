@@ -6,6 +6,6 @@ import java.math.BigInteger
 data class AllocateCase @JsonCreator constructor(
   val crn: String,
   val eventId: BigInteger,
-  val instructions: String? = null,
+  val instructions: String = "",
   val emailTo: List<String>? = null
 )
