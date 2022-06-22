@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Assessment
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AssessmentType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Contact
@@ -104,9 +103,9 @@ class WorkloadCalculatorTests {
     val numberOfCommunityArmAssessments = 8
     val numberOfOtherArmAssessments = 20
 
-    val licenseArmAssessments = (1..numberOfLicenseArmAssessments).map { Assessment(AssessmentType.ARMS, CaseType.LICENSE) }
-    val communityArmAssessments = (1..numberOfCommunityArmAssessments).map { Assessment(AssessmentType.ARMS, CaseType.COMMUNITY) }
-    val otherAssessments = (1..numberOfOtherArmAssessments).map { Assessment(AssessmentType.OTHER, CaseType.UNKNOWN) }
+    val licenseArmAssessments = (1..numberOfLicenseArmAssessments).map { Assessment(CaseType.LICENSE) }
+    val communityArmAssessments = (1..numberOfCommunityArmAssessments).map { Assessment(CaseType.COMMUNITY) }
+    val otherAssessments = (1..numberOfOtherArmAssessments).map { Assessment(CaseType.UNKNOWN) }
 
     val result = workloadCalculator.getWorkloadPoints(emptyList(), emptyList(), emptyList(), licenseArmAssessments + communityArmAssessments + otherAssessments, emptyList(), emptyMap(), t2aWorkloadPoints, workloadPoints)
 

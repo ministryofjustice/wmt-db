@@ -8,22 +8,19 @@ import javax.persistence.Id
 import javax.persistence.Table
 
 @Entity
-@Table(name = "court_reports", schema = "staging")
-data class WMTCourtReportsEntity(
+@Table(name = "arms", schema = "staging")
+data class WMTAssessmentEntity(
   @Id
   @Column
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   val id: Long? = null,
 
-  @Column
-  val teamCode: String,
-
-  @Column(name = "om_key")
+  @Column(name = "assessment_staff_key")
   val staffCode: String,
 
-  @Column(name = "sdr_last_30")
-  val standardDeliveryReportCount: Int? = null,
+  @Column(name = "assessment_team_key")
+  val teamCode: String,
 
-  @Column(name = "sdr_conv_last_30")
-  val fastDeliveryReportCount: Int? = null,
+  @Column
+  val sentenceType: String,
 )

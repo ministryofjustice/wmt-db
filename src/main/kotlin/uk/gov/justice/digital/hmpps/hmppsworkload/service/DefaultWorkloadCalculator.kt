@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Assessment
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AssessmentType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Contact
@@ -63,15 +62,10 @@ class DefaultWorkloadCalculator : WorkloadCalculator {
     }
 
   private fun calculateAssessmentPointsTotal(assessments: List<Assessment>, workloadPoints: WorkloadPointsEntity): BigInteger = assessments.map { assessment ->
-    when (assessment.type) {
-      AssessmentType.ARMS -> {
-        when (assessment.category) {
-          CaseType.COMMUNITY -> workloadPoints.communityARMAssessmentWeighting
-          CaseType.LICENSE -> workloadPoints.licenseARMAssessmentWeighting
-          else -> BigInteger.ZERO
-        }
-      }
-      AssessmentType.OTHER -> BigInteger.ZERO
+    when (assessment.category) {
+      CaseType.COMMUNITY -> workloadPoints.communityARMAssessmentWeighting
+      CaseType.LICENSE -> workloadPoints.licenseARMAssessmentWeighting
+      else -> BigInteger.ZERO
     }
   }.fold(BigInteger.ZERO) { first, second -> first.add(second) }
 
