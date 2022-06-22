@@ -1,3 +1,6 @@
+build:
+  maxIssues: 9
+  excludeCorrectable: false
 
 complexity:
   active: true
@@ -10,17 +13,19 @@ complexity:
   LargeClass:
     active: true
     threshold: 200
+    excludes: [ '**/test/**' ]
   LongMethod:
     active: true
     threshold: 30
     excludes: ['**/test/**']
   LongParameterList:
     active: true
-    functionThreshold: 4
+    functionThreshold: 6
     constructorThreshold: 7
     ignoreDefaultParameters: false
     ignoreDataClasses: true
     ignoreAnnotated: []
+    excludes: ['**/test/**']
   NestedBlockDepth:
     active: true
     threshold: 4
@@ -46,6 +51,8 @@ complexity:
 naming:
   EnumNaming:
     active: false
+  ConstructorParameterNaming:
+    active: false
 
 performance:
   SpreadOperator:
@@ -53,3 +60,7 @@ performance:
 
 style:
   active: false
+
+empty-blocks:
+  EmptyFunctionBlock:
+    ignoreOverridden: true

@@ -13,14 +13,18 @@ import java.util.UUID
 class LogSuccessUpdater : SuccessUpdater {
 
   override fun updatePerson(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
-    log.info("crn {} with allocationId {} updated at {}", crn, allocationId, timeUpdated)
+    logUpdate(crn, allocationId, timeUpdated)
   }
 
   override fun updateEvent(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
-    log.info("crn {} with allocationId {} updated at {}", crn, allocationId, timeUpdated)
+    logUpdate(crn, allocationId, timeUpdated)
   }
 
   override fun updateRequirement(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
+    logUpdate(crn, allocationId, timeUpdated)
+  }
+
+  private fun logUpdate(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
     log.info("crn {} with allocationId {} updated at {}", crn, allocationId, timeUpdated)
   }
 
