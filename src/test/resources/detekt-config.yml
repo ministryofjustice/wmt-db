@@ -1,5 +1,5 @@
 build:
-  maxIssues: 27
+  maxIssues: 9
   excludeCorrectable: false
 
 complexity:
@@ -20,11 +20,12 @@ complexity:
     excludes: ['**/test/**']
   LongParameterList:
     active: true
-    functionThreshold: 4
+    functionThreshold: 6
     constructorThreshold: 7
     ignoreDefaultParameters: false
     ignoreDataClasses: true
     ignoreAnnotated: []
+    excludes: ['**/test/**']
   NestedBlockDepth:
     active: true
     threshold: 4
