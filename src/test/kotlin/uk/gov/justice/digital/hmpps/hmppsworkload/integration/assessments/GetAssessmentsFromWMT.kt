@@ -46,17 +46,4 @@ class GetAssessmentsFromWMT : IntegrationTestBase() {
     val results = wmtGetAssessments.getAssessments(staffCode, teamCode)
     Assertions.assertTrue(results.isEmpty())
   }
-
-  @Test
-  fun `must return unknown assessments when sentence type is not known`() {
-    val staffCode = "STAFF1"
-    val teamCode = "TM1"
-    wmtAssessmentRepository.save(WMTAssessmentEntity(staffCode = staffCode, teamCode = teamCode, sentenceType = "A Different Sentence Type"))
-
-    val results = wmtGetAssessments.getAssessments(staffCode, teamCode)
-
-    Assertions.assertEquals(1, results.size)
-
-    Assertions.assertEquals(CaseType.UNKNOWN, results[0].category)
-  }
 }
