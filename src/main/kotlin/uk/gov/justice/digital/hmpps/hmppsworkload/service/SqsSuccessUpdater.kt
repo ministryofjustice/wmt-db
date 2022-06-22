@@ -19,6 +19,12 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
+private const val EVENT_TYPE = "eventType"
+
+private const val STRING = "String"
+
+private const val LOG_TEMPLATE = "Published event {} to topic for CRN {} and id {}"
+
 @Service
 @ConditionalOnProperty("hmpps.sqs.topics.hmmppsdomaintopic.arn")
 class SqsSuccessUpdater(
@@ -46,9 +52,9 @@ class SqsSuccessUpdater(
     )
     allocationCompleteTopic.snsClient.publish(
       PublishRequest(allocationCompleteTopic.arn, objectMapper.writeValueAsString(hmppsPersonEvent))
-        .withMessageAttributes(mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue(hmppsPersonEvent.eventType)))
+        .withMessageAttributes(mapOf(EVENT_TYPE to MessageAttributeValue().withDataType(STRING).withStringValue(hmppsPersonEvent.eventType)))
     ).also {
-      log.info("Published event {} to topic for CRN {} and id {}", hmppsPersonEvent.eventType, crn, allocationId)
+      log.info(LOG_TEMPLATE, hmppsPersonEvent.eventType, crn, allocationId)
     }
   }
 
@@ -65,9 +71,9 @@ class SqsSuccessUpdater(
     )
     allocationCompleteTopic.snsClient.publish(
       PublishRequest(allocationCompleteTopic.arn, objectMapper.writeValueAsString(hmppsEventAllocatedEvent))
-        .withMessageAttributes(mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue(hmppsEventAllocatedEvent.eventType)))
+        .withMessageAttributes(mapOf(EVENT_TYPE to MessageAttributeValue().withDataType(STRING).withStringValue(hmppsEventAllocatedEvent.eventType)))
     ).also {
-      log.info("Published event {} to topic for CRN {} and id {}", hmppsEventAllocatedEvent.eventType, crn, allocationId)
+      log.info(LOG_TEMPLATE, hmppsEventAllocatedEvent.eventType, crn, allocationId)
     }
   }
 
@@ -82,9 +88,9 @@ class SqsSuccessUpdater(
     )
     allocationCompleteTopic.snsClient.publish(
       PublishRequest(allocationCompleteTopic.arn, objectMapper.writeValueAsString(hmppsRequirementAllocatedEvent))
-        .withMessageAttributes(mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue(hmppsRequirementAllocatedEvent.eventType)))
+        .withMessageAttributes(mapOf(EVENT_TYPE to MessageAttributeValue().withDataType(STRING).withStringValue(hmppsRequirementAllocatedEvent.eventType)))
     ).also {
-      log.info("Published event {} to topic for CRN {} and id {}", hmppsRequirementAllocatedEvent.eventType, crn, allocationId)
+      log.info(LOG_TEMPLATE, hmppsRequirementAllocatedEvent.eventType, crn, allocationId)
     }
   }
 
