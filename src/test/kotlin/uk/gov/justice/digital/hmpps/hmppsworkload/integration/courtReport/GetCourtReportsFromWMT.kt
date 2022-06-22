@@ -47,7 +47,7 @@ class GetCourtReportsFromWMT : IntegrationTestBase() {
   }
 
   @Test
-  fun `get fast delivery reports from convertions in last 30 days`() {
+  fun `get fast delivery reports from conversions in last 30 days`() {
     val staffCode = "STAFF1"
     val teamCode = "TM1"
     val fastDeliveryReportCount = 10
