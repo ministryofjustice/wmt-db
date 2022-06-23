@@ -61,4 +61,54 @@ class GetContactsFromWMT : IntegrationTestBase() {
 
     Assertions.assertTrue(results.isEmpty())
   }
+
+  @Test
+  fun `must return contacts performed by other people than the person manager and outside the team`() {
+    val staffCode = "STAFF1"
+    val teamCode = "TM1"
+    val contactTypeCode = "CONTACT1"
+    wmtcmsRepository.save(WMTCMSEntity(personManagerStaffCode = staffCode, personManagerTeamCode = teamCode, staffCode = "OTHERSTAFFCODE", staffTeamCode = "TM2", contactTypeCode = contactTypeCode))
+
+    val results = wmtGetContacts.findContactsInCaseloadPerformedByOthers(staffCode, teamCode)
+
+    Assertions.assertEquals(1, results.size)
+
+    Assertions.assertEquals(contactTypeCode, results[0].typeCode)
+  }
+
+  @Test
+  fun `must return contacts performed by other people than the person manager and in the same team`() {
+    val staffCode = "STAFF1"
+    val teamCode = "TM1"
+    val contactTypeCode = "CONTACT1"
+    wmtcmsRepository.save(WMTCMSEntity(personManagerStaffCode = staffCode, personManagerTeamCode = teamCode, staffCode = "OTHERSTAFFCODE", staffTeamCode = teamCode, contactTypeCode = contactTypeCode))
+
+    val results = wmtGetContacts.findContactsInCaseloadPerformedByOthers(staffCode, teamCode)
+
+    Assertions.assertEquals(1, results.size)
+
+    Assertions.assertEquals(contactTypeCode, results[0].typeCode)
+  }
+
+  @Test
+  fun `must return empty list when no cms entries exist and getting contacts in caseload performed by others`() {
+    val staffCode = "STAFF1"
+    val teamCode = "TM1"
+
+    val results = wmtGetContacts.findContactsInCaseloadPerformedByOthers(staffCode, teamCode)
+
+    Assertions.assertTrue(results.isEmpty())
+  }
+
+  @Test
+  fun `must not return contacts in caseload performed by others if its the same person performing the contact and is the person manager`() {
+    val staffCode = "STAFF1"
+    val teamCode = "TM1"
+    val contactTypeCode = "CONTACT1"
+    wmtcmsRepository.save(WMTCMSEntity(staffCode = staffCode, staffTeamCode = teamCode, personManagerStaffCode = staffCode, personManagerTeamCode = teamCode, contactTypeCode = contactTypeCode))
+
+    val results = wmtGetContacts.findContactsInCaseloadPerformedByOthers(staffCode, teamCode)
+
+    Assertions.assertTrue(results.isEmpty())
+  }
 }

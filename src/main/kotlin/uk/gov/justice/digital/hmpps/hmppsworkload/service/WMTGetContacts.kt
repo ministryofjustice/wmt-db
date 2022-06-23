@@ -11,7 +11,7 @@ class WMTGetContacts(private val wmtcmsRepository: WMTCMSRepository) : GetContac
     wmtcmsRepository.findByStaffTeamCodeAndStaffCodeAndPersonManagerStaffCodeNot(teamCode, staffCode, staffCode)
       .map { Contact(it.contactTypeCode) }
 
-  override fun findContactsInCaseloadPerformedByOthers(staffCode: String, teamCode: String): List<Contact> {
-    TODO("Not yet implemented")
-  }
+  override fun findContactsInCaseloadPerformedByOthers(staffCode: String, teamCode: String): List<Contact> =
+    wmtcmsRepository.findByPersonManagerTeamCodeAndPersonManagerStaffCodeAndStaffCodeNot(teamCode, staffCode, staffCode)
+      .map { Contact(it.contactTypeCode) }
 }

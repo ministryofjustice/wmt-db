@@ -6,5 +6,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTCMSEntity
 
 @Repository
 interface WMTCMSRepository : CrudRepository<WMTCMSEntity, Long> {
-  fun findByStaffTeamCodeAndStaffCodeAndPersonManagerStaffCodeNot(StaffTeamCode: String, staffCode: String, personManagerStaffCode: String): List<WMTCMSEntity>
+  fun findByStaffTeamCodeAndStaffCodeAndPersonManagerStaffCodeNot(staffTeamCode: String, staffCode: String, personManagerStaffCode: String): List<WMTCMSEntity>
+
+  fun findByPersonManagerTeamCodeAndPersonManagerStaffCodeAndStaffCodeNot(personManagerTeamCode: String, personManagerStaffCode: String, staffCode: String): List<WMTCMSEntity>
 }
