@@ -44,4 +44,14 @@ class GetParoleReportsFromWMT : IntegrationTestBase() {
 
     Assertions.assertEquals(0, results)
   }
+
+  @Test
+  fun `must handle no data`() {
+    val staffCode = "STAFF1"
+    val teamCode = "TM1"
+
+    val results = getParoleReports.getParoleReports(staffCode, teamCode)
+
+    Assertions.assertEquals(0, results)
+  }
 }
