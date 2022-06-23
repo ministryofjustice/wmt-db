@@ -61,7 +61,7 @@ data class WorkloadPointsEntity(
   val fastCourtReportPoints: BigInteger,
 
   @Column(name = "parom")
-  val paroleReportWeighting: BigInteger,
+  val paroleReportWeighting: Int,
 
   @Column(name = "paroms_enabled")
   val paroleReportWeightingEnabled: Boolean,
