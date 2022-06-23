@@ -28,7 +28,7 @@ class WorkloadCalculatorTests {
     val numberOfCases = 5
     val t2aCases = (1..numberOfT2aCases).map { Case(Tier.B2, CaseType.COMMUNITY, true, "CRNCOM$it") }
     val cases = (1..numberOfCases).map { Case(Tier.C1, CaseType.CUSTODY, false, "CRNCUST$it") }
-    val result = workloadCalculator.getWorkloadPoints(t2aCases + cases, emptyList(), 0, emptyList(), emptyList(), emptyMap(), t2aWorkloadPoints, workloadPoints)
+    val result = workloadCalculator.getWorkloadPoints(t2aCases + cases, emptyList(), 0, emptyList(), emptyList(), emptyList(), emptyMap(), t2aWorkloadPoints, workloadPoints)
     val t2aExpectedWorkloadPoints = t2aWorkloadPoints.communityTierPoints.B2Points.multiply(numberOfT2aCases.toBigInteger())
     val casesExpectedWorkloadPoints = workloadPoints.custodyTierPoints.C1Points.multiply(numberOfCases.toBigInteger())
     Assertions.assertEquals(t2aExpectedWorkloadPoints.add(casesExpectedWorkloadPoints), result)
@@ -45,7 +45,7 @@ class WorkloadCalculatorTests {
     val standardCourtReports = (1..numberOfStandardCourtReports).map { CourtReport(CourtReportType.STANDARD) }
     val fastCourtReports = (1..numberOfFastCourtReports).map { CourtReport(CourtReportType.FAST) }
 
-    val result = workloadCalculator.getWorkloadPoints(emptyList(), standardCourtReports + fastCourtReports, 0, emptyList(), emptyList(), emptyMap(), t2aWorkloadPoints, workloadPoints)
+    val result = workloadCalculator.getWorkloadPoints(emptyList(), standardCourtReports + fastCourtReports, 0, emptyList(), emptyList(), emptyList(), emptyMap(), t2aWorkloadPoints, workloadPoints)
 
     val expectedStandardCourtReportPoints = standardCourtReportWeighting.multiply(numberOfStandardCourtReports.toBigInteger())
     val expectedFastCourtReportPoints = fastCourtReportWeighting.multiply(numberOfFastCourtReports.toBigInteger())
@@ -62,7 +62,7 @@ class WorkloadCalculatorTests {
 
     val numberOfParoleReports = 15
 
-    val result = workloadCalculator.getWorkloadPoints(emptyList(), emptyList(), numberOfParoleReports, emptyList(), emptyList(), emptyMap(), t2aWorkloadPoints, workloadPoints)
+    val result = workloadCalculator.getWorkloadPoints(emptyList(), emptyList(), numberOfParoleReports, emptyList(), emptyList(), emptyList(), emptyMap(), t2aWorkloadPoints, workloadPoints)
 
     Assertions.assertEquals((paroleReportWeighting * numberOfParoleReports).toBigInteger(), result)
   }
@@ -76,7 +76,7 @@ class WorkloadCalculatorTests {
 
     val numberOfParoleReports = 15
 
-    val result = workloadCalculator.getWorkloadPoints(emptyList(), emptyList(), numberOfParoleReports, emptyList(), emptyList(), emptyMap(), t2aWorkloadPoints, workloadPoints)
+    val result = workloadCalculator.getWorkloadPoints(emptyList(), emptyList(), numberOfParoleReports, emptyList(), emptyList(), emptyList(), emptyMap(), t2aWorkloadPoints, workloadPoints)
 
     Assertions.assertEquals(BigInteger.ZERO, result)
   }
@@ -97,7 +97,7 @@ class WorkloadCalculatorTests {
     val communityArmAssessments = (1..numberOfCommunityArmAssessments).map { Assessment(CaseType.COMMUNITY) }
     val otherAssessments = (1..numberOfOtherArmAssessments).map { Assessment(CaseType.UNKNOWN) }
 
-    val result = workloadCalculator.getWorkloadPoints(emptyList(), emptyList(), 0, licenseArmAssessments + communityArmAssessments + otherAssessments, emptyList(), emptyMap(), t2aWorkloadPoints, workloadPoints)
+    val result = workloadCalculator.getWorkloadPoints(emptyList(), emptyList(), 0, licenseArmAssessments + communityArmAssessments + otherAssessments, emptyList(), emptyList(), emptyMap(), t2aWorkloadPoints, workloadPoints)
 
     val expectedLicensePointsTotal = licenseARMAssessmentWeighting.multiply(numberOfLicenseArmAssessments.toBigInteger())
     val expectedCommunityPointsTotal = communityARMAssessmentWeighting.multiply(numberOfCommunityArmAssessments.toBigInteger())
@@ -115,10 +115,10 @@ class WorkloadCalculatorTests {
     val t2aWorkloadPoints = mockWorkloadPoints(isT2A = true)
     val workloadPoints = mockWorkloadPoints(isT2A = false)
 
-    val contactOneContacts = (1..numberOfContactOneContacts).map { Contact("CRNONE$it", "CONTACT1") }
-    val contactTwoContacts = (1..numberOfContactTwoContacts).map { Contact("CRNTWO$it", "CONTACT2") }
+    val contactOneContacts = (1..numberOfContactOneContacts).map { Contact("CONTACT1") }
+    val contactTwoContacts = (1..numberOfContactTwoContacts).map { Contact("CONTACT2") }
 
-    val result = workloadCalculator.getWorkloadPoints(emptyList(), emptyList(), 0, emptyList(), contactOneContacts + contactTwoContacts, contactReasonWeightings, t2aWorkloadPoints, workloadPoints)
+    val result = workloadCalculator.getWorkloadPoints(emptyList(), emptyList(), 0, emptyList(), contactOneContacts + contactTwoContacts, emptyList(), contactReasonWeightings, t2aWorkloadPoints, workloadPoints)
 
     val expectedContactOnePointsTotal = contactReasonWeightings["CONTACT1"]!!.multiply(numberOfContactOneContacts.toBigInteger())
     val expectedContactTwoPointsTotal = contactReasonWeightings["CONTACT2"]!!.multiply(numberOfContactTwoContacts.toBigInteger())
@@ -133,28 +133,26 @@ class WorkloadCalculatorTests {
     val t2aWorkloadPoints = mockWorkloadPoints(isT2A = true)
     val workloadPoints = mockWorkloadPoints(isT2A = false)
 
-    val unknownContacts = (1..5).map { Contact("CRNUNKNOWN$it", "ANUNKNOWNCONTACTTYPE") }
+    val unknownContacts = (1..5).map { Contact("ANUNKNOWNCONTACTTYPE") }
 
-    val result = workloadCalculator.getWorkloadPoints(emptyList(), emptyList(), 0, emptyList(), unknownContacts, contactReasonWeightings, t2aWorkloadPoints, workloadPoints)
+    val result = workloadCalculator.getWorkloadPoints(emptyList(), emptyList(), 0, emptyList(), unknownContacts, emptyList(), contactReasonWeightings, t2aWorkloadPoints, workloadPoints)
 
     Assertions.assertEquals(BigInteger.ZERO, result)
   }
 
   @Test
-  fun `contacts which occur within case management must not be counted`() {
-    val managedCrn = "CRN1111"
+  fun `contacts which occur within case management by others must be negative`() {
+
     val contactReasonWeightings = mapOf("CONTACT1" to BigInteger.TEN, "CONTACT2" to BigInteger.TWO)
 
     val t2aWorkloadPoints = mockWorkloadPoints(isT2A = true)
     val workloadPoints = mockWorkloadPoints(isT2A = false)
 
-    val cases = listOf(Case(Tier.B2, CaseType.COMMUNITY, false, managedCrn))
+    val contacts = listOf(Contact("CONTACT1"), Contact("CONTACT2"))
 
-    val contacts = listOf(Contact(managedCrn, "CONTACT1"), Contact(managedCrn, "CONTACT2"))
+    val result = workloadCalculator.getWorkloadPoints(emptyList(), emptyList(), 0, emptyList(), emptyList(), contacts, contactReasonWeightings, t2aWorkloadPoints, workloadPoints)
 
-    val result = workloadCalculator.getWorkloadPoints(cases, emptyList(), 0, emptyList(), contacts, contactReasonWeightings, t2aWorkloadPoints, workloadPoints)
-
-    Assertions.assertEquals(workloadPoints.communityTierPoints.B2Points, result)
+    Assertions.assertEquals(BigInteger.valueOf(12).negate(), result)
   }
 
   private fun mockWorkloadPoints(

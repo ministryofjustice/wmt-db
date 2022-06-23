@@ -15,7 +15,8 @@ class DefaultWorkloadCalculator : WorkloadCalculator {
     courtReports: List<CourtReport>,
     paroleReports: Int,
     assessments: List<Assessment>,
-    contacts: List<Contact>,
+    contactsPerformedOutsideCaseload: List<Contact>,
+    contactsPerformedByOthers: List<Contact>,
     contactTypeWeightings: Map<String, BigInteger>,
     t2aWorkloadPoints: WorkloadPointsEntity,
     workloadPoints: WorkloadPointsEntity
@@ -25,9 +26,9 @@ class DefaultWorkloadCalculator : WorkloadCalculator {
     val courtReportTotal = calculateCourtReportPointsTotal(courtReports, workloadPoints)
     val paroleReportTotal = calculateParoleReportPointsTotal(paroleReports, workloadPoints)
     val assessmentTotal = calculateAssessmentPointsTotal(assessments, workloadPoints)
-    val contactTotal = calculateContactPointsTotal(contacts, contactTypeWeightings, cases.map { it.crn }.toSet())
-
-    return casePointTotal.add(courtReportTotal).add(paroleReportTotal.toBigInteger()).add(assessmentTotal).add(contactTotal)
+    val contactPerformedOutsideCaseloadTotal = sumContacts(contactsPerformedOutsideCaseload, contactTypeWeightings)
+    val contactsPerformedByOthersTotal = sumContacts(contactsPerformedByOthers, contactTypeWeightings).negate()
+    return casePointTotal.add(courtReportTotal).add(paroleReportTotal.toBigInteger()).add(assessmentTotal).add(contactPerformedOutsideCaseloadTotal).add(contactsPerformedByOthersTotal)
   }
 
   private fun calculateCaseTierPointsTotal(cases: List<Case>, t2aWorkloadPoints: WorkloadPointsEntity, workloadPoints: WorkloadPointsEntity): BigInteger = cases.map { case ->
@@ -59,11 +60,8 @@ class DefaultWorkloadCalculator : WorkloadCalculator {
     }
   }.fold(BigInteger.ZERO) { first, second -> first.add(second) }
 
-  private fun calculateContactPointsTotal(contacts: List<Contact>, contactTypeWeightings: Map<String, BigInteger>, managedCrns: Set<String>): BigInteger = contacts.map { contact ->
-    if (managedCrns.contains(contact.crn)) {
-      BigInteger.ZERO
-    } else {
+  private fun sumContacts(contacts: List<Contact>, contactTypeWeightings: Map<String, BigInteger>): BigInteger = contacts
+    .map { contact ->
       contactTypeWeightings.getOrDefault(contact.typeCode, BigInteger.ZERO)
-    }
-  }.fold(BigInteger.ZERO) { first, second -> first.add(second) }
+    }.fold(BigInteger.ZERO) { first, second -> first.add(second) }
 }
