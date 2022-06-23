@@ -22,5 +22,5 @@ data class WMTInstitutionalReportEntity(
   val teamCode: String,
 
   @Column(name = "parom_comp_last_30")
-  val paroleReports: Int = 0,
+  val paroleReports: Int? = 0,
 )

@@ -6,5 +6,5 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTInstitutionalRep
 
 @Repository
 interface WMTInstitutionalReportRepository : CrudRepository<WMTInstitutionalReportEntity, Long> {
-  fun findByTeamCodeAndStaffCode(teamCode: String, staffCode: String): List<WMTInstitutionalReportEntity>
+  fun findFirstByTeamCodeAndStaffCode(teamCode: String, staffCode: String): WMTInstitutionalReportEntity?
 }

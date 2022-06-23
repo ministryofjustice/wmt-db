@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration.institutionalRepo
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.InstitutionalReportType.PAROLE_REPORT
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTInstitutionalReportEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.WMTGetInstitutionalReports
@@ -21,8 +20,28 @@ class GetInstitutionalReportsFromWMT : IntegrationTestBase() {
 
     val results = getInstitutionalReports.getInstitutionalReports(staffCode, teamCode)
 
-    Assertions.assertEquals(1, results.size)
+    Assertions.assertEquals(1, results)
+  }
 
-    Assertions.assertEquals(PAROLE_REPORT, results[0].type)
+  @Test
+  fun `must return multiple parole reports`() {
+    val staffCode = "STAFF1"
+    val teamCode = "TM1"
+    wmtInstitutionalReportRepository.save(WMTInstitutionalReportEntity(staffCode = staffCode, teamCode = teamCode, paroleReports = 3))
+
+    val results = getInstitutionalReports.getInstitutionalReports(staffCode, teamCode)
+
+    Assertions.assertEquals(3, results)
+  }
+
+  @Test
+  fun `must handle null`() {
+    val staffCode = "STAFF1"
+    val teamCode = "TM1"
+    wmtInstitutionalReportRepository.save(WMTInstitutionalReportEntity(staffCode = staffCode, teamCode = teamCode, paroleReports = null))
+
+    val results = getInstitutionalReports.getInstitutionalReports(staffCode, teamCode)
+
+    Assertions.assertEquals(0, results)
   }
 }
