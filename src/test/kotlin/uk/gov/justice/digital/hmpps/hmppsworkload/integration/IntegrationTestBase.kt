@@ -53,6 +53,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.RequirementMana
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.SentenceRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTAssessmentRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTCourtReportsRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTInstitutionalReportRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.listener.HmppsOffenderEvent
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
@@ -105,6 +106,9 @@ abstract class IntegrationTestBase {
   @Autowired
   protected lateinit var wmtAssessmentRepository: WMTAssessmentRepository
 
+  @Autowired
+  protected lateinit var wmtInstitutionalReportRepository: WMTInstitutionalReportRepository
+
   @Qualifier("hmppsallocationcompletequeue-sqs-client")
   @Autowired
   lateinit var allocationCompleteClient: AmazonSQSAsync
@@ -148,6 +152,7 @@ abstract class IntegrationTestBase {
     caseDetailsRepository.deleteAll()
     wmtCourtReportsRepository.deleteAll()
     wmtAssessmentRepository.deleteAll()
+    wmtInstitutionalReportRepository.deleteAll()
     allocationCompleteClient.purgeQueue(PurgeQueueRequest(allocationCompleteUrl))
     hmppsOffenderSqsClient.purgeQueue(PurgeQueueRequest(hmppsOffenderQueue.queueUrl))
     hmppsOffenderSqsDlqClient.purgeQueue(PurgeQueueRequest(hmppsOffenderQueue.dlqUrl))

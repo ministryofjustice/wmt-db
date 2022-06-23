@@ -4,7 +4,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Assessment
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Contact
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CourtReport
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.InstitutionalReport
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadPointsEntity
 import java.math.BigInteger
 
@@ -13,7 +12,7 @@ interface WorkloadCalculator {
   fun getWorkloadPoints(
     cases: List<Case>,
     courtReports: List<CourtReport>,
-    institutionalReports: List<InstitutionalReport>,
+    paroleReports: Int,
     assessments: List<Assessment>,
     contacts: List<Contact>,
     contactTypeWeightings: Map<String, BigInteger>,
