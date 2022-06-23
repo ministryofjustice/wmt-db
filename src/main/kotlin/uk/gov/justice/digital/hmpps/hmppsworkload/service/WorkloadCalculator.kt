@@ -12,7 +12,7 @@ interface WorkloadCalculator {
   fun getWorkloadPoints(
     cases: List<Case>,
     courtReports: List<CourtReport>,
-    institutionalReports: Int,
+    paroleReports: Int,
     assessments: List<Assessment>,
     contacts: List<Contact>,
     contactTypeWeightings: Map<String, BigInteger>,

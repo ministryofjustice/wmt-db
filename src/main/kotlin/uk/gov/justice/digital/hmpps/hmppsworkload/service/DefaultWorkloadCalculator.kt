@@ -13,7 +13,7 @@ class DefaultWorkloadCalculator : WorkloadCalculator {
   override fun getWorkloadPoints(
     cases: List<Case>,
     courtReports: List<CourtReport>,
-    institutionalReports: Int,
+    paroleReports: Int,
     assessments: List<Assessment>,
     contacts: List<Contact>,
     contactTypeWeightings: Map<String, BigInteger>,
@@ -23,11 +23,11 @@ class DefaultWorkloadCalculator : WorkloadCalculator {
 
     val casePointTotal = calculateCaseTierPointsTotal(cases, t2aWorkloadPoints, workloadPoints)
     val courtReportTotal = calculateCourtReportPointsTotal(courtReports, workloadPoints)
-    val institutionalReportTotal = calculateInstitutionalReportPointsTotal(institutionalReports, workloadPoints)
+    val paroleReportTotal = calculateParoleReportPointsTotal(paroleReports, workloadPoints)
     val assessmentTotal = calculateAssessmentPointsTotal(assessments, workloadPoints)
     val contactTotal = calculateContactPointsTotal(contacts, contactTypeWeightings, cases.map { it.crn }.toSet())
 
-    return casePointTotal.add(courtReportTotal).add(institutionalReportTotal.toBigInteger()).add(assessmentTotal).add(contactTotal)
+    return casePointTotal.add(courtReportTotal).add(paroleReportTotal.toBigInteger()).add(assessmentTotal).add(contactTotal)
   }
 
   private fun calculateCaseTierPointsTotal(cases: List<Case>, t2aWorkloadPoints: WorkloadPointsEntity, workloadPoints: WorkloadPointsEntity): BigInteger = cases.map { case ->
@@ -46,9 +46,9 @@ class DefaultWorkloadCalculator : WorkloadCalculator {
     }
   }.fold(BigInteger.ZERO) { first, second -> first.add(second) }
 
-  private fun calculateInstitutionalReportPointsTotal(institutionalReports: Int, workloadPoints: WorkloadPointsEntity): Int =
+  private fun calculateParoleReportPointsTotal(paroleReports: Int, workloadPoints: WorkloadPointsEntity): Int =
     if (workloadPoints.paroleReportWeightingEnabled)
-      institutionalReports * workloadPoints.paroleReportWeighting
+      paroleReports * workloadPoints.paroleReportWeighting
     else 0
 
   private fun calculateAssessmentPointsTotal(assessments: List<Assessment>, workloadPoints: WorkloadPointsEntity): BigInteger = assessments.map { assessment ->

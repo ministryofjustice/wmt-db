@@ -5,12 +5,12 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTInstitutionalReportEntity
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.WMTGetInstitutionalReports
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.WMTGetParoleReports
 
-class GetInstitutionalReportsFromWMT : IntegrationTestBase() {
+class GetParoleReportsFromWMT : IntegrationTestBase() {
 
   @Autowired
-  lateinit var getInstitutionalReports: WMTGetInstitutionalReports
+  lateinit var getParoleReports: WMTGetParoleReports
 
   @Test
   fun `must return parole reports`() {
@@ -18,7 +18,7 @@ class GetInstitutionalReportsFromWMT : IntegrationTestBase() {
     val teamCode = "TM1"
     wmtInstitutionalReportRepository.save(WMTInstitutionalReportEntity(staffCode = staffCode, teamCode = teamCode, paroleReports = 1))
 
-    val results = getInstitutionalReports.getInstitutionalReports(staffCode, teamCode)
+    val results = getParoleReports.getParoleReports(staffCode, teamCode)
 
     Assertions.assertEquals(1, results)
   }
@@ -29,7 +29,7 @@ class GetInstitutionalReportsFromWMT : IntegrationTestBase() {
     val teamCode = "TM1"
     wmtInstitutionalReportRepository.save(WMTInstitutionalReportEntity(staffCode = staffCode, teamCode = teamCode, paroleReports = 3))
 
-    val results = getInstitutionalReports.getInstitutionalReports(staffCode, teamCode)
+    val results = getParoleReports.getParoleReports(staffCode, teamCode)
 
     Assertions.assertEquals(3, results)
   }
@@ -40,7 +40,7 @@ class GetInstitutionalReportsFromWMT : IntegrationTestBase() {
     val teamCode = "TM1"
     wmtInstitutionalReportRepository.save(WMTInstitutionalReportEntity(staffCode = staffCode, teamCode = teamCode, paroleReports = null))
 
-    val results = getInstitutionalReports.getInstitutionalReports(staffCode, teamCode)
+    val results = getParoleReports.getParoleReports(staffCode, teamCode)
 
     Assertions.assertEquals(0, results)
   }
