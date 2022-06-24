@@ -5,6 +5,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBas
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.SentenceEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTWorkloadOwnerEntity
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.LocalDate
@@ -41,6 +42,14 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
       )
     )
 
+    val team = teamRepository.findByCode("T1")
+
+    val offenderManager = offenderManagerRepository.findByCode("OM1")
+
+    val secondWorkloadOwner = WMTWorkloadOwnerEntity(team = team, offenderManager = offenderManager, contractedHours = BigDecimal.valueOf(5))
+
+    wmtWorkloadOwnerRepository.save(secondWorkloadOwner)
+
     webTestClient.get()
       .uri("/team/T1/offenderManagers/OM1")
       .headers {
@@ -65,7 +74,7 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
       .jsonPath("$.totalCases")
       .isEqualTo(35)
       .jsonPath("$.weeklyHours")
-      .isEqualTo(15)
+      .isEqualTo(secondWorkloadOwner.contractedHours)
       .jsonPath("$.totalReductionHours")
       .isEqualTo(reduction.hours)
       .jsonPath("$.pointsAvailable")
