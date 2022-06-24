@@ -12,9 +12,9 @@ class GetWeeklyHours(private val wmtWorkloadOwnerRepository: WMTWorkloadOwnerRep
   fun findWeeklyHours(teamCode: String, staffCode: String, staffGrade: String): BigDecimal = wmtWorkloadOwnerRepository.findByTeamCodeAndOffenderManagerCode(teamCode, staffCode)?.contractedHours
     ?: getDefaultWeeklyHoursForGrade(staffGrade)
 
-  fun getDefaultWeeklyHoursForGrade(staffGrade: String): BigDecimal = getDefaultContractedHours(workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false), staffGrade)
+  private fun getDefaultWeeklyHoursForGrade(staffGrade: String): BigDecimal = getDefaultContractedHours(workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false), staffGrade)
 
-  fun getDefaultContractedHours(workloadPoints: WorkloadPointsEntity, grade: String): BigDecimal {
+  private fun getDefaultContractedHours(workloadPoints: WorkloadPointsEntity, grade: String): BigDecimal {
     return when (grade) {
       "PO", "PQiP" -> workloadPoints.defaultContractedHoursPO
       "PSO" -> workloadPoints.defaultContractedHoursPSO

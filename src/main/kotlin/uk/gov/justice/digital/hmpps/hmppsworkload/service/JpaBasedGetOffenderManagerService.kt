@@ -16,16 +16,11 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadPointsEntit
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.OffenderManagerRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.SentenceRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadPointsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.GradeMapper
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.time.Instant
 import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
 
 @Service
 class JpaBasedGetOffenderManagerService(
@@ -37,7 +32,7 @@ class JpaBasedGetOffenderManagerService(
   private val gradeMapper: GradeMapper,
   private val workloadPointsRepository: WorkloadPointsRepository,
   private val offenderSearchApiClient: OffenderSearchApiClient,
-  private val sentenceRepository: SentenceRepository,
+  private val getSentenceService: GetSentenceService,
   private val caseDetailsRepository: CaseDetailsRepository,
   private val getWeeklyHours: GetWeeklyHours
 ) : GetOffenderManagerService {
@@ -74,24 +69,25 @@ class JpaBasedGetOffenderManagerService(
         it.grade = gradeMapper.workloadToStaffGrade(it.grade)
         it
       } ?: run {
-        val team = staff.teams?.first { team -> team.code == teamCode }
+        val team = staff.teams!!.first { team -> team.code == teamCode }
         getDefaultOffenderManagerOverview(
           staff.staff.forenames,
           staff.staff.surname,
           gradeMapper.deliusToStaffGrade(staff.staffGrade?.code),
           staff.staffCode,
-          team!!.description
+          team.description,
+          teamCode
         )
       }
       overview.potentialCapacity = capacityCalculator.calculate(overview.totalPoints, overview.availablePoints)
       overview
     }
 
-  fun getDefaultOffenderManagerOverview(forename: String, surname: String, grade: String, staffCode: String, teamName: String): OffenderManagerOverview {
+  fun getDefaultOffenderManagerOverview(forename: String, surname: String, grade: String, staffCode: String, teamName: String, teamCode: String): OffenderManagerOverview {
     val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
     val defaultAvailablePointsForGrade = getDefaultPointsAvailable(workloadPoints, grade)
 
-    val defaultContractedHours = getWeeklyHours.getDefaultContractedHours(workloadPoints, grade)
+    val defaultContractedHours = getWeeklyHours.findWeeklyHours(teamCode, staffCode, grade)
     val availablePoints = capacityCalculator.calculateAvailablePoints(
       defaultAvailablePointsForGrade, defaultContractedHours,
       BigDecimal.ZERO, defaultContractedHours
@@ -118,39 +114,23 @@ class JpaBasedGetOffenderManagerService(
       it.tierCaseTotals = totals.map { total -> TierCaseTotals(total.getATotal(), total.getBTotal(), total.getCTotal(), total.getDTotal(), total.untiered) }
         .fold(TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)) { first, second -> TierCaseTotals(first.A.add(second.A), first.B.add(second.B), first.C.add(second.C), first.D.add(second.D), first.untiered.add(second.untiered)) }
     }
-
     offenderManagerRepository.findCasesByTeamCodeAndStaffCode(teamCode, offenderManagerCode).let { cases ->
       val crns = cases.map { case -> case.crn }
-      val dueEndDate = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS).plusDays(28L)
-      sentenceRepository.findByCrnInAndExpectedEndDateGreaterThanEqualAndTerminatedDateIsNull(crns, ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS)).let { sentences ->
-        val casesDueToEnd = sentences
-          .groupBy { sentence -> sentence.crn }
-          .mapValues { sentence -> sentence.value.maxOf { it.expectedEndDate } }
-          .filter { sentence -> sentence.value.isEqual(dueEndDate) || !sentence.value.isAfter(dueEndDate) }
-          .count()
-        it.caseEndDue = casesDueToEnd.toBigInteger()
-      }
-      sentenceRepository.findByCrnInAndExpectedReleaseDateGreaterThanEqualAndTerminatedDateIsNull(crns, ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS)).let { sentences ->
-        val releasesDueToEnd = sentences
-          .groupBy { sentence -> sentence.crn }
-          .mapValues { sentence -> sentence.value.maxOf { it.expectedReleaseDate ?: ZonedDateTime.ofInstant(Instant.EPOCH, ZoneId.systemDefault()) } }
-          .filter { sentence -> sentence.value.isEqual(dueEndDate) || !sentence.value.isAfter(dueEndDate) }
-          .count()
-        it.releasesDue = releasesDueToEnd.toBigInteger()
-      }
+      it.caseEndDue = getSentenceService.getCasesDueToEndCount(crns)
+      it.releasesDue = getSentenceService.getCasesDueToBeReleases(crns)
     }
-
     return it
   } ?: run {
     communityApiClient.getStaffByCode(offenderManagerCode)
       .map { staff ->
-        val team = staff.teams?.first { team -> team.code == teamCode }
+        val team = staff.teams!!.first { team -> team.code == teamCode }
         getDefaultOffenderManagerOverview(
           staff.staff.forenames,
           staff.staff.surname,
           gradeMapper.deliusToStaffGrade(staff.staffGrade?.code),
           staff.staffCode,
-          team!!.description
+          team.description,
+          teamCode
         )
       }.block()
   }
