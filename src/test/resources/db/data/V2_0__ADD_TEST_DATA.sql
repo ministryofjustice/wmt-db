@@ -3,7 +3,7 @@ INSERT INTO app.region(code, description) VALUES ('R1', 'Test Region');
 INSERT INTO app.ldu(code, description, region_id) VALUES ('L1', 'Test LDU', (select max(id) from app.region));
 INSERT INTO app.team(code, description, ldu_id) VALUES ('T1', 'Test Team', (select max(id) from app.ldu));
 INSERT INTO app.offender_manager("key", forename, surname, type_id) VALUES('OM1', 'Ben', 'Doe', 1);
-INSERT INTO app.workload_owner(offender_manager_id,contracted_hours,team_id) VALUES ((select max(id) from app.offender_manager), 37, (select max(id) from app.team));
+INSERT INTO app.workload_owner(offender_manager_id,contracted_hours,team_id) VALUES ((select max(id) from app.offender_manager), 15, (select max(id) from app.team));
 INSERT INTO app.workload_report (status, status_description) VALUES ('COMPLETE', 'COMPLETE');
 
 
