@@ -29,7 +29,12 @@ class GetReductionService(private val reductionsRepository: ReductionsRepository
       .minByOrNull { it }
   }
 
-  fun findReductionHours(workloadOwnerId: Long): BigDecimal = reductionsRepository.findByWorkloadOwnerIdAndEffectiveFromLessThanAndEffectiveToGreaterThan(workloadOwnerId, ZonedDateTime.now(), ZonedDateTime.now())
+  fun findReductionHours(workloadOwnerId: Long): BigDecimal = reductionsRepository.findByWorkloadOwnerIdAndEffectiveFromLessThanAndEffectiveToGreaterThanAndStatusNotIn(
+    workloadOwnerId, ZonedDateTime.now(), ZonedDateTime.now(),
+    listOf(
+      ReductionStatus.ARCHIVED, ReductionStatus.DELETED
+    )
+  )
     .map { it.hours }
     .fold(BigDecimal.ZERO) { first, second -> first.add(second) }.stripTrailingZeros()
 }
