@@ -29,18 +29,12 @@ data class ReductionEntity(
   val effectiveFrom: ZonedDateTime,
 
   @Column(name = "effective_to")
-  val effectiveTo: ZonedDateTime?,
+  val effectiveTo: ZonedDateTime? = null,
 
   @Column(name = "status")
   @Enumerated(EnumType.STRING)
   val status: ReductionStatus,
 
   @Column(name = "reduction_reason_id")
-  val reductionReasonId: Long,
-
-  @Column(name = "updated_date")
-  val updatedDate: ZonedDateTime,
-
-  @Column(name = "user_id")
-  val userId: Long?
+  val reductionReasonId: Long
 )

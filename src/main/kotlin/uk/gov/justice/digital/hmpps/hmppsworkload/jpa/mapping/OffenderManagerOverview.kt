@@ -10,13 +10,13 @@ data class OffenderManagerOverview(
   val forename: String,
   val surname: String,
   var grade: String,
-  val totalCommunityCases: BigDecimal,
-  val totalCustodyCases: BigDecimal,
+  val totalCommunityCases: Int,
+  val totalCustodyCases: Int,
   val availablePoints: BigInteger,
   val totalPoints: BigInteger,
   val code: String,
   val teamName: String,
-  val reductionHours: BigDecimal,
+
   val contractedHours: BigDecimal,
   val lastUpdatedOn: LocalDateTime?,
   val workloadOwnerId: Long,
@@ -25,6 +25,7 @@ data class OffenderManagerOverview(
   var capacity: BigDecimal = BigDecimal.ZERO
   var potentialCapacity: BigDecimal? = null
   var nextReductionChange: ZonedDateTime? = null
+  var reductionHours: BigDecimal = BigDecimal.ZERO
   var tierCaseTotals: TierCaseTotals = TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)
   var caseEndDue = BigInteger.ZERO
   var releasesDue = BigInteger.ZERO

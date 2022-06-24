@@ -22,7 +22,7 @@ data class OffenderManagerOverview @JsonCreator constructor(
   @Schema(description = "Team Name", example = "Team Name")
   val teamName: String,
   @Schema(description = "Probation Practitioner total cases", example = "25")
-  val totalCases: BigDecimal,
+  val totalCases: Int,
   @Schema(description = "Probation Practitioner Contracted hours per week", example = "37")
   val weeklyHours: BigDecimal,
   @Schema(description = "Probation Practitioner total Reduction hours per week", example = "10")

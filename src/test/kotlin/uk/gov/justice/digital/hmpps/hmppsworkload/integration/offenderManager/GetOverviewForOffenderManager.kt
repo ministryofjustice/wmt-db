@@ -2,11 +2,12 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration.offenderManager
 
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.SentenceEntity
+import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -20,6 +21,16 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
     sentenceRepository.save(sentenceWithin30Days)
     val sentenceAfter30Days = SentenceEntity(null, BigInteger.ONE, "CRN2222", ZonedDateTime.now().minusMonths(2L), ZonedDateTime.now().plusDays(45L), null, "SC", ZonedDateTime.now().plusDays(15L))
     sentenceRepository.save(sentenceAfter30Days)
+
+    val reduction = ReductionEntity(
+      workloadOwnerId = 1, hours = BigDecimal.valueOf(5),
+      effectiveFrom = LocalDate.now().minusDays(2).atStartOfDay(
+        ZoneId.systemDefault()
+      ),
+      effectiveTo = LocalDate.now().plusDays(2).atStartOfDay(ZoneId.systemDefault()), status = ReductionStatus.ACTIVE, reductionReasonId = 1
+    )
+    reductionsRepository.save(reduction)
+
     webTestClient.get()
       .uri("/team/T1/offenderManagers/OM1")
       .headers {
@@ -46,7 +57,7 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
       .jsonPath("$.weeklyHours")
       .isEqualTo(37)
       .jsonPath("$.totalReductionHours")
-      .isEqualTo(10)
+      .isEqualTo(reduction.hours)
       .jsonPath("$.pointsAvailable")
       .isEqualTo(1000)
       .jsonPath("$.pointsUsed")
@@ -57,11 +68,9 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
       .isEqualTo("2013-11-03T09:00:00")
       .jsonPath("$.nextReductionChange")
       .isEqualTo(
-        ZonedDateTime.of(LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT), ZoneId.systemDefault()).plusHours(1).plusDays(2)
-          .withZoneSameInstant(ZoneOffset.UTC)
-          .format(
-            DateTimeFormatter.ISO_OFFSET_DATE_TIME
-          )
+        reduction.effectiveTo!!.withZoneSameInstant(ZoneOffset.UTC).format(
+          DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        )
       )
       .jsonPath("$.caseTotals.a")
       .isEqualTo(6)
