@@ -65,7 +65,7 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
       .jsonPath("$.totalCases")
       .isEqualTo(35)
       .jsonPath("$.weeklyHours")
-      .isEqualTo(37)
+      .isEqualTo(15)
       .jsonPath("$.totalReductionHours")
       .isEqualTo(reduction.hours)
       .jsonPath("$.pointsAvailable")

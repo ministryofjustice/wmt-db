@@ -38,7 +38,8 @@ class JpaBasedGetOffenderManagerService(
   private val workloadPointsRepository: WorkloadPointsRepository,
   private val offenderSearchApiClient: OffenderSearchApiClient,
   private val sentenceRepository: SentenceRepository,
-  private val caseDetailsRepository: CaseDetailsRepository
+  private val caseDetailsRepository: CaseDetailsRepository,
+  private val getWeeklyHours: GetWeeklyHours
 ) : GetOffenderManagerService {
 
   override fun getPotentialWorkload(teamCode: String, staffId: BigInteger, impactCase: ImpactCase): OffenderManagerOverview? {
@@ -89,13 +90,15 @@ class JpaBasedGetOffenderManagerService(
   fun getDefaultOffenderManagerOverview(forename: String, surname: String, grade: String, staffCode: String, teamName: String): OffenderManagerOverview {
     val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
     val defaultAvailablePointsForGrade = getDefaultPointsAvailable(workloadPoints, grade)
-    val defaultContractedHours = getDefaultContractedHours(workloadPoints, grade)
+
+    val defaultContractedHours = getWeeklyHours.getDefaultContractedHours(workloadPoints, grade)
     val availablePoints = capacityCalculator.calculateAvailablePoints(
       defaultAvailablePointsForGrade, defaultContractedHours,
       BigDecimal.ZERO, defaultContractedHours
     )
-    val overview = OffenderManagerOverview(forename, surname, grade, 0, 0, availablePoints.toBigInteger(), BigInteger.ZERO, staffCode, teamName, defaultContractedHours, LocalDateTime.now(), -1, BigInteger.ZERO)
+    val overview = OffenderManagerOverview(forename, surname, grade, 0, 0, availablePoints.toBigInteger(), BigInteger.ZERO, staffCode, teamName, LocalDateTime.now(), -1, BigInteger.ZERO)
     overview.capacity = capacityCalculator.calculate(overview.totalPoints, overview.availablePoints)
+    overview.contractedHours = defaultContractedHours
     return overview
   }
 
@@ -106,19 +109,11 @@ class JpaBasedGetOffenderManagerService(
     }
   }
 
-  fun getDefaultContractedHours(workloadPoints: WorkloadPointsEntity, grade: String): BigDecimal {
-    return when (grade) {
-      "PO", "PQiP" -> workloadPoints.defaultContractedHoursPO
-      "PSO" -> workloadPoints.defaultContractedHoursPSO
-      else -> workloadPoints.defaultContractedHoursSPO
-    }
-  }
-
   override fun getOverview(teamCode: String, offenderManagerCode: String): OffenderManagerOverview? = offenderManagerRepository.findByOverview(teamCode, offenderManagerCode)?.let {
     it.capacity = capacityCalculator.calculate(it.totalPoints, it.availablePoints)
     it.nextReductionChange = getReductionService.findNextReductionChange(it.workloadOwnerId)
     it.reductionHours = getReductionService.findReductionHours(it.workloadOwnerId)
-
+    it.contractedHours = getWeeklyHours.findWeeklyHours(teamCode, offenderManagerCode, gradeMapper.workloadToStaffGrade(it.grade))
     offenderManagerRepository.findByCaseloadTotals(it.workloadOwnerId).let { totals ->
       it.tierCaseTotals = totals.map { total -> TierCaseTotals(total.getATotal(), total.getBTotal(), total.getCTotal(), total.getDTotal(), total.untiered) }
         .fold(TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)) { first, second -> TierCaseTotals(first.A.add(second.A), first.B.add(second.B), first.C.add(second.C), first.D.add(second.D), first.untiered.add(second.untiered)) }
