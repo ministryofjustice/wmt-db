@@ -9,8 +9,8 @@ import javax.persistence.Id
 import javax.persistence.Table
 
 @Entity
-@Table(name = "workload_points", schema = "app")
-data class AdjustmentReason constructor(
+@Table(name = "adjustment_reason", schema = "app")
+data class AdjustmentReasonEntity constructor(
   @Id
   @Column
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,6 +18,9 @@ data class AdjustmentReason constructor(
 
   @Column(name = "contact_code")
   val typeCode: String,
+
+  @Column(name = "category_id")
+  val categoryId: Long = 1,
 
   @Column(name = "points")
   val points: BigInteger
