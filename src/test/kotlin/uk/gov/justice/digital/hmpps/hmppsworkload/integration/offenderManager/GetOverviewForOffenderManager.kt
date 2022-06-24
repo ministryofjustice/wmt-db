@@ -78,7 +78,7 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
       .isEqualTo("2013-11-03T09:00:00")
       .jsonPath("$.nextReductionChange")
       .isEqualTo(
-        reduction.effectiveTo!!.withZoneSameInstant(ZoneOffset.UTC).format(
+        reduction.effectiveTo.withZoneSameInstant(ZoneOffset.UTC).format(
           DateTimeFormatter.ISO_OFFSET_DATE_TIME
         )
       )

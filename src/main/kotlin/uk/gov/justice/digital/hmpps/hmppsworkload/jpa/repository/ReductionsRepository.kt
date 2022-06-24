@@ -8,7 +8,8 @@ import java.time.ZonedDateTime
 
 @Repository
 interface ReductionsRepository : CrudRepository<ReductionEntity, Long> {
-  fun findByStatusIsInAndWorkloadOwnerIdIs(statuses: List<ReductionStatus>, workloadOwnerId: Long): List<ReductionEntity>
+
+  fun findByWorkloadOwnerIdAndEffectiveFromGreaterThanOrEffectiveToGreaterThanAndStatusNotIn(workloadOwnerId: Long, effectiveFrom: ZonedDateTime, effectiveTo: ZonedDateTime, statuses: List<ReductionStatus>): List<ReductionEntity>
 
   fun findByWorkloadOwnerIdAndEffectiveFromLessThanAndEffectiveToGreaterThanAndStatusNotIn(workloadOwnerId: Long, effectiveFrom: ZonedDateTime, effectiveTo: ZonedDateTime, statuses: List<ReductionStatus>): List<ReductionEntity>
 }

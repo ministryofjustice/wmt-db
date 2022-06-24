@@ -29,7 +29,7 @@ data class ReductionEntity(
   val effectiveFrom: ZonedDateTime,
 
   @Column(name = "effective_to")
-  val effectiveTo: ZonedDateTime? = null,
+  val effectiveTo: ZonedDateTime,
 
   @Column(name = "status")
   @Enumerated(EnumType.STRING)
