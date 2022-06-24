@@ -31,6 +31,16 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
     )
     reductionsRepository.save(reduction)
 
+    reductionsRepository.save(
+      ReductionEntity(
+        workloadOwnerId = 1, hours = BigDecimal.valueOf(5),
+        effectiveFrom = LocalDate.now().minusDays(2).atStartOfDay(
+          ZoneId.systemDefault()
+        ),
+        effectiveTo = LocalDate.now().plusDays(2).atStartOfDay(ZoneId.systemDefault()), status = ReductionStatus.DELETED, reductionReasonId = 1
+      )
+    )
+
     webTestClient.get()
       .uri("/team/T1/offenderManagers/OM1")
       .headers {
