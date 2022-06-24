@@ -11,5 +11,5 @@ interface TeamRepository : CrudRepository<TeamEntity, Long> {
   @Query(nativeQuery = true)
   fun findByOverview(teamCode: String): List<TeamOverview>
 
-  fun existsByCode(code: String): Boolean
+  fun findByCode(code: String): TeamEntity
 }

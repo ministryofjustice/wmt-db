@@ -49,14 +49,17 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.teamStaf
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.AdjustmentReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.EventManagerRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.OffenderManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.ReductionsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.RequirementManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.SentenceRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.TeamRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTAssessmentRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTCMSRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTCourtReportsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTInstitutionalReportRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTWorkloadOwnerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.listener.HmppsOffenderEvent
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
@@ -117,6 +120,15 @@ abstract class IntegrationTestBase {
 
   @Autowired
   protected lateinit var reductionsRepository: ReductionsRepository
+
+  @Autowired
+  protected lateinit var wmtWorkloadOwnerRepository: WMTWorkloadOwnerRepository
+
+  @Autowired
+  protected lateinit var teamRepository: TeamRepository
+
+  @Autowired
+  protected lateinit var offenderManagerRepository: OffenderManagerRepository
 
   @Autowired
   protected lateinit var adjustmentReasonRepository: AdjustmentReasonRepository

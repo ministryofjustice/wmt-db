@@ -7,5 +7,5 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTWorkloadOwnerEnt
 @Repository
 interface WMTWorkloadOwnerRepository : CrudRepository<WMTWorkloadOwnerEntity, Long> {
 
-  fun findByTeamCodeAndOffenderManagerCode(teamCode: String, offenderManagerCode: String): WMTWorkloadOwnerEntity?
+  fun findFirstByTeamCodeAndOffenderManagerCodeOrderByIdDesc(teamCode: String, offenderManagerCode: String): WMTWorkloadOwnerEntity?
 }

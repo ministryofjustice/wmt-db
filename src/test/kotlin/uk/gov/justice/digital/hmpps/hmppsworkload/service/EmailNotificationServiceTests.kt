@@ -409,8 +409,6 @@ class EmailNotificationServiceTests {
     val teamCode = "TM1"
     val token = "token"
 
-    val tier = "B3"
-
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, teamCode, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
