@@ -12,12 +12,10 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.ImpactCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerCases
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.TierCaseTotals
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadPointsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.OffenderManagerRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.ReductionsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.SentenceRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadPointsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.GradeMapper
@@ -34,7 +32,7 @@ class JpaBasedGetOffenderManagerService(
   private val offenderManagerRepository: OffenderManagerRepository,
   private val capacityCalculator: CapacityCalculator,
   private val caseCalculator: CaseCalculator,
-  private val reductionsRepository: ReductionsRepository,
+  private val getReductionService: GetReductionService,
   private val communityApiClient: CommunityApiClient,
   private val gradeMapper: GradeMapper,
   private val workloadPointsRepository: WorkloadPointsRepository,
@@ -96,7 +94,7 @@ class JpaBasedGetOffenderManagerService(
       defaultAvailablePointsForGrade, defaultContractedHours,
       BigDecimal.ZERO, defaultContractedHours
     )
-    val overview = OffenderManagerOverview(forename, surname, grade, BigDecimal.ZERO, BigDecimal.ZERO, availablePoints.toBigInteger(), BigInteger.ZERO, staffCode, teamName, BigDecimal.ZERO, defaultContractedHours, LocalDateTime.now(), -1, BigInteger.ZERO)
+    val overview = OffenderManagerOverview(forename, surname, grade, 0, 0, availablePoints.toBigInteger(), BigInteger.ZERO, staffCode, teamName, defaultContractedHours, LocalDateTime.now(), -1, BigInteger.ZERO)
     overview.capacity = capacityCalculator.calculate(overview.totalPoints, overview.availablePoints)
     return overview
   }
@@ -118,12 +116,9 @@ class JpaBasedGetOffenderManagerService(
 
   override fun getOverview(teamCode: String, offenderManagerCode: String): OffenderManagerOverview? = offenderManagerRepository.findByOverview(teamCode, offenderManagerCode)?.let {
     it.capacity = capacityCalculator.calculate(it.totalPoints, it.availablePoints)
-    reductionsRepository.findByStatusIsInAndWorkloadOwnerIdIs(listOf(ReductionStatus.ACTIVE, ReductionStatus.SCHEDULED), it.workloadOwnerId).let { reductions ->
-      reductions.flatMap { reduction -> listOf(reduction.effectiveFrom, reduction.effectiveTo ?: ZonedDateTime.ofInstant(Instant.EPOCH, ZoneId.systemDefault())) }
-        .filter { date -> !date.isBefore(ZonedDateTime.now()) }
-        .minByOrNull { date -> date }
-        ?.let { nextReductionChange -> it.nextReductionChange = nextReductionChange }
-    }
+    it.nextReductionChange = getReductionService.findNextReductionChange(it.workloadOwnerId)
+    it.reductionHours = getReductionService.findReductionHours(it.workloadOwnerId)
+
     offenderManagerRepository.findByCaseloadTotals(it.workloadOwnerId).let { totals ->
       it.tierCaseTotals = totals.map { total -> TierCaseTotals(total.getATotal(), total.getBTotal(), total.getCTotal(), total.getDTotal(), total.untiered) }
         .fold(TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)) { first, second -> TierCaseTotals(first.A.add(second.A), first.B.add(second.B), first.C.add(second.C), first.D.add(second.D), first.untiered.add(second.untiered)) }

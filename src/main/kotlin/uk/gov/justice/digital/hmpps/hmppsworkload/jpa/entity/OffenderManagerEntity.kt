@@ -24,13 +24,12 @@ import javax.persistence.Table
         ColumnResult(name = "forename"),
         ColumnResult(name = "surname"),
         ColumnResult(name = "grade_code"),
-        ColumnResult(name = "total_community_cases"),
-        ColumnResult(name = "total_filtered_custody_cases"),
+        ColumnResult(name = "total_community_cases", type = Int::class),
+        ColumnResult(name = "total_filtered_custody_cases", type = Int::class),
         ColumnResult(name = "available_points"),
         ColumnResult(name = "total_points"),
         ColumnResult(name = "key"),
         ColumnResult(name = "description"),
-        ColumnResult(name = "reduction_hours"),
         ColumnResult(name = "contracted_hours"),
         ColumnResult(name = "last_updated_on", type = LocalDateTime::class),
         ColumnResult(name = "workload_owner_id", type = Long::class),
@@ -84,7 +83,7 @@ import javax.persistence.Table
   name = "OffenderManagerEntity.findByOverview",
   resultSetMapping = "OffenderManagerOverviewResult",
   query = """SELECT
-    om.forename,om.surname, om_type.grade_code AS grade_code, (w.total_filtered_community_cases + w.total_filtered_license_cases) as total_community_cases, w.total_filtered_custody_cases , wpc.available_points AS available_points, wpc.total_points AS total_points, om."key", t.description, wpc.reduction_hours, wpc.contracted_hours, wpc.last_updated_on, wo.id as workload_owner_id, w.paroms_due_next_30_days
+    om.forename,om.surname, om_type.grade_code AS grade_code, (w.total_filtered_community_cases + w.total_filtered_license_cases) as total_community_cases, w.total_filtered_custody_cases , wpc.available_points AS available_points, wpc.total_points AS total_points, om."key", t.description, wpc.contracted_hours, wpc.last_updated_on, wo.id as workload_owner_id, w.paroms_due_next_30_days
     FROM app.workload_owner AS wo
     JOIN app.team AS t
         ON wo.team_id = t.id

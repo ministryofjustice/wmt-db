@@ -49,6 +49,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.teamStaf
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.EventManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.ReductionsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.RequirementManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.SentenceRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTAssessmentRepository
@@ -113,6 +114,9 @@ abstract class IntegrationTestBase {
   @Autowired
   protected lateinit var wmtcmsRepository: WMTCMSRepository
 
+  @Autowired
+  protected lateinit var reductionsRepository: ReductionsRepository
+
   @Qualifier("hmppsallocationcompletequeue-sqs-client")
   @Autowired
   lateinit var allocationCompleteClient: AmazonSQSAsync
@@ -158,6 +162,7 @@ abstract class IntegrationTestBase {
     wmtAssessmentRepository.deleteAll()
     wmtInstitutionalReportRepository.deleteAll()
     wmtcmsRepository.deleteAll()
+    reductionsRepository.deleteAll()
     allocationCompleteClient.purgeQueue(PurgeQueueRequest(allocationCompleteUrl))
     hmppsOffenderSqsClient.purgeQueue(PurgeQueueRequest(hmppsOffenderQueue.queueUrl))
     hmppsOffenderSqsDlqClient.purgeQueue(PurgeQueueRequest(hmppsOffenderQueue.dlqUrl))
@@ -181,6 +186,7 @@ abstract class IntegrationTestBase {
     wmtCourtReportsRepository.deleteAll()
     wmtAssessmentRepository.deleteAll()
     wmtcmsRepository.deleteAll()
+    reductionsRepository.deleteAll()
   }
 
   internal fun HttpHeaders.authToken(roles: List<String> = emptyList()) {
