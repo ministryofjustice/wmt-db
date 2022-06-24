@@ -7,6 +7,8 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.SentenceEntity
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.time.LocalDate
+import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -20,7 +22,13 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
     val sentenceAfter30Days = SentenceEntity(null, BigInteger.ONE, "CRN2222", ZonedDateTime.now().minusMonths(2L), ZonedDateTime.now().plusDays(45L), null, "SC", ZonedDateTime.now().plusDays(15L))
     sentenceRepository.save(sentenceAfter30Days)
 
-    val reduction = ReductionEntity(workloadOwnerId = 1, hours = BigDecimal.valueOf(5), effectiveFrom = ZonedDateTime.now().minusDays(2), effectiveTo = ZonedDateTime.now().plusDays(2), status = ReductionStatus.ACTIVE, reductionReasonId = 1)
+    val reduction = ReductionEntity(
+      workloadOwnerId = 1, hours = BigDecimal.valueOf(5),
+      effectiveFrom = LocalDate.now().minusDays(2).atStartOfDay(
+        ZoneId.systemDefault()
+      ),
+      effectiveTo = LocalDate.now().plusDays(2).atStartOfDay(ZoneId.systemDefault()), status = ReductionStatus.ACTIVE, reductionReasonId = 1
+    )
     reductionsRepository.save(reduction)
 
     webTestClient.get()
