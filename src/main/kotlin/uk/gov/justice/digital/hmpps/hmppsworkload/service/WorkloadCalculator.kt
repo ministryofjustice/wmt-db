@@ -14,7 +14,8 @@ interface WorkloadCalculator {
     courtReports: List<CourtReport>,
     paroleReports: Int,
     assessments: List<Assessment>,
-    contacts: List<Contact>,
+    contactsPerformedOutsideCaseload: List<Contact>,
+    contactsPerformedByOthers: List<Contact>,
     contactTypeWeightings: Map<String, BigInteger>,
     t2aWorkloadPoints: WorkloadPointsEntity,
     workloadPoints: WorkloadPointsEntity
