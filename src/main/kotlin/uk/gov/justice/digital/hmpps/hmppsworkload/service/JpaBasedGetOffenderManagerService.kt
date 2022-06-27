@@ -86,7 +86,7 @@ class JpaBasedGetOffenderManagerService(
     val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
     val defaultAvailablePointsForGrade = workloadPoints.getDefaultPointsAvailable(grade)
 
-    val defaultContractedHours = getWeeklyHours.findWeeklyHours(teamCode, staffCode, grade)
+    val defaultContractedHours = workloadPoints.getDefaultContractedHours(grade)
     val availablePoints = capacityCalculator.calculateAvailablePoints(
       defaultAvailablePointsForGrade, defaultContractedHours,
       BigDecimal.ZERO, defaultContractedHours

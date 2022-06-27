@@ -22,13 +22,7 @@ class WorkloadCalculationService(
   private val workloadCalculationRepository: WorkloadCalculationRepository
 ) {
 
-  fun calculateWorkloadCalculation(
-    staffCode: String,
-    teamCode: String,
-    providerCode: String,
-    staffGrade: String,
-    workloadOwnerId: Long
-  ): WorkloadCalculationEntity {
+  fun calculateWorkloadCalculation(staffCode: String, teamCode: String, providerCode: String, staffGrade: String, workloadOwnerId: Long): WorkloadCalculationEntity {
 
     val cases = emptyList<Case>()
     val courtReports = getCourtReports.getCourtReports(staffCode, teamCode)
@@ -38,40 +32,15 @@ class WorkloadCalculationService(
     val contactsPerformedByOthers = getContacts.findContactsInCaseloadPerformedByOthers(staffCode, teamCode)
     val contactTypeWeightings = getContactTypeWeightings.findAll()
     val t2aWorkloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(true)
-    val workloadPointsWeighting =
-      workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
+    val workloadPointsWeighting = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
     val weeklyHours = weeklyHours.findWeeklyHours(teamCode, staffCode, staffGrade)
     val reductions = getReductionService.findReductionHours(workloadOwnerId)
-    val availablePoints = capacityCalculator
-      .calculateAvailablePoints(
-        workloadPointsWeighting.getDefaultPointsAvailable(staffGrade),
-        weeklyHours,
-        reductions,
-        workloadPointsWeighting.getDefaultContractedHours(staffGrade)
-      )
-
-    val workloadPoints = workloadCalculator.getWorkloadPoints(
-      cases,
-      courtReports,
-      paroleReports,
-      assessments,
-      contactsPerformedOutsideCaseload,
-      contactsPerformedByOthers,
-      contactTypeWeightings,
-      t2aWorkloadPoints,
-      workloadPointsWeighting
-    )
+    val availablePoints = capacityCalculator.calculateAvailablePoints(workloadPointsWeighting.getDefaultPointsAvailable(staffGrade), weeklyHours, reductions, workloadPointsWeighting.getDefaultContractedHours(staffGrade))
+    val workloadPoints = workloadCalculator.getWorkloadPoints(cases, courtReports, paroleReports, assessments, contactsPerformedOutsideCaseload, contactsPerformedByOthers, contactTypeWeightings, t2aWorkloadPoints, workloadPointsWeighting)
 
     return workloadCalculationRepository.save(
       WorkloadCalculationEntity(
-        weeklyHours = weeklyHours,
-        reductions = reductions,
-        availablePoints = availablePoints,
-        workloadPoints = workloadPoints,
-        staffCode = staffCode,
-        teamCode = teamCode,
-        providerCode = providerCode,
-        breakdownData = BreakdownDataEntity(0)
+        weeklyHours = weeklyHours, reductions = reductions, availablePoints = availablePoints, workloadPoints = workloadPoints, staffCode = staffCode, teamCode = teamCode, providerCode = providerCode, breakdownData = BreakdownDataEntity(0)
       )
     )
   }

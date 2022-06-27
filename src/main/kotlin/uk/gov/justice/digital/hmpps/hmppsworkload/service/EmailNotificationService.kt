@@ -28,6 +28,9 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Optional
 
+private const val SCORE_UNAVAILABLE = "Score Unavailable"
+private const val NOT_APPLICABLE = "N/A"
+
 @Service
 class EmailNotificationService(
   private val notificationClient: NotificationClientApi,
@@ -78,12 +81,22 @@ class EmailNotificationService(
           "tier" to caseDetailsRepository.findByIdOrNull(allocateCase.crn)!!.tier,
           "rosh" to results.t3.map { riskSummary ->
             capitalize(riskSummary.overallRiskLevel)
-          }.orElse("Score Unavailable"),
-          "rsrLevel" to latestRiskPredictor.map { riskPredictor -> capitalize(riskPredictor.rsrScoreLevel) }.orElse("Score Unavailable"),
-          "rsrPercentage" to latestRiskPredictor.map { riskPredictor -> riskPredictor.rsrPercentageScore?.toString() }.orElse("N/A"),
-          "ogrsLevel" to results.t5.map { assessment -> assessment.ogrsScore?.let { orgsScoreToLevel(it.toInt()) } }.orElse("Score Unavailable"),
-          "ogrsPercentage" to results.t5.map { assessment -> assessment.ogrsScore?.toString() }.orElse("N/A"),
-          "previousConvictions" to previousConvictions.map { mapConvictionsToOffenceDescription(it) }.orElse(listOf("N/A")),
+          }.orElse(SCORE_UNAVAILABLE),
+          "rsrLevel" to latestRiskPredictor.map { riskPredictor -> capitalize(riskPredictor.rsrScoreLevel) }.orElse(
+            SCORE_UNAVAILABLE
+          ),
+          "rsrPercentage" to latestRiskPredictor.map { riskPredictor -> riskPredictor.rsrPercentageScore?.toString() }.orElse(
+            NOT_APPLICABLE
+          ),
+          "ogrsLevel" to results.t5.map { assessment -> assessment.ogrsScore?.let { orgsScoreToLevel(it.toInt()) } }.orElse(
+            SCORE_UNAVAILABLE
+          ),
+          "ogrsPercentage" to results.t5.map { assessment -> assessment.ogrsScore?.toString() }.orElse(NOT_APPLICABLE),
+          "previousConvictions" to previousConvictions.map { mapConvictionsToOffenceDescription(it) }.orElse(
+            listOf(
+              NOT_APPLICABLE
+            )
+          ),
           "notes" to allocateCase.instructions,
           "allocatingOfficerName" to "${results.t2.staff.forenames} ${results.t2.staff.surname}",
           "allocatingOfficerGrade" to gradeMapper.deliusToStaffGrade(results.t2.staffGrade?.code),
