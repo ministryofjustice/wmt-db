@@ -23,8 +23,14 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
     val sentenceAfter30Days = SentenceEntity(null, BigInteger.ONE, "CRN2222", ZonedDateTime.now().minusMonths(2L), ZonedDateTime.now().plusDays(45L), null, "SC", ZonedDateTime.now().plusDays(15L))
     sentenceRepository.save(sentenceAfter30Days)
 
+    val team = teamRepository.findByCode("T1")
+
+    val offenderManager = offenderManagerRepository.findByCode("OM1")
+
+    val secondWorkloadOwner = wmtWorkloadOwnerRepository.save(WMTWorkloadOwnerEntity(team = team, offenderManager = offenderManager, contractedHours = BigDecimal.valueOf(5)))
+
     val reduction = ReductionEntity(
-      workloadOwnerId = 1, hours = BigDecimal.valueOf(5),
+      workloadOwnerId = secondWorkloadOwner.id!!, hours = BigDecimal.valueOf(5),
       effectiveFrom = LocalDate.now().minusDays(2).atStartOfDay(
         ZoneId.systemDefault()
       ),
@@ -34,21 +40,13 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
 
     reductionsRepository.save(
       ReductionEntity(
-        workloadOwnerId = 1, hours = BigDecimal.valueOf(5),
+        workloadOwnerId = secondWorkloadOwner.id!!, hours = BigDecimal.valueOf(5),
         effectiveFrom = LocalDate.now().minusDays(2).atStartOfDay(
           ZoneId.systemDefault()
         ),
         effectiveTo = LocalDate.now().plusDays(2).atStartOfDay(ZoneId.systemDefault()), status = ReductionStatus.DELETED, reductionReasonId = 1
       )
     )
-
-    val team = teamRepository.findByCode("T1")
-
-    val offenderManager = offenderManagerRepository.findByCode("OM1")
-
-    val secondWorkloadOwner = WMTWorkloadOwnerEntity(team = team, offenderManager = offenderManager, contractedHours = BigDecimal.valueOf(5))
-
-    wmtWorkloadOwnerRepository.save(secondWorkloadOwner)
 
     webTestClient.get()
       .uri("/team/T1/offenderManagers/OM1")

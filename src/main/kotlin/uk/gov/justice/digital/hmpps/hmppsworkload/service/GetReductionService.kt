@@ -3,30 +3,37 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.ReductionsRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTWorkloadOwnerRepository
 import java.math.BigDecimal
 import java.time.ZonedDateTime
 
 @Service
-class GetReductionService(private val reductionsRepository: ReductionsRepository) {
+class GetReductionService(private val reductionsRepository: ReductionsRepository, private val workloadOwnerRepository: WMTWorkloadOwnerRepository) {
 
   private val excludeStatuses = listOf(
     ReductionStatus.ARCHIVED, ReductionStatus.DELETED
   )
 
-  fun findNextReductionChange(workloadOwnerId: Long): ZonedDateTime? = reductionsRepository.findByWorkloadOwnerIdAndEffectiveFromGreaterThanOrEffectiveToGreaterThanAndStatusNotIn(
-    workloadOwnerId, ZonedDateTime.now(), ZonedDateTime.now(), excludeStatuses
-  )
-    .flatMap { reduction ->
-      listOf(
-        reduction.effectiveFrom,
-        reduction.effectiveTo
-      )
-    }.filter { date -> !date.isBefore(ZonedDateTime.now()) }
-    .minByOrNull { it }
+  fun findNextReductionChange(staffCode: String, teamCode: String): ZonedDateTime? = workloadOwnerRepository.findFirstByTeamCodeAndOffenderManagerCodeOrderByIdDesc(teamCode, staffCode)?.let { workloadOwner ->
+    reductionsRepository.findByWorkloadOwnerIdAndEffectiveFromGreaterThanOrEffectiveToGreaterThanAndStatusNotIn(
+      workloadOwner.id!!, ZonedDateTime.now(), ZonedDateTime.now(), excludeStatuses
+    )
+      .flatMap { reduction ->
+        listOf(
+          reduction.effectiveFrom,
+          reduction.effectiveTo
+        )
+      }.filter { date -> !date.isBefore(ZonedDateTime.now()) }
+      .minByOrNull { it }
+  }
 
-  fun findReductionHours(workloadOwnerId: Long): BigDecimal = reductionsRepository.findByWorkloadOwnerIdAndEffectiveFromLessThanAndEffectiveToGreaterThanAndStatusNotIn(
-    workloadOwnerId, ZonedDateTime.now(), ZonedDateTime.now(), excludeStatuses
-  )
-    .map { it.hours }
-    .fold(BigDecimal.ZERO) { first, second -> first.add(second) }.stripTrailingZeros()
+  fun findReductionHours(staffCode: String, teamCode: String): BigDecimal = (
+    workloadOwnerRepository.findFirstByTeamCodeAndOffenderManagerCodeOrderByIdDesc(teamCode, staffCode)?.let { workloadOwner ->
+      reductionsRepository.findByWorkloadOwnerIdAndEffectiveFromLessThanAndEffectiveToGreaterThanAndStatusNotIn(
+        workloadOwner.id!!, ZonedDateTime.now(), ZonedDateTime.now(), excludeStatuses
+      )
+        .map { it.hours }
+        .fold(BigDecimal.ZERO) { first, second -> first.add(second) }
+    } ?: BigDecimal.ZERO
+    ).stripTrailingZeros()
 }
