@@ -29,6 +29,12 @@ class CommunityApiClient(private val webClient: WebClient) {
         { Mono.error(MissingTeamError("No team found for $teamCode")) }
       )
       .bodyToMono(responseType)
+      .onErrorResume { ex ->
+        when (ex) {
+          is MissingTeamError -> Mono.empty()
+          else -> Mono.error(ex)
+        }
+      }
   }
 
   fun getStaffById(staffId: BigInteger): Mono<Staff> {

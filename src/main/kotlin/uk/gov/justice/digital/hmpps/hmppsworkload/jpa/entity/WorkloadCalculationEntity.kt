@@ -28,7 +28,7 @@ data class WorkloadCalculationEntity(
   val calculationId: Long? = null,
 
   @Column
-  val calculatedDate: ZonedDateTime? = null,
+  val calculatedDate: ZonedDateTime = ZonedDateTime.now(),
 
   @Column
   val weeklyHours: BigDecimal,
