@@ -12,7 +12,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.ImpactCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerCases
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.TierCaseTotals
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadPointsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.OffenderManagerRepository
@@ -85,24 +84,17 @@ class JpaBasedGetOffenderManagerService(
 
   fun getDefaultOffenderManagerOverview(forename: String, surname: String, grade: String, staffCode: String, teamName: String, teamCode: String): OffenderManagerOverview {
     val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
-    val defaultAvailablePointsForGrade = getDefaultPointsAvailable(workloadPoints, grade)
+    val defaultAvailablePointsForGrade = workloadPoints.getDefaultPointsAvailable(grade)
 
     val defaultContractedHours = getWeeklyHours.findWeeklyHours(teamCode, staffCode, grade)
     val availablePoints = capacityCalculator.calculateAvailablePoints(
       defaultAvailablePointsForGrade, defaultContractedHours,
       BigDecimal.ZERO, defaultContractedHours
     )
-    val overview = OffenderManagerOverview(forename, surname, grade, 0, 0, availablePoints.toBigInteger(), BigInteger.ZERO, staffCode, teamName, LocalDateTime.now(), -1, BigInteger.ZERO)
+    val overview = OffenderManagerOverview(forename, surname, grade, 0, 0, availablePoints, BigInteger.ZERO, staffCode, teamName, LocalDateTime.now(), -1, BigInteger.ZERO)
     overview.capacity = capacityCalculator.calculate(overview.totalPoints, overview.availablePoints)
     overview.contractedHours = defaultContractedHours
     return overview
-  }
-
-  fun getDefaultPointsAvailable(workloadPoints: WorkloadPointsEntity, grade: String): BigDecimal {
-    return when (grade) {
-      "SPO" -> workloadPoints.defaultAvailablePointsSPO
-      else -> workloadPoints.defaultAvailablePointsPO
-    }
   }
 
   override fun getOverview(teamCode: String, offenderManagerCode: String): OffenderManagerOverview? = offenderManagerRepository.findByOverview(teamCode, offenderManagerCode)?.let {

@@ -79,4 +79,18 @@ data class WorkloadPointsEntity(
     CaseType.COMMUNITY -> communityTierPoints.asMap()
     else -> emptyMap()
   }
+
+  fun getDefaultPointsAvailable(grade: String): BigDecimal {
+    return when (grade) {
+      "SPO" -> defaultAvailablePointsSPO
+      else -> defaultAvailablePointsPO
+    }
+  }
+  fun getDefaultContractedHours(grade: String): BigDecimal {
+    return when (grade) {
+      "PO", "PQiP" -> defaultContractedHoursPO
+      "PSO" -> defaultContractedHoursPSO
+      else -> defaultContractedHoursSPO
+    }
+  }
 }
