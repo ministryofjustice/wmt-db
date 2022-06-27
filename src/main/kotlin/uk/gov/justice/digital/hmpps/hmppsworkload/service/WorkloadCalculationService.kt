@@ -22,7 +22,7 @@ class WorkloadCalculationService(
   private val workloadCalculationRepository: WorkloadCalculationRepository
 ) {
 
-  fun calculateWorkloadCalculation(staffCode: String, teamCode: String, providerCode: String, staffGrade: String, workloadOwnerId: Long): WorkloadCalculationEntity {
+  fun calculate(staffCode: String, teamCode: String, providerCode: String, staffGrade: String): WorkloadCalculationEntity {
 
     val cases = emptyList<Case>()
     val courtReports = getCourtReports.getCourtReports(staffCode, teamCode)

@@ -19,9 +19,8 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
     val teamCode = "TM1"
     val providerCode = "SC1"
     val staffGrade = "PO"
-    val workloadOwnerId = 5L
 
-    workloadCalculation.calculateWorkloadCalculation(staffCode, teamCode, providerCode, staffGrade, workloadOwnerId)
+    workloadCalculation.calculate(staffCode, teamCode, providerCode, staffGrade)
 
     Assertions.assertEquals(
       BigInteger.ZERO,
