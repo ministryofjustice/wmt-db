@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.AdjustmentReasonEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTAssessmentEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTCMSEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTCourtReportsEntity
@@ -108,14 +109,19 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
     val workloadCalculationResult = workloadCalculationRepository
       .findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)
 
-    assertEquals(
-      communityAssessmentCount,
-      workloadCalculationResult?.breakdownData?.communityCaseAssessmentCount
-    )
-
-    assertEquals(
-      licenseAssessmentCount,
-      workloadCalculationResult?.breakdownData?.licenseCaseAssessmentCount
+    Assertions.assertAll(
+      {
+        assertEquals(
+          communityAssessmentCount,
+          workloadCalculationResult?.breakdownData?.communityCaseAssessmentCount
+        )
+      },
+      {
+        assertEquals(
+          licenseAssessmentCount,
+          workloadCalculationResult?.breakdownData?.licenseCaseAssessmentCount
+        )
+      }
     )
   }
 
@@ -127,7 +133,6 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
     val staffGrade = "PO"
     val contactTypeCode = "CONTACT1"
 
-    // increased
     wmtcmsRepository.save(
       WMTCMSEntity(
         staffCode = staffCode, staffTeamCode = teamCode, personManagerStaffCode = "OTHERSTAFFCODE",
@@ -135,7 +140,6 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
       )
     )
 
-    // decreased
     wmtcmsRepository.save(
       WMTCMSEntity(
         staffCode = "StaffCode", staffTeamCode = "TM2", personManagerStaffCode = staffCode,
@@ -148,14 +152,37 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
     val workloadCalculationResult = workloadCalculationRepository
       .findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)
 
-    assertEquals(
-      1,
-      workloadCalculationResult?.breakdownData?.contactsPerformedByOthersCount?.get(contactTypeCode)
+    Assertions.assertAll(
+      {
+        assertEquals(
+          1,
+          workloadCalculationResult?.breakdownData?.contactsPerformedByOthersCount?.get(contactTypeCode)
+        )
+      },
+      {
+        assertEquals(
+          1,
+          workloadCalculationResult?.breakdownData?.contactsPerformedOutsideCaseloadCount?.get(contactTypeCode)
+        )
+      }
     )
+  }
 
-    assertEquals(
-      1,
-      workloadCalculationResult?.breakdownData?.contactsPerformedOutsideCaseloadCount?.get(contactTypeCode)
-    )
+  @Test
+  fun `must include contact type weightings in breakdown`() {
+    val staffCode = "STAFF1"
+    val teamCode = "TM1"
+    val providerCode = "SC1"
+    val staffGrade = "PO"
+
+    val adjustmentReason = AdjustmentReasonEntity(typeCode = "ADJUSTMENT_REASON1", points = 10)
+    adjustmentReasonRepository.save(adjustmentReason)
+
+    workloadCalculation.calculate(staffCode, teamCode, providerCode, staffGrade)
+
+    val breakdown = workloadCalculationRepository
+      .findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)!!.breakdownData
+
+    assertEquals(adjustmentReason.points, breakdown.contactTypeWeightings[adjustmentReason.typeCode])
   }
 }

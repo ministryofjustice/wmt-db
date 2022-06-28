@@ -107,7 +107,7 @@ class WorkloadCalculatorTests {
 
   @Test
   fun `must sum all contacts which occurred on cases outside of case management`() {
-    val contactReasonWeightings = mapOf("CONTACT1" to BigInteger.TEN, "CONTACT2" to BigInteger.TWO)
+    val contactReasonWeightings = mapOf("CONTACT1" to 10, "CONTACT2" to 2)
 
     val numberOfContactOneContacts = 5
     val numberOfContactTwoContacts = 10
@@ -120,15 +120,15 @@ class WorkloadCalculatorTests {
 
     val result = workloadCalculator.getWorkloadPoints(emptyList(), emptyList(), 0, emptyList(), contactOneContacts + contactTwoContacts, emptyList(), contactReasonWeightings, t2aWorkloadPoints, workloadPoints)
 
-    val expectedContactOnePointsTotal = contactReasonWeightings["CONTACT1"]!!.multiply(numberOfContactOneContacts.toBigInteger())
-    val expectedContactTwoPointsTotal = contactReasonWeightings["CONTACT2"]!!.multiply(numberOfContactTwoContacts.toBigInteger())
+    val expectedContactOnePointsTotal = contactReasonWeightings["CONTACT1"]!! * numberOfContactOneContacts
+    val expectedContactTwoPointsTotal = contactReasonWeightings["CONTACT2"]!! * numberOfContactTwoContacts
 
-    Assertions.assertEquals(expectedContactOnePointsTotal.add(expectedContactTwoPointsTotal), result)
+    Assertions.assertEquals((expectedContactOnePointsTotal + expectedContactTwoPointsTotal).toBigInteger(), result)
   }
 
   @Test
   fun `must not count contacts where the contact reason does not have a weighting`() {
-    val contactReasonWeightings = mapOf("CONTACT1" to BigInteger.TEN, "CONTACT2" to BigInteger.TWO)
+    val contactReasonWeightings = mapOf("CONTACT1" to 10, "CONTACT2" to 2)
 
     val t2aWorkloadPoints = mockWorkloadPoints(isT2A = true)
     val workloadPoints = mockWorkloadPoints(isT2A = false)
@@ -143,7 +143,7 @@ class WorkloadCalculatorTests {
   @Test
   fun `contacts which occur within case management by others must be negative`() {
 
-    val contactReasonWeightings = mapOf("CONTACT1" to BigInteger.TEN, "CONTACT2" to BigInteger.TWO)
+    val contactReasonWeightings = mapOf("CONTACT1" to 10, "CONTACT2" to 2)
 
     val t2aWorkloadPoints = mockWorkloadPoints(isT2A = true)
     val workloadPoints = mockWorkloadPoints(isT2A = false)

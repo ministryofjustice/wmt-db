@@ -8,5 +8,6 @@ data class BreakdownDataEntity(
   val communityCaseAssessmentCount: Int,
   val licenseCaseAssessmentCount: Int,
   val contactsPerformedOutsideCaseloadCount: Map<String, Int>,
-  val contactsPerformedByOthersCount: Map<String, Int>
+  val contactsPerformedByOthersCount: Map<String, Int>,
+  val contactTypeWeightings: Map<String, Int>
 ) : Serializable
