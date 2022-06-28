@@ -1,0 +1,45 @@
+hmpps.sqs:
+  provider: localstack
+  localstackUrl: http://localhost:4566
+  queues:
+    extractqueue:
+      accessKeyId: foobar
+      secretAccessKey: foobar
+      queueName: hmpps_workload_s3_extract_event_queue
+      dlqName: hmpps_workload_s3_extract_event_dlq
+    hmppsallocationcompletequeue:
+      queueName: hmpps_allocation_complete_event_queue
+      dlqName: hmpps_allocation_complete_event_dlq
+      subscribeTopicId: hmmppsdomaintopic
+      subscribeFilter: '{"eventType":[ "person.community.manager.allocated", "event.manager.allocated","requirement.manager.allocated"] }'
+      asyncQueueClient: true
+    hmppsoffenderqueue:
+      queueName: hmpps_offender_event_queue
+      dlqName: hmpps_offender_event_dlq
+      subscribeTopicId: hmppsoffendertopic
+      subscribeFilter: '{"eventType":[ "SENTENCE_CHANGED"] }'
+    tiercalcqueue:
+      queueName: tier_calc_event_queue
+      dlqName: tier_calc_event_dlq
+      subscribeTopicId: hmmppsdomaintopic
+      subscribeFilter: '{"eventType":[ "TIER_CALCULATION_COMPLETE"] }'
+  topics:
+    hmmppsdomaintopic:
+      arn: arn:aws:sns:eu-west-2:000000000000:${random.uuid}
+    hmppsoffendertopic:
+      arn: arn:aws:sns:eu-west-2:000000000000:${random.uuid}
+
+community:
+  endpoint:
+    url: http://localhost:8099
+hmpps-tier:
+  endpoint:
+    url: http://localhost:8099
+assess-risks-needs:
+  endpoint:
+    url: http://localhost:8099
+offender-search:
+  endpoint:
+    url: http://localhost:8099
+ingress:
+  url: localhost:8080

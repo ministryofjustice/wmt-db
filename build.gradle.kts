@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.2.3"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.3.0"
   kotlin("plugin.spring") version "1.6.21"
   kotlin("plugin.jpa") version "1.6.21"
   id("io.gitlab.arturbosch.detekt").version("1.20.0")
@@ -28,7 +28,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("uk.gov.service.notify:notifications-java-client:3.17.3-RELEASE")
-  implementation("com.vladmihalcea:hibernate-types-52:2.16.2")
+  implementation("com.vladmihalcea:hibernate-types-52:2.16.3")
 
   implementation("com.opencsv:opencsv:5.6")
 
@@ -59,7 +59,7 @@ tasks {
 }
 
 tasks.named<JavaExec>("bootRun") {
-  systemProperty("spring.profiles.active", "dev,localstack,docker")
+  systemProperty("spring.profiles.active", "dev,docker")
 }
 repositories {
   mavenCentral()

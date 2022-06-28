@@ -19,7 +19,7 @@ class DefaultWorkloadCalculator : WorkloadCalculator {
     assessments: List<Assessment>,
     contactsPerformedOutsideCaseload: List<Contact>,
     contactsPerformedByOthers: List<Contact>,
-    contactTypeWeightings: Map<String, BigInteger>,
+    contactTypeWeightings: Map<String, Int>,
     t2aWorkloadPoints: WorkloadPointsEntity,
     workloadPoints: WorkloadPointsEntity
   ): BigInteger {
@@ -62,8 +62,8 @@ class DefaultWorkloadCalculator : WorkloadCalculator {
     }
   }.fold(BigInteger.ZERO) { first, second -> first.add(second) }
 
-  private fun sumContacts(contacts: List<Contact>, contactTypeWeightings: Map<String, BigInteger>): BigInteger = contacts
+  private fun sumContacts(contacts: List<Contact>, contactTypeWeightings: Map<String, Int>): BigInteger = contacts
     .map { contact ->
-      contactTypeWeightings.getOrDefault(contact.typeCode, BigInteger.ZERO)
-    }.fold(BigInteger.ZERO) { first, second -> first.add(second) }
+      contactTypeWeightings.getOrDefault(contact.typeCode, 0)
+    }.fold(0) { first, second -> first + second }.toBigInteger()
 }

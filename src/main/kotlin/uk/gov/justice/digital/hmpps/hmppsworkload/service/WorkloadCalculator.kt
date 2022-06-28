@@ -16,7 +16,7 @@ interface WorkloadCalculator {
     assessments: List<Assessment>,
     contactsPerformedOutsideCaseload: List<Contact>,
     contactsPerformedByOthers: List<Contact>,
-    contactTypeWeightings: Map<String, BigInteger>,
+    contactTypeWeightings: Map<String, Int>,
     t2aWorkloadPoints: WorkloadPointsEntity,
     workloadPoints: WorkloadPointsEntity
   ): BigInteger

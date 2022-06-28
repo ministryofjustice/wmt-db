@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity
 
-import java.math.BigInteger
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -23,5 +22,5 @@ data class AdjustmentReasonEntity constructor(
   val categoryId: Long = 1,
 
   @Column(name = "points")
-  val points: BigInteger
+  val points: Int
 )
