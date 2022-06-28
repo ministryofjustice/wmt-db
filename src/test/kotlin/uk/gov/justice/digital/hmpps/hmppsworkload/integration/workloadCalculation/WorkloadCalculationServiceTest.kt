@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsworkload.integration.workloadCalc
+package uk.gov.justice.digital.hmpps.hmppsworkload.integration.workloadCalculation
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals

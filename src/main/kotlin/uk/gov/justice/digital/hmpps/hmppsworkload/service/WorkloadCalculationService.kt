@@ -1,8 +1,11 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Assessment
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Contact
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CourtReport
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CourtReportType
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.BreakdownDataEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadCalculationEntity
@@ -25,7 +28,6 @@ class WorkloadCalculationService(
 ) {
 
   fun calculate(staffCode: String, teamCode: String, providerCode: String, staffGrade: String): WorkloadCalculationEntity {
-
     val cases = emptyList<Case>()
     val courtReports = getCourtReports.getCourtReports(staffCode, teamCode)
     val paroleReports = getParoleReports.getParoleReports(staffCode, teamCode)
@@ -37,33 +39,15 @@ class WorkloadCalculationService(
     val workloadPointsWeighting = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
     val weeklyHours = weeklyHours.findWeeklyHours(teamCode, staffCode, staffGrade)
     val reductions = getReductionService.findReductionHours(staffCode, teamCode)
-    val availablePoints = capacityCalculator.calculateAvailablePoints(
-      workloadPointsWeighting.getDefaultPointsAvailable(staffGrade), weeklyHours,
-      reductions, workloadPointsWeighting.getDefaultContractedHours(staffGrade)
-    )
+    val availablePoints = capacityCalculator.calculateAvailablePoints(workloadPointsWeighting.getDefaultPointsAvailable(staffGrade), weeklyHours, reductions, workloadPointsWeighting.getDefaultContractedHours(staffGrade))
+    val workloadPoints = workloadCalculator.getWorkloadPoints(cases, courtReports, paroleReports, assessments, contactsPerformedOutsideCaseload, contactsPerformedByOthers, contactTypeWeightings, t2aWorkloadPoints, workloadPointsWeighting)
 
-    val workloadPoints = workloadCalculator.getWorkloadPoints(
-      cases, courtReports, paroleReports, assessments, contactsPerformedOutsideCaseload,
-      contactsPerformedByOthers, contactTypeWeightings, t2aWorkloadPoints, workloadPointsWeighting
-    )
-
-    val courtReportStandardCount = courtReports.count { r -> r.type == CourtReportType.STANDARD }
-    val courtReportFastCount = courtReports.count { r -> r.type == CourtReportType.FAST }
-
-    val communityCaseAssessmentCount = assessments.count { assessment -> assessment.category == CaseType.COMMUNITY }
-    val licenseCaseAssessmentCount = assessments.count { assessment -> assessment.category == CaseType.LICENSE }
-    val contactsPerformedOutsideCaseloadCount = contactsPerformedOutsideCaseload.groupingBy { c -> c.typeCode }.eachCount()
-    val contactsPerformedByOthersCount = contactsPerformedByOthers.groupingBy { c -> c.typeCode }.eachCount()
-
-    return workloadCalculationRepository.save(
-      WorkloadCalculationEntity(
-        weeklyHours = weeklyHours, reductions = reductions, availablePoints = availablePoints, workloadPoints = workloadPoints, staffCode = staffCode,
-        teamCode = teamCode, providerCode = providerCode,
-        breakdownData = BreakdownDataEntity(
-          courtReportStandardCount, courtReportFastCount, paroleReports,
-          communityCaseAssessmentCount, licenseCaseAssessmentCount, contactsPerformedOutsideCaseloadCount, contactsPerformedByOthersCount
-        )
-      )
-    )
+    return workloadCalculationRepository.save(WorkloadCalculationEntity(weeklyHours = weeklyHours, reductions = reductions, availablePoints = availablePoints, workloadPoints = workloadPoints, staffCode = staffCode, teamCode = teamCode, providerCode = providerCode, breakdownData = BreakdownDataEntity(getCourtReportCounts(courtReports, CourtReportType.STANDARD), getCourtReportCounts(courtReports, CourtReportType.FAST), paroleReports, getAssessmentCounts(assessments, CaseType.COMMUNITY), getAssessmentCounts(assessments, CaseType.LICENSE), getContactTypeCodeCounts(contactsPerformedOutsideCaseload), getContactTypeCodeCounts(contactsPerformedByOthers))))
   }
+
+  private fun getCourtReportCounts(courtReports: List<CourtReport>, type: CourtReportType): Int = courtReports.count { it.type == type }
+
+  private fun getAssessmentCounts(assessments: List<Assessment>, type: CaseType): Int = assessments.count { it.category == type }
+
+  private fun getContactTypeCodeCounts(contacts: List<Contact>): Map<String, Int> = contacts.groupingBy { c -> c.typeCode }.eachCount()
 }
