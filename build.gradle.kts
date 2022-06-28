@@ -30,6 +30,8 @@ dependencies {
   implementation("uk.gov.service.notify:notifications-java-client:3.17.3-RELEASE")
   implementation("com.vladmihalcea:hibernate-types-52:2.16.2")
 
+  implementation("com.opencsv:opencsv:5.6")
+
   runtimeOnly("com.zaxxer:HikariCP")
   runtimeOnly("org.flywaydb:flyway-core")
   runtimeOnly("org.postgresql:postgresql:42.4.0")
