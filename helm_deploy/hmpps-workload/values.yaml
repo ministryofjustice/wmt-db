@@ -14,7 +14,19 @@ generic-service:
     host: &ingressHost app-hostname.local    # override per environment
     tlsSecretName: hmpps-workload-cert
     contextColour: green
-    path: /
+    annotations:
+      nginx.ingress.kubernetes.io/custom-http-errors: "418"
+      external-dns.alpha.kubernetes.io/aws-weight: "100"
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        server_tokens off;
+        location /cases/upload {
+          deny all;
+          return 401;
+        }
+        location /queue-admin/** {
+          deny all;
+          return 401;
+        }
 
   # Environment variables to load into the deployment
   env:
