@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
+import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model.MessageAttributeValue
 import com.amazonaws.services.sqs.model.SendMessageRequest
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -20,12 +21,11 @@ import java.math.BigInteger
 class PopulateRealtimeService(
   private val hmppsQueueService: HmppsQueueService,
   private val objectMapper: ObjectMapper,
+  @Qualifier("hmppsoffenderqueue-sqs-client") private val hmppsOffenderSqsClient: AmazonSQSAsync,
   @Qualifier("communityApiClient") private val communityApiClient: CommunityApiClient
 ) {
 
-  private val hmppsOffenderQueue by lazy { hmppsQueueService.findByQueueId("hmppsoffenderqueue") ?: throw MissingQueueException("HmppsQueue hmppsoffenderqueue not found") }
-
-  private val hmppsOffenderSqsClient by lazy { hmppsOffenderQueue.sqsClient }
+  private val hmppsOffenderQueueUrl by lazy { hmppsQueueService.findByQueueId("hmppsoffenderqueue")?.queueUrl ?: throw MissingQueueException("HmppsQueue hmppsoffenderqueue not found") }
 
   @Async
   fun sendEvents(cases: List<CaseCsv>) {
@@ -44,7 +44,7 @@ class PopulateRealtimeService(
           .map { it.sentence!! }
           .forEach {
             val sendMessage = SendMessageRequest(
-              hmppsOffenderQueue.queueUrl,
+              hmppsOffenderQueueUrl,
               objectMapper.writeValueAsString(
                 caseToOffenderSqsMessage(case.crn!!, it.sentenceId)
               )

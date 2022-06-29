@@ -1,6 +1,9 @@
 hmpps:
   sqs:
     queueAdminRole: ROLE_QUEUE_WORKLOAD_ADMIN
+    queues:
+      hmppsoffenderqueue:
+        asyncQueueClient: true
 spring:
   application:
     name: hmpps-workload
