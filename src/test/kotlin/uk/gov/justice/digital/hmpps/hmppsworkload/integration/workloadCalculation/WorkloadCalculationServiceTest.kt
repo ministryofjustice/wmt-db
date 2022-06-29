@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTCMSEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTCourtReportsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTInstitutionalReportEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.WorkloadCalculationService
+import java.math.BigDecimal
 import java.math.BigInteger
 
 internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
@@ -184,5 +185,21 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
       .findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)!!.breakdownData
 
     assertEquals(adjustmentReason.points, breakdown.contactTypeWeightings[adjustmentReason.typeCode])
+  }
+
+  @Test
+  fun `must include weekly hours Points in breakdown`() {
+    val staffCode = "STAFF1"
+    val teamCode = "TM1"
+    val providerCode = "SC1"
+    val staffGrade = "PO"
+    val contractedWeeklyHours = BigDecimal.valueOf(37L)
+
+    workloadCalculation.calculate(staffCode, teamCode, providerCode, staffGrade)
+
+    val breakdown = workloadCalculationRepository
+      .findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)!!.breakdownData
+
+    assertEquals(contractedWeeklyHours, breakdown.contractedWeeklyHours)
   }
 }

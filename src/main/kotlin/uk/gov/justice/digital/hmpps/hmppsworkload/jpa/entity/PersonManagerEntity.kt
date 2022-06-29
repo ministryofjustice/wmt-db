@@ -49,6 +49,17 @@ ORDER BY crn, created_date DESC;
 """
 )
 
+@NamedNativeQuery(
+  name = "PersonManagerEntity.findByTeamCodeAndStaffCodeLatest",
+  resultSetMapping = "PersonManagerEntity",
+  query = """
+  SELECT DISTINCT ON (crn) *
+  FROM person_manager pm
+  WHERE pm.team_code = ?1 AND pm.staff_code = ?2
+  ORDER BY crn, created_date DESC;
+"""
+)
+
 @Entity
 @Table(name = "PERSON_MANAGER")
 @EntityListeners(AuditingEntityListener::class)
