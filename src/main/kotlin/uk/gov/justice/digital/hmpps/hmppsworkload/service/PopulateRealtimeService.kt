@@ -38,7 +38,7 @@ class PopulateRealtimeService(
   }
 
   private fun publishToHmppsOffenderQueue(case: CaseCsv): Mono<Any> {
-    return communityApiClient.getAllConvictions(case.crn!!)
+    return communityApiClient.getActiveConvictions(case.crn!!)
       .map { convictions ->
         convictions.filter { it.sentence != null }
           .map { it.sentence!! }

@@ -18,15 +18,14 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import java.io.File
 import java.io.FileWriter
-import java.math.BigInteger
 
 class PopulateOffenderEvents : IntegrationTestBase() {
 
   @Test
   fun `populate offender events from csv upload of crns`() {
     val crn = "CRN1"
-    val sentenceId = BigInteger.valueOf(2500278160L)
-    singleActiveConvictionResponseForAllConvictions(crn)
+
+    singleActiveConvictionResponse(crn)
     singleActiveConvictionResponseForAllConvictions(crn)
     singleActiveConvictionResponse(crn)
     tierCalculationResponse(crn)
