@@ -2,7 +2,7 @@
 generic-service:
   nameOverride: hmpps-workload
 
-  replicaCount: 4
+  replicaCount: 1
 
   image:
     repository: quay.io/hmpps/hmpps-workload

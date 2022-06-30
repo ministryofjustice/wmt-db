@@ -30,7 +30,7 @@ spring:
     username: "${database.username:root}"
     password: "${database.password:dev}"
     hikari:
-      maximum-pool-size: 25
+      maximum-pool-size: 10
   security:
     oauth2:
       resourceserver:
