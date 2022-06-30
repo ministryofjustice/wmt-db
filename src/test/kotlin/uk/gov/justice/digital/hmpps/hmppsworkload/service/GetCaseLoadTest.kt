@@ -59,4 +59,26 @@ class GetCaseLoadTest : IntegrationTestBase() {
 
     Assertions.assertEquals(realtimeCase.crn, actualCases[0].crn)
   }
+
+  @Test
+  fun `must return one case when offender manager and person manager have entries for the same CRN`() {
+
+    val staffCode = "OM1"
+    val teamCode = "T1"
+
+    val realtimeCase = Case(Tier.A1, CaseType.LICENSE, false, "CRN1111")
+    caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, CaseType.LICENSE))
+
+    personManagerRepository.save(
+      PersonManagerEntity(
+        crn = realtimeCase.crn, staffCode = staffCode,
+        teamCode = teamCode, staffId = BigInteger.TEN, offenderName = "offenderName", createdBy = "createdBy",
+        providerCode = "providerCode"
+      )
+    )
+
+    val actualCases = getCaseLoad.getCases(staffCode, teamCode)
+
+    Assertions.assertEquals(1, actualCases.size)
+  }
 }
