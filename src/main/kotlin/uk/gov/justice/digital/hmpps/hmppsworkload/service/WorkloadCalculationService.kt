@@ -28,13 +28,7 @@ class WorkloadCalculationService(
   private val getCaseLoad: GetCaseLoad
 ) {
 
-  fun calculate(
-    staffCode: String,
-    teamCode: String,
-    providerCode: String,
-    staffGrade: String
-  ): WorkloadCalculationEntity {
-
+  fun calculate(staffCode: String, teamCode: String, providerCode: String, staffGrade: String): WorkloadCalculationEntity {
     val cases = getCaseLoad.getCases(staffCode, teamCode)
     val courtReports = getCourtReports.getCourtReports(staffCode, teamCode)
     val paroleReports = getParoleReports.getParoleReports(staffCode, teamCode)
@@ -43,51 +37,12 @@ class WorkloadCalculationService(
     val contactsPerformedByOthers = getContacts.findContactsInCaseloadPerformedByOthers(staffCode, teamCode)
     val contactTypeWeightings = getContactTypeWeightings.findAll()
     val t2aWorkloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(true)
-    val workloadPointsWeighting: WorkloadPointsEntity =
-      workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
+    val workloadPointsWeighting: WorkloadPointsEntity = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
     val weeklyHours = weeklyHours.findWeeklyHours(teamCode, staffCode, staffGrade)
     val reductions = getReductionService.findReductionHours(staffCode, teamCode)
-    val availablePoints = capacityCalculator.calculateAvailablePoints(
-      workloadPointsWeighting.getDefaultPointsAvailable(staffGrade),
-      weeklyHours,
-      reductions,
-      workloadPointsWeighting.getDefaultContractedHours(staffGrade)
-    )
-
-    val workloadPoints = workloadCalculator.getWorkloadPoints(
-      cases,
-      courtReports,
-      paroleReports,
-      assessments,
-      contactsPerformedOutsideCaseload,
-      contactsPerformedByOthers,
-      contactTypeWeightings,
-      t2aWorkloadPoints,
-      workloadPointsWeighting
-    )
-
-    return workloadCalculationRepository.save(
-      WorkloadCalculationEntity(
-        weeklyHours = weeklyHours,
-        reductions = reductions,
-        availablePoints = availablePoints,
-        workloadPoints = workloadPoints,
-        staffCode = staffCode,
-        teamCode = teamCode,
-        providerCode = providerCode,
-        breakdownData = BreakdownDataEntity(
-          getCourtReportCounts(courtReports, CourtReportType.STANDARD),
-          getCourtReportCounts(courtReports, CourtReportType.FAST),
-          paroleReports,
-          getAssessmentCounts(assessments, CaseType.COMMUNITY),
-          getAssessmentCounts(assessments, CaseType.LICENSE),
-          getContactTypeCodeCounts(contactsPerformedOutsideCaseload),
-          getContactTypeCodeCounts(contactsPerformedByOthers),
-          contactTypeWeightings,
-          weeklyHours
-        )
-      )
-    )
+    val availablePoints = capacityCalculator.calculateAvailablePoints(workloadPointsWeighting.getDefaultPointsAvailable(staffGrade), weeklyHours, reductions, workloadPointsWeighting.getDefaultContractedHours(staffGrade))
+    val workloadPoints = workloadCalculator.getWorkloadPoints(cases, courtReports, paroleReports, assessments, contactsPerformedOutsideCaseload, contactsPerformedByOthers, contactTypeWeightings, t2aWorkloadPoints, workloadPointsWeighting)
+    return workloadCalculationRepository.save(WorkloadCalculationEntity(weeklyHours = weeklyHours, reductions = reductions, availablePoints = availablePoints, workloadPoints = workloadPoints, staffCode = staffCode, teamCode = teamCode, providerCode = providerCode, breakdownData = BreakdownDataEntity(getCourtReportCounts(courtReports, CourtReportType.STANDARD), getCourtReportCounts(courtReports, CourtReportType.FAST), paroleReports, getAssessmentCounts(assessments, CaseType.COMMUNITY), getAssessmentCounts(assessments, CaseType.LICENSE), getContactTypeCodeCounts(contactsPerformedOutsideCaseload), getContactTypeCodeCounts(contactsPerformedByOthers), contactTypeWeightings, weeklyHours)))
   }
 
   private fun getCourtReportCounts(courtReports: List<CourtReport>, type: CourtReportType): Int =
