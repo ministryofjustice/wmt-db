@@ -14,7 +14,7 @@ import java.math.BigInteger
 class GetCaseLoadTest : IntegrationTestBase() {
 
   @Autowired
-  private lateinit var getCaseLoad: GetCaseLoad
+  private lateinit var getCaseLoad: GetCombinedCaseLoad
 
   @Test
   fun `must return list of cases`() {
