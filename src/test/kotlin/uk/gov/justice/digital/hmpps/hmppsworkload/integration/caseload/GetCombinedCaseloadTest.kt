@@ -1,23 +1,28 @@
-package uk.gov.justice.digital.hmpps.hmppsworkload.service
+package uk.gov.justice.digital.hmpps.hmppsworkload.integration.caseload
 
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetCombinedCaseload
 import java.math.BigInteger
 
-class GetCaseLoadTest : IntegrationTestBase() {
+class GetCombinedCaseloadTest : IntegrationTestBase() {
 
-  @Autowired
-  private lateinit var getCaseLoad: GetCombinedCaseLoad
+  private lateinit var getCaseLoad: GetCombinedCaseload
+
+  @BeforeAll
+  fun setup() {
+    getCaseLoad = GetCombinedCaseload(offenderManagerRepository, personManagerRepository, caseDetailsRepository)
+  }
 
   @Test
-  fun `must return list of cases`() {
+  fun `must return list of wmt cases`() {
     val staffCode = "OM1"
     val teamCode = "T1"
 

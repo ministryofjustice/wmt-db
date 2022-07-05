@@ -2,6 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 
-interface GetCaseLoad {
+interface GetCaseload {
   fun getCases(staffCode: String, teamCode: String): List<Case>
 }
