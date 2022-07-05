@@ -7,5 +7,5 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTInstitutiona
 class WMTGetParoleReports(private val wmtInstitutionalReportRepository: WMTInstitutionalReportRepository) :
   GetParoleReports {
   override fun getParoleReports(staffCode: String, teamCode: String): Int =
-    wmtInstitutionalReportRepository.findFirstByStaffCodeAndTeamCode(staffCode, teamCode)?.let { it.paroleReports } ?: 0
+    wmtInstitutionalReportRepository.findFirstByStaffCodeAndTeamCode(staffCode, teamCode)?.paroleReports ?: 0
 }
