@@ -1,8 +1,8 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.caseload
 
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType.LICENSE
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier.A1
@@ -10,13 +10,16 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBas
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetCaseload
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetCurrentlyManagedCaseload
 import java.math.BigInteger
 
 class GetCaseloadTest : IntegrationTestBase() {
 
-  @Autowired
   private lateinit var getCaseLoad: GetCaseload
-
+  @BeforeAll
+  fun setup() {
+    getCaseLoad = GetCurrentlyManagedCaseload(personManagerRepository, caseDetailsRepository)
+  }
   @Test
   fun `must not return list of cases if no realtime data exist`() {
     val staffCode = "OM1"
