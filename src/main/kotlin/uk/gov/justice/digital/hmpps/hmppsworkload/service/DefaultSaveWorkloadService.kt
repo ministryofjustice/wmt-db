@@ -25,25 +25,16 @@ class DefaultSaveWorkloadService(
     loggedInUser: String,
     authToken: String
   ): CaseAllocated {
-    return Mono.zip(communityApiClient.getStaffById(staffId), communityApiClient.getSummaryByCrn(allocateCase.crn), communityApiClient.getActiveRequirements(allocateCase.crn, allocateCase.eventId))
+    return Mono.zip(
+      communityApiClient.getStaffById(staffId), communityApiClient.getSummaryByCrn(allocateCase.crn), communityApiClient.getActiveRequirements(allocateCase.crn, allocateCase.eventId)
+    )
       .flatMap { results ->
         val staff = results.t1
-        val personManagerId = savePersonManagerService.savePersonManager(
-          teamCode,
-          staff, allocateCase, loggedInUser, results.t2
-        ).uuid
+        val personManagerId = savePersonManagerService.savePersonManager(teamCode, staff, allocateCase, loggedInUser, results.t2).uuid
         val eventManagerId = saveEventManagerService.saveEventManager(teamCode, staff, allocateCase, loggedInUser).uuid
-        val requirementManagerIds = saveRequirementManagerService.saveRequirementManagers(
-          teamCode,
-          staff, allocateCase, loggedInUser, results.t3.requirements
-        )
+        val requirementManagerIds = saveRequirementManagerService.saveRequirementManagers(teamCode, staff, allocateCase, loggedInUser, results.t3.requirements)
 
-        workloadCalculationService.calculate(
-          staffCode = staff.staffCode,
-          teamCode = teamCode,
-          providerCode = staff.probationArea?.code ?: "",
-          staffGrade = staff.staffGrade?.code ?: ""
-        )
+        workloadCalculationService.calculate(staff.staffCode, teamCode, staff.probationArea?.code ?: "", staff.staffGrade?.code ?: "")
 
         notificationService.notifyAllocation(staff, results.t2, results.t3.requirements, allocateCase, loggedInUser, teamCode, authToken)
           .map { CaseAllocated(personManagerId, eventManagerId, requirementManagerIds.map { it.uuid }) }
