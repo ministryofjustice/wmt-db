@@ -18,9 +18,11 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.emailRes
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RequirementManagerEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadCalculationEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.NotificationService
 import uk.gov.service.notify.SendEmailResponse
 import java.math.BigInteger
+import java.time.LocalDateTime
 
 class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
@@ -71,6 +73,15 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
 
     expectWorkloadAllocationCompleteMessages(crn)
+
+    val actualWorkloadCalcEntity: WorkloadCalculationEntity? =
+      workloadCalculationRepository.findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)
+
+    Assertions.assertAll(
+      { Assertions.assertEquals(staffCode, actualWorkloadCalcEntity?.staffCode) },
+      { Assertions.assertEquals(teamCode, actualWorkloadCalcEntity?.teamCode) },
+      { Assertions.assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity?.calculatedDate?.dayOfMonth) }
+    )
 
     verify(exactly = 1) { notificationService.notifyAllocation(any(), any(), any(), any(), any(), teamCode, any()) }
   }

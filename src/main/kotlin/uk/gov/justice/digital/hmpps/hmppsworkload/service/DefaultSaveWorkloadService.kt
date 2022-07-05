@@ -14,7 +14,8 @@ class DefaultSaveWorkloadService(
   private val communityApiClient: CommunityApiClient,
   private val saveEventManagerService: SaveEventManagerService,
   private val saveRequirementManagerService: SaveRequirementManagerService,
-  private val notificationService: NotificationService
+  private val notificationService: NotificationService,
+  private val workloadCalculationService: WorkloadCalculationService
 ) : SaveWorkloadService {
   @Transactional
   override fun saveWorkload(
@@ -26,10 +27,25 @@ class DefaultSaveWorkloadService(
   ): CaseAllocated {
     return Mono.zip(communityApiClient.getStaffById(staffId), communityApiClient.getSummaryByCrn(allocateCase.crn), communityApiClient.getActiveRequirements(allocateCase.crn, allocateCase.eventId))
       .flatMap { results ->
-        val personManagerId = savePersonManagerService.savePersonManager(teamCode, results.t1, allocateCase, loggedInUser, results.t2).uuid
-        val eventManagerId = saveEventManagerService.saveEventManager(teamCode, results.t1, allocateCase, loggedInUser).uuid
-        val requirementManagerIds = saveRequirementManagerService.saveRequirementManagers(teamCode, results.t1, allocateCase, loggedInUser, results.t3.requirements)
-        notificationService.notifyAllocation(results.t1, results.t2, results.t3.requirements, allocateCase, loggedInUser, teamCode, authToken)
+        val staff = results.t1
+        val personManagerId = savePersonManagerService.savePersonManager(
+          teamCode,
+          staff, allocateCase, loggedInUser, results.t2
+        ).uuid
+        val eventManagerId = saveEventManagerService.saveEventManager(teamCode, staff, allocateCase, loggedInUser).uuid
+        val requirementManagerIds = saveRequirementManagerService.saveRequirementManagers(
+          teamCode,
+          staff, allocateCase, loggedInUser, results.t3.requirements
+        )
+
+        workloadCalculationService.calculate(
+          staffCode = staff.staffCode,
+          teamCode = teamCode,
+          providerCode = staff.probationArea?.code ?: "",
+          staffGrade = staff.staffGrade?.code ?: ""
+        )
+
+        notificationService.notifyAllocation(staff, results.t2, results.t3.requirements, allocateCase, loggedInUser, teamCode, authToken)
           .map { CaseAllocated(personManagerId, eventManagerId, requirementManagerIds.map { it.uuid }) }
       }.block()!!
   }

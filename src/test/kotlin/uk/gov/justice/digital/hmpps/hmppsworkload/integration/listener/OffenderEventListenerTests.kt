@@ -211,4 +211,28 @@ class OffenderEventListenerTests : IntegrationTestBase() {
 
     assertThat(sentenceRepository.count()).isEqualTo(1)
   }
+
+  @Test
+  fun `update case details when there is a change`() {
+    val crn = "J678910"
+    val sentenceId = BigInteger.valueOf(2500278160L)
+    singleActiveConvictionResponseForAllConvictions(crn)
+    singleActiveConvictionResponse(crn)
+    tierCalculationResponse(crn)
+
+    val caseDetailsEntity = CaseDetailsEntity(crn, Tier.C3, CaseType.COMMUNITY)
+
+    caseDetailsRepository.save(caseDetailsEntity)
+
+    hmppsOffenderSnsClient.publish(
+      PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn, sentenceId))).withMessageAttributes(
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED"))
+      )
+    )
+
+    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+
+    assertThat(caseDetailsRepository.count()).isEqualTo(1)
+    assertThat(caseDetailsRepository.findByIdOrNull(crn)?.tier).isEqualTo(Tier.B3)
+  }
 }
