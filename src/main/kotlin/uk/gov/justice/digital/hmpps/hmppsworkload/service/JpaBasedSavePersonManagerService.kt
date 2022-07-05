@@ -24,13 +24,13 @@ class JpaBasedSavePersonManagerService(
       if (personManager.staffId == staff.staffIdentifier && personManager.teamCode == teamCode) {
         personManager
       } else {
-        createPersonManagerEntity(allocateCase, staff, teamCode, personSummary, loggedInUser)
+        createPersonManagerEntityAndSendSQSMessage(allocateCase, staff, teamCode, personSummary, loggedInUser)
       }
     } ?: run {
-      createPersonManagerEntity(allocateCase, staff, teamCode, personSummary, loggedInUser)
+      createPersonManagerEntityAndSendSQSMessage(allocateCase, staff, teamCode, personSummary, loggedInUser)
     }
 
-  private fun createPersonManagerEntity(
+  private fun createPersonManagerEntityAndSendSQSMessage(
     allocateCase: AllocateCase,
     staff: Staff,
     teamCode: String,
