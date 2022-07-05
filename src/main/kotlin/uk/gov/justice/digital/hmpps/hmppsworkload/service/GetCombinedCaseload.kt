@@ -17,7 +17,7 @@ class GetCombinedCaseload(
 
   override fun getCases(staffCode: String, teamCode: String): List<Case> {
     val wmtCases: List<OffenderManagerCase> =
-      offenderManagerRepository.findCasesByTeamCodeAndStaffCode(teamCode, staffCode)
+      offenderManagerRepository.findCasesByTeamCodeAndStaffCode(staffCode, teamCode)
 
     val realtimeCases: List<PersonManagerEntity> =
       personManagerRepository.findByTeamCodeAndStaffCodeLatest(teamCode, staffCode)

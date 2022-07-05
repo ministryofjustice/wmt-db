@@ -15,7 +15,7 @@ interface OffenderManagerRepository : CrudRepository<OffenderManagerEntity, Long
   @Query(nativeQuery = true)
   fun findByCaseloadTotals(workloadOwnerId: Long): List<OffenderManagerCaseloadTotals>
   @Query(nativeQuery = true)
-  fun findCasesByTeamCodeAndStaffCode(teamCode: String, offenderManagerCode: String): List<OffenderManagerCase>
+  fun findCasesByTeamCodeAndStaffCode(offenderManagerCode: String, teamCode: String): List<OffenderManagerCase>
   @Query(nativeQuery = true)
   fun findCaseByTeamCodeAndStaffCodeAndCrn(teamCode: String, offenderManagerCode: String, crn: String): OffenderManagerCase?
 

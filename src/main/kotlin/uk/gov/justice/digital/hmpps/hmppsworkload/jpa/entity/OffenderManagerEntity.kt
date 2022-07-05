@@ -126,7 +126,7 @@ import javax.persistence.Table
         ON w.workload_report_id = wr.id
     JOIN app.case_category AS cc
         ON c.tier_code = cc.category_id
-    WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS null and c.row_type = 'N' and t.code = ?1 and om."key" = ?2
+    WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS null and c.row_type = 'N' and t.code = ?2 and om."key" = ?1
 """
 )
 @NamedNativeQuery(

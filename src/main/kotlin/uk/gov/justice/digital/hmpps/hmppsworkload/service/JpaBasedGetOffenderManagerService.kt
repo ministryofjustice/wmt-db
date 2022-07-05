@@ -106,7 +106,7 @@ class JpaBasedGetOffenderManagerService(
       it.tierCaseTotals = totals.map { total -> TierCaseTotals(total.getATotal(), total.getBTotal(), total.getCTotal(), total.getDTotal(), total.untiered) }
         .fold(TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)) { first, second -> TierCaseTotals(first.A.add(second.A), first.B.add(second.B), first.C.add(second.C), first.D.add(second.D), first.untiered.add(second.untiered)) }
     }
-    offenderManagerRepository.findCasesByTeamCodeAndStaffCode(teamCode, offenderManagerCode).let { cases ->
+    offenderManagerRepository.findCasesByTeamCodeAndStaffCode(offenderManagerCode, teamCode).let { cases ->
       val crns = cases.map { case -> case.crn }
       it.caseEndDue = getSentenceService.getCasesDueToEndCount(crns)
       it.releasesDue = getSentenceService.getCasesDueToBeReleases(crns)
@@ -128,7 +128,7 @@ class JpaBasedGetOffenderManagerService(
   }
 
   override fun getCases(teamCode: String, offenderManagerCode: String): OffenderManagerCases? =
-    offenderManagerRepository.findCasesByTeamCodeAndStaffCode(teamCode, offenderManagerCode).let { cases ->
+    offenderManagerRepository.findCasesByTeamCodeAndStaffCode(offenderManagerCode, teamCode).let { cases ->
       Mono.zip(
         communityApiClient.getStaffByCode(offenderManagerCode),
         getCrnToOffenderDetails(cases.map { it.crn })
