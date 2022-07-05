@@ -8,8 +8,8 @@ import java.math.BigDecimal
 @Service
 class GetWeeklyHours(private val wmtWorkloadOwnerRepository: WMTWorkloadOwnerRepository, private val workloadPointsRepository: WorkloadPointsRepository) {
 
-  fun findWeeklyHours(teamCode: String, staffCode: String, staffGrade: String): BigDecimal = (
-    wmtWorkloadOwnerRepository.findFirstByTeamCodeAndOffenderManagerCodeOrderByIdDesc(teamCode, staffCode)?.contractedHours
+  fun findWeeklyHours(staffCode: String, teamCode: String, staffGrade: String): BigDecimal = (
+    wmtWorkloadOwnerRepository.findFirstByOffenderManagerCodeAndTeamCodeOrderByIdDesc(staffCode, teamCode)?.contractedHours
       ?: getDefaultWeeklyHoursForGrade(staffGrade)
     ).stripTrailingZeros()
 

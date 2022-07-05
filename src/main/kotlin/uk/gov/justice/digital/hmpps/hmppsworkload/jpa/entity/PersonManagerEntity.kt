@@ -55,7 +55,7 @@ ORDER BY crn, created_date DESC;
   query = """
   SELECT DISTINCT ON (crn) *
   FROM person_manager pm
-  WHERE pm.team_code = ?1 AND pm.staff_code = ?2
+  WHERE pm.staff_code = ?1 AND pm.team_code = ?2
   ORDER BY crn, created_date DESC;
 """
 )

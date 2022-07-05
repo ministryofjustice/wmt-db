@@ -6,5 +6,5 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTAssessmentEntity
 
 @Repository
 interface WMTAssessmentRepository : CrudRepository<WMTAssessmentEntity, Long> {
-  fun findByTeamCodeAndStaffCode(teamCode: String, staffCode: String): List<WMTAssessmentEntity>
+  fun findByStaffCodeAndTeamCode(staffCode: String, teamCode: String): List<WMTAssessmentEntity>
 }

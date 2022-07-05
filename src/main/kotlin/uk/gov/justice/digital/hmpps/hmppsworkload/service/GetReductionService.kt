@@ -14,7 +14,7 @@ class GetReductionService(private val reductionsRepository: ReductionsRepository
     ReductionStatus.ARCHIVED, ReductionStatus.DELETED
   )
 
-  fun findNextReductionChange(staffCode: String, teamCode: String): ZonedDateTime? = workloadOwnerRepository.findFirstByTeamCodeAndOffenderManagerCodeOrderByIdDesc(teamCode, staffCode)?.let { workloadOwner ->
+  fun findNextReductionChange(staffCode: String, teamCode: String): ZonedDateTime? = workloadOwnerRepository.findFirstByOffenderManagerCodeAndTeamCodeOrderByIdDesc(staffCode, teamCode)?.let { workloadOwner ->
     reductionsRepository.findByWorkloadOwnerIdAndEffectiveFromGreaterThanOrEffectiveToGreaterThanAndStatusNotIn(
       workloadOwner.id!!, ZonedDateTime.now(), ZonedDateTime.now(), excludeStatuses
     )
@@ -28,7 +28,7 @@ class GetReductionService(private val reductionsRepository: ReductionsRepository
   }
 
   fun findReductionHours(staffCode: String, teamCode: String): BigDecimal = (
-    workloadOwnerRepository.findFirstByTeamCodeAndOffenderManagerCodeOrderByIdDesc(teamCode, staffCode)?.let { workloadOwner ->
+    workloadOwnerRepository.findFirstByOffenderManagerCodeAndTeamCodeOrderByIdDesc(staffCode, teamCode)?.let { workloadOwner ->
       reductionsRepository.findByWorkloadOwnerIdAndEffectiveFromLessThanAndEffectiveToGreaterThanAndStatusNotIn(
         workloadOwner.id!!, ZonedDateTime.now(), ZonedDateTime.now(), excludeStatuses
       )
