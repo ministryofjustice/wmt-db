@@ -50,7 +50,7 @@ ORDER BY crn, created_date DESC;
 )
 
 @NamedNativeQuery(
-  name = "PersonManagerEntity.findByTeamCodeAndStaffCodeLatest",
+  name = "PersonManagerEntity.findByStaffCodeAndTeamCodeLatest",
   resultSetMapping = "PersonManagerEntity",
   query = """
   SELECT DISTINCT ON (crn) *

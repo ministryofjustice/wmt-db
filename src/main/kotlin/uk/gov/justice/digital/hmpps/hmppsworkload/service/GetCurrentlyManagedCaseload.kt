@@ -12,7 +12,7 @@ class GetCurrentlyManagedCaseload(
   override fun getCases(staffCode: String, teamCode: String): List<Case> {
 
     val realtimeCases: List<PersonManagerEntity> =
-      personManagerRepository.findByTeamCodeAndStaffCodeLatest(staffCode, teamCode)
+      personManagerRepository.findByStaffCodeAndTeamCodeLatest(staffCode, teamCode)
 
     return caseDetailsRepository.findAllById(
       realtimeCases.map { c -> c.crn }

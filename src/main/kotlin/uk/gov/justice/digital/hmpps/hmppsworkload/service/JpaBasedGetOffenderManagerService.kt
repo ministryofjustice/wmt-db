@@ -74,15 +74,20 @@ class JpaBasedGetOffenderManagerService(
           staff.staff.surname,
           gradeMapper.deliusToStaffGrade(staff.staffGrade?.code),
           staff.staffCode,
-          team.description,
-          teamCode
+          team.description
         )
       }
       overview.potentialCapacity = capacityCalculator.calculate(overview.totalPoints, overview.availablePoints)
       overview
     }
 
-  fun getDefaultOffenderManagerOverview(forename: String, surname: String, grade: String, staffCode: String, teamName: String, teamCode: String): OffenderManagerOverview {
+  private fun getDefaultOffenderManagerOverview(
+    forename: String,
+    surname: String,
+    grade: String,
+    staffCode: String,
+    teamName: String
+  ): OffenderManagerOverview {
     val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
     val defaultAvailablePointsForGrade = workloadPoints.getDefaultPointsAvailable(grade)
 
@@ -125,8 +130,7 @@ class JpaBasedGetOffenderManagerService(
           staff.staff.surname,
           gradeMapper.deliusToStaffGrade(staff.staffGrade?.code),
           staff.staffCode,
-          team.description,
-          teamCode
+          team.description
         )
       }.block()
   }
