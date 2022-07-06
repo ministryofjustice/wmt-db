@@ -74,15 +74,20 @@ class JpaBasedGetOffenderManagerService(
           staff.staff.surname,
           gradeMapper.deliusToStaffGrade(staff.staffGrade?.code),
           staff.staffCode,
-          team.description,
-          teamCode
+          team.description
         )
       }
       overview.potentialCapacity = capacityCalculator.calculate(overview.totalPoints, overview.availablePoints)
       overview
     }
 
-  fun getDefaultOffenderManagerOverview(forename: String, surname: String, grade: String, staffCode: String, teamName: String, teamCode: String): OffenderManagerOverview {
+  private fun getDefaultOffenderManagerOverview(
+    forename: String,
+    surname: String,
+    grade: String,
+    staffCode: String,
+    teamName: String
+  ): OffenderManagerOverview {
     val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
     val defaultAvailablePointsForGrade = workloadPoints.getDefaultPointsAvailable(grade)
 
@@ -101,7 +106,11 @@ class JpaBasedGetOffenderManagerService(
     it.capacity = capacityCalculator.calculate(it.totalPoints, it.availablePoints)
     it.nextReductionChange = getReductionService.findNextReductionChange(offenderManagerCode, teamCode)
     it.reductionHours = getReductionService.findReductionHours(offenderManagerCode, teamCode)
-    it.contractedHours = getWeeklyHours.findWeeklyHours(teamCode, offenderManagerCode, gradeMapper.workloadToStaffGrade(it.grade))
+    it.contractedHours = getWeeklyHours.findWeeklyHours(
+      offenderManagerCode,
+      teamCode,
+      gradeMapper.workloadToStaffGrade(it.grade)
+    )
     offenderManagerRepository.findByCaseloadTotals(it.workloadOwnerId).let { totals ->
       it.tierCaseTotals = totals.map { total -> TierCaseTotals(total.getATotal(), total.getBTotal(), total.getCTotal(), total.getDTotal(), total.untiered) }
         .fold(TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)) { first, second -> TierCaseTotals(first.A.add(second.A), first.B.add(second.B), first.C.add(second.C), first.D.add(second.D), first.untiered.add(second.untiered)) }
@@ -121,8 +130,7 @@ class JpaBasedGetOffenderManagerService(
           staff.staff.surname,
           gradeMapper.deliusToStaffGrade(staff.staffGrade?.code),
           staff.staffCode,
-          team.description,
-          teamCode
+          team.description
         )
       }.block()
   }

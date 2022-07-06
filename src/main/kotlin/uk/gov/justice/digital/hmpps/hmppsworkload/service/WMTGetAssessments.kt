@@ -9,7 +9,7 @@ import java.util.Locale
 @Service
 class WMTGetAssessments(private val wmtAssessmentRepository: WMTAssessmentRepository) : GetAssessments {
   override fun getAssessments(staffCode: String, teamCode: String): List<Assessment> =
-    wmtAssessmentRepository.findByTeamCodeAndStaffCode(teamCode, staffCode).let { wmtAssessments ->
+    wmtAssessmentRepository.findByStaffCodeAndTeamCode(staffCode, teamCode).let { wmtAssessments ->
       wmtAssessments.map { Assessment(CaseType.valueOf(it.sentenceType.uppercase(Locale.getDefault()))) }
     }
 }

@@ -9,7 +9,7 @@ import java.util.stream.IntStream
 @Service
 class WMTGetCourtReports(private val wmtCourtReportsRepository: WMTCourtReportsRepository) : GetCourtReports {
   override fun getCourtReports(staffCode: String, teamCode: String): List<CourtReport> =
-    wmtCourtReportsRepository.findByTeamCodeAndStaffCode(teamCode, staffCode)?.let { wmtCourtReportsEntity ->
+    wmtCourtReportsRepository.findByStaffCodeAndTeamCode(staffCode, teamCode)?.let { wmtCourtReportsEntity ->
       return countToCourtReports(wmtCourtReportsEntity.standardDeliveryReportCount, CourtReportType.STANDARD) +
         countToCourtReports(wmtCourtReportsEntity.fastDeliveryReportCount, CourtReportType.FAST)
     } ?: emptyList()

@@ -20,7 +20,7 @@ class GetCombinedCaseload(
       offenderManagerRepository.findCasesByTeamCodeAndStaffCode(staffCode, teamCode)
 
     val realtimeCases: List<PersonManagerEntity> =
-      personManagerRepository.findByTeamCodeAndStaffCodeLatest(teamCode, staffCode)
+      personManagerRepository.findByStaffCodeAndTeamCodeLatest(staffCode, teamCode)
 
     return caseDetailsRepository.findAllById(
       wmtCases

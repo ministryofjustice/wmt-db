@@ -6,5 +6,5 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTCourtReportsEnti
 
 @Repository
 interface WMTCourtReportsRepository : CrudRepository<WMTCourtReportsEntity, Long> {
-  fun findByTeamCodeAndStaffCode(teamCode: String, staffCode: String): WMTCourtReportsEntity?
+  fun findByStaffCodeAndTeamCode(staffCode: String, teamCode: String): WMTCourtReportsEntity?
 }
