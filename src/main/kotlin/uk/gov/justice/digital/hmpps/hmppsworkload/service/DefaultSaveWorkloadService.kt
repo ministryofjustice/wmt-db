@@ -5,6 +5,7 @@ import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseAllocated
+import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.GradeMapper
 import java.math.BigInteger
 import javax.transaction.Transactional
 
@@ -15,7 +16,8 @@ class DefaultSaveWorkloadService(
   private val saveEventManagerService: SaveEventManagerService,
   private val saveRequirementManagerService: SaveRequirementManagerService,
   private val notificationService: NotificationService,
-  private val workloadCalculationService: WorkloadCalculationService
+  private val workloadCalculationService: WorkloadCalculationService,
+  private val gradeMapper: GradeMapper
 ) : SaveWorkloadService {
   @Transactional
   override fun saveWorkload(
@@ -34,7 +36,7 @@ class DefaultSaveWorkloadService(
         val eventManagerId = saveEventManagerService.saveEventManager(teamCode, staff, allocateCase, loggedInUser).uuid
         val requirementManagerIds = saveRequirementManagerService.saveRequirementManagers(teamCode, staff, allocateCase, loggedInUser, results.t3.requirements)
 
-        workloadCalculationService.calculate(staff.staffCode, teamCode, staff.probationArea?.code ?: "", staff.staffGrade?.code ?: "")
+        workloadCalculationService.calculate(staff.staffCode, teamCode, staff.probationArea?.code ?: "", gradeMapper.deliusToStaffGrade(staff.staffGrade?.code ?: ""))
 
         notificationService.notifyAllocation(staff, results.t2, results.t3.requirements, allocateCase, loggedInUser, teamCode, authToken)
           .map { CaseAllocated(personManagerId, eventManagerId, requirementManagerIds.map { it.uuid }) }

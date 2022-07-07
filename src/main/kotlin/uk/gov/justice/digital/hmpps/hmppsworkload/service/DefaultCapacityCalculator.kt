@@ -22,8 +22,8 @@ class DefaultCapacityCalculator : CapacityCalculator {
     defaultContractedHoursForGrade: BigDecimal
   ): BigInteger {
     if (currentHours != BigDecimal.ZERO && defaultContractedHoursForGrade != BigDecimal.ZERO) {
-      val availablePointsForCurrentHours = availablePoints.multiply(currentHours.divide(defaultContractedHoursForGrade))
-      val currentHoursWorked = currentHours.minus(reductionHours).divide(currentHours)
+      val availablePointsForCurrentHours = availablePoints.multiply(currentHours.divide(defaultContractedHoursForGrade, 2, RoundingMode.HALF_UP))
+      val currentHoursWorked = currentHours.minus(reductionHours).divide(currentHours, 2, RoundingMode.HALF_UP)
       return availablePointsForCurrentHours.multiply(currentHoursWorked).toBigInteger()
     }
     return BigInteger.ZERO

@@ -13,9 +13,12 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.SentenceEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadCalculationEntity
 import java.math.BigInteger
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
 
 class OffenderEventListenerTests : IntegrationTestBase() {
@@ -66,9 +69,16 @@ class OffenderEventListenerTests : IntegrationTestBase() {
   fun `must save case details when processing new sentence event`() {
     val crn = "J678910"
     val sentenceId = BigInteger.valueOf(2500278160L)
+    val staffCode = "staff1"
+    val teamCode = "team1"
+    val staffId = BigInteger.ONE
     singleActiveConvictionResponseForAllConvictions(crn)
     singleActiveConvictionResponse(crn)
     tierCalculationResponse(crn)
+
+    staffIdResponse(staffId, staffCode, teamCode)
+    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "offender", createdBy = "createdby", providerCode = "providerCode"))
+
     hmppsOffenderSnsClient.publish(
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn, sentenceId))).withMessageAttributes(
         mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED"))
@@ -90,9 +100,16 @@ class OffenderEventListenerTests : IntegrationTestBase() {
   fun `only save latest case details if they have changed`() {
     val crn = "J678910"
     val sentenceId = BigInteger.valueOf(2500278160L)
+    val staffCode = "staff1"
+    val teamCode = "team1"
+    val staffId = BigInteger.ONE
     singleActiveConvictionResponseForAllConvictions(crn)
     singleActiveConvictionResponse(crn)
     tierCalculationResponse(crn)
+
+    staffIdResponse(staffId, staffCode, teamCode)
+    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "offender", createdBy = "createdby", providerCode = "providerCode"))
+    staffIdResponse(staffId, staffCode, teamCode)
 
     singleActiveConvictionResponseForAllConvictions(crn)
     singleActiveConvictionResponse(crn)
@@ -216,12 +233,16 @@ class OffenderEventListenerTests : IntegrationTestBase() {
   fun `update case details when there is a change`() {
     val crn = "J678910"
     val sentenceId = BigInteger.valueOf(2500278160L)
+    val staffCode = "staff1"
+    val teamCode = "team1"
+    val staffId = BigInteger.ONE
     singleActiveConvictionResponseForAllConvictions(crn)
     singleActiveConvictionResponse(crn)
     tierCalculationResponse(crn)
 
     val caseDetailsEntity = CaseDetailsEntity(crn, Tier.C3, CaseType.COMMUNITY)
-
+    staffIdResponse(staffId, staffCode, teamCode)
+    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "offender", createdBy = "createdby", providerCode = "providerCode"))
     caseDetailsRepository.save(caseDetailsEntity)
 
     hmppsOffenderSnsClient.publish(
@@ -234,5 +255,42 @@ class OffenderEventListenerTests : IntegrationTestBase() {
 
     assertThat(caseDetailsRepository.count()).isEqualTo(1)
     assertThat(caseDetailsRepository.findByIdOrNull(crn)?.tier).isEqualTo(Tier.B3)
+  }
+
+  @Test
+  fun `calculate workload when updating case details for realtime offender manager`() {
+    val crn = "J678910"
+    val staffCode = "staff1"
+    val teamCode = "team1"
+    val staffId = BigInteger.ONE
+
+    val sentenceId = BigInteger.valueOf(2500278160L)
+    singleActiveConvictionResponseForAllConvictions(crn)
+    singleActiveConvictionResponse(crn)
+    tierCalculationResponse(crn)
+
+    val caseDetailsEntity = CaseDetailsEntity(crn, Tier.C3, CaseType.COMMUNITY)
+
+    caseDetailsRepository.save(caseDetailsEntity)
+
+    staffIdResponse(staffId, staffCode, teamCode)
+    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "offender", createdBy = "createdby", providerCode = "providerCode"))
+
+    hmppsOffenderSnsClient.publish(
+      PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn, sentenceId))).withMessageAttributes(
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED"))
+      )
+    )
+
+    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+
+    val actualWorkloadCalcEntity: WorkloadCalculationEntity? =
+      workloadCalculationRepository.findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)
+
+    Assertions.assertAll(
+      { Assertions.assertEquals(staffCode, actualWorkloadCalcEntity?.staffCode) },
+      { Assertions.assertEquals(teamCode, actualWorkloadCalcEntity?.teamCode) },
+      { Assertions.assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity?.calculatedDate?.dayOfMonth) }
+    )
   }
 }
