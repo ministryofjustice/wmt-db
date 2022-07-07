@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.HmppsTierApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PersonManager
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
@@ -17,7 +18,10 @@ class SaveCaseDetailsService(
   @Qualifier("communityApiClient") private val communityApiClient: CommunityApiClient,
   private val caseTypeMapper: CaseTypeMapper,
   @Qualifier("hmppsTierApiClient") private val hmppsTierApiClient: HmppsTierApiClient,
-  private val caseDetailsRepository: CaseDetailsRepository
+  private val caseDetailsRepository: CaseDetailsRepository,
+  private val workloadCalculationService: WorkloadCalculationService,
+  @Qualifier("offenderManagerService") private val offenderManagerService: OffenderManagerService
+
 ) {
   @Transactional
   fun save(crn: String) {
@@ -30,7 +34,13 @@ class SaveCaseDetailsService(
         case.type = caseType
         case.tier = tier
         case
-      }.block()?.let { caseDetailsRepository.save(it) }
+      }.block()?.let {
+        caseDetailsRepository.save(it)
+        val staff: PersonManager? = offenderManagerService.getByCrn(crn)
+        if (staff != null) {
+          workloadCalculationService.calculate(staff.staffCode, staff.teamCode, staff.providerCode, staff.staffGrade)
+        }
+      }
     } ?: caseDetailsRepository.findByIdOrNull(crn)?.let { caseDetailsRepository.delete(it) }
   }
 }

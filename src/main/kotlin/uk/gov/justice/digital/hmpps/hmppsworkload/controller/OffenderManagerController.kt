@@ -21,7 +21,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerCases
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerOverview
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerPotentialWorkload
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetOffenderManagerService
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.SaveCaseDetailsService
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.SaveWorkloadService
 import java.math.BigInteger
 import javax.persistence.EntityNotFoundException
@@ -30,8 +29,7 @@ import javax.persistence.EntityNotFoundException
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 class OffenderManagerController(
   private val getOffenderManagerService: GetOffenderManagerService,
-  private val saveWorkloadService: SaveWorkloadService,
-  private val saveCaseDetailsService: SaveCaseDetailsService
+  private val saveWorkloadService: SaveWorkloadService
 ) {
 
   @Operation(summary = "Retrieves capacity and potential capacity if case were to be allocated")
@@ -86,7 +84,6 @@ class OffenderManagerController(
       HttpHeaders.AUTHORIZATION
     ) authToken: String
   ): CaseAllocated {
-    saveCaseDetailsService.save(allocateCase.crn)
     return saveWorkloadService.saveWorkload(teamCode, staffId, allocateCase, authentication.name, authToken)
   }
 
