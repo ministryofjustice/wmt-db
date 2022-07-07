@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseAllocated
@@ -27,19 +26,14 @@ class DefaultSaveWorkloadService(
     loggedInUser: String,
     authToken: String
   ): CaseAllocated {
-    return Mono.zip(
-      communityApiClient.getStaffById(staffId), communityApiClient.getSummaryByCrn(allocateCase.crn), communityApiClient.getActiveRequirements(allocateCase.crn, allocateCase.eventId)
-    )
-      .flatMap { results ->
-        val staff = results.t1
-        val personManagerId = savePersonManagerService.savePersonManager(teamCode, staff, allocateCase, loggedInUser, results.t2).uuid
-        val eventManagerId = saveEventManagerService.saveEventManager(teamCode, staff, allocateCase, loggedInUser).uuid
-        val requirementManagerIds = saveRequirementManagerService.saveRequirementManagers(teamCode, staff, allocateCase, loggedInUser, results.t3.requirements)
+    val staff = communityApiClient.getStaffById(staffId).block()!!
+    val summary = communityApiClient.getSummaryByCrn(allocateCase.crn).block()!!
+    val activeRequirements = communityApiClient.getActiveRequirements(allocateCase.crn, allocateCase.eventId).block()!!.requirements
+    val personManagerId = savePersonManagerService.savePersonManager(teamCode, staff, allocateCase, loggedInUser, summary).uuid
+    val eventManagerId = saveEventManagerService.saveEventManager(teamCode, staff, allocateCase, loggedInUser).uuid
+    val requirementManagerIds = saveRequirementManagerService.saveRequirementManagers(teamCode, staff, allocateCase, loggedInUser, activeRequirements)
+    notificationService.notifyAllocation(staff, summary, activeRequirements, allocateCase, loggedInUser, teamCode, authToken).block()
 
-        workloadCalculationService.calculate(staff.staffCode, teamCode, staff.probationArea?.code ?: "", gradeMapper.deliusToStaffGrade(staff.staffGrade?.code ?: ""))
-
-        notificationService.notifyAllocation(staff, results.t2, results.t3.requirements, allocateCase, loggedInUser, teamCode, authToken)
-          .map { CaseAllocated(personManagerId, eventManagerId, requirementManagerIds.map { it.uuid }) }
-      }.block()!!
+    return CaseAllocated(personManagerId, eventManagerId, requirementManagerIds.map { it.uuid })
   }
 }
