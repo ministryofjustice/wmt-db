@@ -26,7 +26,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Sentence
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.SentenceType
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffName
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Team
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
@@ -715,28 +714,6 @@ class EmailNotificationServiceTests {
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
     Assertions.assertEquals(mappedGrade, parameters.captured["allocatingOfficerGrade"])
-  }
-
-  @Test
-  fun `must add allocating officer team name`() {
-    val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
-    val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, "Some Notes")
-    val allocatingOfficerUsername = "ALLOCATOR"
-    val teamCode = "TM1"
-    val token = "token"
-
-    val team = Team(teamCode, "Team Description")
-    val allocatingOfficer = Staff(BigInteger.ONE, "ALLOCATOR1", StaffName("Alli", "Cator"), null, listOf(team), null, "all1@cat0r.com")
-
-    every { communityApiClient.getStaffByUsername(any()) } returns Mono.just(allocatingOfficer)
-
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, teamCode, token)
-      .block()
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
-    Assertions.assertEquals(team.description, parameters.captured["allocatingOfficerTeam"])
   }
 
   @Test

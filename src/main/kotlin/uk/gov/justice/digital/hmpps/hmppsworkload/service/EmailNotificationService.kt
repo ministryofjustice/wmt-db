@@ -99,8 +99,7 @@ class EmailNotificationService(
           ),
           "notes" to allocateCase.instructions,
           "allocatingOfficerName" to "${results.t2.staff.forenames} ${results.t2.staff.surname}",
-          "allocatingOfficerGrade" to gradeMapper.deliusToStaffGrade(results.t2.staffGrade?.code),
-          "allocatingOfficerTeam" to results.t2.teams?.find { team -> team.code == teamCode }?.description
+          "allocatingOfficerGrade" to gradeMapper.deliusToStaffGrade(results.t2.staffGrade?.code)
         )
         val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
         emailTo.add(allocatedOfficer.email!!)
