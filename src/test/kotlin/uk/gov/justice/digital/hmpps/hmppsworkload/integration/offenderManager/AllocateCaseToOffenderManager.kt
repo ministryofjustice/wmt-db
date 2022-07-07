@@ -153,10 +153,10 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   @Test
   fun `can allocate an already managed CRN to different staff member`() {
     staffIdResponse(staffId, staffCode, teamCode)
-    staffIdResponse(staffId, staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveUnpaidRequirementResponse(crn, eventId)
-    val storedPersonManager = PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = teamCode, offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1")
+    val storedPersonManager = PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1")
+    staffIdResponse(storedPersonManager.staffId, storedPersonManager.staffCode, storedPersonManager.teamCode)
     personManagerRepository.save(storedPersonManager)
     every { notificationService.notifyAllocation(any(), any(), any(), any(), any(), teamCode, any()) } returns Mono.just(
       listOf(
@@ -180,5 +180,14 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
       .jsonPath("$.personManagerId")
       .value(IsNot.not(storedPersonManager.uuid.toString()))
+
+    val actualWorkloadCalcEntity: WorkloadCalculationEntity? =
+      workloadCalculationRepository.findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(storedPersonManager.staffCode, storedPersonManager.teamCode)
+
+    Assertions.assertAll(
+      { Assertions.assertEquals(storedPersonManager.staffCode, actualWorkloadCalcEntity!!.staffCode) },
+      { Assertions.assertEquals(storedPersonManager.teamCode, actualWorkloadCalcEntity!!.teamCode) },
+      { Assertions.assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity!!.calculatedDate.dayOfMonth) }
+    )
   }
 }
