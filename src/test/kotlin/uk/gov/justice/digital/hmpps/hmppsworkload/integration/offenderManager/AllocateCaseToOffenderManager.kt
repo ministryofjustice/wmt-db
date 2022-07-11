@@ -20,6 +20,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RequirementManagerE
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadCalculationEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.NotificationService
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.TelemetryEventType.EVENT_MANAGER_ALLOCATED
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.getWmtPeriod
 import uk.gov.service.notify.SendEmailResponse
 import java.math.BigInteger
 import java.time.LocalDateTime
@@ -98,7 +99,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
           "providerCode" to "N01",
           "staffId" to "123456789",
           "eventId" to "123456789",
-          "WMT_PERIOD" to "2022-07-01 18:30 to 2022-07-02 19:30"
+          "WMT_PERIOD" to getWmtPeriod(LocalDateTime.now())
         ),
         null
       )
