@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.offenderManager
 
+import com.microsoft.applicationinsights.TelemetryClient
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.verify
@@ -18,6 +19,8 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RequirementManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadCalculationEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.NotificationService
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.TelemetryEventType.EVENT_MANAGER_ALLOCATED
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.getWmtPeriod
 import uk.gov.service.notify.SendEmailResponse
 import java.math.BigInteger
 import java.time.LocalDateTime
@@ -26,6 +29,9 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @MockkBean
   private lateinit var notificationService: NotificationService
+  @MockkBean
+  private lateinit var telemetryClient: TelemetryClient
+
   private val crn = "CRN1"
   private val staffId = BigInteger.valueOf(123456789L)
 
@@ -37,6 +43,15 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     singleActiveConvictionResponseForAllConvictions(crn)
     singleActiveConvictionResponse(crn)
     tierCalculationResponse(crn)
+    every { notificationService.notifyAllocation(any(), any(), any(), any(), any(), teamCode, any()) } returns Mono.just(
+      listOf(
+        SendEmailResponse(
+          emailResponse()
+        )
+      )
+    )
+
+    every { telemetryClient.trackEvent(any(), any(), null) } returns Unit
   }
 
   @Test
@@ -45,13 +60,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     offenderSummaryResponse(crn)
     singleActiveRequirementResponse(crn, eventId)
 
-    every { notificationService.notifyAllocation(any(), any(), any(), any(), any(), teamCode, any()) } returns Mono.just(
-      listOf(
-        SendEmailResponse(
-          emailResponse()
-        )
-      )
-    )
     webTestClient.post()
       .uri("/team/$teamCode/offenderManagers/$staffId/cases")
       .bodyValue(allocateCase(crn, eventId))
@@ -82,6 +90,20 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     )
 
     verify(exactly = 1) { notificationService.notifyAllocation(any(), any(), any(), any(), any(), teamCode, any()) }
+    verify(exactly = 1) {
+      telemetryClient.trackEvent(
+        EVENT_MANAGER_ALLOCATED.eventName,
+        mapOf(
+          "crn" to crn,
+          "teamCode" to teamCode,
+          "providerCode" to "N01",
+          "staffId" to "123456789",
+          "eventId" to "123456789",
+          "WMT_PERIOD" to getWmtPeriod(LocalDateTime.now())
+        ),
+        null
+      )
+    }
   }
 
   @Test
@@ -89,13 +111,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     staffIdResponse(staffId, staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveUnpaidRequirementResponse(crn, eventId)
-    every { notificationService.notifyAllocation(any(), any(), any(), any(), any(), teamCode, any()) } returns Mono.just(
-      listOf(
-        SendEmailResponse(
-          emailResponse()
-        )
-      )
-    )
+
     webTestClient.post()
       .uri("/team/$teamCode/offenderManagers/$staffId/cases")
       .bodyValue(allocateCase(crn, eventId))
@@ -124,13 +140,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     eventManagerRepository.save(storedEventManager)
     val storedRequirementManager = RequirementManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, eventId = eventId, requirementId = requirementId, createdBy = "USER1", providerCode = "PV1")
     requirementManagerRepository.save(storedRequirementManager)
-    every { notificationService.notifyAllocation(any(), any(), any(), any(), any(), teamCode, any()) } returns Mono.just(
-      listOf(
-        SendEmailResponse(
-          emailResponse()
-        )
-      )
-    )
+
     webTestClient.post()
       .uri("/team/$teamCode/offenderManagers/$staffId/cases")
       .bodyValue(allocateCase(crn, eventId))
@@ -158,13 +168,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     val storedPersonManager = PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1")
     staffIdResponse(storedPersonManager.staffId, storedPersonManager.staffCode, storedPersonManager.teamCode)
     personManagerRepository.save(storedPersonManager)
-    every { notificationService.notifyAllocation(any(), any(), any(), any(), any(), teamCode, any()) } returns Mono.just(
-      listOf(
-        SendEmailResponse(
-          emailResponse()
-        )
-      )
-    )
+
     webTestClient.post()
       .uri("/team/$teamCode/offenderManagers/$staffId/cases")
       .bodyValue(allocateCase(crn, eventId))
