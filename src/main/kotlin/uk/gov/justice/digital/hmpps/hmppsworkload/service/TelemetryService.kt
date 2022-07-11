@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RequirementManagerEntity
+import java.time.LocalDateTime
 
 private const val CRN = "crn"
 
@@ -40,7 +41,8 @@ class TelemetryService(@Autowired private val telemetryClient: TelemetryClient) 
         TEAM_CODE to eventManagerEntity.teamCode,
         PROVIDER_CODE to eventManagerEntity.providerCode,
         STAFF_ID to eventManagerEntity.staffId.toString(10),
-        EVENT_ID to eventManagerEntity.eventId.toString(10)
+        EVENT_ID to eventManagerEntity.eventId.toString(10),
+        "WMT_PERIOD" to getWmtPeriod(LocalDateTime.now())
       )
     )
   }
