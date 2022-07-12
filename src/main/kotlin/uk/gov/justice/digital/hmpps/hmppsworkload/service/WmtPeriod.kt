@@ -24,7 +24,7 @@ fun getWmtPeriod(now: LocalDateTime): String {
       startOfPeriod = now.atSevenThirty()
     } else {
       startOfPeriod = now.minusDays(1).atSixThirty()
-      endOfPeriod = endOfPeriod.minusDays(1).atSevenThirty()
+      endOfPeriod = now.atSevenThirty()
     }
   }
 
