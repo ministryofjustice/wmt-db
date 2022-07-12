@@ -28,7 +28,8 @@ class TelemetryService(@Autowired private val telemetryClient: TelemetryClient) 
         CRN to personManagerEntity.crn,
         TEAM_CODE to personManagerEntity.teamCode,
         PROVIDER_CODE to personManagerEntity.providerCode,
-        STAFF_ID to personManagerEntity.staffId.toString(10)
+        STAFF_ID to personManagerEntity.staffId.toString(10),
+        "wmtPeriod" to getWmtPeriod(LocalDateTime.now())
       )
     )
   }
@@ -41,8 +42,7 @@ class TelemetryService(@Autowired private val telemetryClient: TelemetryClient) 
         TEAM_CODE to eventManagerEntity.teamCode,
         PROVIDER_CODE to eventManagerEntity.providerCode,
         STAFF_ID to eventManagerEntity.staffId.toString(10),
-        EVENT_ID to eventManagerEntity.eventId.toString(10),
-        "wmtPeriod" to getWmtPeriod(LocalDateTime.now())
+        EVENT_ID to eventManagerEntity.eventId.toString(10)
       )
     )
   }
