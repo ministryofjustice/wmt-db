@@ -5,35 +5,36 @@ import java.time.DayOfWeek.WEDNESDAY
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-private const val SEVEN_THIRTY_PM = "19:30"
-
-private const val SIX_THIRTY_PM = "18:30"
+private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
 
 fun getWmtPeriod(now: LocalDateTime): String {
-  val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+  var startOfPeriod = now.minusDays(1).atSixThirty()
+  var endOfPeriod = now.atSixThirty()
 
-  var startPeriodTime = SIX_THIRTY_PM
-  var endPeriodTime = SIX_THIRTY_PM
-  var startOfPeriod = now.minusDays(1).format(formatter)
-  var endOfPeriod = now.format(formatter)
-
-  if (now.isAfter(LocalDateTime.of(now.year, now.month, now.dayOfMonth, 18, 30))) {
-    startOfPeriod = now.format(formatter)
-    endOfPeriod = now.plusDays(1).format(formatter)
+  if (now.isAfterSixThirty()) {
+    startOfPeriod = now.atSixThirty()
+    endOfPeriod = now.plusDays(1).atSixThirty()
     if (now.dayOfWeek == TUESDAY) {
-      endPeriodTime = SEVEN_THIRTY_PM
+      endOfPeriod = endOfPeriod.atSevenThirty()
     }
   }
 
   if (now.dayOfWeek == WEDNESDAY) {
-    if (now.isAfter(LocalDateTime.of(now.year, now.month, now.dayOfMonth, 19, 30))) {
-      startPeriodTime = SEVEN_THIRTY_PM
+    if (now.isAfterSevenThirty()) {
+      startOfPeriod = now.atSevenThirty()
     } else {
-      startOfPeriod = now.minusDays(1).format(formatter)
-      endOfPeriod = now.format(formatter)
-      endPeriodTime = SEVEN_THIRTY_PM
+      startOfPeriod = now.minusDays(1).atSixThirty()
+      endOfPeriod = now.atSevenThirty()
     }
   }
 
-  return "$startOfPeriod $startPeriodTime to $endOfPeriod $endPeriodTime"
+  return "${startOfPeriod.format(formatter)} to ${endOfPeriod.format(formatter)}"
 }
+
+fun LocalDateTime.atSixThirty(): LocalDateTime = this.withHour(18).withMinute(30)
+
+fun LocalDateTime.atSevenThirty(): LocalDateTime = this.withHour(19).withMinute(30)
+
+fun LocalDateTime.isAfterSixThirty(): Boolean = this.isAfter(LocalDateTime.of(this.year, this.month, this.dayOfMonth, 18, 30))
+
+fun LocalDateTime.isAfterSevenThirty(): Boolean = this.isAfter(LocalDateTime.of(this.year, this.month, this.dayOfMonth, 19, 30))
