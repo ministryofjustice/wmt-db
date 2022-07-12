@@ -42,7 +42,7 @@ class TelemetryService(@Autowired private val telemetryClient: TelemetryClient) 
         PROVIDER_CODE to eventManagerEntity.providerCode,
         STAFF_ID to eventManagerEntity.staffId.toString(10),
         EVENT_ID to eventManagerEntity.eventId.toString(10),
-        "WMT_PERIOD" to getWmtPeriod(LocalDateTime.now())
+        "wmtPeriod" to getWmtPeriod(LocalDateTime.now())
       )
     )
   }

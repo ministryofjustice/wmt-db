@@ -99,7 +99,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
           "providerCode" to "N01",
           "staffId" to "123456789",
           "eventId" to "123456789",
-          "WMT_PERIOD" to getWmtPeriod(LocalDateTime.now())
+          "wmtPeriod" to getWmtPeriod(LocalDateTime.now())
         ),
         null
       )
