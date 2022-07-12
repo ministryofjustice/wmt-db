@@ -19,7 +19,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RequirementManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadCalculationEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.NotificationService
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.TelemetryEventType.EVENT_MANAGER_ALLOCATED
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.TelemetryEventType.PERSON_MANAGER_ALLOCATED
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.getWmtPeriod
 import uk.gov.service.notify.SendEmailResponse
 import java.math.BigInteger
@@ -92,14 +92,13 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     verify(exactly = 1) { notificationService.notifyAllocation(any(), any(), any(), any(), any(), teamCode, any()) }
     verify(exactly = 1) {
       telemetryClient.trackEvent(
-        EVENT_MANAGER_ALLOCATED.eventName,
+        PERSON_MANAGER_ALLOCATED.eventName,
         mapOf(
           "crn" to crn,
           "teamCode" to teamCode,
           "providerCode" to "N01",
           "staffId" to "123456789",
-          "eventId" to "123456789",
-          "WMT_PERIOD" to getWmtPeriod(LocalDateTime.now())
+          "wmtPeriod" to getWmtPeriod(LocalDateTime.now())
         ),
         null
       )
