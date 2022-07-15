@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseAllocated
-import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.GradeMapper
 import java.math.BigInteger
 import javax.transaction.Transactional
 
@@ -14,10 +13,9 @@ class DefaultSaveWorkloadService(
   private val communityApiClient: CommunityApiClient,
   private val saveEventManagerService: SaveEventManagerService,
   private val saveRequirementManagerService: SaveRequirementManagerService,
-  private val notificationService: NotificationService,
-  private val workloadCalculationService: WorkloadCalculationService,
-  private val gradeMapper: GradeMapper
+  private val notificationService: NotificationService
 ) : SaveWorkloadService {
+
   @Transactional
   override fun saveWorkload(
     teamCode: String,

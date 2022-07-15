@@ -11,9 +11,12 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
 import reactor.core.publisher.Mono
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.request.allocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.emailResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RequirementManagerEntity
@@ -60,6 +63,8 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     offenderSummaryResponse(crn)
     singleActiveRequirementResponse(crn, eventId)
 
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY))
+
     webTestClient.post()
       .uri("/team/$teamCode/offenderManagers/$staffId/cases")
       .bodyValue(allocateCase(crn, eventId))
@@ -80,13 +85,14 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
     expectWorkloadAllocationCompleteMessages(crn)
 
-    val actualWorkloadCalcEntity: WorkloadCalculationEntity? =
-      workloadCalculationRepository.findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)
+    val actualWorkloadCalcEntity: WorkloadCalculationEntity =
+      workloadCalculationRepository.findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)!!
 
     Assertions.assertAll(
-      { Assertions.assertEquals(staffCode, actualWorkloadCalcEntity?.staffCode) },
-      { Assertions.assertEquals(teamCode, actualWorkloadCalcEntity?.teamCode) },
-      { Assertions.assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity?.calculatedDate?.dayOfMonth) }
+      { Assertions.assertEquals(staffCode, actualWorkloadCalcEntity.staffCode) },
+      { Assertions.assertEquals(teamCode, actualWorkloadCalcEntity.teamCode) },
+      { Assertions.assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity.calculatedDate.dayOfMonth) },
+      { Assertions.assertEquals(1, actualWorkloadCalcEntity.breakdownData.caseloadCount) }
     )
 
     verify(exactly = 1) { notificationService.notifyAllocation(any(), any(), any(), any(), any(), teamCode, any()) }
