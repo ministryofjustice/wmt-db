@@ -42,6 +42,7 @@ class JpaBasedSavePersonManagerService(
     personSummary: PersonSummary,
     loggedInUser: String
   ): PersonManagerEntity {
+    val providerCode = staff.probationArea!!.code
     val personManagerEntity = PersonManagerEntity(
       crn = allocateCase.crn,
       staffId = staff.staffIdentifier,
@@ -49,12 +50,12 @@ class JpaBasedSavePersonManagerService(
       teamCode = teamCode,
       offenderName = "${personSummary.firstName} ${personSummary.surname}",
       createdBy = loggedInUser,
-      providerCode = staff.probationArea!!.code
+      providerCode = providerCode
     )
     personManagerRepository.save(personManagerEntity)
     telemetryService.trackPersonManagerAllocated(personManagerEntity)
     successUpdater.updatePerson(personManagerEntity.crn, personManagerEntity.uuid, personManagerEntity.createdDate!!)
-    workloadCalculationService.calculate(staff.staffCode, teamCode, staff.probationArea?.code ?: "", gradeMapper.deliusToStaffGrade(staff.staffGrade?.code ?: ""))
+    workloadCalculationService.calculate(staff.staffCode, teamCode, providerCode, gradeMapper.deliusToStaffGrade(staff.staffGrade?.code ?: ""))
     return personManagerEntity
   }
 }
