@@ -32,11 +32,7 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
 
     workloadCalculation.calculate(staffCode, teamCode, providerCode, staffGrade)
 
-    assertEquals(
-      BigInteger.ZERO,
-      workloadCalculationRepository
-        .findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)?.workloadPoints
-    )
+    assertEquals(BigInteger.ZERO, workloadCalculationRepository.findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)?.workloadPoints)
   }
 
   @Test
@@ -48,30 +44,16 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
     val standardDeliveryReportCount = 10
     val fastDeliveryReportCount = 0
 
-    wmtCourtReportsRepository.save(
-      WMTCourtReportsEntity(
-        staffCode = staffCode, teamCode = teamCode,
-        fastDeliveryReportCount = fastDeliveryReportCount, standardDeliveryReportCount = standardDeliveryReportCount
-      )
-    )
+    wmtCourtReportsRepository
+      .save(WMTCourtReportsEntity(staffCode = staffCode, teamCode = teamCode, fastDeliveryReportCount = fastDeliveryReportCount, standardDeliveryReportCount = standardDeliveryReportCount))
     workloadCalculation.calculate(staffCode, teamCode, providerCode, staffGrade)
 
     val workloadCalculationResult = workloadCalculationRepository
       .findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)
 
     Assertions.assertAll(
-      {
-        assertEquals(
-          standardDeliveryReportCount,
-          workloadCalculationResult?.breakdownData?.standardDeliveryReportCount
-        )
-      },
-      {
-        assertEquals(
-          fastDeliveryReportCount,
-          workloadCalculationResult?.breakdownData?.fastDeliveryReportCount
-        )
-      }
+      { assertEquals(standardDeliveryReportCount, workloadCalculationResult?.breakdownData?.standardDeliveryReportCount) },
+      { assertEquals(fastDeliveryReportCount, workloadCalculationResult?.breakdownData?.fastDeliveryReportCount) }
     )
   }
 
@@ -90,10 +72,7 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
     val workloadCalculationResult = workloadCalculationRepository
       .findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)
 
-    assertEquals(
-      paroleReportsCount,
-      workloadCalculationResult?.breakdownData?.paroleReportsCount
-    )
+    assertEquals(paroleReportsCount, workloadCalculationResult?.breakdownData?.paroleReportsCount)
   }
 
   @Test
@@ -114,18 +93,8 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
       .findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)
 
     Assertions.assertAll(
-      {
-        assertEquals(
-          communityAssessmentCount,
-          workloadCalculationResult?.breakdownData?.communityCaseAssessmentCount
-        )
-      },
-      {
-        assertEquals(
-          licenseAssessmentCount,
-          workloadCalculationResult?.breakdownData?.licenseCaseAssessmentCount
-        )
-      }
+      { assertEquals(communityAssessmentCount, workloadCalculationResult?.breakdownData?.communityCaseAssessmentCount) },
+      { assertEquals(licenseAssessmentCount, workloadCalculationResult?.breakdownData?.licenseCaseAssessmentCount) }
     )
   }
 
@@ -137,19 +106,11 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
     val staffGrade = "PO"
     val contactTypeCode = "CONTACT1"
 
-    wmtcmsRepository.save(
-      WMTCMSEntity(
-        staffCode = staffCode, staffTeamCode = teamCode, personManagerStaffCode = "OTHERSTAFFCODE",
-        personManagerTeamCode = "TM2", contactTypeCode = contactTypeCode
-      )
-    )
+    wmtcmsRepository
+      .save(WMTCMSEntity(staffCode = staffCode, staffTeamCode = teamCode, personManagerStaffCode = "OTHERSTAFFCODE", personManagerTeamCode = "TM2", contactTypeCode = contactTypeCode))
 
-    wmtcmsRepository.save(
-      WMTCMSEntity(
-        staffCode = "StaffCode", staffTeamCode = "TM2", personManagerStaffCode = staffCode,
-        personManagerTeamCode = teamCode, contactTypeCode = contactTypeCode
-      )
-    )
+    wmtcmsRepository
+      .save(WMTCMSEntity(staffCode = "StaffCode", staffTeamCode = "TM2", personManagerStaffCode = staffCode, personManagerTeamCode = teamCode, contactTypeCode = contactTypeCode))
 
     workloadCalculation.calculate(staffCode, teamCode, providerCode, staffGrade)
 
@@ -157,18 +118,8 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
       .findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)
 
     Assertions.assertAll(
-      {
-        assertEquals(
-          1,
-          workloadCalculationResult?.breakdownData?.contactsPerformedByOthersCount?.get(contactTypeCode)
-        )
-      },
-      {
-        assertEquals(
-          1,
-          workloadCalculationResult?.breakdownData?.contactsPerformedOutsideCaseloadCount?.get(contactTypeCode)
-        )
-      }
+      { assertEquals(1, workloadCalculationResult?.breakdownData?.contactsPerformedByOthersCount?.get(contactTypeCode)) },
+      { assertEquals(1, workloadCalculationResult?.breakdownData?.contactsPerformedOutsideCaseloadCount?.get(contactTypeCode)) }
     )
   }
 

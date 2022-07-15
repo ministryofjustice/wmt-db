@@ -30,7 +30,7 @@ class SaveCaseDetailsService(
       hmppsTierApiClient.getTierByCrn(crn).map {
         val tier = Tier.valueOf(it)
         val case =
-          caseDetailsRepository.findByIdOrNull(crn) ?: CaseDetailsEntity(crn = crn, type = caseType, tier = tier)
+          caseDetailsRepository.findByIdOrNull(crn) ?: CaseDetailsEntity(crn, tier, caseType)
         case.type = caseType
         case.tier = tier
         case
