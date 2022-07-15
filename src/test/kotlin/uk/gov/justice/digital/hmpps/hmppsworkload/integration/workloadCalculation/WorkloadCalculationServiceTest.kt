@@ -4,8 +4,12 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.AdjustmentReasonEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTAssessmentEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTCMSEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTCourtReportsEntity
@@ -184,5 +188,24 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
       .findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)!!.breakdownData
 
     assertEquals(adjustmentReason.points, breakdown.contactTypeWeightings[adjustmentReason.typeCode])
+  }
+
+  @Test
+  fun `must include caseload count in breakdown`() {
+    val staffCode = "STAFF1"
+    val teamCode = "TM1"
+    val providerCode = "SC1"
+    val staffGrade = "PO"
+
+    personManagerRepository.save(PersonManagerEntity(crn = "CRN1", staffId = BigInteger.ONE, staffCode = staffCode, teamCode = teamCode, offenderName = "Ben Smith", createdBy = "USER", providerCode = providerCode))
+
+    caseDetailsRepository.save(CaseDetailsEntity("CRN1", Tier.B2, CaseType.COMMUNITY))
+
+    workloadCalculation.calculate(staffCode, teamCode, providerCode, staffGrade)
+
+    val breakdown = workloadCalculationRepository
+      .findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)!!.breakdownData
+
+    assertEquals(1, breakdown.caseloadCount)
   }
 }
