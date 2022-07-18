@@ -10,6 +10,14 @@ import java.util.Locale
 class WMTGetAssessments(private val wmtAssessmentRepository: WMTAssessmentRepository) : GetAssessments {
   override fun getAssessments(staffCode: String, teamCode: String): List<Assessment> =
     wmtAssessmentRepository.findByStaffCodeAndTeamCode(staffCode, teamCode).let { wmtAssessments ->
-      wmtAssessments.map { Assessment(CaseType.valueOf(it.sentenceType.uppercase(Locale.getDefault()))) }
+      wmtAssessments.map { Assessment(getCaseType(it.sentenceType)) }
     }
+
+  private fun getCaseType(wmtType: String): CaseType {
+    val type = wmtType.uppercase(Locale.getDefault())
+    if (type == "LICENCE") {
+      return CaseType.LICENSE
+    }
+    return CaseType.valueOf(type)
+  }
 }

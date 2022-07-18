@@ -40,6 +40,19 @@ class GetAssessmentsFromWMT : IntegrationTestBase() {
   }
 
   @Test
+  fun `must return licence assessments as License`() {
+    val staffCode = "STAFF1"
+    val teamCode = "TM1"
+    wmtAssessmentRepository.save(WMTAssessmentEntity(staffCode = staffCode, teamCode = teamCode, sentenceType = "Licence"))
+
+    val results = wmtGetAssessments.getAssessments(staffCode, teamCode)
+
+    Assertions.assertEquals(1, results.size)
+
+    Assertions.assertEquals(CaseType.LICENSE, results[0].category)
+  }
+
+  @Test
   fun `must return empty list when no assessments are returned`() {
     val staffCode = "STAFF1"
     val teamCode = "TM1"
