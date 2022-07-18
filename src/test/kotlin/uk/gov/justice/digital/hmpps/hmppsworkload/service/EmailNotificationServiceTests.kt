@@ -416,7 +416,7 @@ class EmailNotificationServiceTests {
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
-    Assertions.assertEquals(listOf("${requirement.requirementTypeMainCategory.description}: ${requirement.requirementTypeSubCategory.description}  "), parameters.captured["requirements"])
+    Assertions.assertEquals(listOf("${requirement.requirementTypeMainCategory.description}: ${requirement.requirementTypeSubCategory.description}"), parameters.captured["requirements"])
   }
 
   @Test
