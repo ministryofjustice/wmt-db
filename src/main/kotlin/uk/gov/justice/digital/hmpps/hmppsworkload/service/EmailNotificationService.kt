@@ -152,5 +152,5 @@ class EmailNotificationService(
     .map { offence -> offence.detail.mainCategoryDescription }
 
   private fun mapRequirements(requirements: List<ConvictionRequirement>): List<String> = requirements
-    .map { requirement -> "${requirement.requirementTypeMainCategory.description}: ${requirement.requirementTypeSubCategory.description} ${requirement.length} ${requirement.lengthUnit}" }
+    .map { requirement -> "${requirement.requirementTypeMainCategory.description}: ${requirement.requirementTypeSubCategory.description} ${requirement.length ?: ""} ${requirement.lengthUnit ?: ""}" }
 }

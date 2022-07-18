@@ -37,6 +37,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offender
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.oneOffenderSearchByCrnsResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveConvictionResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveInductionResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveRequirementNoLengthResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveRequirementResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveUnpaidRequirementResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleInactiveConvictionResponse
@@ -450,6 +451,15 @@ abstract class IntegrationTestBase {
 
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
       HttpResponse.response().withContentType(APPLICATION_JSON).withBody(singleActiveRequirementResponse(requirementId))
+    )
+  }
+
+  protected fun singleActiveRequirementNoLengthResponse(crn: String, convictionId: BigInteger, requirementId: BigInteger = BigInteger.valueOf(123456789L)) {
+    val convictionsRequest =
+      HttpRequest.request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameter(Parameter("activeOnly", "true"))
+
+    communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
+      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(singleActiveRequirementNoLengthResponse(requirementId))
     )
   }
 }
