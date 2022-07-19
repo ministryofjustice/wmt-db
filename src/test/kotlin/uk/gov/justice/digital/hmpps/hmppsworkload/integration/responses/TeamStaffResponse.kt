@@ -8,6 +8,10 @@ fun teamStaffResponse() = """
           "staff": {
               "forenames": "Ben",
               "surname": "Doe"
+          },
+          "staffGrade": {
+            "code": "PSM",
+            "description": "Some description"
           }
       },
       {
@@ -16,6 +20,10 @@ fun teamStaffResponse() = """
           "staff": {
               "forenames": "Sally",
               "surname": "Socks"
+          },
+          "staffGrade": {
+            "code": "PSM",
+            "description": "Some description"
           }
       },
       {
@@ -32,7 +40,12 @@ fun teamStaffResponse() = """
           "staff": {
               "forenames": "Billy",
               "surname": "Smith"
+          },
+          "staffGrade": {
+            "code": "PSP",
+            "description": "Some description"
           }
+          
       }
   ]
 """.trimIndent()

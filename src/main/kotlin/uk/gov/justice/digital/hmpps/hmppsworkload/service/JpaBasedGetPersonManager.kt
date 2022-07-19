@@ -5,14 +5,12 @@ import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PersonManagerDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.GradeMapper
 import java.util.UUID
 
 @Service
 class JpaBasedGetPersonManager(
   private val personManagerRepository: PersonManagerRepository,
-  private val communityApiClient: CommunityApiClient,
-  private val gradeMapper: GradeMapper
+  private val communityApiClient: CommunityApiClient
 ) : GetPersonManager {
   override fun findById(id: UUID): PersonManagerDetails? = personManagerRepository.findByUuid(id)?.let { entity ->
     val staff = communityApiClient.getStaffById(entity.staffId).onErrorResume { Mono.empty() }.block()!!

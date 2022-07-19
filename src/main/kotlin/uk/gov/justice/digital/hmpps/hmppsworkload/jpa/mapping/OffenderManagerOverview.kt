@@ -9,14 +9,12 @@ import java.time.ZonedDateTime
 data class OffenderManagerOverview(
   val forename: String,
   val surname: String,
-  var grade: String,
   val totalCommunityCases: Int,
   val totalCustodyCases: Int,
   val availablePoints: BigInteger,
   val totalPoints: BigInteger,
   val code: String,
   val teamName: String,
-
   val lastUpdatedOn: LocalDateTime?,
   val workloadOwnerId: Long,
   val paroleReportsDue: BigInteger
@@ -29,4 +27,5 @@ data class OffenderManagerOverview(
   var tierCaseTotals: TierCaseTotals = TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)
   var caseEndDue = BigInteger.ZERO
   var releasesDue = BigInteger.ZERO
+  var grade = ""
 }
