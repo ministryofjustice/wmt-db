@@ -4,6 +4,9 @@ generic-service:
 
   replicaCount: 1
 
+  poddisruptionbudget:
+    enabled: false
+
   image:
     repository: quay.io/hmpps/hmpps-workload
     tag: app_version    # override at deployment time
