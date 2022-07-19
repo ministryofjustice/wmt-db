@@ -58,7 +58,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   }
 
   @Test
-  fun `can allocate CRN to Offender`() {
+  fun `can allocate CRN to Staff member`() {
     staffIdResponse(staffId, staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveRequirementResponse(crn, eventId)
@@ -109,6 +109,35 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
         null
       )
     }
+  }
+
+  @Test
+  fun `can allocate a requirement without a length`() {
+    staffIdResponse(staffId, staffCode, teamCode)
+    offenderSummaryResponse(crn)
+    singleActiveRequirementNoLengthResponse(crn, eventId)
+
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY))
+
+    webTestClient.post()
+      .uri("/team/$teamCode/offenderManagers/$staffId/cases")
+      .bodyValue(allocateCase(crn, eventId))
+      .headers {
+        it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
+        it.contentType = MediaType.APPLICATION_JSON
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody()
+      .jsonPath("$.personManagerId")
+      .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
+      .jsonPath("$.eventManagerId")
+      .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
+      .jsonPath("$.requirementManagerIds[0]")
+      .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
+
+    expectWorkloadAllocationCompleteMessages(crn)
   }
 
   @Test

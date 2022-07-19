@@ -399,6 +399,27 @@ class EmailNotificationServiceTests {
   }
 
   @Test
+  fun `must add requirements without length`() {
+    val personSummary = PersonSummary("John", "Doe")
+    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val requirement = ConvictionRequirement(
+      RequirementCategory("MAIN", "Main Category"), RequirementCategory("SUB", "Sub Category"),
+      BigInteger.TEN, null, null
+    )
+    val requirements = listOf(requirement)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
+    val allocatingOfficerUsername = "ALLOCATOR"
+    val teamCode = "TM1"
+    val token = "token"
+
+    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, teamCode, token)
+      .block()
+    val parameters = slot<MutableMap<String, Any>>()
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    Assertions.assertEquals(listOf("${requirement.requirementTypeMainCategory.description}: ${requirement.requirementTypeSubCategory.description}"), parameters.captured["requirements"])
+  }
+
+  @Test
   fun `must add tier`() {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
