@@ -6,10 +6,6 @@ generic-service:
   ingress:
     host: &ingressHost hmpps-workload-dev.hmpps.service.justice.gov.uk
 
-  replicaCount: 1
-  poddisruptionbudget:
-    enabled: false
-
   env:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json
     OAUTH_ENDPOINT_URL: https://sign-in-dev.hmpps.service.justice.gov.uk/auth
