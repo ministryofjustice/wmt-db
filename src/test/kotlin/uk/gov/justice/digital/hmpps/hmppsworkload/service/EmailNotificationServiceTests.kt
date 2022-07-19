@@ -74,7 +74,6 @@ class EmailNotificationServiceTests {
     )
     every { communityApiClient.getInductionContacts(any(), any()) } returns Mono.just(emptyList())
     val staff = Staff(BigInteger.ONE, "ALLOCATOR1", StaffName("Alli", "Cator"), null, null, null, "all1@cat0r.com")
-    staff.grade = ""
     every { communityApiClient.getStaffByUsername(any()) } returns Mono.just(staff)
     every { assessRisksNeedsApiClient.getRiskSummary(any(), any()) } returns Mono.just(Optional.empty())
     every { assessRisksNeedsApiClient.getRiskPredictors(any(), any()) } returns Mono.just(emptyList())
@@ -699,7 +698,6 @@ class EmailNotificationServiceTests {
   fun `must add allocating officer name`() {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
-    allocatedOfficer.grade = ""
     val requirements = emptyList<ConvictionRequirement>()
     val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, "Some Notes")
     val allocatingOfficerUsername = "ALLOCATOR"
@@ -707,7 +705,6 @@ class EmailNotificationServiceTests {
     val token = "token"
 
     val allocatingOfficer = Staff(BigInteger.ONE, "ALLOCATOR1", StaffName("Alli", "Cator"), null, null, null, "all1@cat0r.com")
-    allocatingOfficer.grade = ""
 
     every { communityApiClient.getStaffByUsername(any()) } returns Mono.just(allocatingOfficer)
 
@@ -722,16 +719,14 @@ class EmailNotificationServiceTests {
   fun `must add allocating officer grade`() {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
-
+    val mappedGrade = "ALLOCATING OFFICER GRADE"
+    allocatedOfficer.grade = mappedGrade
+    every { communityApiClient.getStaffByUsername(any()) } returns Mono.just(allocatedOfficer)
     val requirements = emptyList<ConvictionRequirement>()
     val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, "Some Notes")
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"
-
-    val mappedGrade = "ALLOCATING OFFICER GRADE"
-    allocatedOfficer.grade = mappedGrade
-    every { communityApiClient.getStaffByUsername(any()) } returns Mono.just(allocatedOfficer)
 
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, teamCode, token)
       .block()
