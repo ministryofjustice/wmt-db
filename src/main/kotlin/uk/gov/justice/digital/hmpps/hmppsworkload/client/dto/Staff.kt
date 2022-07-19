@@ -11,7 +11,9 @@ data class Staff @JsonCreator constructor(
   val teams: List<Team>? = null,
   val probationArea: StaffProbationArea? = null,
   val email: String? = null
-)
+) {
+  lateinit var grade: String
+}
 
 data class StaffName @JsonCreator constructor(
   val forenames: String,

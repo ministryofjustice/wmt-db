@@ -20,6 +20,7 @@ import org.springframework.web.reactive.function.client.WebClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.HmppsTierApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.OffenderSearchApiClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.GradeMapper
 
 @Configuration
 class WebClientUserEnhancementConfiguration(
@@ -56,8 +57,8 @@ class WebClientUserEnhancementConfiguration(
 
   @Primary
   @Bean
-  fun communityApiClientUserEnhanced(@Qualifier("communityWebClientUserEnhancedAppScope") webClient: WebClient): CommunityApiClient {
-    return CommunityApiClient(webClient)
+  fun communityApiClientUserEnhanced(@Qualifier("communityWebClientUserEnhancedAppScope") webClient: WebClient, gradeMapper: GradeMapper): CommunityApiClient {
+    return CommunityApiClient(webClient, gradeMapper)
   }
 
   @Bean

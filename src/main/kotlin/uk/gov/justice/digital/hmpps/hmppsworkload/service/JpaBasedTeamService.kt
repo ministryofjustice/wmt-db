@@ -40,7 +40,7 @@ class JpaBasedTeamService(
           teamOverview.casesInLastWeek = caseCounts.getOrDefault(teamOverview.code, 0).toBigInteger()
           teamOverview
         } ?: run {
-          getTeamOverviewForOffenderManagerWithoutWorkload(it.staff.forenames, it.staff.surname, gradeMapper.deliusToStaffGrade(it.staffGrade?.code), it.staffCode, it.staffIdentifier)
+          getTeamOverviewForOffenderManagerWithoutWorkload(it.staff.forenames, it.staff.surname, it.grade, it.staffCode, it.staffIdentifier)
         }
       }.filter {
         grades == null || grades.contains(it.grade)

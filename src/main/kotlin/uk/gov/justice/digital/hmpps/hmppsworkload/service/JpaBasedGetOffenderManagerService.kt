@@ -72,7 +72,7 @@ class JpaBasedGetOffenderManagerService(
         getDefaultOffenderManagerOverview(
           staff.staff.forenames,
           staff.staff.surname,
-          gradeMapper.deliusToStaffGrade(staff.staffGrade?.code),
+          staff.grade,
           staff.staffCode,
           team.description
         )
@@ -124,7 +124,7 @@ class JpaBasedGetOffenderManagerService(
         getDefaultOffenderManagerOverview(
           staff.staff.forenames,
           staff.staff.surname,
-          gradeMapper.deliusToStaffGrade(staff.staffGrade?.code),
+          staff.grade,
           staff.staffCode,
           team.description
         )
@@ -138,7 +138,7 @@ class JpaBasedGetOffenderManagerService(
         getCrnToOffenderDetails(cases.map { it.crn })
       ).map { results ->
         val team = results.t1.teams?.first { team -> team.code == teamCode }
-        OffenderManagerCases.from(results.t1, gradeMapper.deliusToStaffGrade(results.t1.staffGrade?.code), team!!, cases, results.t2)
+        OffenderManagerCases.from(results.t1, results.t1.grade, team!!, cases, results.t2)
       }.block()
     }
 

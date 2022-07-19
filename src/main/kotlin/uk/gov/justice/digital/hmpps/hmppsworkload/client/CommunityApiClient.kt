@@ -11,12 +11,13 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderAssessment
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffSummary
+import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.GradeMapper
 import java.math.BigInteger
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Optional
 
-class CommunityApiClient(private val webClient: WebClient) {
+class CommunityApiClient(private val webClient: WebClient, private val gradeMapper: GradeMapper) {
 
   fun getTeamStaff(teamCode: String): Mono<List<StaffSummary>> {
     val responseType = object : ParameterizedTypeReference<List<StaffSummary>>() {}
@@ -29,6 +30,12 @@ class CommunityApiClient(private val webClient: WebClient) {
         { Mono.error(MissingTeamError("No team found for $teamCode")) }
       )
       .bodyToMono(responseType)
+      .map {
+        it.map { staff ->
+          staff.grade = gradeMapper.deliusToStaffGrade(staff.staffGrade?.code)
+          staff
+        }
+      }
       .onErrorResume { ex ->
         when (ex) {
           is MissingTeamError -> Mono.empty()
@@ -43,6 +50,10 @@ class CommunityApiClient(private val webClient: WebClient) {
       .uri("/staff/staffIdentifier/$staffId")
       .retrieve()
       .bodyToMono(Staff::class.java)
+      .map {
+        it.grade = gradeMapper.deliusToStaffGrade(it.staffGrade?.code)
+        it
+      }
   }
 
   fun getStaffByUsername(username: String): Mono<Staff> {
@@ -51,6 +62,10 @@ class CommunityApiClient(private val webClient: WebClient) {
       .uri("/staff/username/{username}", username)
       .retrieve()
       .bodyToMono(Staff::class.java)
+      .map {
+        it.grade = gradeMapper.deliusToStaffGrade(it.staffGrade?.code)
+        it
+      }
   }
 
   fun getStaffByCode(staffCode: String): Mono<Staff> {
@@ -59,6 +74,10 @@ class CommunityApiClient(private val webClient: WebClient) {
       .uri("/staff/staffCode/$staffCode")
       .retrieve()
       .bodyToMono(Staff::class.java)
+      .map {
+        it.grade = gradeMapper.deliusToStaffGrade(it.staffGrade?.code)
+        it
+      }
   }
 
   fun getActiveConvictions(crn: String): Mono<List<Conviction>> {

@@ -8,4 +8,6 @@ data class StaffSummary @JsonCreator constructor(
   val staffCode: String,
   val staff: StaffName,
   val staffGrade: StaffGrade?,
-)
+) {
+  lateinit var grade: String
+}

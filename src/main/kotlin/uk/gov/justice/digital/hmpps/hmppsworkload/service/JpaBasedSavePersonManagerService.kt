@@ -6,7 +6,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.GradeMapper
 
 @Service
 class JpaBasedSavePersonManagerService(
@@ -14,8 +13,7 @@ class JpaBasedSavePersonManagerService(
   private val telemetryService: TelemetryService,
   private val successUpdater: SuccessUpdater,
   private val workloadCalculationService: WorkloadCalculationService,
-  private val offenderManagerService: OffenderManagerService,
-  private val gradeMapper: GradeMapper
+  private val offenderManagerService: OffenderManagerService
 ) : SavePersonManagerService {
   override fun savePersonManager(
     teamCode: String,
@@ -55,7 +53,7 @@ class JpaBasedSavePersonManagerService(
     personManagerRepository.save(personManagerEntity)
     telemetryService.trackPersonManagerAllocated(personManagerEntity)
     successUpdater.updatePerson(personManagerEntity.crn, personManagerEntity.uuid, personManagerEntity.createdDate!!)
-    workloadCalculationService.calculate(staff.staffCode, teamCode, providerCode, gradeMapper.deliusToStaffGrade(staff.staffGrade?.code ?: ""))
+    workloadCalculationService.calculate(staff.staffCode, teamCode, providerCode, staff.grade)
     return personManagerEntity
   }
 }
