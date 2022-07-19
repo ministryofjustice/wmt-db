@@ -3,6 +3,8 @@ generic-service:
   nameOverride: hmpps-workload
 
   replicaCount: 2
+  poddisruptionbudget:
+    minAvailable: 1
 
   image:
     repository: quay.io/hmpps/hmpps-workload
