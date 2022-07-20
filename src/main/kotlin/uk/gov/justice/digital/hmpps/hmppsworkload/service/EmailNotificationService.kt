@@ -18,7 +18,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.DateMapper
-import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.GradeMapper
 import uk.gov.service.notify.NotificationClientApi
 import uk.gov.service.notify.SendEmailResponse
 import java.time.LocalDate
@@ -36,7 +35,6 @@ class EmailNotificationService(
   private val notificationClient: NotificationClientApi,
   @Value("\${application.notify.allocation.template}") private val allocationTemplateId: String,
   @Qualifier("communityApiClient") private val communityApiClient: CommunityApiClient,
-  private val gradeMapper: GradeMapper,
   private val dateMapper: DateMapper,
   private val assessRisksNeedsApiClient: AssessRisksNeedsApiClient,
   private val caseDetailsRepository: CaseDetailsRepository
@@ -99,7 +97,7 @@ class EmailNotificationService(
           ),
           "notes" to allocateCase.instructions,
           "allocatingOfficerName" to "${results.t2.staff.forenames} ${results.t2.staff.surname}",
-          "allocatingOfficerGrade" to gradeMapper.deliusToStaffGrade(results.t2.staffGrade?.code)
+          "allocatingOfficerGrade" to results.t2.grade
         )
         val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
         emailTo.add(allocatedOfficer.email!!)

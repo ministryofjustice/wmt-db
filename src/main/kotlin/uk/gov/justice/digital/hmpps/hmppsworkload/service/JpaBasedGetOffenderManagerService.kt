@@ -6,6 +6,7 @@ import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.OffenderSearchApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderDetails
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.ImpactCase
@@ -16,7 +17,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOve
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.OffenderManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadPointsRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.GradeMapper
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.LocalDateTime
@@ -28,7 +28,6 @@ class JpaBasedGetOffenderManagerService(
   private val caseCalculator: CaseCalculator,
   private val getReductionService: GetReductionService,
   private val communityApiClient: CommunityApiClient,
-  private val gradeMapper: GradeMapper,
   private val workloadPointsRepository: WorkloadPointsRepository,
   private val offenderSearchApiClient: OffenderSearchApiClient,
   private val getSentenceService: GetSentenceService,
@@ -65,71 +64,59 @@ class JpaBasedGetOffenderManagerService(
     .map { staff ->
       val overview = offenderManagerRepository.findByOverview(teamCode, staff.staffCode)?.let {
         it.capacity = capacityCalculator.calculate(it.totalPoints, it.availablePoints)
-        it.grade = gradeMapper.workloadToStaffGrade(it.grade)
         it
       } ?: run {
         val team = staff.teams!!.first { team -> team.code == teamCode }
         getDefaultOffenderManagerOverview(
-          staff.staff.forenames,
-          staff.staff.surname,
-          gradeMapper.deliusToStaffGrade(staff.staffGrade?.code),
-          staff.staffCode,
+          staff,
           team.description
         )
       }
       overview.potentialCapacity = capacityCalculator.calculate(overview.totalPoints, overview.availablePoints)
+      overview.grade = staff.grade
       overview
     }
 
   private fun getDefaultOffenderManagerOverview(
-    forename: String,
-    surname: String,
-    grade: String,
-    staffCode: String,
+    staff: Staff,
     teamName: String
   ): OffenderManagerOverview {
     val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
-    val defaultAvailablePointsForGrade = workloadPoints.getDefaultPointsAvailable(grade)
+    val defaultAvailablePointsForGrade = workloadPoints.getDefaultPointsAvailable(staff.grade)
 
-    val defaultContractedHours = workloadPoints.getDefaultContractedHours(grade)
+    val defaultContractedHours = workloadPoints.getDefaultContractedHours(staff.grade)
     val availablePoints = capacityCalculator.calculateAvailablePoints(
       defaultAvailablePointsForGrade, defaultContractedHours,
       BigDecimal.ZERO, defaultContractedHours
     )
-    val overview = OffenderManagerOverview(forename, surname, grade, 0, 0, availablePoints, BigInteger.ZERO, staffCode, teamName, LocalDateTime.now(), -1, BigInteger.ZERO)
+    val overview = OffenderManagerOverview(staff.staff.forenames, staff.staff.surname, 0, 0, availablePoints, BigInteger.ZERO, staff.staffCode, teamName, LocalDateTime.now(), -1, BigInteger.ZERO)
     overview.capacity = capacityCalculator.calculate(overview.totalPoints, overview.availablePoints)
     overview.contractedHours = defaultContractedHours
     return overview
   }
 
-  override fun getOverview(teamCode: String, offenderManagerCode: String): OffenderManagerOverview? = offenderManagerRepository.findByOverview(teamCode, offenderManagerCode)?.let {
-    it.capacity = capacityCalculator.calculate(it.totalPoints, it.availablePoints)
-    it.nextReductionChange = getReductionService.findNextReductionChange(offenderManagerCode, teamCode)
-    it.reductionHours = getReductionService.findReductionHours(offenderManagerCode, teamCode)
-    it.contractedHours = getWeeklyHours.findWeeklyHours(offenderManagerCode, teamCode, gradeMapper.workloadToStaffGrade(it.grade))
-    offenderManagerRepository.findByCaseloadTotals(it.workloadOwnerId).let { totals ->
-      it.tierCaseTotals = totals.map { total -> TierCaseTotals(total.getATotal(), total.getBTotal(), total.getCTotal(), total.getDTotal(), total.untiered) }
-        .fold(TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)) { first, second -> TierCaseTotals(first.A.add(second.A), first.B.add(second.B), first.C.add(second.C), first.D.add(second.D), first.untiered.add(second.untiered)) }
-    }
-    offenderManagerRepository.findCasesByTeamCodeAndStaffCode(offenderManagerCode, teamCode).let { cases ->
-      val crns = cases.map { case -> case.crn }
-      it.caseEndDue = getSentenceService.getCasesDueToEndCount(crns)
-      it.releasesDue = getSentenceService.getCasesDueToBeReleases(crns)
-    }
-    return it
-  } ?: run {
-    communityApiClient.getStaffByCode(offenderManagerCode)
-      .map { staff ->
-        val team = staff.teams!!.first { team -> team.code == teamCode }
-        getDefaultOffenderManagerOverview(
-          staff.staff.forenames,
-          staff.staff.surname,
-          gradeMapper.deliusToStaffGrade(staff.staffGrade?.code),
-          staff.staffCode,
-          team.description
-        )
-      }.block()
-  }
+  override fun getOverview(teamCode: String, offenderManagerCode: String): OffenderManagerOverview? =
+    communityApiClient.getStaffByCode(offenderManagerCode).map { staff ->
+      val team = staff.teams!!.first { team -> team.code == teamCode }
+      val overview = offenderManagerRepository.findByOverview(team.code, staff.staffCode)?.let {
+        it.capacity = capacityCalculator.calculate(it.totalPoints, it.availablePoints)
+        it.nextReductionChange = getReductionService.findNextReductionChange(offenderManagerCode, teamCode)
+        it.reductionHours = getReductionService.findReductionHours(offenderManagerCode, teamCode)
+        it.contractedHours = getWeeklyHours.findWeeklyHours(offenderManagerCode, teamCode, staff.grade)
+        offenderManagerRepository.findByCaseloadTotals(it.workloadOwnerId).let { totals ->
+          it.tierCaseTotals = totals.map { total -> TierCaseTotals(total.getATotal(), total.getBTotal(), total.getCTotal(), total.getDTotal(), total.untiered) }
+            .fold(TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)) { first, second -> TierCaseTotals(first.A.add(second.A), first.B.add(second.B), first.C.add(second.C), first.D.add(second.D), first.untiered.add(second.untiered)) }
+        }
+        offenderManagerRepository.findCasesByTeamCodeAndStaffCode(offenderManagerCode, teamCode).let { cases ->
+          val crns = cases.map { case -> case.crn }
+          it.caseEndDue = getSentenceService.getCasesDueToEndCount(crns)
+          it.releasesDue = getSentenceService.getCasesDueToBeReleases(crns)
+        }
+        it
+      } ?: getDefaultOffenderManagerOverview(staff, team.description)
+      overview.grade = staff.grade
+      overview
+    }.block()
 
   override fun getCases(teamCode: String, offenderManagerCode: String): OffenderManagerCases? =
     offenderManagerRepository.findCasesByTeamCodeAndStaffCode(offenderManagerCode, teamCode).let { cases ->
@@ -138,7 +125,7 @@ class JpaBasedGetOffenderManagerService(
         getCrnToOffenderDetails(cases.map { it.crn })
       ).map { results ->
         val team = results.t1.teams?.first { team -> team.code == teamCode }
-        OffenderManagerCases.from(results.t1, gradeMapper.deliusToStaffGrade(results.t1.staffGrade?.code), team!!, cases, results.t2)
+        OffenderManagerCases.from(results.t1, results.t1.grade, team!!, cases, results.t2)
       }.block()
     }
 

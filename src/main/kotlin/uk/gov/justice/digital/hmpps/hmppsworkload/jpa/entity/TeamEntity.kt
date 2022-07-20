@@ -22,7 +22,6 @@ import javax.persistence.Table
       columns = [
         ColumnResult(name = "forename"),
         ColumnResult(name = "surname"),
-        ColumnResult(name = "grade_code"),
         ColumnResult(name = "total_community_cases"),
         ColumnResult(name = "total_filtered_custody_cases"),
         ColumnResult(name = "available_points"),
@@ -36,7 +35,7 @@ import javax.persistence.Table
   name = "TeamEntity.findByOverview",
   resultSetMapping = "TeamOverviewResult",
   query = """SELECT
-    om.forename,om.surname, om_type.grade_code AS grade_code, (w.total_filtered_community_cases + w.total_filtered_license_cases) as total_community_cases, w.total_filtered_custody_cases , wpc.available_points AS available_points, wpc.total_points AS total_points, om."key"
+    om.forename,om.surname, (w.total_filtered_community_cases + w.total_filtered_license_cases) as total_community_cases, w.total_filtered_custody_cases , wpc.available_points AS available_points, wpc.total_points AS total_points, om."key"
     FROM app.workload_owner AS wo
     JOIN app.team AS t
         ON wo.team_id = t.id
@@ -48,8 +47,6 @@ import javax.persistence.Table
         ON wr.id = wpc.workload_report_id
     JOIN app.offender_manager AS om
         ON om.id = wo.offender_manager_id
-    JOIN app.offender_manager_type AS om_type
-        ON om_type.id = om.type_id
     WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS NULL AND t.code = ?1"""
 )
 @Entity

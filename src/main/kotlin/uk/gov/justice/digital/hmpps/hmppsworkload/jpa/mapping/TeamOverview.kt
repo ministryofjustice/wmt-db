@@ -6,7 +6,6 @@ import java.math.BigInteger
 data class TeamOverview(
   val forename: String,
   val surname: String,
-  var grade: String,
   val totalCommunityCases: BigDecimal,
   val totalCustodyCases: BigDecimal,
   val availablePoints: BigInteger,
@@ -16,4 +15,5 @@ data class TeamOverview(
   var capacity: BigDecimal = BigDecimal.ZERO
   var staffId: BigInteger = BigInteger.valueOf(-1)
   var casesInLastWeek: BigInteger = BigInteger.ZERO
+  var grade = ""
 }

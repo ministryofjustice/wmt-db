@@ -33,7 +33,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.emailRes
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.DateMapper
-import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.GradeMapper
 import uk.gov.service.notify.NotificationClientApi
 import uk.gov.service.notify.SendEmailResponse
 import java.math.BigDecimal
@@ -48,13 +47,12 @@ class EmailNotificationServiceTests {
   private val notificationClient = mockk<NotificationClientApi>()
   private val communityApiClient = mockk<CommunityApiClient>()
   private val hmppsCaseDetailsRepo = mockk<CaseDetailsRepository>()
-  private val gradeMapper = mockk<GradeMapper>()
   private val dateMapper = mockk<DateMapper>()
   private val assessRisksNeedsApiClient = mockk<AssessRisksNeedsApiClient>()
   private val templateId = "templateId"
   private val notificationService = EmailNotificationService(
     notificationClient, templateId, communityApiClient,
-    gradeMapper, dateMapper, assessRisksNeedsApiClient, hmppsCaseDetailsRepo
+    dateMapper, assessRisksNeedsApiClient, hmppsCaseDetailsRepo
   )
 
   @BeforeEach
@@ -75,11 +73,11 @@ class EmailNotificationServiceTests {
       )
     )
     every { communityApiClient.getInductionContacts(any(), any()) } returns Mono.just(emptyList())
-    every { communityApiClient.getStaffByUsername(any()) } returns Mono.just(Staff(BigInteger.ONE, "ALLOCATOR1", StaffName("Alli", "Cator"), null, null, null, "all1@cat0r.com"))
+    val staff = Staff(BigInteger.ONE, "ALLOCATOR1", StaffName("Alli", "Cator"), null, null, null, "all1@cat0r.com")
+    every { communityApiClient.getStaffByUsername(any()) } returns Mono.just(staff)
     every { assessRisksNeedsApiClient.getRiskSummary(any(), any()) } returns Mono.just(Optional.empty())
     every { assessRisksNeedsApiClient.getRiskPredictors(any(), any()) } returns Mono.just(emptyList())
     every { communityApiClient.getAssessment(any()) } returns Mono.just(Optional.empty())
-    every { gradeMapper.deliusToStaffGrade(any()) } returns ""
     every { notificationClient.sendEmail(any(), any(), any(), any()) } returns SendEmailResponse(emailResponse())
     every { hmppsCaseDetailsRepo.findByIdOrNull(any()) } returns CaseDetailsEntity("", Tier.B3, CaseType.CUSTODY)
   }
@@ -721,14 +719,14 @@ class EmailNotificationServiceTests {
   fun `must add allocating officer grade`() {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val mappedGrade = "ALLOCATING OFFICER GRADE"
+    allocatedOfficer.grade = mappedGrade
+    every { communityApiClient.getStaffByUsername(any()) } returns Mono.just(allocatedOfficer)
     val requirements = emptyList<ConvictionRequirement>()
     val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, "Some Notes")
     val allocatingOfficerUsername = "ALLOCATOR"
     val teamCode = "TM1"
     val token = "token"
-
-    val mappedGrade = "ALLOCATING OFFICER GRADE"
-    every { gradeMapper.deliusToStaffGrade(any()) } returns mappedGrade
 
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, teamCode, token)
       .block()

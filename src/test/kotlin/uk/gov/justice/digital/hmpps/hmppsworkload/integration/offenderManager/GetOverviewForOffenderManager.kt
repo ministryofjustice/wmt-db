@@ -18,14 +18,17 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can get overview for an offender manager`() {
+    val teamCode = "T1"
+    val offenderManagerCode = "OM1"
+    staffCodeResponse(offenderManagerCode, teamCode)
     val sentenceWithin30Days = SentenceEntity(null, BigInteger.TEN, "CRN3333", ZonedDateTime.now().minusMonths(2L), ZonedDateTime.now().plusDays(15L), null, "SP", null)
     sentenceRepository.save(sentenceWithin30Days)
     val sentenceAfter30Days = SentenceEntity(null, BigInteger.ONE, "CRN2222", ZonedDateTime.now().minusMonths(2L), ZonedDateTime.now().plusDays(45L), null, "SC", ZonedDateTime.now().plusDays(15L))
     sentenceRepository.save(sentenceAfter30Days)
 
-    val team = teamRepository.findByCode("T1")
+    val team = teamRepository.findByCode(teamCode)
 
-    val offenderManager = offenderManagerRepository.findByCode("OM1")
+    val offenderManager = offenderManagerRepository.findByCode(offenderManagerCode)
 
     val secondWorkloadOwner = wmtWorkloadOwnerRepository.save(WMTWorkloadOwnerEntity(team = team, offenderManager = offenderManager, contractedHours = BigDecimal.valueOf(5)))
 
@@ -49,7 +52,7 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
     )
 
     webTestClient.get()
-      .uri("/team/T1/offenderManagers/OM1")
+      .uri("/team/$teamCode/offenderManagers/$offenderManagerCode")
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
       }
@@ -109,8 +112,11 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can get overview for an offender manager without any reductions`() {
+    val teamCode = "T1"
+    val offenderManagerCode = "OM2"
+    staffCodeResponse(offenderManagerCode, teamCode)
     webTestClient.get()
-      .uri("/team/T1/offenderManagers/OM2")
+      .uri("/team/$teamCode/offenderManagers/$offenderManagerCode")
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
       }

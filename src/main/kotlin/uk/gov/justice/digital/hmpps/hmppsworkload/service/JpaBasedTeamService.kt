@@ -6,7 +6,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.TeamOverview
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.TeamRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadPointsRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.GradeMapper
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.LocalDate
@@ -17,7 +16,6 @@ class JpaBasedTeamService(
   private val teamRepository: TeamRepository,
   private val capacityCalculator: CapacityCalculator,
   private val communityApiClient: CommunityApiClient,
-  private val gradeMapper: GradeMapper,
   private val workloadPointsRepository: WorkloadPointsRepository,
   private val personManagerRepository: PersonManagerRepository
 ) : TeamService {
@@ -34,14 +32,13 @@ class JpaBasedTeamService(
         .groupBy { it.staffCode }
         .mapValues { countEntry -> countEntry.value.size }
       staff.map {
-        overviews[it.staffCode]?.let { teamOverview ->
+        val overview = overviews[it.staffCode]?.let { teamOverview ->
           teamOverview.staffId = it.staffIdentifier
-          teamOverview.grade = gradeMapper.workloadToStaffGrade(teamOverview.grade)
           teamOverview.casesInLastWeek = caseCounts.getOrDefault(teamOverview.code, 0).toBigInteger()
           teamOverview
-        } ?: run {
-          getTeamOverviewForOffenderManagerWithoutWorkload(it.staff.forenames, it.staff.surname, gradeMapper.deliusToStaffGrade(it.staffGrade?.code), it.staffCode, it.staffIdentifier)
-        }
+        } ?: getTeamOverviewForOffenderManagerWithoutWorkload(it.staff.forenames, it.staff.surname, it.grade, it.staffCode, it.staffIdentifier)
+        overview.grade = it.grade
+        overview
       }.filter {
         grades == null || grades.contains(it.grade)
       }
@@ -49,7 +46,7 @@ class JpaBasedTeamService(
 
   fun getTeamOverviewForOffenderManagerWithoutWorkload(forename: String, surname: String, grade: String, staffCode: String, staffId: BigInteger): TeamOverview {
     val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
-    val overview = TeamOverview(forename, surname, grade, BigDecimal.ZERO, BigDecimal.ZERO, workloadPoints.getDefaultPointsAvailable(grade).toBigInteger(), BigInteger.ZERO, staffCode)
+    val overview = TeamOverview(forename, surname, BigDecimal.ZERO, BigDecimal.ZERO, workloadPoints.getDefaultPointsAvailable(grade).toBigInteger(), BigInteger.ZERO, staffCode)
     overview.capacity = capacityCalculator.calculate(overview.totalPoints, overview.availablePoints)
     overview.staffId = staffId
     return overview

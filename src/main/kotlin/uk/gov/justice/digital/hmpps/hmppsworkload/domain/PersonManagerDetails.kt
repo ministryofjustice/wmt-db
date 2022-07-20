@@ -28,16 +28,16 @@ data class PersonManagerDetails @JsonCreator constructor(
   @Schema(description = "personName")
   val personName: String,
   @Schema(description = "Staff Grade")
-  val staffGrade: String?,
+  val staffGrade: String,
   @Schema(description = "Staff Email")
-  val staffEmail: String?,
+  val staffEmail: String,
   @Schema(description = "Staff Forename")
-  val staffForename: String?,
+  val staffForename: String,
   @Schema(description = "Staff Surname")
-  val staffSurname: String?
+  val staffSurname: String
 ) {
   companion object {
-    fun from(personManagerEntity: PersonManagerEntity, grade: String?, staff: Staff?): PersonManagerDetails {
+    fun from(personManagerEntity: PersonManagerEntity, grade: String, staff: Staff): PersonManagerDetails {
       return PersonManagerDetails(
         personManagerEntity.uuid,
         personManagerEntity.staffId,
@@ -49,9 +49,9 @@ data class PersonManagerDetails @JsonCreator constructor(
         personManagerEntity.crn,
         personManagerEntity.offenderName,
         grade,
-        staff?.email,
-        staff?.staff?.forenames,
-        staff?.staff?.surname
+        staff.email,
+        staff.staff.forenames,
+        staff.staff.surname
       )
     }
   }
