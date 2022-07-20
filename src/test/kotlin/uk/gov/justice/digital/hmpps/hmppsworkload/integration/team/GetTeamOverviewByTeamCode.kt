@@ -22,6 +22,9 @@ class GetTeamOverviewByTeamCode : IntegrationTestBase() {
     val newPersonManager = PersonManagerEntity(crn = "CRN3", staffId = BigInteger.valueOf(56789321L), staffCode = "OM2", teamCode = "T1", offenderName = "John Doe", createdBy = "USER2", providerCode = "R1", createdDate = ZonedDateTime.now().minusDays(2L))
     personManagerRepository.save(newPersonManager)
 
+    val personManagerWithNoWorkload = PersonManagerEntity(crn = "CRN4", staffId = BigInteger.valueOf(56789321L), staffCode = "NOWORKLOAD1", teamCode = "T1", offenderName = "John Doe", createdBy = "USER2", providerCode = "R1", createdDate = ZonedDateTime.now().minusDays(2L))
+    personManagerRepository.save(personManagerWithNoWorkload)
+
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers")
       .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT")) }
@@ -53,6 +56,8 @@ class GetTeamOverviewByTeamCode : IntegrationTestBase() {
       .isEqualTo("Doe")
       .jsonPath("$.offenderManagers[2].grade")
       .isEqualTo("DMY")
+      .jsonPath("$.offenderManagers[2].totalCasesInLastWeek")
+      .isEqualTo(1)
       .jsonPath("$.offenderManagers[2].totalCommunityCases")
       .isEqualTo(0)
       .jsonPath("$.offenderManagers[2].totalCustodyCases")

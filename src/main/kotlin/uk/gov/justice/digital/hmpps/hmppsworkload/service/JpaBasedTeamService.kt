@@ -23,21 +23,17 @@ class JpaBasedTeamService(
   override fun getTeamOverview(teamCode: String, grades: List<String>?): List<TeamOverview>? = communityApiClient
     .getTeamStaff(teamCode)
     .map { staff ->
-      val overviews = teamRepository.findByOverview(teamCode).associateBy {
-        it.capacity = capacityCalculator.calculate(it.totalPoints, it.availablePoints)
-        it.code
-      }
+      val overviews = teamRepository.findByOverview(teamCode).associateBy { it.code }
       val caseCountAfter = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).minusDays(7L)
       val caseCounts = personManagerRepository.findByTeamCodeAndCreatedDateGreaterThanEqualLatest(teamCode, caseCountAfter)
         .groupBy { it.staffCode }
         .mapValues { countEntry -> countEntry.value.size }
       staff.map {
-        val overview = overviews[it.staffCode]?.let { teamOverview ->
-          teamOverview.staffId = it.staffIdentifier
-          teamOverview.casesInLastWeek = caseCounts.getOrDefault(teamOverview.code, 0).toBigInteger()
-          teamOverview
-        } ?: getTeamOverviewForOffenderManagerWithoutWorkload(it.staff.forenames, it.staff.surname, it.grade, it.staffCode, it.staffIdentifier)
+        val overview = overviews[it.staffCode] ?: getTeamOverviewForOffenderManagerWithoutWorkload(it.staff.forenames, it.staff.surname, it.grade, it.staffCode, it.staffIdentifier)
+        overview.staffId = it.staffIdentifier
+        overview.casesInLastWeek = caseCounts.getOrDefault(overview.code, 0).toBigInteger()
         overview.grade = it.grade
+        overview.capacity = capacityCalculator.calculate(overview.totalPoints, overview.availablePoints)
         overview
       }.filter {
         grades == null || grades.contains(it.grade)
@@ -46,9 +42,6 @@ class JpaBasedTeamService(
 
   fun getTeamOverviewForOffenderManagerWithoutWorkload(forename: String, surname: String, grade: String, staffCode: String, staffId: BigInteger): TeamOverview {
     val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
-    val overview = TeamOverview(forename, surname, BigDecimal.ZERO, BigDecimal.ZERO, workloadPoints.getDefaultPointsAvailable(grade).toBigInteger(), BigInteger.ZERO, staffCode)
-    overview.capacity = capacityCalculator.calculate(overview.totalPoints, overview.availablePoints)
-    overview.staffId = staffId
-    return overview
+    return TeamOverview(forename, surname, BigDecimal.ZERO, BigDecimal.ZERO, workloadPoints.getDefaultPointsAvailable(grade).toBigInteger(), BigInteger.ZERO, staffCode)
   }
 }
