@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PersonManagerDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
@@ -13,7 +12,7 @@ class JpaBasedGetPersonManager(
   private val communityApiClient: CommunityApiClient
 ) : GetPersonManager {
   override fun findById(id: UUID): PersonManagerDetails? = personManagerRepository.findByUuid(id)?.let { entity ->
-    val staff = communityApiClient.getStaffById(entity.staffId).onErrorResume { Mono.empty() }.block()!!
-    PersonManagerDetails.from(entity, staff?.grade, staff)
+    val staff = communityApiClient.getStaffById(entity.staffId).block()!!
+    PersonManagerDetails.from(entity, staff.grade, staff)
   }
 }
