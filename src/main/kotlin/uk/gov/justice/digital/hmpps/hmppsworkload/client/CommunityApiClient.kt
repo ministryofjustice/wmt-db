@@ -50,6 +50,10 @@ class CommunityApiClient(private val webClient: WebClient) {
       .get()
       .uri("/staff/username/{username}", username)
       .retrieve()
+      .onStatus(
+        { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
+        { Mono.error(MissingStaffError("User is not a staff member $username")) }
+      )
       .bodyToMono(Staff::class.java)
   }
 
@@ -127,4 +131,5 @@ class CommunityApiClient(private val webClient: WebClient) {
 }
 
 class MissingTeamError(msg: String) : RuntimeException(msg)
+class MissingStaffError(msg: String) : RuntimeException(msg)
 private class MissingOffenderAssessmentError(msg: String) : RuntimeException(msg)
