@@ -48,22 +48,22 @@ class EmailNotificationService(
 
   @Async
   override fun notifyAllocation(allocatedOfficer: Staff, personSummary: PersonSummary, requirements: List<ConvictionRequirement>, allocateCase: AllocateCase, allocatingOfficerUsername: String, token: String): CompletableFuture<List<SendEmailResponse>> {
-    return CompletableFuture.completedFuture(
-      getNotifyData(allocateCase.crn, allocatingOfficerUsername, token, allocateCase.eventId).map { notifyData ->
-        val caseDetails = caseDetailsRepository.findByIdOrNull(allocateCase.crn)!!
-        val parameters = mapOf(
-          "officer_name" to "${allocatedOfficer.staff.forenames} ${allocatedOfficer.staff.surname}",
-          "induction_statement" to mapInductionAppointment(notifyData.initialAppointments, caseDetails.type, notifyData.conviction.sentence!!.startDate),
-          "requirements" to mapRequirements(requirements),
-        ).plus(getRiskParameters(notifyData.riskSummary, notifyData.riskPredictors, notifyData.assessment, caseDetails.tier))
-          .plus(getConvictionParameters(notifyData.conviction, notifyData.previousConvictions))
-          .plus(getPersonOnProbationParameters(personSummary, allocateCase))
-          .plus(getLoggedInUserParameters(notifyData.allocatingStaff))
-        val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
-        emailTo.add(allocatedOfficer.email)
-        emailTo.map { email -> notificationClient.sendEmail(allocationTemplateId, email, parameters, null) }
-      }.block()!!
-    )
+    val future = CompletableFuture<List<SendEmailResponse>>()
+    getNotifyData(allocateCase.crn, allocatingOfficerUsername, token, allocateCase.eventId).map { notifyData ->
+      val caseDetails = caseDetailsRepository.findByIdOrNull(allocateCase.crn)!!
+      val parameters = mapOf(
+        "officer_name" to "${allocatedOfficer.staff.forenames} ${allocatedOfficer.staff.surname}",
+        "induction_statement" to mapInductionAppointment(notifyData.initialAppointments, caseDetails.type, notifyData.conviction.sentence!!.startDate),
+        "requirements" to mapRequirements(requirements),
+      ).plus(getRiskParameters(notifyData.riskSummary, notifyData.riskPredictors, notifyData.assessment, caseDetails.tier))
+        .plus(getConvictionParameters(notifyData.conviction, notifyData.previousConvictions))
+        .plus(getPersonOnProbationParameters(personSummary, allocateCase))
+        .plus(getLoggedInUserParameters(notifyData.allocatingStaff))
+      val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
+      emailTo.add(allocatedOfficer.email)
+      emailTo.map { email -> notificationClient.sendEmail(allocationTemplateId, email, parameters, null) }
+    }.subscribe { future.complete(it) }
+    return future
   }
 
   private fun getLoggedInUserParameters(loggedInUser: Staff): Map<String, Any> = mapOf(
