@@ -15,13 +15,13 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderAssessment
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskPredictor
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskSummary
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Sentence
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.DateMapper
+import uk.gov.justice.digital.hmpps.hmppsworkload.utils.capitalize
 import uk.gov.service.notify.NotificationClientApi
 import uk.gov.service.notify.SendEmailResponse
 import java.math.BigInteger
@@ -76,7 +76,7 @@ class EmailNotificationService(
     "court_name" to conviction.courtAppearance!!.courtName,
     "sentence_date" to conviction.courtAppearance.appearanceDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
     "offences" to mapOffences(conviction.offences!!),
-    "order" to mapOrder(conviction.sentence!!),
+    "order" to conviction.sentence!!.mapOrder(),
     "previousConvictions" to mapConvictionsToOffenceDescription(previousConvictions)
   )
 
@@ -84,9 +84,9 @@ class EmailNotificationService(
     val latestRiskPredictor =
       riskPredictors.filter { riskPredictor -> riskPredictor.rsrScoreLevel != null && riskPredictor.rsrPercentageScore != null }
         .maxByOrNull { riskPredictor -> riskPredictor.completedDate ?: LocalDateTime.MIN }
-    val rsrLevel = latestRiskPredictor?.let { capitalize(it.rsrScoreLevel) } ?: SCORE_UNAVAILABLE
-    val rsrPercentage = latestRiskPredictor?.let { it.rsrPercentageScore?.toString() } ?: NOT_APPLICABLE
-    val rosh = riskSummary?.let { capitalize(it.overallRiskLevel) } ?: SCORE_UNAVAILABLE
+    val rsrLevel = latestRiskPredictor?.rsrScoreLevel?.capitalize() ?: SCORE_UNAVAILABLE
+    val rsrPercentage = latestRiskPredictor?.rsrPercentageScore?.toString() ?: NOT_APPLICABLE
+    val rosh = riskSummary?.overallRiskLevel?.capitalize() ?: SCORE_UNAVAILABLE
     val ogrsLevel = assessment?.ogrsScore?.let { orgsScoreToLevel(it.toInt()) } ?: SCORE_UNAVAILABLE
     val ogrsPercentage = assessment?.ogrsScore?.toString() ?: NOT_APPLICABLE
     return mapOf(
@@ -135,15 +135,6 @@ class EmailNotificationService(
       }
     }
   }
-
-  private fun capitalize(value: String?): String? = value?.let {
-    if (it.isNotEmpty() && it.isNotBlank()) {
-      return it[0].uppercase() + it.substring(1).lowercase()
-    }
-    return it
-  }
-
-  private fun mapOrder(sentence: Sentence) = "${sentence.description} (${sentence.originalLength} ${sentence.originalLengthUnits})"
 
   private fun mapOffences(offences: List<Offence>): List<String> = offences
     .map { offence -> offence.detail.mainCategoryDescription }
