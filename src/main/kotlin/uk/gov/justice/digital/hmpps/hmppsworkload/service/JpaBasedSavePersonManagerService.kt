@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
+import javax.transaction.Transactional
 
 @Service
 class JpaBasedSavePersonManagerService(
@@ -15,6 +16,7 @@ class JpaBasedSavePersonManagerService(
   private val workloadCalculationService: WorkloadCalculationService,
   private val offenderManagerService: OffenderManagerService
 ) : SavePersonManagerService {
+  @Transactional
   override fun savePersonManager(
     teamCode: String,
     staff: Staff,

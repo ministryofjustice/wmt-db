@@ -5,7 +5,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseAllocated
 import java.math.BigInteger
-import javax.transaction.Transactional
 
 @Service
 class DefaultSaveWorkloadService(
@@ -16,7 +15,6 @@ class DefaultSaveWorkloadService(
   private val notificationService: NotificationService
 ) : SaveWorkloadService {
 
-  @Transactional
   override fun saveWorkload(
     teamCode: String,
     staffId: BigInteger,

@@ -5,6 +5,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.EventManagerRepository
+import javax.transaction.Transactional
 
 @Service
 class JpaBasedSaveEventManagerService(
@@ -13,6 +14,7 @@ class JpaBasedSaveEventManagerService(
   private val successUpdater: SuccessUpdater
 ) : SaveEventManagerService {
 
+  @Transactional
   override fun saveEventManager(
     teamCode: String,
     staff: Staff,

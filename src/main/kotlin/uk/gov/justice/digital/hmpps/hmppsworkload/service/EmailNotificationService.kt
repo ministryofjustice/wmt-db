@@ -145,7 +145,7 @@ class EmailNotificationService(
   private fun getNotifyData(crn: String, allocatingOfficerUsername: String, token: String, eventId: BigInteger): Mono<NotifyData> = Mono.zip(
     communityApiClient.getAllConvictions(crn), communityApiClient.getStaffByUsername(allocatingOfficerUsername), assessRisksNeedsApiClient.getRiskSummary(crn, token),
     assessRisksNeedsApiClient.getRiskPredictors(crn, token),
-    communityApiClient.getAssessment(crn)
+    communityApiClient.getAssessment(crn),
   )
     .flatMap { results ->
       val conviction = results.t1.first { it.convictionId == eventId }

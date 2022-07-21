@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Assessment
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
@@ -28,6 +29,7 @@ class WorkloadCalculationService(
   private val getCaseLoad: GetCaseload
 ) {
 
+  @Async
   fun calculate(staffCode: String, teamCode: String, providerCode: String, staffGrade: String): WorkloadCalculationEntity {
     val cases = getCaseLoad.getCases(staffCode, teamCode)
     val courtReports = getCourtReports.getCourtReports(staffCode, teamCode)

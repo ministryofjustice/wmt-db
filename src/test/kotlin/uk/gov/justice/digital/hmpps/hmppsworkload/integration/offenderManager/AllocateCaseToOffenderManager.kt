@@ -4,6 +4,9 @@ import com.microsoft.applicationinsights.TelemetryClient
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.verify
+import org.awaitility.kotlin.await
+import org.awaitility.kotlin.matches
+import org.awaitility.kotlin.untilCallTo
 import org.hamcrest.core.IsNot
 import org.hamcrest.text.MatchesPattern
 import org.junit.jupiter.api.Assertions
@@ -85,6 +88,9 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
     expectWorkloadAllocationCompleteMessages(crn)
 
+    await untilCallTo {
+      workloadCalculationRepository.count()
+    } matches { it == 1L }
     val actualWorkloadCalcEntity: WorkloadCalculationEntity =
       workloadCalculationRepository.findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)!!
 
@@ -218,6 +224,10 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
       .jsonPath("$.personManagerId")
       .value(IsNot.not(storedPersonManager.uuid.toString()))
+
+    await untilCallTo {
+      workloadCalculationRepository.count()
+    } matches { it == 2L }
 
     val actualWorkloadCalcEntity: WorkloadCalculationEntity? =
       workloadCalculationRepository.findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(storedPersonManager.staffCode, storedPersonManager.teamCode)
