@@ -19,6 +19,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Sentence
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.DateMapper
 import uk.gov.service.notify.NotificationClientApi
@@ -43,49 +44,59 @@ class EmailNotificationService(
   private val caseDetailsRepository: CaseDetailsRepository
 ) : NotificationService {
 
-  override fun notifyAllocation(
-    allocatedOfficer: Staff,
-    personSummary: PersonSummary,
-    requirements: List<ConvictionRequirement>,
-    allocateCase: AllocateCase,
-    allocatingOfficerUsername: String,
-    token: String
-  ): Mono<List<SendEmailResponse>> {
+  override fun notifyAllocation(allocatedOfficer: Staff, personSummary: PersonSummary, requirements: List<ConvictionRequirement>, allocateCase: AllocateCase, allocatingOfficerUsername: String, token: String): Mono<List<SendEmailResponse>> {
     return getNotifyData(allocateCase.crn, allocatingOfficerUsername, token, allocateCase.eventId).map { notifyData ->
-      val latestRiskPredictor =
-        notifyData.riskPredictors.filter { riskPredictor -> riskPredictor.rsrScoreLevel != null && riskPredictor.rsrPercentageScore != null }
-          .maxByOrNull { riskPredictor -> riskPredictor.completedDate ?: LocalDateTime.MIN }
-      val rsrLevel = latestRiskPredictor?.let { capitalize(it.rsrScoreLevel) } ?: SCORE_UNAVAILABLE
-      val rsrPercentage = latestRiskPredictor?.let { it.rsrPercentageScore?.toString() } ?: NOT_APPLICABLE
-      val rosh = notifyData.riskSummary?.let { capitalize(it.overallRiskLevel) } ?: SCORE_UNAVAILABLE
-      val ogrsLevel = notifyData.assessment?.ogrsScore?.let { orgsScoreToLevel(it.toInt()) } ?: SCORE_UNAVAILABLE
-      val ogrsPercentage = notifyData.assessment?.ogrsScore?.toString() ?: NOT_APPLICABLE
-
+      val caseDetails = caseDetailsRepository.findByIdOrNull(allocateCase.crn)!!
       val parameters = mapOf(
-        "case_name" to "${personSummary.firstName} ${personSummary.surname}",
-        "crn" to allocateCase.crn,
         "officer_name" to "${allocatedOfficer.staff.forenames} ${allocatedOfficer.staff.surname}",
-        "court_name" to notifyData.conviction.courtAppearance!!.courtName,
-        "sentence_date" to notifyData.conviction.courtAppearance.appearanceDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
-        "induction_statement" to mapInductionAppointment(notifyData.initialAppointments, caseDetailsRepository.findByIdOrNull(allocateCase.crn)!!.type, notifyData.conviction.sentence!!.startDate),
-        "offences" to mapOffences(notifyData.conviction.offences!!),
-        "order" to mapOrder(notifyData.conviction.sentence),
+        "induction_statement" to mapInductionAppointment(notifyData.initialAppointments, caseDetails.type, notifyData.conviction.sentence!!.startDate),
         "requirements" to mapRequirements(requirements),
-        "tier" to caseDetailsRepository.findByIdOrNull(allocateCase.crn)!!.tier,
-        "rosh" to rosh,
-        "rsrLevel" to rsrLevel,
-        "rsrPercentage" to rsrPercentage,
-        "ogrsLevel" to ogrsLevel,
-        "ogrsPercentage" to ogrsPercentage,
-        "previousConvictions" to mapConvictionsToOffenceDescription(notifyData.previousConvictions),
-        "notes" to allocateCase.instructions,
-        "allocatingOfficerName" to "${notifyData.allocatingStaff.staff.forenames} ${notifyData.allocatingStaff.staff.surname}",
-        "allocatingOfficerGrade" to notifyData.allocatingStaff.grade
-      )
+      ).plus(getRiskParameters(notifyData.riskSummary, notifyData.riskPredictors, notifyData.assessment, caseDetails.tier))
+        .plus(getConvictionParameters(notifyData.conviction, notifyData.previousConvictions))
+        .plus(getPersonOnProbationParameters(personSummary, allocateCase))
+        .plus(getLoggedInUserParameters(notifyData.allocatingStaff))
       val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
       emailTo.add(allocatedOfficer.email!!)
       emailTo.map { email -> notificationClient.sendEmail(allocationTemplateId, email, parameters, null) }
     }
+  }
+
+  private fun getLoggedInUserParameters(loggedInUser: Staff): Map<String, Any> = mapOf(
+    "allocatingOfficerName" to "${loggedInUser.staff.forenames} ${loggedInUser.staff.surname}",
+    "allocatingOfficerGrade" to loggedInUser.grade
+  )
+
+  private fun getPersonOnProbationParameters(personSummary: PersonSummary, allocateCase: AllocateCase): Map<String, Any> = mapOf(
+    "case_name" to "${personSummary.firstName} ${personSummary.surname}",
+    "crn" to allocateCase.crn,
+    "notes" to allocateCase.instructions,
+  )
+
+  private fun getConvictionParameters(conviction: Conviction, previousConvictions: List<Conviction>): Map<String, Any> = mapOf(
+    "court_name" to conviction.courtAppearance!!.courtName,
+    "sentence_date" to conviction.courtAppearance.appearanceDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
+    "offences" to mapOffences(conviction.offences!!),
+    "order" to mapOrder(conviction.sentence!!),
+    "previousConvictions" to mapConvictionsToOffenceDescription(previousConvictions)
+  )
+
+  private fun getRiskParameters(riskSummary: RiskSummary?, riskPredictors: List<RiskPredictor>, assessment: OffenderAssessment?, tier: Tier): Map<String, Any> {
+    val latestRiskPredictor =
+      riskPredictors.filter { riskPredictor -> riskPredictor.rsrScoreLevel != null && riskPredictor.rsrPercentageScore != null }
+        .maxByOrNull { riskPredictor -> riskPredictor.completedDate ?: LocalDateTime.MIN }
+    val rsrLevel = latestRiskPredictor?.let { capitalize(it.rsrScoreLevel) } ?: SCORE_UNAVAILABLE
+    val rsrPercentage = latestRiskPredictor?.let { it.rsrPercentageScore?.toString() } ?: NOT_APPLICABLE
+    val rosh = riskSummary?.let { capitalize(it.overallRiskLevel) } ?: SCORE_UNAVAILABLE
+    val ogrsLevel = assessment?.ogrsScore?.let { orgsScoreToLevel(it.toInt()) } ?: SCORE_UNAVAILABLE
+    val ogrsPercentage = assessment?.ogrsScore?.toString() ?: NOT_APPLICABLE
+    return mapOf(
+      "tier" to tier,
+      "rosh" to rosh,
+      "rsrLevel" to rsrLevel,
+      "rsrPercentage" to rsrPercentage,
+      "ogrsLevel" to ogrsLevel,
+      "ogrsPercentage" to ogrsPercentage,
+    )
   }
 
   private fun mapConvictionsToOffenceDescription(convictions: List<Conviction>): List<String> {
