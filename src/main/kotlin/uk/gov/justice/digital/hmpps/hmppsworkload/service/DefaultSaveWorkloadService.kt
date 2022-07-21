@@ -28,7 +28,7 @@ class DefaultSaveWorkloadService(
     val personManagerId = savePersonManagerService.savePersonManager(teamCode, staff, allocateCase, loggedInUser, summary).uuid
     val eventManagerId = saveEventManagerService.saveEventManager(teamCode, staff, allocateCase, loggedInUser).uuid
     val requirementManagerIds = saveRequirementManagerService.saveRequirementManagers(teamCode, staff, allocateCase, loggedInUser, activeRequirements)
-    notificationService.notifyAllocation(staff, summary, activeRequirements, allocateCase, loggedInUser, authToken).block()
+    notificationService.notifyAllocation(staff, summary, activeRequirements, allocateCase, loggedInUser, authToken)
 
     return CaseAllocated(personManagerId, eventManagerId, requirementManagerIds.map { it.uuid })
   }

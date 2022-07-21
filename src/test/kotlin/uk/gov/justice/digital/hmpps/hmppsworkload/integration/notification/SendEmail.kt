@@ -12,14 +12,14 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType.COMMUNITY
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier.B3
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.EmailNotificationService
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.NotificationService
 import java.math.BigInteger
 import java.util.UUID
 
 class SendEmail : IntegrationTestBase() {
 
   @Autowired
-  lateinit var emailNotificationService: EmailNotificationService
+  lateinit var emailNotificationService: NotificationService
   @Test
   fun `sends an email when ROSH cannot be retrieved`() {
     val allocatedOfficer = Staff(staffIdentifier = BigInteger.ONE, staffCode = "STAFF1", staff = StaffName("Staff", "Member"), email = "simulate-delivered@notifications.service.gov.uk")
@@ -43,7 +43,7 @@ class SendEmail : IntegrationTestBase() {
       allocateCase,
       allocatingOfficerUsername,
       token
-    ).block()
-    assertEquals(UUID.fromString("6c036f17-b8a8-46df-965d-6b33ff27b171"), emailSendResponse?.first()?.templateId)
+    )
+    assertEquals(UUID.fromString("6c036f17-b8a8-46df-965d-6b33ff27b171"), emailSendResponse.get().first().templateId)
   }
 }

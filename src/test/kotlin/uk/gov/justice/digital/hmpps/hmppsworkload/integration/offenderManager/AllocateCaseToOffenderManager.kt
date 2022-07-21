@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
-import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
@@ -30,6 +29,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.service.getWmtPeriod
 import uk.gov.service.notify.SendEmailResponse
 import java.math.BigInteger
 import java.time.LocalDateTime
+import java.util.concurrent.CompletableFuture
 
 class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
@@ -49,13 +49,14 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     singleActiveConvictionResponseForAllConvictions(crn)
     singleActiveConvictionResponse(crn)
     tierCalculationResponse(crn)
-    every { notificationService.notifyAllocation(any(), any(), any(), any(), any(), any()) } returns Mono.just(
-      listOf(
-        SendEmailResponse(
-          emailResponse()
+    every { notificationService.notifyAllocation(any(), any(), any(), any(), any(), any()) } returns
+      CompletableFuture.completedFuture(
+        listOf(
+          SendEmailResponse(
+            emailResponse()
+          )
         )
       )
-    )
 
     every { telemetryClient.trackEvent(any(), any(), null) } returns Unit
   }
