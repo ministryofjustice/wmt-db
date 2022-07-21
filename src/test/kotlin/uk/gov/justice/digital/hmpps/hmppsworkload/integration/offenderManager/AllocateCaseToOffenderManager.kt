@@ -46,7 +46,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     singleActiveConvictionResponseForAllConvictions(crn)
     singleActiveConvictionResponse(crn)
     tierCalculationResponse(crn)
-    every { notificationService.notifyAllocation(any(), any(), any(), any(), any(), teamCode, any()) } returns Mono.just(
+    every { notificationService.notifyAllocation(any(), any(), any(), any(), any(), any()) } returns Mono.just(
       listOf(
         SendEmailResponse(
           emailResponse()
@@ -95,7 +95,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       { Assertions.assertEquals(1, actualWorkloadCalcEntity.breakdownData.caseloadCount) }
     )
 
-    verify(exactly = 1) { notificationService.notifyAllocation(any(), any(), any(), any(), any(), teamCode, any()) }
+    verify(exactly = 1) { notificationService.notifyAllocation(any(), any(), any(), any(), any(), any()) }
     verify(exactly = 1) {
       telemetryClient.trackEvent(
         PERSON_MANAGER_ALLOCATED.eventName,
