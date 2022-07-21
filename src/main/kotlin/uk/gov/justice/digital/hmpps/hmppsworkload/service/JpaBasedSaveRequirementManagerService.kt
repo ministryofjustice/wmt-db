@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RequirementManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.RequirementManagerRepository
+import javax.transaction.Transactional
 
 @Service
 class JpaBasedSaveRequirementManagerService(
@@ -14,6 +15,7 @@ class JpaBasedSaveRequirementManagerService(
   private val successUpdater: SuccessUpdater
 ) : SaveRequirementManagerService {
 
+  @Transactional
   override fun saveRequirementManagers(
     teamCode: String,
     staff: Staff,

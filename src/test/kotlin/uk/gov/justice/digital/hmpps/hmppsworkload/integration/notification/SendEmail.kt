@@ -28,7 +28,6 @@ class SendEmail : IntegrationTestBase() {
     val crn = "X123456"
     val allocateCase = AllocateCase(crn, BigInteger.valueOf(123456789))
     val allocatingOfficerUsername = "AllocatingOfficer"
-    val teamCode = "T1"
     val token = "token"
     singleActiveConvictionResponseForAllConvictions(crn)
     singleActiveInductionResponse(crn)
@@ -43,7 +42,6 @@ class SendEmail : IntegrationTestBase() {
       requirements,
       allocateCase,
       allocatingOfficerUsername,
-      teamCode,
       token
     ).block()
     assertEquals(UUID.fromString("6c036f17-b8a8-46df-965d-6b33ff27b171"), emailSendResponse?.first()?.templateId)

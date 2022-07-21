@@ -4,6 +4,9 @@ import com.microsoft.applicationinsights.TelemetryClient
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.verify
+import org.awaitility.kotlin.await
+import org.awaitility.kotlin.matches
+import org.awaitility.kotlin.untilCallTo
 import org.hamcrest.core.IsNot
 import org.hamcrest.text.MatchesPattern
 import org.junit.jupiter.api.Assertions
@@ -46,7 +49,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     singleActiveConvictionResponseForAllConvictions(crn)
     singleActiveConvictionResponse(crn)
     tierCalculationResponse(crn)
-    every { notificationService.notifyAllocation(any(), any(), any(), any(), any(), teamCode, any()) } returns Mono.just(
+    every { notificationService.notifyAllocation(any(), any(), any(), any(), any(), any()) } returns Mono.just(
       listOf(
         SendEmailResponse(
           emailResponse()
@@ -85,6 +88,9 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
     expectWorkloadAllocationCompleteMessages(crn)
 
+    await untilCallTo {
+      workloadCalculationRepository.count()
+    } matches { it == 1L }
     val actualWorkloadCalcEntity: WorkloadCalculationEntity =
       workloadCalculationRepository.findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)!!
 
@@ -95,7 +101,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       { Assertions.assertEquals(1, actualWorkloadCalcEntity.breakdownData.caseloadCount) }
     )
 
-    verify(exactly = 1) { notificationService.notifyAllocation(any(), any(), any(), any(), any(), teamCode, any()) }
+    verify(exactly = 1) { notificationService.notifyAllocation(any(), any(), any(), any(), any(), any()) }
     verify(exactly = 1) {
       telemetryClient.trackEvent(
         PERSON_MANAGER_ALLOCATED.eventName,
@@ -218,6 +224,10 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
       .jsonPath("$.personManagerId")
       .value(IsNot.not(storedPersonManager.uuid.toString()))
+
+    await untilCallTo {
+      workloadCalculationRepository.count()
+    } matches { it == 2L }
 
     val actualWorkloadCalcEntity: WorkloadCalculationEntity? =
       workloadCalculationRepository.findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(storedPersonManager.staffCode, storedPersonManager.teamCode)

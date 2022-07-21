@@ -15,7 +15,6 @@ interface NotificationService {
     requirements: List<ConvictionRequirement>,
     allocateCase: AllocateCase,
     allocatingOfficerUsername: String,
-    teamCode: String,
     token: String
   ): Mono<List<SendEmailResponse>>
 }

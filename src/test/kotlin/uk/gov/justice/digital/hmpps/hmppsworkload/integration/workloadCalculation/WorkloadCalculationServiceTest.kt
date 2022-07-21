@@ -1,5 +1,8 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.workloadCalculation
 
+import org.awaitility.kotlin.await
+import org.awaitility.kotlin.matches
+import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -32,6 +35,10 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
 
     workloadCalculation.calculate(staffCode, teamCode, providerCode, staffGrade)
 
+    await untilCallTo {
+      workloadCalculationRepository.count()
+    } matches { it == 1L }
+
     assertEquals(BigInteger.ZERO, workloadCalculationRepository.findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)?.workloadPoints)
   }
 
@@ -47,6 +54,10 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
     wmtCourtReportsRepository
       .save(WMTCourtReportsEntity(staffCode = staffCode, teamCode = teamCode, fastDeliveryReportCount = fastDeliveryReportCount, standardDeliveryReportCount = standardDeliveryReportCount))
     workloadCalculation.calculate(staffCode, teamCode, providerCode, staffGrade)
+
+    await untilCallTo {
+      workloadCalculationRepository.count()
+    } matches { it == 1L }
 
     val workloadCalculationResult = workloadCalculationRepository
       .findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)
@@ -68,6 +79,9 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
     wmtInstitutionalReportRepository.save(WMTInstitutionalReportEntity(staffCode = staffCode, teamCode = teamCode, paroleReports = paroleReportsCount))
 
     workloadCalculation.calculate(staffCode, teamCode, providerCode, staffGrade)
+    await untilCallTo {
+      workloadCalculationRepository.count()
+    } matches { it == 1L }
 
     val workloadCalculationResult = workloadCalculationRepository
       .findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)
@@ -86,8 +100,11 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
 
     wmtAssessmentRepository.save(WMTAssessmentEntity(staffCode = staffCode, teamCode = teamCode, sentenceType = "Community"))
     wmtAssessmentRepository.save(WMTAssessmentEntity(staffCode = staffCode, teamCode = teamCode, sentenceType = "License"))
-
     workloadCalculation.calculate(staffCode, teamCode, providerCode, staffGrade)
+
+    await untilCallTo {
+      workloadCalculationRepository.count()
+    } matches { it == 1L }
 
     val workloadCalculationResult = workloadCalculationRepository
       .findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)
@@ -114,6 +131,9 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
 
     workloadCalculation.calculate(staffCode, teamCode, providerCode, staffGrade)
 
+    await untilCallTo {
+      workloadCalculationRepository.count()
+    } matches { it == 1L }
     val workloadCalculationResult = workloadCalculationRepository
       .findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)
 
@@ -135,6 +155,10 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
 
     workloadCalculation.calculate(staffCode, teamCode, providerCode, staffGrade)
 
+    await untilCallTo {
+      workloadCalculationRepository.count()
+    } matches { it == 1L }
+
     val breakdown = workloadCalculationRepository
       .findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)!!.breakdownData
 
@@ -153,6 +177,10 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
     caseDetailsRepository.save(CaseDetailsEntity("CRN1", Tier.B2, CaseType.COMMUNITY))
 
     workloadCalculation.calculate(staffCode, teamCode, providerCode, staffGrade)
+
+    await untilCallTo {
+      workloadCalculationRepository.count()
+    } matches { it == 1L }
 
     val breakdown = workloadCalculationRepository
       .findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)!!.breakdownData
