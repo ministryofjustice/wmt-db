@@ -28,7 +28,7 @@ class StaffController(private val communityApiClient: CommunityApiClient) {
     ]
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
-  @GetMapping("/staff/id/{staffId}")
+  @GetMapping("/staff/{staffId}")
   fun getStaffById(@PathVariable(required = true) staffId: BigInteger): Mono<StaffSummary> =
     communityApiClient.getStaffById(staffId)
       .onErrorMap { ex ->
