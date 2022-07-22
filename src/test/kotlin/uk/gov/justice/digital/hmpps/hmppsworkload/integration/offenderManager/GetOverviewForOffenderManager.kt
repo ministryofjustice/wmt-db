@@ -145,9 +145,9 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
       .isOk
       .expectBody()
       .jsonPath("$.forename")
-      .isEqualTo("Ben")
+      .isEqualTo("Sheila")
       .jsonPath("$.surname")
-      .isEqualTo("Doe")
+      .isEqualTo("Hancock")
       .jsonPath("$.grade")
       .isEqualTo("PO")
       .jsonPath("$.capacity")

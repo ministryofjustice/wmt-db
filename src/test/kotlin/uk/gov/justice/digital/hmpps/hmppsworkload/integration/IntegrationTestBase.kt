@@ -13,8 +13,9 @@ import org.mockserver.configuration.Configuration
 import org.mockserver.integration.ClientAndServer
 import org.mockserver.integration.ClientAndServer.startClientAndServer
 import org.mockserver.matchers.Times
-import org.mockserver.model.HttpRequest
+import org.mockserver.model.HttpRequest.request
 import org.mockserver.model.HttpResponse
+import org.mockserver.model.HttpResponse.response
 import org.mockserver.model.HttpStatusCode
 import org.mockserver.model.MediaType.APPLICATION_JSON
 import org.mockserver.model.Parameter
@@ -237,70 +238,70 @@ abstract class IntegrationTestBase {
   protected fun jsonString(any: Any) = objectMapper.writeValueAsString(any) as String
 
   private final fun bankHolidayResponse() {
-    val bankHolidayRequest = HttpRequest.request()
+    val bankHolidayRequest = request()
       .withPath("/bank-holidays.json")
 
     bankHolidayApi.`when`(bankHolidayRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(bankHolidayJsonResponse())
+      response().withContentType(APPLICATION_JSON).withBody(bankHolidayJsonResponse())
     )
   }
 
   fun setupOauth() {
-    val response = HttpResponse.response().withContentType(APPLICATION_JSON)
+    val response = response().withContentType(APPLICATION_JSON)
       .withBody(objectMapper.writeValueAsString(mapOf("access_token" to "ABCDE", "token_type" to "bearer")))
-    oauthMock.`when`(HttpRequest.request().withPath("/auth/oauth/token")).respond(response)
+    oauthMock.`when`(request().withPath("/auth/oauth/token")).respond(response)
   }
 
   protected fun teamStaffResponse(teamCode: String) {
     val convictionsRequest =
-      HttpRequest.request()
+      request()
         .withPath("/teams/$teamCode/staff")
 
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(teamStaffResponse())
+      response().withContentType(APPLICATION_JSON).withBody(teamStaffResponse())
     )
   }
 
   protected fun tierCalculationResponse(crn: String, tier: String = "B3") {
-    val request = HttpRequest.request().withPath("/crn/$crn/tier")
+    val request = request().withPath("/crn/$crn/tier")
     hmppsTier.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(APPLICATION_JSON).withBody("{\"tierScore\":\"${tier}\"}")
+      response().withContentType(APPLICATION_JSON).withBody("{\"tierScore\":\"${tier}\"}")
     )
   }
 
   protected fun riskSummaryResponse(crn: String) {
-    val request = HttpRequest.request().withPath("/risks/crn/$crn/summary")
+    val request = request().withPath("/risks/crn/$crn/summary")
     assessRisksNeedsApi.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(successfulRiskSummaryResponse())
+      response().withContentType(APPLICATION_JSON).withBody(successfulRiskSummaryResponse())
     )
   }
 
   protected fun riskPredictorResponse(crn: String) {
-    val request = HttpRequest.request().withPath("/risks/crn/$crn/predictors/rsr/history")
+    val request = request().withPath("/risks/crn/$crn/predictors/rsr/history")
     assessRisksNeedsApi.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(successfulRiskPredictorResponse())
+      response().withContentType(APPLICATION_JSON).withBody(successfulRiskPredictorResponse())
     )
   }
 
   protected fun assessmentCommunityApiResponse(crn: String) {
     val ogrsRequest =
-      HttpRequest.request().withPath("/offenders/crn/$crn/assessments")
+      request().withPath("/offenders/crn/$crn/assessments")
 
     communityApi.`when`(ogrsRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(communityApiAssessmentResponse())
+      response().withContentType(APPLICATION_JSON).withBody(communityApiAssessmentResponse())
     )
   }
   protected fun riskSummaryErrorResponse(crn: String) {
-    val request = HttpRequest.request().withPath("/risks/crn/$crn/summary")
+    val request = request().withPath("/risks/crn/$crn/summary")
     assessRisksNeedsApi.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.response().withStatusCode(HttpStatusCode.INTERNAL_SERVER_ERROR_500.code()).withContentType(
+      response().withStatusCode(HttpStatusCode.INTERNAL_SERVER_ERROR_500.code()).withContentType(
         APPLICATION_JSON
       ).withBody("{}")
     )
   }
 
   protected fun tierCalculationNotFoundResponse(crn: String) {
-    val request = HttpRequest.request().withPath("/crn/$crn/tier")
+    val request = request().withPath("/crn/$crn/tier")
     hmppsTier.`when`(request, Times.exactly(1)).respond(
       HttpResponse.notFoundResponse().withContentType(APPLICATION_JSON).withBody(notFoundTierResponse())
     )
@@ -308,72 +309,72 @@ abstract class IntegrationTestBase {
 
   protected fun singleActiveInductionResponse(crn: String) {
     val inductionRequest =
-      HttpRequest.request().withPath("/offenders/crn/$crn/contact-summary/inductions")
+      request().withPath("/offenders/crn/$crn/contact-summary/inductions")
 
     communityApi.`when`(inductionRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(singleActiveInductionResponse())
+      response().withContentType(APPLICATION_JSON).withBody(singleActiveInductionResponse())
     )
   }
 
   protected fun staffIdResponse(staffId: BigInteger, staffCode: String, teamCode: String, staffGradeCode: String = "PSM") {
-    val request = HttpRequest.request().withPath("/staff/staffIdentifier/$staffId")
+    val request = request().withPath("/staff/staffIdentifier/$staffId")
     communityApi.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(staffByIdResponse(staffCode, staffGradeCode, teamCode))
+      response().withContentType(APPLICATION_JSON).withBody(staffByIdResponse(staffCode, staffGradeCode, teamCode))
     )
   }
 
   protected fun singleActiveConvictionResponse(crn: String) {
     val convictionsRequest =
-      HttpRequest.request()
+      request()
         .withPath("/offenders/crn/$crn/convictions").withQueryStringParameter(Parameter("activeOnly", "true"))
 
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(singleActiveConvictionResponse())
+      response().withContentType(APPLICATION_JSON).withBody(singleActiveConvictionResponse())
     )
   }
 
   protected fun convictionWithNoSentenceResponse(crn: String) {
     val convictionsRequest =
-      HttpRequest.request().withPath("/offenders/crn/$crn/convictions").withQueryStringParameter(Parameter("activeOnly", "true"))
+      request().withPath("/offenders/crn/$crn/convictions").withQueryStringParameter(Parameter("activeOnly", "true"))
 
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(convictionNoSentenceResponse())
+      response().withContentType(APPLICATION_JSON).withBody(convictionNoSentenceResponse())
     )
   }
 
   protected fun noConvictionsResponse(crn: String) {
     val convictionsRequest =
-      HttpRequest.request().withPath("/offenders/crn/$crn/convictions").withQueryStringParameter(Parameter("activeOnly", "true"))
+      request().withPath("/offenders/crn/$crn/convictions").withQueryStringParameter(Parameter("activeOnly", "true"))
 
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(APPLICATION_JSON).withBody("[]")
+      response().withContentType(APPLICATION_JSON).withBody("[]")
     )
   }
 
   protected fun singleActiveConvictionResponseForAllConvictions(crn: String) {
     val convictionsRequest =
-      HttpRequest.request()
+      request()
         .withPath("/offenders/crn/$crn/convictions")
 
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(singleActiveConvictionResponse())
+      response().withContentType(APPLICATION_JSON).withBody(singleActiveConvictionResponse())
     )
   }
 
   protected fun singleInactiveConvictionsResponse(crn: String) {
     val convictionsRequest =
-      HttpRequest.request().withPath("/offenders/crn/$crn/convictions")
+      request().withPath("/offenders/crn/$crn/convictions")
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(singleInactiveConvictionResponse())
+      response().withContentType(APPLICATION_JSON).withBody(singleInactiveConvictionResponse())
     )
   }
 
   protected fun offenderSummaryResponse(crn: String) {
     val summaryRequest =
-      HttpRequest.request().withPath("/offenders/crn/$crn")
+      request().withPath("/offenders/crn/$crn")
 
     communityApi.`when`(summaryRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(offenderSummaryResponse())
+      response().withContentType(APPLICATION_JSON).withBody(offenderSummaryResponse())
     )
   }
 
@@ -409,57 +410,57 @@ abstract class IntegrationTestBase {
   }
 
   protected fun staffCodeResponse(staffCode: String, teamCode: String) {
-    val request = HttpRequest.request().withPath("/staff/staffCode/$staffCode")
+    val request = request().withPath("/staff/staffCode/$staffCode")
     communityApi.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(staffByCodeResponse(staffCode, teamCode))
+      response().withContentType(APPLICATION_JSON).withBody(staffByCodeResponse(staffCode, teamCode))
     )
   }
 
   protected fun staffUserNameResponse(userName: String) {
-    val request = HttpRequest.request().withPath("/staff/username/$userName")
+    val request = request().withPath("/staff/username/$userName")
     communityApi.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(staffByUserNameResponse(userName))
+      response().withContentType(APPLICATION_JSON).withBody(staffByUserNameResponse(userName))
     )
   }
 
   protected fun offenderSearchByCrnsResponse(crns: List<String>) {
-    val request = HttpRequest.request().withPath("/crns").withBody(objectMapper.writeValueAsString(crns))
+    val request = request().withPath("/crns").withBody(objectMapper.writeValueAsString(crns))
     offenderSearchApi.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(offenderSearchByCrnsResponse())
+      response().withContentType(APPLICATION_JSON).withBody(offenderSearchByCrnsResponse())
     )
   }
 
   protected fun oneOffenderReturnedWhenSearchByCrnsResponse(crns: List<String>) {
-    val request = HttpRequest.request().withPath("/crns").withBody(objectMapper.writeValueAsString(crns))
+    val request = request().withPath("/crns").withBody(objectMapper.writeValueAsString(crns))
     offenderSearchApi.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(oneOffenderSearchByCrnsResponse())
+      response().withContentType(APPLICATION_JSON).withBody(oneOffenderSearchByCrnsResponse())
     )
   }
 
   protected fun singleActiveUnpaidRequirementResponse(crn: String, convictionId: BigInteger) {
     val convictionsRequest =
-      HttpRequest.request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameter(Parameter("activeOnly", "true"))
+      request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameter(Parameter("activeOnly", "true"))
 
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(singleActiveUnpaidRequirementResponse())
+      response().withContentType(APPLICATION_JSON).withBody(singleActiveUnpaidRequirementResponse())
     )
   }
 
   protected fun singleActiveRequirementResponse(crn: String, convictionId: BigInteger, requirementId: BigInteger = BigInteger.valueOf(123456789L)) {
     val convictionsRequest =
-      HttpRequest.request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameter(Parameter("activeOnly", "true"))
+      request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameter(Parameter("activeOnly", "true"))
 
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(singleActiveRequirementResponse(requirementId))
+      response().withContentType(APPLICATION_JSON).withBody(singleActiveRequirementResponse(requirementId))
     )
   }
 
   protected fun singleActiveRequirementNoLengthResponse(crn: String, convictionId: BigInteger, requirementId: BigInteger = BigInteger.valueOf(123456789L)) {
     val convictionsRequest =
-      HttpRequest.request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameter(Parameter("activeOnly", "true"))
+      request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameter(Parameter("activeOnly", "true"))
 
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(APPLICATION_JSON).withBody(singleActiveRequirementNoLengthResponse(requirementId))
+      response().withContentType(APPLICATION_JSON).withBody(singleActiveRequirementNoLengthResponse(requirementId))
     )
   }
 }

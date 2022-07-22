@@ -12,7 +12,7 @@ class GetPersonManagerById : IntegrationTestBase() {
   fun `can get person manager by Id`() {
     val storedPersonManager = PersonManagerEntity(crn = "CRN1", staffId = BigInteger.valueOf(123456789L), staffCode = "OM1", teamCode = "T1", offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1")
     personManagerRepository.save(storedPersonManager)
-    staffIdResponse(storedPersonManager.staffId, storedPersonManager.staffCode, storedPersonManager.teamCode)
+    staffCodeResponse(storedPersonManager.staffCode, storedPersonManager.teamCode)
     webTestClient.get()
       .uri("/allocation/person/${storedPersonManager.uuid}")
       .headers {
@@ -43,11 +43,11 @@ class GetPersonManagerById : IntegrationTestBase() {
       .jsonPath("$.staffGrade")
       .isEqualTo("PO")
       .jsonPath("$.staffEmail")
-      .isEqualTo("ben.doe@test.justice.gov.uk")
+      .isEqualTo("sheila.hancock@test.justice.gov.uk")
       .jsonPath("$.staffForename")
-      .isEqualTo("Ben")
+      .isEqualTo("Sheila")
       .jsonPath("$.staffSurname")
-      .isEqualTo("Doe")
+      .isEqualTo("Hancock")
   }
 
   @Test
