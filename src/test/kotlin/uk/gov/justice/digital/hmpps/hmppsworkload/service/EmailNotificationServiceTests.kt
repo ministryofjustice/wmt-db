@@ -94,7 +94,7 @@ class EmailNotificationServiceTests {
 
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token).block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals("${personSummary.firstName} ${personSummary.surname}", parameters.captured["case_name"])
   }
 
@@ -111,7 +111,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals(allocateCase.crn, parameters.captured["crn"])
   }
 
@@ -128,7 +128,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals("${allocatedOfficer.staff.forenames} ${allocatedOfficer.staff.surname}", parameters.captured["officer_name"])
   }
 
@@ -158,7 +158,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals(activeConviction.courtAppearance!!.courtName, parameters.captured["court_name"])
   }
 
@@ -188,7 +188,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals(activeConviction.courtAppearance!!.appearanceDate.format(DateTimeFormatter.ISO_LOCAL_DATE), parameters.captured["sentence_date"])
   }
 
@@ -205,7 +205,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals("No induction appointment is needed", parameters.captured["induction_statement"])
   }
 
@@ -239,7 +239,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals("Their induction has been booked and is due on ${appointment.contactStart.format(DateTimeFormatter.ISO_LOCAL_DATE)}", parameters.captured["induction_statement"])
   }
 
@@ -273,7 +273,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals("Their induction is overdue and was due on ${appointment.contactStart.format(DateTimeFormatter.ISO_LOCAL_DATE)}", parameters.captured["induction_statement"])
   }
 
@@ -310,7 +310,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals("Their induction has not been booked and is due on ${dueDate.format(DateTimeFormatter.ISO_LOCAL_DATE)}", parameters.captured["induction_statement"])
   }
 
@@ -343,7 +343,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals(listOf(offence.detail.mainCategoryDescription), parameters.captured["offences"])
   }
 
@@ -371,7 +371,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals("${sentence.description} (${sentence.originalLength} ${sentence.originalLengthUnits})", parameters.captured["order"])
   }
 
@@ -392,7 +392,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals(listOf("${requirement.requirementTypeMainCategory.description}: ${requirement.requirementTypeSubCategory.description} ${requirement.length} ${requirement.lengthUnit}"), parameters.captured["requirements"])
   }
 
@@ -413,7 +413,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals(listOf("${requirement.requirementTypeMainCategory.description}: ${requirement.requirementTypeSubCategory.description}"), parameters.captured["requirements"])
   }
 
@@ -430,7 +430,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals(Tier.B3, parameters.captured["tier"])
   }
 
@@ -450,7 +450,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals("High", parameters.captured["rosh"])
   }
 
@@ -471,7 +471,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals("Medium", parameters.captured["rsrLevel"])
   }
 
@@ -492,7 +492,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals(riskPredictor.rsrPercentageScore.toString(), parameters.captured["rsrPercentage"])
   }
 
@@ -513,7 +513,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals(offenderAssessment.ogrsScore.toString(), parameters.captured["ogrsPercentage"])
   }
 
@@ -534,7 +534,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals("Low", parameters.captured["ogrsLevel"])
   }
 
@@ -555,7 +555,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals("Medium", parameters.captured["ogrsLevel"])
   }
 
@@ -576,7 +576,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals("High", parameters.captured["ogrsLevel"])
   }
 
@@ -597,7 +597,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals("Very High", parameters.captured["ogrsLevel"])
   }
 
@@ -642,7 +642,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals(listOf(previousOffence.detail.description), parameters.captured["previousConvictions"])
   }
 
@@ -673,7 +673,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals(listOf("N/A"), parameters.captured["previousConvictions"])
   }
 
@@ -690,7 +690,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals(allocateCase.instructions, parameters.captured["notes"])
   }
 
@@ -711,7 +711,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals("${allocatingOfficer.staff.forenames} ${allocatingOfficer.staff.surname}", parameters.captured["allocatingOfficerName"])
   }
 
@@ -731,7 +731,7 @@ class EmailNotificationServiceTests {
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, capture(parameters), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals(mappedGrade, parameters.captured["allocatingOfficerGrade"])
   }
 
@@ -748,7 +748,7 @@ class EmailNotificationServiceTests {
     val token = "token"
 
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token).block()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email!!, any(), isNull()) }
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, any(), isNull()) }
     verify(exactly = 1) { notificationClient.sendEmail(templateId, firstEmail, any(), isNull()) }
     verify(exactly = 1) { notificationClient.sendEmail(templateId, secondEmail, any(), isNull()) }
   }
