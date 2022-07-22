@@ -56,7 +56,7 @@ class EmailNotificationService(
         .plus(getPersonOnProbationParameters(personSummary, allocateCase))
         .plus(getLoggedInUserParameters(notifyData.allocatingStaff))
       val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
-      emailTo.add(allocatedOfficer.email!!)
+      emailTo.add(allocatedOfficer.email)
       emailTo.map { email -> notificationClient.sendEmail(allocationTemplateId, email, parameters, null) }
     }
   }
@@ -87,7 +87,7 @@ class EmailNotificationService(
     val rsrLevel = latestRiskPredictor?.rsrScoreLevel?.capitalize() ?: SCORE_UNAVAILABLE
     val rsrPercentage = latestRiskPredictor?.rsrPercentageScore?.toString() ?: NOT_APPLICABLE
     val rosh = riskSummary?.overallRiskLevel?.capitalize() ?: SCORE_UNAVAILABLE
-    val ogrsLevel = assessment?.ogrsScore?.let { orgsScoreToLevel(it.toInt()) } ?: SCORE_UNAVAILABLE
+    val ogrsLevel = assessment?.ogrsScore?.let { ogrsScoreToLevel(it.toInt()) } ?: SCORE_UNAVAILABLE
     val ogrsPercentage = assessment?.ogrsScore?.toString() ?: NOT_APPLICABLE
     return mapOf(
       "tier" to tier,
@@ -110,12 +110,11 @@ class EmailNotificationService(
     return mappedConvictions
   }
 
-  private fun orgsScoreToLevel(ogrsScore: Int): String? = when {
+  private fun ogrsScoreToLevel(ogrsScore: Int): String = when {
     ogrsScore <= 49 -> "Low"
     ogrsScore in 50..74 -> "Medium"
     ogrsScore in 75..89 -> "High"
-    ogrsScore >= 90 -> "Very High"
-    else -> null
+    else -> "Very High"
   }
 
   private fun mapInductionAppointment(appointments: List<Contact>, caseType: CaseType, sentenceStartDate: LocalDate): String {
