@@ -2,16 +2,15 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration.staff
 
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
-import java.math.BigInteger
 
-class GetStaffById : IntegrationTestBase() {
+class GetStaffByCode : IntegrationTestBase() {
 
   @Test
-  fun `get staff by ID`() {
-    val staffId = BigInteger.valueOf(123456789L)
-    staffIdResponse(staffId, "OM1", "T1")
+  fun `get staff by Code`() {
+    val staffCode = "Staff01"
+    staffCodeResponse(staffCode, "OM1", "T1")
     webTestClient.get()
-      .uri("/staff/$staffId")
+      .uri("/staff/code/$staffCode")
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
       }
@@ -20,20 +19,20 @@ class GetStaffById : IntegrationTestBase() {
       .isOk
       .expectBody()
       .jsonPath("$.forename")
-      .isEqualTo("Ben")
+      .isEqualTo("Sheila")
       .jsonPath("$.surname")
-      .isEqualTo("Doe")
+      .isEqualTo("Hancock")
       .jsonPath("$.email")
-      .isEqualTo("ben.doe@test.justice.gov.uk")
+      .isEqualTo("sheila.hancock@test.justice.gov.uk")
       .jsonPath("$.id")
-      .isEqualTo(staffId)
+      .isEqualTo(123456)
   }
 
   @Test
-  fun `not found returned when no staff exists for ID`() {
-    val staffId = BigInteger.valueOf(123456789L)
+  fun `not found returned when no staff exists for Code`() {
+    val staffCode = "Staff01"
     webTestClient.get()
-      .uri("/staff/$staffId")
+      .uri("/staff/code/$staffCode")
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
       }

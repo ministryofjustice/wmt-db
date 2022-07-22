@@ -28,12 +28,31 @@ class StaffController(private val communityApiClient: CommunityApiClient) {
     ]
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
-  @GetMapping("/staff/{staffId}")
+  @GetMapping("/staff/id/{staffId}")
   fun getStaffById(@PathVariable(required = true) staffId: BigInteger): Mono<StaffSummary> =
     communityApiClient.getStaffById(staffId)
       .onErrorMap { ex ->
         when (ex) {
           is MissingStaffError -> EntityNotFoundException("staff not found for $staffId")
+          else -> ex
+        }
+      }
+      .map { staff -> StaffSummary.from(staff) }
+
+  @Operation(summary = "Get Staff by Code")
+  @ApiResponses(
+    value = [
+      ApiResponse(responseCode = "200", description = "OK"),
+      ApiResponse(responseCode = "404", description = "Result Not Found")
+    ]
+  )
+  @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
+  @GetMapping("/staff/code/{staffCode}")
+  fun getStaffById(@PathVariable(required = true) staffCode: String): Mono<StaffSummary> =
+    communityApiClient.getStaffByCode(staffCode)
+      .onErrorMap { ex ->
+        when (ex) {
+          is MissingStaffError -> EntityNotFoundException("staff not found for $staffCode")
           else -> ex
         }
       }
