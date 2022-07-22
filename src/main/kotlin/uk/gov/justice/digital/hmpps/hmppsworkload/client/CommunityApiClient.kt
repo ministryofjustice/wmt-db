@@ -62,12 +62,20 @@ class CommunityApiClient(private val webClient: WebClient) {
       .bodyToMono(Staff::class.java)
   }
 
-  fun getStaffByCode(staffCode: String): Mono<StaffSummary> {
+  fun getStaffSummaryByCode(staffCode: String): Mono<StaffSummary> {
     return webClient
       .get()
       .uri("/staff/staffCode/$staffCode")
       .retrieve()
       .bodyToMono(StaffSummary::class.java)
+  }
+
+  fun getStaffByCode(staffCode: String): Mono<Staff> {
+    return webClient
+      .get()
+      .uri("/staff/staffCode/$staffCode")
+      .retrieve()
+      .bodyToMono(Staff::class.java)
   }
 
   fun getActiveConvictions(crn: String): Mono<List<Conviction>> {

@@ -103,6 +103,26 @@ class OffenderManagerController(
   ): CaseAllocated {
     return saveWorkloadService.saveWorkload(teamCode, staffId, allocateCase, authentication.name, authToken)
   }
+  @Operation(summary = "Allocate Case to an Offender Manager")
+  @ApiResponses(
+    value = [
+      ApiResponse(responseCode = "200", description = "OK"),
+      ApiResponse(responseCode = "404", description = "Result Not Found")
+    ]
+  )
+  @PreAuthorize("hasRole('ROLE_MANAGE_A_WORKFORCE_ALLOCATE')")
+  @PostMapping("/team/{teamCode}/offenderManager/{staffCode}/case")
+  fun allocateCaseToOffenderManager(
+    @PathVariable(required = true) teamCode: String,
+    @PathVariable(required = true) staffCode: String,
+    @RequestBody allocateCase: AllocateCase,
+    authentication: Authentication,
+    @RequestHeader(
+      HttpHeaders.AUTHORIZATION
+    ) authToken: String
+  ): CaseAllocated {
+    return saveWorkloadService.saveWorkload(teamCode, staffCode, allocateCase, authentication.name, authToken)
+  }
 
   @Operation(summary = "Retrieves all cases allocated to an Offender Manager")
   @ApiResponses(

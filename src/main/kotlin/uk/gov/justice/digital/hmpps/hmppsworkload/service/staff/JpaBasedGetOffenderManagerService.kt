@@ -114,7 +114,7 @@ class JpaBasedGetOffenderManagerService(
   }
 
   override fun getOverview(teamCode: String, offenderManagerCode: String): OffenderManagerOverview? =
-    communityApiClient.getStaffByCode(offenderManagerCode).map { staff ->
+    communityApiClient.getStaffSummaryByCode(offenderManagerCode).map { staff ->
       val team = staff.teams!!.first { team -> team.code == teamCode }
       val overview = offenderManagerRepository.findByOverview(team.code, staff.staffCode)?.let {
         it.capacity = capacityCalculator.calculate(it.totalPoints, it.availablePoints)
@@ -139,7 +139,7 @@ class JpaBasedGetOffenderManagerService(
   override fun getCases(teamCode: String, offenderManagerCode: String): OffenderManagerCases? =
     offenderManagerRepository.findCasesByTeamCodeAndStaffCode(offenderManagerCode, teamCode).let { cases ->
       Mono.zip(
-        communityApiClient.getStaffByCode(offenderManagerCode),
+        communityApiClient.getStaffSummaryByCode(offenderManagerCode),
         getCrnToOffenderDetails(cases.map { it.crn })
       ).map { results ->
         val team = results.t1.teams?.first { team -> team.code == teamCode }

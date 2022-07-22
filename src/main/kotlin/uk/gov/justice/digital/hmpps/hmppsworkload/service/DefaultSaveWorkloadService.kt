@@ -35,4 +35,22 @@ class DefaultSaveWorkloadService(
 
     return CaseAllocated(personManagerId, eventManagerId, requirementManagerIds.map { it.uuid })
   }
+
+  override fun saveWorkload(
+    teamCode: String,
+    staffCode: String,
+    allocateCase: AllocateCase,
+    loggedInUser: String,
+    authToken: String
+  ): CaseAllocated {
+    val staff = communityApiClient.getStaffByCode(staffCode).block()!!
+    val summary = communityApiClient.getSummaryByCrn(allocateCase.crn).block()!!
+    val activeRequirements = communityApiClient.getActiveRequirements(allocateCase.crn, allocateCase.eventId).block()!!.requirements
+    val personManagerId = savePersonManagerService.savePersonManager(teamCode, staff, allocateCase, loggedInUser, summary).uuid
+    val eventManagerId = saveEventManagerService.saveEventManager(teamCode, staff, allocateCase, loggedInUser).uuid
+    val requirementManagerIds = saveRequirementManagerService.saveRequirementManagers(teamCode, staff, allocateCase, loggedInUser, activeRequirements)
+    notificationService.notifyAllocation(staff, summary, activeRequirements, allocateCase, loggedInUser, authToken).block()
+
+    return CaseAllocated(personManagerId, eventManagerId, requirementManagerIds.map { it.uuid })
+  }
 }

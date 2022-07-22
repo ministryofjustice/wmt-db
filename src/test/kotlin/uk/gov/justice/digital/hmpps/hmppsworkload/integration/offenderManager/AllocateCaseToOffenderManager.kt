@@ -39,11 +39,11 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   private lateinit var telemetryClient: TelemetryClient
 
   private val crn = "CRN1"
-  private val staffId = BigInteger.valueOf(123456789L)
+  private val staffId = BigInteger.valueOf(123456L)
 
   private val staffCode = "OM1"
   private val teamCode = "T1"
-  private val eventId = BigInteger.valueOf(123456789L)
+  private val eventId = BigInteger.valueOf(123456L)
   @BeforeEach
   fun setupApiCalls() {
     singleActiveConvictionResponseForAllConvictions(crn)
@@ -62,14 +62,14 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can allocate CRN to Staff member`() {
-    staffIdResponse(staffId, staffCode, teamCode)
+    staffCodeResponse(staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveRequirementResponse(crn, eventId)
 
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY))
 
     webTestClient.post()
-      .uri("/team/$teamCode/offenderManagers/$staffId/cases")
+      .uri("/team/$teamCode/offenderManager/$staffCode/case")
       .bodyValue(allocateCase(crn, eventId))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
@@ -109,7 +109,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
           "crn" to crn,
           "teamCode" to teamCode,
           "providerCode" to "N01",
-          "staffId" to "123456789",
+          "staffId" to "123456",
           "wmtPeriod" to getWmtPeriod(LocalDateTime.now())
         ),
         null
@@ -119,14 +119,14 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can allocate a requirement without a length`() {
-    staffIdResponse(staffId, staffCode, teamCode)
+    staffCodeResponse(staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveRequirementNoLengthResponse(crn, eventId)
 
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY))
 
     webTestClient.post()
-      .uri("/team/$teamCode/offenderManagers/$staffId/cases")
+      .uri("/team/$teamCode/offenderManager/$staffCode/case")
       .bodyValue(allocateCase(crn, eventId))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
@@ -148,12 +148,12 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `do not allocate active unpaid requirements`() {
-    staffIdResponse(staffId, staffCode, teamCode)
+    staffCodeResponse(staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveUnpaidRequirementResponse(crn, eventId)
 
     webTestClient.post()
-      .uri("/team/$teamCode/offenderManagers/$staffId/cases")
+      .uri("/team/$teamCode/offenderManager/$staffCode/case")
       .bodyValue(allocateCase(crn, eventId))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
@@ -170,8 +170,8 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   @Test
   fun `can allocate an already managed CRN to same staff member`() {
     val requirementId = BigInteger.valueOf(567891234L)
-    staffIdResponse(staffId, staffCode, teamCode)
-    staffIdResponse(staffId, staffCode, teamCode)
+    staffCodeResponse(staffCode, teamCode)
+    staffCodeResponse(staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveRequirementResponse(crn, eventId, requirementId)
     val storedPersonManager = PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1")
@@ -182,7 +182,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     requirementManagerRepository.save(storedRequirementManager)
 
     webTestClient.post()
-      .uri("/team/$teamCode/offenderManagers/$staffId/cases")
+      .uri("/team/$teamCode/offenderManager/$staffCode/case")
       .bodyValue(allocateCase(crn, eventId))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
@@ -202,7 +202,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can allocate an already managed CRN to different staff member`() {
-    staffIdResponse(staffId, staffCode, teamCode)
+    staffCodeResponse(staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveUnpaidRequirementResponse(crn, eventId)
     val storedPersonManager = PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1")
@@ -210,7 +210,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     personManagerRepository.save(storedPersonManager)
 
     webTestClient.post()
-      .uri("/team/$teamCode/offenderManagers/$staffId/cases")
+      .uri("/team/$teamCode/offenderManager/$staffCode/case")
       .bodyValue(allocateCase(crn, eventId))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
