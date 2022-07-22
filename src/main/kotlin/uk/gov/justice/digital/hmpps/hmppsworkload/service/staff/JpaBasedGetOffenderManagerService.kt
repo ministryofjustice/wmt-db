@@ -54,6 +54,18 @@ class JpaBasedGetOffenderManagerService(
       }.block()
   }
 
+  override fun getPotentialWorkload(teamCode: String, staffCode: String, impactCase: ImpactCase): OffenderManagerOverview? {
+    return getOverview(teamCode, staffCode)?.let { overview ->
+      val currentCaseImpact = getCurrentCasePoints(teamCode, overview.code, impactCase.crn)
+      overview.potentialCapacity = capacityCalculator.calculate(
+        overview.totalPoints.minus(currentCaseImpact)
+          .plus(caseCalculator.getPointsForCase(getPotentialCase(crn = impactCase.crn))),
+        overview.availablePoints
+      )
+      overview
+    }
+  }
+
   private fun getPotentialCase(crn: String): Case {
     return caseDetailsRepository.findByIdOrNull(crn)!!
       .let { Case(tier = it.tier, type = it.type, crn = crn) }

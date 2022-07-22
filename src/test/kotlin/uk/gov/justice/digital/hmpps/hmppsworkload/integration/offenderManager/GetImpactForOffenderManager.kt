@@ -7,22 +7,19 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.request.impactCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
-import java.math.BigInteger
 
 class GetImpactForOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can get impact for an offender manager with workload`() {
-
-    val staffId = BigInteger.valueOf(123456789L)
     val crn = "CRN1"
     val staffCode = "OM1"
     val teamCode = "T1"
-    staffIdResponse(staffId, staffCode, teamCode)
+    staffCodeResponse(staffCode, teamCode)
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY))
 
     webTestClient.post()
-      .uri("/team/$teamCode/offenderManagers/$staffId/impact")
+      .uri("/team/$teamCode/offenderManager/$staffCode/impact")
       .bodyValue(impactCase(crn))
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
@@ -48,14 +45,14 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `must not change capacity if case already allocated to the officer and is classified the same`() {
-    val staffId = BigInteger.valueOf(123456789L)
+
     val crn = "CRN2222"
     val staffCode = "OM1"
     val teamCode = "T1"
-    staffIdResponse(staffId, staffCode, teamCode)
+    staffCodeResponse(staffCode, teamCode)
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY))
     webTestClient.post()
-      .uri("/team/$teamCode/offenderManagers/$staffId/impact")
+      .uri("/team/$teamCode/offenderManager/$staffCode/impact")
       .bodyValue(impactCase(crn))
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
@@ -81,14 +78,14 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can get impact for an offender manager without workload`() {
-    val staffId = BigInteger.valueOf(123456789L)
+
     val crn = "CRN1"
     val staffCode = "NOWORKLOAD1"
     val teamCode = "T1"
-    staffIdResponse(staffId, staffCode, teamCode)
+    staffCodeResponse(staffCode, teamCode)
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY))
     webTestClient.post()
-      .uri("/team/$teamCode/offenderManagers/$staffId/impact")
+      .uri("/team/$teamCode/offenderManager/$staffCode/impact")
       .bodyValue(impactCase(crn))
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
@@ -99,9 +96,9 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
       .isOk
       .expectBody()
       .jsonPath("$.forename")
-      .isEqualTo("Ben")
+      .isEqualTo("Sheila")
       .jsonPath("$.surname")
-      .isEqualTo("Doe")
+      .isEqualTo("Hancock")
       .jsonPath("$.grade")
       .isEqualTo("PO")
       .jsonPath("$.capacity")
@@ -114,14 +111,13 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can get impact for an offender manager without a grade and a workload`() {
-    val staffId = BigInteger.valueOf(123456789L)
     val crn = "CRN1"
     val staffCode = "NOWORKLOAD1"
     val teamCode = "T1"
-    staffIdResponse(staffId, staffCode, teamCode, "UNKNOWNGRADECODE")
+    staffCodeResponse(staffCode, teamCode, "UNKNOWNGRADECODE")
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY))
     webTestClient.post()
-      .uri("/team/$teamCode/offenderManagers/$staffId/impact")
+      .uri("/team/$teamCode/offenderManager/$staffCode/impact")
       .bodyValue(impactCase(crn))
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
@@ -132,9 +128,9 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
       .isOk
       .expectBody()
       .jsonPath("$.forename")
-      .isEqualTo("Ben")
+      .isEqualTo("Sheila")
       .jsonPath("$.surname")
-      .isEqualTo("Doe")
+      .isEqualTo("Hancock")
       .jsonPath("$.grade")
       .isEqualTo("DMY")
       .jsonPath("$.capacity")

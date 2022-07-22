@@ -8,6 +8,7 @@ import java.math.BigInteger
 interface GetOffenderManagerService {
 
   fun getPotentialWorkload(teamCode: String, staffId: BigInteger, impactCase: ImpactCase): OffenderManagerOverview?
+  fun getPotentialWorkload(teamCode: String, staffCode: String, impactCase: ImpactCase): OffenderManagerOverview?
   fun getOverview(teamCode: String, offenderManagerCode: String): OffenderManagerOverview?
   fun getCases(teamCode: String, offenderManagerCode: String): OffenderManagerCases?
 }
