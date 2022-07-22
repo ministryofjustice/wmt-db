@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PersonManagerDetails
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetPersonManager
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.GetPersonManager
 import java.util.UUID
 import javax.persistence.EntityNotFoundException
 

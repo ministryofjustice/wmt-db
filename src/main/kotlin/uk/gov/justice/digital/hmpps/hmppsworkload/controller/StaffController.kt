@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffSummary
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetStaffService
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.GetStaffService
 import java.math.BigInteger
 import javax.persistence.EntityNotFoundException
 

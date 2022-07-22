@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsworkload.service
+package uk.gov.justice.digital.hmpps.hmppsworkload.service.staff
 
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.ImpactCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerCases

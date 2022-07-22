@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsworkload.service
+package uk.gov.justice.digital.hmpps.hmppsworkload.service.staff
 
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -18,6 +18,11 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOve
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.OffenderManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadPointsRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.CapacityCalculator
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.CaseCalculator
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetReductionService
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetSentenceService
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetWeeklyHours
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.LocalDateTime

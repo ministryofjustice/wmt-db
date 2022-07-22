@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsworkload.service
+package uk.gov.justice.digital.hmpps.hmppsworkload.service.staff
 
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
@@ -6,6 +6,9 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.SuccessUpdater
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.TelemetryService
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.WorkloadCalculationService
 import javax.transaction.Transactional
 
 @Service

@@ -20,8 +20,8 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.ImpactCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerCases
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerOverview
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerPotentialWorkload
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetOffenderManagerService
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.SaveWorkloadService
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.GetOffenderManagerService
 import java.math.BigInteger
 import javax.persistence.EntityNotFoundException
 

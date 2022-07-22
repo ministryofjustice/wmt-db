@@ -4,6 +4,9 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseAllocated
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.SaveEventManagerService
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.SavePersonManagerService
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.SaveRequirementManagerService
 import java.math.BigInteger
 
 @Service

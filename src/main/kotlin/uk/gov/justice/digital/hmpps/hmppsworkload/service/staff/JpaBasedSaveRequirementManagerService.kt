@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsworkload.service
+package uk.gov.justice.digital.hmpps.hmppsworkload.service.staff
 
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ConvictionRequirement
@@ -6,6 +6,8 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RequirementManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.RequirementManagerRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.SuccessUpdater
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.TelemetryService
 import javax.transaction.Transactional
 
 @Service

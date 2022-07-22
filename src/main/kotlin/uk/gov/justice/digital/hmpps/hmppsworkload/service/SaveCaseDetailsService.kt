@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.CaseTypeMapper
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.OffenderManagerService
 import javax.transaction.Transactional
 
 @Service
