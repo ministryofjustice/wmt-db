@@ -4,15 +4,11 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.deliusToStaffGrade
 import java.math.BigInteger
 
-data class StaffSummary @JsonCreator constructor(
+data class TeamStaff @JsonCreator constructor(
   val staffIdentifier: BigInteger,
   val staffCode: String,
   val staff: StaffName,
-  val staffGrade: StaffGrade? = null,
-  val teams: List<Team>? = null,
-  val probationArea: StaffProbationArea? = null,
+  val staffGrade: StaffGrade?,
 ) {
   var grade: String = deliusToStaffGrade(staffGrade?.code)
 }
-
-fun staffToStaffSummary(staff: Staff): StaffSummary = StaffSummary(staff.staffIdentifier, staff.staffCode, staff.staff, staff.staffGrade, staff.teams, staff.probationArea)

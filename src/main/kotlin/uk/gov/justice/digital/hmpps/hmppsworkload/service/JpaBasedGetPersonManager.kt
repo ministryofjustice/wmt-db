@@ -12,7 +12,7 @@ class JpaBasedGetPersonManager(
   private val communityApiClient: CommunityApiClient
 ) : GetPersonManager {
   override fun findById(id: UUID): PersonManagerDetails? = personManagerRepository.findByUuid(id)?.let { entity ->
-    val staff = communityApiClient.getStaffByCode(entity.staffCode).block()!!
-    PersonManagerDetails.from(entity, staff.grade, staff)
+    val staff = communityApiClient.getStaffById(entity.staffId).block()!!
+    PersonManagerDetails.from(entity, staff)
   }
 }

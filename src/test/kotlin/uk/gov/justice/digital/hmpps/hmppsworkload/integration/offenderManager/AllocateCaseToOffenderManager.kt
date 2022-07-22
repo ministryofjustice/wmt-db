@@ -206,7 +206,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     offenderSummaryResponse(crn)
     singleActiveUnpaidRequirementResponse(crn, eventId)
     val storedPersonManager = PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1")
-    staffIdResponse(storedPersonManager.staffId, storedPersonManager.staffCode, storedPersonManager.teamCode)
+    staffCodeResponse(storedPersonManager.staffCode, storedPersonManager.teamCode)
     personManagerRepository.save(storedPersonManager)
 
     webTestClient.post()

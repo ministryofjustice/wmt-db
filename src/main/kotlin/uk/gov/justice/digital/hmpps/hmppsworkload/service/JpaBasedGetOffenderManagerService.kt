@@ -6,7 +6,8 @@ import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.OffenderSearchApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderDetails
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffSummary
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.staffToStaffSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.ImpactCase
@@ -68,7 +69,7 @@ class JpaBasedGetOffenderManagerService(
       } ?: run {
         val team = staff.teams!!.first { team -> team.code == teamCode }
         getDefaultOffenderManagerOverview(
-          staff,
+          staffToStaffSummary(staff),
           team.description
         )
       }
@@ -78,7 +79,7 @@ class JpaBasedGetOffenderManagerService(
     }
 
   private fun getDefaultOffenderManagerOverview(
-    staff: Staff,
+    staff: StaffSummary,
     teamName: String
   ): OffenderManagerOverview {
     val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
@@ -125,7 +126,7 @@ class JpaBasedGetOffenderManagerService(
         getCrnToOffenderDetails(cases.map { it.crn })
       ).map { results ->
         val team = results.t1.teams?.first { team -> team.code == teamCode }
-        OffenderManagerCases.from(results.t1, results.t1.grade, team!!, cases, results.t2)
+        OffenderManagerCases.from(results.t1, team!!, cases, results.t2)
       }.block()
     }
 

@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderAssessment
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffSummary
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.TeamStaff
 import java.math.BigInteger
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -18,8 +19,8 @@ import java.util.Optional
 
 class CommunityApiClient(private val webClient: WebClient) {
 
-  fun getTeamStaff(teamCode: String): Mono<List<StaffSummary>> {
-    val responseType = object : ParameterizedTypeReference<List<StaffSummary>>() {}
+  fun getTeamStaff(teamCode: String): Mono<List<TeamStaff>> {
+    val responseType = object : ParameterizedTypeReference<List<TeamStaff>>() {}
     return webClient
       .get()
       .uri("/teams/$teamCode/staff")
@@ -57,12 +58,12 @@ class CommunityApiClient(private val webClient: WebClient) {
       .bodyToMono(Staff::class.java)
   }
 
-  fun getStaffByCode(staffCode: String): Mono<Staff> {
+  fun getStaffByCode(staffCode: String): Mono<StaffSummary> {
     return webClient
       .get()
       .uri("/staff/staffCode/$staffCode")
       .retrieve()
-      .bodyToMono(Staff::class.java)
+      .bodyToMono(StaffSummary::class.java)
   }
 
   fun getActiveConvictions(crn: String): Mono<List<Conviction>> {

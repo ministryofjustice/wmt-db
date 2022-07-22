@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.domain
 import com.fasterxml.jackson.annotation.JsonCreator
 import io.swagger.v3.oas.annotations.media.Schema
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderDetails
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Team
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerCase
 
@@ -21,8 +21,8 @@ data class OffenderManagerCases @JsonCreator constructor(
   val activeCases: List<OffenderManagerActiveCase>
 ) {
   companion object {
-    fun from(staff: Staff, grade: String, team: Team, cases: List<OffenderManagerCase>, offenderDetails: Map<String, OffenderDetails>): OffenderManagerCases {
-      return OffenderManagerCases(staff.staff.forenames, staff.staff.surname, grade, staff.staffCode, team.description, cases.map { OffenderManagerActiveCase.from(it, offenderDetails[it.crn]) })
+    fun from(staff: StaffSummary, team: Team, cases: List<OffenderManagerCase>, offenderDetails: Map<String, OffenderDetails>): OffenderManagerCases {
+      return OffenderManagerCases(staff.staff.forenames, staff.staff.surname, staff.grade, staff.staffCode, team.description, cases.map { OffenderManagerActiveCase.from(it, offenderDetails[it.crn]) })
     }
   }
 }

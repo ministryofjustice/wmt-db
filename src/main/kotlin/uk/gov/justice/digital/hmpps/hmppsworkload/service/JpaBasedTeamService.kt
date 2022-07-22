@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffSummary
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.TeamStaff
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.TeamOverview
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.TeamRepository
@@ -42,16 +42,16 @@ class JpaBasedTeamService(
     }.block()
 
   fun getTeamOverviewForOffenderManagerWithoutWorkload(
-    staffSummary: StaffSummary
+    teamStaff: TeamStaff
   ): TeamOverview {
     return TeamOverview(
-      staffSummary.staff.forenames, staffSummary.staff.surname, BigDecimal.ZERO, BigDecimal.ZERO,
-      defaultAvailablePointsForGrade(staffSummary), BigInteger.ZERO, staffSummary.staffCode
+      teamStaff.staff.forenames, teamStaff.staff.surname, BigDecimal.ZERO, BigDecimal.ZERO,
+      defaultAvailablePointsForGrade(teamStaff), BigInteger.ZERO, teamStaff.staffCode
     )
   }
 
-  private fun defaultAvailablePointsForGrade(staffSummary: StaffSummary): BigInteger {
+  private fun defaultAvailablePointsForGrade(teamStaff: TeamStaff): BigInteger {
     val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
-    return workloadPoints.getDefaultPointsAvailable(staffSummary.grade).toBigInteger()
+    return workloadPoints.getDefaultPointsAvailable(teamStaff.grade).toBigInteger()
   }
 }

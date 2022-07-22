@@ -76,7 +76,7 @@ class OffenderEventListenerTests : IntegrationTestBase() {
     singleActiveConvictionResponse(crn)
     tierCalculationResponse(crn)
 
-    staffIdResponse(staffId, staffCode, teamCode)
+    staffCodeResponse(staffCode, teamCode)
     personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "offender", createdBy = "createdby", providerCode = "providerCode"))
 
     hmppsOffenderSnsClient.publish(
@@ -107,14 +107,14 @@ class OffenderEventListenerTests : IntegrationTestBase() {
     singleActiveConvictionResponse(crn)
     tierCalculationResponse(crn)
 
-    staffIdResponse(staffId, staffCode, teamCode)
-    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "offender", createdBy = "createdby", providerCode = "providerCode"))
-    staffIdResponse(staffId, staffCode, teamCode)
-
     singleActiveConvictionResponseForAllConvictions(crn)
     singleActiveConvictionResponse(crn)
     tierCalculationResponse(crn, Tier.C3.name)
 
+    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "offender", createdBy = "createdby", providerCode = "providerCode"))
+
+    staffCodeResponse(staffCode, teamCode)
+    staffCodeResponse(staffCode, teamCode)
     val sentenceChangedEvent =
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn, sentenceId))).withMessageAttributes(
         mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED"))
@@ -241,7 +241,7 @@ class OffenderEventListenerTests : IntegrationTestBase() {
     tierCalculationResponse(crn)
 
     val caseDetailsEntity = CaseDetailsEntity(crn, Tier.C3, CaseType.COMMUNITY)
-    staffIdResponse(staffId, staffCode, teamCode)
+    staffCodeResponse(staffCode, teamCode)
     personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "offender", createdBy = "createdby", providerCode = "providerCode"))
     caseDetailsRepository.save(caseDetailsEntity)
 
@@ -273,7 +273,7 @@ class OffenderEventListenerTests : IntegrationTestBase() {
 
     caseDetailsRepository.save(caseDetailsEntity)
 
-    staffIdResponse(staffId, staffCode, teamCode)
+    staffCodeResponse(staffCode, teamCode)
     personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "offender", createdBy = "createdby", providerCode = "providerCode"))
 
     hmppsOffenderSnsClient.publish(

@@ -37,7 +37,7 @@ data class PersonManagerDetails @JsonCreator constructor(
   val staffSurname: String
 ) {
   companion object {
-    fun from(personManagerEntity: PersonManagerEntity, grade: String, staff: Staff): PersonManagerDetails {
+    fun from(personManagerEntity: PersonManagerEntity, staff: Staff): PersonManagerDetails {
       return PersonManagerDetails(
         personManagerEntity.uuid,
         personManagerEntity.staffId,
@@ -48,7 +48,7 @@ data class PersonManagerDetails @JsonCreator constructor(
         personManagerEntity.createdDate!!,
         personManagerEntity.crn,
         personManagerEntity.offenderName,
-        grade,
+        staff.grade,
         staff.email,
         staff.staff.forenames,
         staff.staff.surname
