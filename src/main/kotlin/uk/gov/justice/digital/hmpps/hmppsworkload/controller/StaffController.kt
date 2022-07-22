@@ -9,14 +9,16 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import reactor.core.publisher.Mono
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.MissingStaffError
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffSummary
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.GetStaffService
 import java.math.BigInteger
 import javax.persistence.EntityNotFoundException
 
 @RestController
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
-class StaffController(private val getStaffService: GetStaffService) {
+class StaffController(private val communityApiClient: CommunityApiClient) {
 
   @Operation(summary = "Get Staff by ID")
   @ApiResponses(
@@ -27,8 +29,13 @@ class StaffController(private val getStaffService: GetStaffService) {
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/staff/{staffId}")
-  fun getStaffById(@PathVariable(required = true) staffId: BigInteger): StaffSummary =
-    getStaffService.getStaffById(staffId)?.let { staff -> StaffSummary.from(staff) } ?: run {
-      throw EntityNotFoundException("staff ID not found for $staffId")
-    }
+  fun getStaffById(@PathVariable(required = true) staffId: BigInteger): Mono<StaffSummary> =
+    communityApiClient.getStaffById(staffId)
+      .onErrorMap { ex ->
+        when (ex) {
+          is MissingStaffError -> EntityNotFoundException("staff not found for $staffId")
+          else -> ex
+        }
+      }
+      .map { staff -> StaffSummary.from(staff) }
 }

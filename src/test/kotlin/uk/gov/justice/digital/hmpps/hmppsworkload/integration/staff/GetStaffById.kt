@@ -28,4 +28,17 @@ class GetStaffById : IntegrationTestBase() {
       .jsonPath("$.id")
       .isEqualTo(staffId)
   }
+
+  @Test
+  fun `not found returned when no staff exists for ID`() {
+    val staffId = BigInteger.valueOf(123456789L)
+    webTestClient.get()
+      .uri("/staff/$staffId")
+      .headers {
+        it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
+      }
+      .exchange()
+      .expectStatus()
+      .isNotFound
+  }
 }
