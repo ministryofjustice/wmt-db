@@ -506,7 +506,7 @@ class EmailNotificationServiceTests {
 
     val token = "token"
 
-    val offenderAssessment = OffenderAssessment(LocalDate.now(), BigInteger.TEN)
+    val offenderAssessment = OffenderAssessment(LocalDate.now(), 10)
 
     every { communityApiClient.getAssessment(any()) } returns Mono.just(Optional.of(offenderAssessment))
 
@@ -527,7 +527,7 @@ class EmailNotificationServiceTests {
 
     val token = "token"
 
-    val offenderAssessment = OffenderAssessment(LocalDate.now(), BigInteger.TEN)
+    val offenderAssessment = OffenderAssessment(LocalDate.now(), 10)
 
     every { communityApiClient.getAssessment(any()) } returns Mono.just(Optional.of(offenderAssessment))
 
@@ -548,7 +548,7 @@ class EmailNotificationServiceTests {
 
     val token = "token"
 
-    val offenderAssessment = OffenderAssessment(LocalDate.now(), BigInteger.valueOf(55L))
+    val offenderAssessment = OffenderAssessment(LocalDate.now(), 55)
 
     every { communityApiClient.getAssessment(any()) } returns Mono.just(Optional.of(offenderAssessment))
 
@@ -569,7 +569,7 @@ class EmailNotificationServiceTests {
 
     val token = "token"
 
-    val offenderAssessment = OffenderAssessment(LocalDate.now(), BigInteger.valueOf(80L))
+    val offenderAssessment = OffenderAssessment(LocalDate.now(), 80)
 
     every { communityApiClient.getAssessment(any()) } returns Mono.just(Optional.of(offenderAssessment))
 
@@ -590,7 +590,7 @@ class EmailNotificationServiceTests {
 
     val token = "token"
 
-    val offenderAssessment = OffenderAssessment(LocalDate.now(), BigInteger.valueOf(95L))
+    val offenderAssessment = OffenderAssessment(LocalDate.now(), 95)
 
     every { communityApiClient.getAssessment(any()) } returns Mono.just(Optional.of(offenderAssessment))
 

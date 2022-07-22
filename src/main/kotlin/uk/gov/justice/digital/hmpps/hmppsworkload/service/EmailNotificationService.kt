@@ -31,7 +31,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-private const val SCORE_UNAVAILABLE = "Score Unavailable"
+const val SCORE_UNAVAILABLE = "Score Unavailable"
 private const val NOT_APPLICABLE = "N/A"
 
 @Service
@@ -87,7 +87,7 @@ class EmailNotificationService(
     val rsrLevel = latestRiskPredictor?.rsrScoreLevel?.capitalize() ?: SCORE_UNAVAILABLE
     val rsrPercentage = latestRiskPredictor?.rsrPercentageScore?.toString() ?: NOT_APPLICABLE
     val rosh = riskSummary?.overallRiskLevel?.capitalize() ?: SCORE_UNAVAILABLE
-    val ogrsLevel = assessment?.ogrsScore?.let { ogrsScoreToLevel(it.toInt()) } ?: SCORE_UNAVAILABLE
+    val ogrsLevel = assessment?.getOgrsLevel() ?: SCORE_UNAVAILABLE
     val ogrsPercentage = assessment?.ogrsScore?.toString() ?: NOT_APPLICABLE
     return mapOf(
       "tier" to tier,
@@ -108,13 +108,6 @@ class EmailNotificationService(
       return listOf(NOT_APPLICABLE)
     }
     return mappedConvictions
-  }
-
-  private fun ogrsScoreToLevel(ogrsScore: Int): String = when {
-    ogrsScore <= 49 -> "Low"
-    ogrsScore in 50..74 -> "Medium"
-    ogrsScore in 75..89 -> "High"
-    else -> "Very High"
   }
 
   private fun mapInductionAppointment(appointments: List<Contact>, caseType: CaseType, sentenceStartDate: LocalDate): String {
