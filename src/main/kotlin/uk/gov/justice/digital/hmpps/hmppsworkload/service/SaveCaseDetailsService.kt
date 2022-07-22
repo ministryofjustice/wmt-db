@@ -11,7 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.CaseTypeMapper
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.OffenderManagerService
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.GetPersonManager
 import javax.transaction.Transactional
 
 @Service
@@ -21,7 +21,7 @@ class SaveCaseDetailsService(
   @Qualifier("hmppsTierApiClient") private val hmppsTierApiClient: HmppsTierApiClient,
   private val caseDetailsRepository: CaseDetailsRepository,
   private val workloadCalculationService: WorkloadCalculationService,
-  @Qualifier("offenderManagerService") private val offenderManagerService: OffenderManagerService
+  private val getPersonManager: GetPersonManager
 
 ) {
   @Transactional
@@ -37,7 +37,7 @@ class SaveCaseDetailsService(
         case
       }.block()?.let {
         caseDetailsRepository.save(it)
-        val staff: PersonManager? = offenderManagerService.getByCrn(crn)
+        val staff: PersonManager? = getPersonManager.findLatestByCrn(crn)
         if (staff != null) {
           workloadCalculationService.calculate(staff.staffCode, staff.teamCode, staff.providerCode, staff.staffGrade)
         }

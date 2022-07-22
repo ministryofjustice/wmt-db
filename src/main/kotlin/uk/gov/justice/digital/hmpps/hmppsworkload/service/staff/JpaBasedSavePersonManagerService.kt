@@ -17,7 +17,7 @@ class JpaBasedSavePersonManagerService(
   private val telemetryService: TelemetryService,
   private val successUpdater: SuccessUpdater,
   private val workloadCalculationService: WorkloadCalculationService,
-  private val offenderManagerService: OffenderManagerService
+  private val getPersonManager: GetPersonManager
 ) : SavePersonManagerService {
   @Transactional
   override fun savePersonManager(
@@ -31,9 +31,9 @@ class JpaBasedSavePersonManagerService(
       if (personManager.staffId == staff.staffIdentifier && personManager.teamCode == teamCode) {
         personManager
       } else {
-        val oldOffenderManager = offenderManagerService.getByCrn(allocateCase.crn)
+        val currentPersonManager = getPersonManager.findLatestByCrn(allocateCase.crn)
         createPersonManagerEntityAndSendSQSMessage(allocateCase, staff, teamCode, personSummary, loggedInUser).also {
-          workloadCalculationService.calculate(oldOffenderManager!!.staffCode, oldOffenderManager.teamCode, oldOffenderManager.providerCode, oldOffenderManager.staffGrade)
+          workloadCalculationService.calculate(currentPersonManager!!.staffCode, currentPersonManager.teamCode, currentPersonManager.providerCode, currentPersonManager.staffGrade)
         }
       }
     } ?: createPersonManagerEntityAndSendSQSMessage(allocateCase, staff, teamCode, personSummary, loggedInUser)
