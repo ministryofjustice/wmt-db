@@ -43,7 +43,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleAc
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveUnpaidRequirementResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleInactiveConvictionResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByCodeResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByIdResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByUserNameResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.successfulRiskPredictorResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.successfulRiskSummaryResponse
@@ -313,13 +312,6 @@ abstract class IntegrationTestBase {
 
     communityApi.`when`(inductionRequest, Times.exactly(1)).respond(
       response().withContentType(APPLICATION_JSON).withBody(singleActiveInductionResponse())
-    )
-  }
-
-  protected fun staffIdResponse(staffId: BigInteger, staffCode: String, teamCode: String, staffGradeCode: String = "PSM") {
-    val request = request().withPath("/staff/staffIdentifier/$staffId")
-    communityApi.`when`(request, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(staffByIdResponse(staffCode, staffGradeCode, teamCode))
     )
   }
 

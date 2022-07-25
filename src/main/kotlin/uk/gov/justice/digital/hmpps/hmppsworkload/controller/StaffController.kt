@@ -13,31 +13,11 @@ import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.MissingStaffError
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffSummary
-import java.math.BigInteger
 import javax.persistence.EntityNotFoundException
 
 @RestController
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 class StaffController(private val communityApiClient: CommunityApiClient) {
-
-  @Operation(summary = "Get Staff by ID")
-  @ApiResponses(
-    value = [
-      ApiResponse(responseCode = "200", description = "OK"),
-      ApiResponse(responseCode = "404", description = "Result Not Found")
-    ]
-  )
-  @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
-  @GetMapping("/staff/{staffId}")
-  fun getStaffById(@PathVariable(required = true) staffId: BigInteger): Mono<StaffSummary> =
-    communityApiClient.getStaffById(staffId)
-      .onErrorMap { ex ->
-        when (ex) {
-          is MissingStaffError -> EntityNotFoundException("staff not found for $staffId")
-          else -> ex
-        }
-      }
-      .map { staff -> StaffSummary.from(staff) }
 
   @Operation(summary = "Get Staff by Code")
   @ApiResponses(

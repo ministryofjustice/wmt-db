@@ -38,18 +38,6 @@ class CommunityApiClient(private val webClient: WebClient) {
       }
   }
 
-  fun getStaffById(staffId: BigInteger): Mono<Staff> {
-    return webClient
-      .get()
-      .uri("/staff/staffIdentifier/$staffId")
-      .retrieve()
-      .onStatus(
-        { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
-        { Mono.error(MissingStaffError("staff member not found at $staffId")) }
-      )
-      .bodyToMono(Staff::class.java)
-  }
-
   fun getStaffByUsername(username: String): Mono<Staff> {
     return webClient
       .get()

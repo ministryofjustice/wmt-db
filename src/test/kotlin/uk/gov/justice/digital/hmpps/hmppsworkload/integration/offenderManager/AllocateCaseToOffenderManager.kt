@@ -118,6 +118,39 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   }
 
   @Test
+  fun `Notify error still keeps entry in db`() {
+    staffCodeResponse(staffCode, teamCode)
+    offenderSummaryResponse(crn)
+    val requirementId = BigInteger.valueOf(75315091L)
+    singleActiveRequirementResponse(crn, eventId, requirementId)
+    every { notificationService.notifyAllocation(any(), any(), any(), any(), any(), any()) } returns Mono.error(RuntimeException("An exception"))
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY))
+
+    webTestClient.post()
+      .uri("/team/$teamCode/offenderManager/$staffCode/case")
+      .bodyValue(allocateCase(crn, eventId))
+      .headers {
+        it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
+        it.contentType = MediaType.APPLICATION_JSON
+      }
+      .exchange()
+      .expectStatus()
+      .is5xxServerError
+
+    val personManager = personManagerRepository.findFirstByCrnOrderByCreatedDateDesc(crn)!!
+    Assertions.assertEquals(staffCode, personManager.staffCode)
+    Assertions.assertEquals(teamCode, personManager.teamCode)
+
+    val eventManager = eventManagerRepository.findFirstByCrnAndEventIdOrderByCreatedDateDesc(crn, eventId)!!
+    Assertions.assertEquals(staffCode, eventManager.staffCode)
+    Assertions.assertEquals(teamCode, eventManager.teamCode)
+
+    val requirementManager = requirementManagerRepository.findFirstByCrnAndEventIdAndRequirementIdOrderByCreatedDateDesc(crn, eventId, requirementId)!!
+    Assertions.assertEquals(staffCode, requirementManager.staffCode)
+    Assertions.assertEquals(teamCode, requirementManager.teamCode)
+  }
+
+  @Test
   fun `can allocate a requirement without a length`() {
     staffCodeResponse(staffCode, teamCode)
     offenderSummaryResponse(crn)

@@ -7,7 +7,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.OffenderSearchApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffSummary
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.staffToStaffSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.ImpactCase
@@ -41,19 +40,6 @@ class JpaBasedGetOffenderManagerService(
   private val getWeeklyHours: GetWeeklyHours
 ) : GetOffenderManagerService {
 
-  override fun getPotentialWorkload(teamCode: String, staffId: BigInteger, impactCase: ImpactCase): OffenderManagerOverview? {
-    return getOffenderManagerOverview(staffId, teamCode)
-      .map { overview ->
-        val currentCaseImpact = getCurrentCasePoints(teamCode, overview.code, impactCase.crn)
-        overview.potentialCapacity = capacityCalculator.calculate(
-          overview.totalPoints.minus(currentCaseImpact)
-            .plus(caseCalculator.getPointsForCase(getPotentialCase(crn = impactCase.crn))),
-          overview.availablePoints
-        )
-        overview
-      }.block()
-  }
-
   override fun getPotentialWorkload(teamCode: String, staffCode: String, impactCase: ImpactCase): OffenderManagerOverview? {
     return getOverview(teamCode, staffCode)?.let { overview ->
       val currentCaseImpact = getCurrentCasePoints(teamCode, overview.code, impactCase.crn)
@@ -74,26 +60,6 @@ class JpaBasedGetOffenderManagerService(
   private fun getCurrentCasePoints(teamCode: String, staffCode: String, crn: String): BigInteger = offenderManagerRepository.findCaseByTeamCodeAndStaffCodeAndCrn(teamCode, staffCode, crn)?.let { currentCase ->
     return caseCalculator.getPointsForCase(Case(Tier.valueOf(currentCase.tier), CaseType.valueOf(currentCase.caseCategory), false, crn))
   } ?: BigInteger.ZERO
-
-  private fun getOffenderManagerOverview(
-    staffId: BigInteger,
-    teamCode: String
-  ) = communityApiClient.getStaffById(staffId)
-    .map { staff ->
-      val overview = offenderManagerRepository.findByOverview(teamCode, staff.staffCode)?.let {
-        it.capacity = capacityCalculator.calculate(it.totalPoints, it.availablePoints)
-        it
-      } ?: run {
-        val team = staff.teams!!.first { team -> team.code == teamCode }
-        getDefaultOffenderManagerOverview(
-          staffToStaffSummary(staff),
-          team.description
-        )
-      }
-      overview.potentialCapacity = capacityCalculator.calculate(overview.totalPoints, overview.availablePoints)
-      overview.grade = staff.grade
-      overview
-    }
 
   private fun getDefaultOffenderManagerOverview(
     staff: StaffSummary,
