@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ConvictionRequirement
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.SaveResult
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RequirementManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.RequirementManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.SuccessUpdater
@@ -24,19 +25,17 @@ class JpaBasedSaveRequirementManagerService(
     allocateCase: AllocateCase,
     loggedInUser: String,
     requirements: List<ConvictionRequirement>
-  ): List<RequirementManagerEntity> {
+  ): List<SaveResult<RequirementManagerEntity>> {
     return requirements
       .filter { requirement -> requirement.requirementTypeMainCategory.code != "W" }
       .map { requirement ->
         requirementManagerRepository.findFirstByCrnAndEventIdAndRequirementIdOrderByCreatedDateDesc(allocateCase.crn, allocateCase.eventId, requirement.requirementId)?.let { requirementManagerEntity ->
           if (requirementManagerEntity.staffId == staff.staffIdentifier && requirementManagerEntity.teamCode == teamCode) {
-            requirementManagerEntity
+            SaveResult(requirementManagerEntity, false)
           } else {
             saveRequirementManagerEntity(allocateCase, staff, teamCode, loggedInUser, requirement)
           }
-        } ?: run {
-          saveRequirementManagerEntity(allocateCase, staff, teamCode, loggedInUser, requirement)
-        }
+        } ?: saveRequirementManagerEntity(allocateCase, staff, teamCode, loggedInUser, requirement)
       }
   }
 
@@ -46,7 +45,7 @@ class JpaBasedSaveRequirementManagerService(
     teamCode: String,
     loggedInUser: String,
     requirement: ConvictionRequirement
-  ): RequirementManagerEntity {
+  ): SaveResult<RequirementManagerEntity> {
     val requirementManagerEntity = RequirementManagerEntity(
       crn = allocateCase.crn,
       staffId = staff.staffIdentifier,
@@ -60,6 +59,6 @@ class JpaBasedSaveRequirementManagerService(
     requirementManagerRepository.save(requirementManagerEntity)
     telemetryService.trackRequirementManagerAllocated(requirementManagerEntity)
     successUpdater.updateRequirement(requirementManagerEntity.crn, requirementManagerEntity.uuid, requirementManagerEntity.createdDate!!)
-    return requirementManagerEntity
+    return SaveResult(requirementManagerEntity, true)
   }
 }

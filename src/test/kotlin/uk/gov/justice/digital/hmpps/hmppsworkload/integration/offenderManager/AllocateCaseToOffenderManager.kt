@@ -271,4 +271,40 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       { Assertions.assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity!!.calculatedDate.dayOfMonth) }
     )
   }
+
+  @Test
+  fun `must only call notify once when workload is the same`() {
+    staffCodeResponse(staffCode, teamCode)
+    staffCodeResponse(staffCode, teamCode)
+    offenderSummaryResponse(crn)
+    offenderSummaryResponse(crn)
+    singleActiveRequirementResponse(crn, eventId)
+    singleActiveRequirementResponse(crn, eventId)
+
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY))
+
+    webTestClient.post()
+      .uri("/team/$teamCode/offenderManager/$staffCode/case")
+      .bodyValue(allocateCase(crn, eventId))
+      .headers {
+        it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
+        it.contentType = MediaType.APPLICATION_JSON
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+
+    webTestClient.post()
+      .uri("/team/$teamCode/offenderManager/$staffCode/case")
+      .bodyValue(allocateCase(crn, eventId))
+      .headers {
+        it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
+        it.contentType = MediaType.APPLICATION_JSON
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+
+    verify(exactly = 1) { notificationService.notifyAllocation(any(), any(), any(), any(), any(), any()) }
+  }
 }

@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.SaveResult
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.SuccessUpdater
@@ -26,10 +27,10 @@ class JpaBasedSavePersonManagerService(
     allocateCase: AllocateCase,
     loggedInUser: String,
     personSummary: PersonSummary
-  ): PersonManagerEntity =
+  ): SaveResult<PersonManagerEntity> =
     personManagerRepository.findFirstByCrnOrderByCreatedDateDesc(allocateCase.crn)?.let { personManager ->
       if (personManager.staffId == staff.staffIdentifier && personManager.teamCode == teamCode) {
-        personManager
+        SaveResult(personManager, false)
       } else {
         val currentPersonManager = getPersonManager.findLatestByCrn(allocateCase.crn)
         createPersonManagerEntityAndSendSQSMessage(allocateCase, staff, teamCode, personSummary, loggedInUser).also {
@@ -44,7 +45,7 @@ class JpaBasedSavePersonManagerService(
     teamCode: String,
     personSummary: PersonSummary,
     loggedInUser: String
-  ): PersonManagerEntity {
+  ): SaveResult<PersonManagerEntity> {
     val providerCode = staff.probationArea!!.code
     val personManagerEntity = PersonManagerEntity(
       crn = allocateCase.crn,
@@ -59,6 +60,6 @@ class JpaBasedSavePersonManagerService(
     telemetryService.trackPersonManagerAllocated(personManagerEntity)
     successUpdater.updatePerson(personManagerEntity.crn, personManagerEntity.uuid, personManagerEntity.createdDate!!)
     workloadCalculationService.calculate(staff.staffCode, teamCode, providerCode, staff.grade)
-    return personManagerEntity
+    return SaveResult(personManagerEntity, true)
   }
 }

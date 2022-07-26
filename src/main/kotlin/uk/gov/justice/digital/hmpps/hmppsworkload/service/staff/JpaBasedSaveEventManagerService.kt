@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service.staff
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.SaveResult
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.EventManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.SuccessUpdater
@@ -22,21 +23,19 @@ class JpaBasedSaveEventManagerService(
     staff: Staff,
     allocateCase: AllocateCase,
     loggedInUser: String
-  ): EventManagerEntity = eventManagerRepository.findFirstByCrnAndEventIdOrderByCreatedDateDesc(allocateCase.crn, allocateCase.eventId)?.let { eventManager ->
+  ): SaveResult<EventManagerEntity> = eventManagerRepository.findFirstByCrnAndEventIdOrderByCreatedDateDesc(allocateCase.crn, allocateCase.eventId)?.let { eventManager ->
     if (eventManager.staffId == staff.staffIdentifier && eventManager.teamCode == teamCode) {
-      return eventManager
+      return SaveResult(eventManager, false)
     }
     saveEventManagerEntity(allocateCase, staff, teamCode, loggedInUser)
-  } ?: run {
-    saveEventManagerEntity(allocateCase, staff, teamCode, loggedInUser)
-  }
+  } ?: saveEventManagerEntity(allocateCase, staff, teamCode, loggedInUser)
 
   private fun saveEventManagerEntity(
     allocateCase: AllocateCase,
     staff: Staff,
     teamCode: String,
     loggedInUser: String
-  ): EventManagerEntity {
+  ): SaveResult<EventManagerEntity> {
     val eventManagerEntity = EventManagerEntity(
       crn = allocateCase.crn,
       staffId = staff.staffIdentifier,
@@ -49,6 +48,6 @@ class JpaBasedSaveEventManagerService(
     eventManagerRepository.save(eventManagerEntity)
     telemetryService.trackEventManagerAllocated(eventManagerEntity)
     successUpdater.updateEvent(eventManagerEntity.crn, eventManagerEntity.uuid, eventManagerEntity.createdDate!!)
-    return eventManagerEntity
+    return SaveResult(eventManagerEntity, true)
   }
 }
