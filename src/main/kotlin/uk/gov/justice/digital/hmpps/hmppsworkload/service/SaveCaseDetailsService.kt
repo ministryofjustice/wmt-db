@@ -30,11 +30,7 @@ class SaveCaseDetailsService(
     caseTypeMapper.getCaseType(convictions).takeUnless { it == CaseType.UNKNOWN }?.let { caseType ->
       hmppsTierApiClient.getTierByCrn(crn).map {
         val tier = Tier.valueOf(it)
-        val case =
-          caseDetailsRepository.findByIdOrNull(crn) ?: CaseDetailsEntity(crn, tier, caseType)
-        case.type = caseType
-        case.tier = tier
-        case
+        CaseDetailsEntity(crn, tier, caseType)
       }.block()?.let {
         caseDetailsRepository.save(it)
         val staff: PersonManager? = getPersonManager.findLatestByCrn(crn)
