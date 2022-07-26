@@ -27,11 +27,14 @@ class DefaultSaveWorkloadService(
     val staff = communityApiClient.getStaffByCode(staffCode).block()!!
     val summary = communityApiClient.getSummaryByCrn(allocateCase.crn).block()!!
     val activeRequirements = communityApiClient.getActiveRequirements(allocateCase.crn, allocateCase.eventId).block()!!.requirements
-    val personManagerId = savePersonManagerService.savePersonManager(teamCode, staff, allocateCase, loggedInUser, summary).uuid
-    val eventManagerId = saveEventManagerService.saveEventManager(teamCode, staff, allocateCase, loggedInUser).uuid
-    val requirementManagerIds = saveRequirementManagerService.saveRequirementManagers(teamCode, staff, allocateCase, loggedInUser, activeRequirements)
-    notificationService.notifyAllocation(staff, summary, activeRequirements, allocateCase, loggedInUser, authToken).block()
+    val personManagerSaveResult = savePersonManagerService.savePersonManager(teamCode, staff, allocateCase, loggedInUser, summary)
+    val eventManagerSaveResult = saveEventManagerService.saveEventManager(teamCode, staff, allocateCase, loggedInUser)
+    val requirementManagerSaveResults = saveRequirementManagerService.saveRequirementManagers(teamCode, staff, allocateCase, loggedInUser, activeRequirements)
+    if (personManagerSaveResult.hasChanged || eventManagerSaveResult.hasChanged || requirementManagerSaveResults.any { it.hasChanged }) {
+      notificationService.notifyAllocation(staff, summary, activeRequirements, allocateCase, loggedInUser, authToken)
+        .block()
+    }
 
-    return CaseAllocated(personManagerId, eventManagerId, requirementManagerIds.map { it.uuid })
+    return CaseAllocated(personManagerSaveResult.entity.uuid, eventManagerSaveResult.entity.uuid, requirementManagerSaveResults.map { it.entity.uuid })
   }
 }
