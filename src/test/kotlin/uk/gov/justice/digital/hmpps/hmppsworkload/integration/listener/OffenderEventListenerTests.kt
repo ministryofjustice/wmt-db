@@ -227,6 +227,32 @@ class OffenderEventListenerTests : IntegrationTestBase() {
   }
 
   @Test
+  fun `delete sentence if there is a termination date`() {
+    val crn = "J678910"
+    val sentenceId = BigInteger.valueOf(2500278160L)
+    singleInactiveConvictionsResponse(crn)
+    singleActiveConvictionResponse(crn)
+    tierCalculationResponse(crn)
+    val savedSentence = SentenceEntity(
+      sentenceId, crn, LocalDate.of(2019, 11, 17).atStartOfDay(ZoneId.systemDefault()), LocalDate.of(2020, 5, 16).atStartOfDay(ZoneId.systemDefault()), "SC",
+      LocalDate.of(2020, 6, 23).atStartOfDay(ZoneId.systemDefault())
+    )
+    sentenceRepository.save(savedSentence)
+
+    hmppsOffenderSnsClient.publish(
+      PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn, sentenceId))).withMessageAttributes(
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED"))
+      )
+    )
+
+    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+
+    Assertions.assertEquals(0, countMessagesOnOffenderEventDeadLetterQueue())
+
+    Assertions.assertNull(sentenceRepository.findBySentenceId(sentenceId))
+  }
+
+  @Test
   fun `do not update sentence if it has not changed`() {
     val crn = "J678910"
     val sentenceId = BigInteger.valueOf(2500278160L)

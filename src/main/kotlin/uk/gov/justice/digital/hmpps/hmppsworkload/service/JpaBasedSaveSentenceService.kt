@@ -18,22 +18,31 @@ class JpaBasedSaveSentenceService(
   override fun saveSentence(crn: String, sentenceId: BigInteger) {
     communityApiClient.getAllConvictions(crn)
       .map { convictions ->
-        Optional.ofNullable(convictions.firstOrNull { it.sentence?.sentenceId == sentenceId && it.sentence.terminationDate == null })
+        Optional.ofNullable(convictions.firstOrNull { it.sentence?.sentenceId == sentenceId })
       }.block()!!.ifPresent { conviction ->
-      val sentenceToSave = sentenceRepository.findBySentenceId(sentenceId) ?: SentenceEntity(
-        conviction.sentence!!.sentenceId,
-        crn,
-        conviction.sentence.startDate.atStartOfDay(ZoneId.systemDefault()),
-        conviction.sentence.expectedSentenceEndDate?.atStartOfDay(ZoneId.systemDefault()) ?: conviction.sentence.startDate.atStartOfDay(ZoneId.systemDefault()),
-        conviction.sentence.sentenceType.code,
-        conviction.custody?.keyDates?.expectedReleaseDate?.atStartOfDay(ZoneId.systemDefault())
-      )
-      sentenceToSave.startDate = conviction.sentence!!.startDate.atStartOfDay(ZoneId.systemDefault())
-      sentenceToSave.expectedEndDate = conviction.sentence.expectedSentenceEndDate?.atStartOfDay(ZoneId.systemDefault()) ?: conviction.sentence.startDate.atStartOfDay(ZoneId.systemDefault())
-      sentenceToSave.sentenceTypeCode = conviction.sentence.sentenceType.code
-      sentenceToSave.expectedReleaseDate = conviction.custody?.keyDates?.expectedReleaseDate?.atStartOfDay(ZoneId.systemDefault())
+      if (conviction.sentence?.terminationDate != null) {
+        if (sentenceRepository.existsById(sentenceId))
+          sentenceRepository.deleteById(sentenceId)
+      } else {
+        val sentenceToSave = sentenceRepository.findBySentenceId(sentenceId) ?: SentenceEntity(
+          conviction.sentence!!.sentenceId,
+          crn,
+          conviction.sentence.startDate.atStartOfDay(ZoneId.systemDefault()),
+          conviction.sentence.expectedSentenceEndDate?.atStartOfDay(ZoneId.systemDefault())
+            ?: conviction.sentence.startDate.atStartOfDay(ZoneId.systemDefault()),
+          conviction.sentence.sentenceType.code,
+          conviction.custody?.keyDates?.expectedReleaseDate?.atStartOfDay(ZoneId.systemDefault())
+        )
+        sentenceToSave.startDate = conviction.sentence!!.startDate.atStartOfDay(ZoneId.systemDefault())
+        sentenceToSave.expectedEndDate =
+          conviction.sentence.expectedSentenceEndDate?.atStartOfDay(ZoneId.systemDefault())
+            ?: conviction.sentence.startDate.atStartOfDay(ZoneId.systemDefault())
+        sentenceToSave.sentenceTypeCode = conviction.sentence.sentenceType.code
+        sentenceToSave.expectedReleaseDate =
+          conviction.custody?.keyDates?.expectedReleaseDate?.atStartOfDay(ZoneId.systemDefault())
 
-      sentenceRepository.save(sentenceToSave)
+        sentenceRepository.save(sentenceToSave)
+      }
     }
   }
 }
