@@ -12,7 +12,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.CaseTypeMapper
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.GetPersonManager
-import javax.transaction.Transactional
 
 @Service
 class SaveCaseDetailsService(
@@ -24,17 +23,13 @@ class SaveCaseDetailsService(
   private val getPersonManager: GetPersonManager
 
 ) {
-  @Transactional
+
   fun save(crn: String) {
     val convictions = communityApiClient.getActiveConvictions(crn).block()!!
     caseTypeMapper.getCaseType(convictions).takeUnless { it == CaseType.UNKNOWN }?.let { caseType ->
       hmppsTierApiClient.getTierByCrn(crn).map {
         val tier = Tier.valueOf(it)
-        val case =
-          caseDetailsRepository.findByIdOrNull(crn) ?: CaseDetailsEntity(crn, tier, caseType)
-        case.type = caseType
-        case.tier = tier
-        case
+        CaseDetailsEntity(crn, tier, caseType)
       }.block()?.let {
         caseDetailsRepository.save(it)
         val staff: PersonManager? = getPersonManager.findLatestByCrn(crn)
