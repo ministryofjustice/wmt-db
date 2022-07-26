@@ -46,6 +46,7 @@ fun singleInactiveConvictionResponse() = """
                 "code": "SC",
                 "description": "Adult Custody < 12m"
             },
+            "terminationDate": "2021-05-16",
             "failureToComplyLimit": 3,
             "cja2003Order": true,
             "legacyOrder": false

@@ -99,4 +99,5 @@ data class PersonManagerEntity(
 
   @Column
   var providerCode: String
+
 )

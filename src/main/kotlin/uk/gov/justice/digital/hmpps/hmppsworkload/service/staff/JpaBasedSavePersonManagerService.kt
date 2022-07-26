@@ -17,7 +17,7 @@ class JpaBasedSavePersonManagerService(
   private val telemetryService: TelemetryService,
   private val successUpdater: SuccessUpdater,
   private val workloadCalculationService: WorkloadCalculationService,
-  private val getPersonManager: GetPersonManager
+  private val getPersonManager: GetPersonManager,
 ) : SavePersonManagerService {
   @Transactional
   override fun savePersonManager(

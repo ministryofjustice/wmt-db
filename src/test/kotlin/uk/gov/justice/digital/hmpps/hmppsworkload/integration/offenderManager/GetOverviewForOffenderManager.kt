@@ -21,9 +21,9 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
     val teamCode = "T1"
     val offenderManagerCode = "OM1"
     staffCodeResponse(offenderManagerCode, teamCode)
-    val sentenceWithin30Days = SentenceEntity(null, BigInteger.TEN, "CRN3333", ZonedDateTime.now().minusMonths(2L), ZonedDateTime.now().plusDays(15L), null, "SP", null)
+    val sentenceWithin30Days = SentenceEntity(BigInteger.TEN, "CRN3333", ZonedDateTime.now().minusMonths(2L), ZonedDateTime.now().plusDays(15L), "SP", null)
     sentenceRepository.save(sentenceWithin30Days)
-    val sentenceAfter30Days = SentenceEntity(null, BigInteger.ONE, "CRN2222", ZonedDateTime.now().minusMonths(2L), ZonedDateTime.now().plusDays(45L), null, "SC", ZonedDateTime.now().plusDays(15L))
+    val sentenceAfter30Days = SentenceEntity(BigInteger.ONE, "CRN2222", ZonedDateTime.now().minusMonths(2L), ZonedDateTime.now().plusDays(45L), "SC", ZonedDateTime.now().plusDays(15L))
     sentenceRepository.save(sentenceAfter30Days)
 
     val team = teamRepository.findByCode(teamCode)

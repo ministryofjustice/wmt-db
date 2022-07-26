@@ -16,23 +16,20 @@ class JpaBasedSaveSentenceService(
 ) : SaveSentenceService {
 
   override fun saveSentence(crn: String, sentenceId: BigInteger) {
-    communityApiClient.getAllConvictions(crn).map { convictions ->
-      Optional.ofNullable(convictions.firstOrNull { conviction -> conviction.sentence?.sentenceId == sentenceId })
-    }.block()!!.ifPresent { conviction ->
+    communityApiClient.getAllConvictions(crn)
+      .map { convictions ->
+        Optional.ofNullable(convictions.firstOrNull { it.sentence?.sentenceId == sentenceId && it.sentence.terminationDate == null })
+      }.block()!!.ifPresent { conviction ->
       val sentenceToSave = sentenceRepository.findBySentenceId(sentenceId) ?: SentenceEntity(
-        null,
         conviction.sentence!!.sentenceId,
         crn,
         conviction.sentence.startDate.atStartOfDay(ZoneId.systemDefault()),
         conviction.sentence.expectedSentenceEndDate?.atStartOfDay(ZoneId.systemDefault()) ?: conviction.sentence.startDate.atStartOfDay(ZoneId.systemDefault()),
-        conviction.sentence.terminationDate?.atStartOfDay(ZoneId.systemDefault()),
         conviction.sentence.sentenceType.code,
         conviction.custody?.keyDates?.expectedReleaseDate?.atStartOfDay(ZoneId.systemDefault())
       )
-
       sentenceToSave.startDate = conviction.sentence!!.startDate.atStartOfDay(ZoneId.systemDefault())
       sentenceToSave.expectedEndDate = conviction.sentence.expectedSentenceEndDate?.atStartOfDay(ZoneId.systemDefault()) ?: conviction.sentence.startDate.atStartOfDay(ZoneId.systemDefault())
-      sentenceToSave.terminatedDate = conviction.sentence.terminationDate?.atStartOfDay(ZoneId.systemDefault())
       sentenceToSave.sentenceTypeCode = conviction.sentence.sentenceType.code
       sentenceToSave.expectedReleaseDate = conviction.custody?.keyDates?.expectedReleaseDate?.atStartOfDay(ZoneId.systemDefault())
 

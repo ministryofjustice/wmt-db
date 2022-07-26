@@ -11,7 +11,7 @@ import java.time.temporal.ChronoUnit
 @Service
 class GetSentenceService(private val sentenceRepository: SentenceRepository) {
 
-  fun getCasesDueToEndCount(crns: List<String>): BigInteger = sentenceRepository.findByCrnInAndExpectedEndDateGreaterThanEqualAndTerminatedDateIsNull(
+  fun getCasesDueToEndCount(crns: List<String>): BigInteger = sentenceRepository.findByCrnInAndExpectedEndDateGreaterThanEqual(
     crns,
     ZonedDateTime.now().truncatedTo(
       ChronoUnit.DAYS
@@ -26,7 +26,7 @@ class GetSentenceService(private val sentenceRepository: SentenceRepository) {
     casesDueToEnd.toBigInteger()
   }
 
-  fun getCasesDueToBeReleases(crns: List<String>): BigInteger = sentenceRepository.findByCrnInAndExpectedReleaseDateGreaterThanEqualAndTerminatedDateIsNull(crns, ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS)).let { sentences ->
+  fun getCasesDueToBeReleases(crns: List<String>): BigInteger = sentenceRepository.findByCrnInAndExpectedReleaseDateGreaterThanEqual(crns, ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS)).let { sentences ->
     val beforeEndDate = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS).plusDays(28L)
     val releasesDueToEnd = sentences
       .groupBy { sentence -> sentence.crn }
