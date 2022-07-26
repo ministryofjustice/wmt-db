@@ -370,20 +370,20 @@ abstract class IntegrationTestBase {
     )
   }
 
-  protected fun expectWorkloadAllocationCompleteMessages(crn: String) {
-    numberOfMessagesCurrentlyOnQueue(allocationCompleteClient, allocationCompleteUrl, 3)
+  protected fun expectWorkloadAllocationCompleteMessages(crn: String, times: Int) {
+    numberOfMessagesCurrentlyOnQueue(allocationCompleteClient, allocationCompleteUrl, 3 * times)
     val changeEvents = getAllAllocationMessages()
     changeEvents.forEach { changeEvent ->
       Assertions.assertEquals(crn, changeEvent.personReference.identifiers.first { it.type == "CRN" }.value)
     }
     val numberOfPersonAllocationMessages = changeEvents.count { it.eventType == "person.community.manager.allocated" }
-    Assertions.assertEquals(1, numberOfPersonAllocationMessages)
+    Assertions.assertEquals(1 * times, numberOfPersonAllocationMessages)
 
     val numberOfEventAllocationMessages = changeEvents.count { it.eventType == "event.manager.allocated" }
-    Assertions.assertEquals(1, numberOfEventAllocationMessages)
+    Assertions.assertEquals(1 * times, numberOfEventAllocationMessages)
 
     val numberOfRequirementAllocationMessages = changeEvents.count { it.eventType == "requirement.manager.allocated" }
-    Assertions.assertEquals(1, numberOfRequirementAllocationMessages)
+    Assertions.assertEquals(1 * times, numberOfRequirementAllocationMessages)
   }
 
   private fun getAllAllocationMessages(): List<HmppsMessage<HmppsAllocationMessage>> {

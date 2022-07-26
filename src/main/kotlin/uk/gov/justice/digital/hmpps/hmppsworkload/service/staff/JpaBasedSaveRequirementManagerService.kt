@@ -29,13 +29,17 @@ class JpaBasedSaveRequirementManagerService(
     return requirements
       .filter { requirement -> requirement.requirementTypeMainCategory.code != "W" }
       .map { requirement ->
-        requirementManagerRepository.findFirstByCrnAndEventIdAndRequirementIdOrderByCreatedDateDesc(allocateCase.crn, allocateCase.eventId, requirement.requirementId)?.let { requirementManagerEntity ->
-          if (requirementManagerEntity.staffId == staff.staffIdentifier && requirementManagerEntity.teamCode == teamCode) {
-            SaveResult(requirementManagerEntity, false)
-          } else {
-            saveRequirementManagerEntity(allocateCase, staff, teamCode, loggedInUser, requirement)
-          }
-        } ?: saveRequirementManagerEntity(allocateCase, staff, teamCode, loggedInUser, requirement)
+        (
+          requirementManagerRepository.findFirstByCrnAndEventIdAndRequirementIdOrderByCreatedDateDesc(allocateCase.crn, allocateCase.eventId, requirement.requirementId)?.let { requirementManagerEntity ->
+            if (requirementManagerEntity.staffId == staff.staffIdentifier && requirementManagerEntity.teamCode == teamCode) {
+              SaveResult(requirementManagerEntity, false)
+            } else {
+              saveRequirementManagerEntity(allocateCase, staff, teamCode, loggedInUser, requirement)
+            }
+          } ?: saveRequirementManagerEntity(allocateCase, staff, teamCode, loggedInUser, requirement)
+          ).also { savedRequirementManager ->
+          successUpdater.updateRequirement(savedRequirementManager.entity.crn, savedRequirementManager.entity.uuid, savedRequirementManager.entity.createdDate!!)
+        }
       }
   }
 
@@ -58,7 +62,6 @@ class JpaBasedSaveRequirementManagerService(
     )
     requirementManagerRepository.save(requirementManagerEntity)
     telemetryService.trackRequirementManagerAllocated(requirementManagerEntity)
-    successUpdater.updateRequirement(requirementManagerEntity.crn, requirementManagerEntity.uuid, requirementManagerEntity.createdDate!!)
     return SaveResult(requirementManagerEntity, true)
   }
 }

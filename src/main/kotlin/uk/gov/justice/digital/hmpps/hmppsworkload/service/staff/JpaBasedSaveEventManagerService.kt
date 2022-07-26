@@ -23,12 +23,17 @@ class JpaBasedSaveEventManagerService(
     staff: Staff,
     allocateCase: AllocateCase,
     loggedInUser: String
-  ): SaveResult<EventManagerEntity> = eventManagerRepository.findFirstByCrnAndEventIdOrderByCreatedDateDesc(allocateCase.crn, allocateCase.eventId)?.let { eventManager ->
-    if (eventManager.staffId == staff.staffIdentifier && eventManager.teamCode == teamCode) {
-      return SaveResult(eventManager, false)
-    }
-    saveEventManagerEntity(allocateCase, staff, teamCode, loggedInUser)
-  } ?: saveEventManagerEntity(allocateCase, staff, teamCode, loggedInUser)
+  ): SaveResult<EventManagerEntity> = (
+    eventManagerRepository.findFirstByCrnAndEventIdOrderByCreatedDateDesc(allocateCase.crn, allocateCase.eventId)?.let { eventManager ->
+      if (eventManager.staffId == staff.staffIdentifier && eventManager.teamCode == teamCode) {
+        SaveResult(eventManager, false)
+      } else {
+        saveEventManagerEntity(allocateCase, staff, teamCode, loggedInUser)
+      }
+    } ?: saveEventManagerEntity(allocateCase, staff, teamCode, loggedInUser)
+    ).also { savedEventManager ->
+    successUpdater.updateEvent(savedEventManager.entity.crn, savedEventManager.entity.uuid, savedEventManager.entity.createdDate!!)
+  }
 
   private fun saveEventManagerEntity(
     allocateCase: AllocateCase,
@@ -47,7 +52,7 @@ class JpaBasedSaveEventManagerService(
     )
     eventManagerRepository.save(eventManagerEntity)
     telemetryService.trackEventManagerAllocated(eventManagerEntity)
-    successUpdater.updateEvent(eventManagerEntity.crn, eventManagerEntity.uuid, eventManagerEntity.createdDate!!)
+
     return SaveResult(eventManagerEntity, true)
   }
 }
