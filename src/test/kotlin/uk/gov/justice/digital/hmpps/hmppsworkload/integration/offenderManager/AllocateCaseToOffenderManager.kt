@@ -86,7 +86,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .jsonPath("$.requirementManagerIds[0]")
       .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
 
-    expectWorkloadAllocationCompleteMessages(crn, 1)
+    expectWorkloadAllocationCompleteMessages(crn)
 
     await untilCallTo {
       workloadCalculationRepository.count()
@@ -176,7 +176,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .jsonPath("$.requirementManagerIds[0]")
       .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
 
-    expectWorkloadAllocationCompleteMessages(crn, 1)
+    expectWorkloadAllocationCompleteMessages(crn)
   }
 
   @Test
@@ -306,41 +306,5 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .isOk
 
     verify(exactly = 1) { notificationService.notifyAllocation(any(), any(), any(), any(), any(), any()) }
-  }
-
-  @Test
-  fun `must sent person manager allocated each time after a save`() {
-    staffCodeResponse(staffCode, teamCode)
-    staffCodeResponse(staffCode, teamCode)
-    offenderSummaryResponse(crn)
-    offenderSummaryResponse(crn)
-    singleActiveRequirementResponse(crn, eventId)
-    singleActiveRequirementResponse(crn, eventId)
-
-    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY))
-
-    webTestClient.post()
-      .uri("/team/$teamCode/offenderManager/$staffCode/case")
-      .bodyValue(allocateCase(crn, eventId))
-      .headers {
-        it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
-        it.contentType = MediaType.APPLICATION_JSON
-      }
-      .exchange()
-      .expectStatus()
-      .isOk
-
-    webTestClient.post()
-      .uri("/team/$teamCode/offenderManager/$staffCode/case")
-      .bodyValue(allocateCase(crn, eventId))
-      .headers {
-        it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
-        it.contentType = MediaType.APPLICATION_JSON
-      }
-      .exchange()
-      .expectStatus()
-      .isOk
-
-    expectWorkloadAllocationCompleteMessages(crn, 2)
   }
 }

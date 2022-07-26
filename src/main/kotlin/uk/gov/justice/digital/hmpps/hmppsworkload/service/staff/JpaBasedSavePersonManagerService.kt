@@ -28,20 +28,16 @@ class JpaBasedSavePersonManagerService(
     loggedInUser: String,
     personSummary: PersonSummary
   ): SaveResult<PersonManagerEntity> =
-    (
-      personManagerRepository.findFirstByCrnOrderByCreatedDateDesc(allocateCase.crn)?.let { personManager ->
-        if (personManager.staffId == staff.staffIdentifier && personManager.teamCode == teamCode) {
-          SaveResult(personManager, false)
-        } else {
-          val currentPersonManager = getPersonManager.findLatestByCrn(allocateCase.crn)
-          createPersonManagerEntityAndSendSQSMessage(allocateCase, staff, teamCode, personSummary, loggedInUser).also {
-            workloadCalculationService.calculate(currentPersonManager!!.staffCode, currentPersonManager.teamCode, currentPersonManager.providerCode, currentPersonManager.staffGrade)
-          }
+    personManagerRepository.findFirstByCrnOrderByCreatedDateDesc(allocateCase.crn)?.let { personManager ->
+      if (personManager.staffId == staff.staffIdentifier && personManager.teamCode == teamCode) {
+        SaveResult(personManager, false)
+      } else {
+        val currentPersonManager = getPersonManager.findLatestByCrn(allocateCase.crn)
+        createPersonManagerEntityAndSendSQSMessage(allocateCase, staff, teamCode, personSummary, loggedInUser).also {
+          workloadCalculationService.calculate(currentPersonManager!!.staffCode, currentPersonManager.teamCode, currentPersonManager.providerCode, currentPersonManager.staffGrade)
         }
-      } ?: createPersonManagerEntityAndSendSQSMessage(allocateCase, staff, teamCode, personSummary, loggedInUser)
-      ).also { savedPersonManager ->
-      successUpdater.updatePerson(savedPersonManager.entity.crn, savedPersonManager.entity.uuid, savedPersonManager.entity.createdDate!!)
-    }
+      }
+    } ?: createPersonManagerEntityAndSendSQSMessage(allocateCase, staff, teamCode, personSummary, loggedInUser)
 
   private fun createPersonManagerEntityAndSendSQSMessage(
     allocateCase: AllocateCase,
@@ -62,6 +58,7 @@ class JpaBasedSavePersonManagerService(
     )
     personManagerRepository.save(personManagerEntity)
     telemetryService.trackPersonManagerAllocated(personManagerEntity)
+    successUpdater.updatePerson(personManagerEntity.crn, personManagerEntity.uuid, personManagerEntity.createdDate!!)
     workloadCalculationService.calculate(staff.staffCode, teamCode, providerCode, staff.grade)
     return SaveResult(personManagerEntity, true)
   }
