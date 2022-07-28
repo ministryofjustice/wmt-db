@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Conviction
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.SentenceEntity
@@ -18,12 +17,11 @@ class JpaBasedSaveSentenceService(
 
   override fun saveSentence(crn: String, sentenceId: BigInteger) {
     communityApiClient.getAllConvictions(crn)
-      .flatMap { convictions ->
-        convictions.firstOrNull { it.sentence?.sentenceId == sentenceId }?.let { Mono.just(it) } ?: Mono.empty()
+      .mapNotNull { convictions ->
+        convictions.firstOrNull { it.sentence?.sentenceId == sentenceId && it.sentence.terminationDate == null }
       }
-      .filter { conviction -> conviction.sentence?.terminationDate == null }
       .map { conviction ->
-        convictionToSentenceEntity(conviction, crn)
+        convictionToSentenceEntity(conviction!!, crn)
       }.block()?.let {
         sentenceRepository.save(it)
       } ?: sentenceRepository.findBySentenceId(sentenceId)?.let { sentenceRepository.delete(it) }

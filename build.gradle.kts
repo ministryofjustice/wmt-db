@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.3.3"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.4.1"
   kotlin("plugin.spring") version "1.7.10"
   kotlin("plugin.jpa") version "1.7.10"
   id("io.gitlab.arturbosch.detekt").version("1.20.0")
@@ -28,7 +28,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("uk.gov.service.notify:notifications-java-client:3.17.3-RELEASE")
-  implementation("com.vladmihalcea:hibernate-types-52:2.17.0")
+  implementation("com.vladmihalcea:hibernate-types-52:2.17.1")
 
   implementation("com.opencsv:opencsv:5.6")
 
@@ -39,7 +39,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt:0.9.1")
   testImplementation("org.mock-server:mockserver-netty:5.13.2")
   testImplementation("org.awaitility:awaitility-kotlin:4.2.0")
-  testImplementation("io.mockk:mockk:1.12.4")
+  testImplementation("io.mockk:mockk:1.12.5")
   testImplementation("com.ninja-squad:springmockk:3.1.1")
 }
 
