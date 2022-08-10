@@ -72,7 +72,7 @@ server:
 application:
   notify:
     allocation:
-      template: 6c036f17-b8a8-46df-965d-6b33ff27b171
+      template: d2708c23-d5d2-4455-b26c-7d5d1d5c5733
 person:
   manager:
     getByIdPath: /allocation/person/{id}

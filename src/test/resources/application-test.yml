@@ -50,10 +50,6 @@ assess-risks-needs:
   endpoint:
     url: http://localhost:8085
 
-bank-holiday-api:
-  endpoint:
-    url: http://localhost:8093
-
 application:
   notify:
     key: hmppsworkloadtest-c1974bd1-2ef5-4322-9a58-a43e117fc04c-4f8a200f-afb8-4fd1-bcb6-b550f65d3df5

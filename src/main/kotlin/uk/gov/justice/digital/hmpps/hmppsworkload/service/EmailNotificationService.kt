@@ -18,9 +18,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.DateMapper
 import uk.gov.justice.digital.hmpps.hmppsworkload.utils.capitalize
 import uk.gov.service.notify.NotificationClientApi
 import uk.gov.service.notify.SendEmailResponse
@@ -39,7 +37,6 @@ class EmailNotificationService(
   private val notificationClient: NotificationClientApi,
   @Value("\${application.notify.allocation.template}") private val allocationTemplateId: String,
   @Qualifier("communityApiClient") private val communityApiClient: CommunityApiClient,
-  private val dateMapper: DateMapper,
   private val assessRisksNeedsApiClient: AssessRisksNeedsApiClient,
   private val caseDetailsRepository: CaseDetailsRepository
 ) : NotificationService {
@@ -51,7 +48,7 @@ class EmailNotificationService(
         "officer_name" to "${allocatedOfficer.staff.forenames} ${allocatedOfficer.staff.surname}",
         "induction_statement" to mapInductionAppointment(notifyData.initialAppointments, caseDetails.type, notifyData.conviction.sentence!!.startDate),
         "requirements" to mapRequirements(requirements),
-      ).plus(getRiskParameters(notifyData.riskSummary, notifyData.riskPredictors, notifyData.assessment, caseDetails.tier))
+      ).plus(getRiskParameters(notifyData.riskSummary, notifyData.riskPredictors, notifyData.assessment))
         .plus(getConvictionParameters(notifyData.conviction, notifyData.previousConvictions))
         .plus(getPersonOnProbationParameters(personSummary, allocateCase))
         .plus(getLoggedInUserParameters(notifyData.allocatingStaff))
@@ -80,7 +77,7 @@ class EmailNotificationService(
     "previousConvictions" to mapConvictionsToOffenceDescription(previousConvictions)
   )
 
-  private fun getRiskParameters(riskSummary: RiskSummary?, riskPredictors: List<RiskPredictor>, assessment: OffenderAssessment?, tier: Tier): Map<String, Any> {
+  private fun getRiskParameters(riskSummary: RiskSummary?, riskPredictors: List<RiskPredictor>, assessment: OffenderAssessment?): Map<String, Any> {
     val latestRiskPredictor =
       riskPredictors.filter { riskPredictor -> riskPredictor.rsrScoreLevel != null && riskPredictor.rsrPercentageScore != null }
         .maxByOrNull { riskPredictor -> riskPredictor.completedDate ?: LocalDateTime.MIN }
@@ -90,7 +87,6 @@ class EmailNotificationService(
     val ogrsLevel = assessment?.getOgrsLevel() ?: SCORE_UNAVAILABLE
     val ogrsPercentage = assessment?.ogrsScore?.toString() ?: NOT_APPLICABLE
     return mapOf(
-      "tier" to tier,
       "rosh" to rosh,
       "rsrLevel" to rsrLevel,
       "rsrPercentage" to rsrPercentage,
@@ -112,18 +108,17 @@ class EmailNotificationService(
 
   private fun mapInductionAppointment(appointments: List<Contact>, caseType: CaseType, sentenceStartDate: LocalDate): String {
     return when (caseType) {
-      CaseType.CUSTODY -> "No induction appointment is needed"
+      CaseType.CUSTODY -> "no initial appointment needed"
       else -> {
         val mostRecentAppointment = appointments.maxByOrNull { it.contactStart }
         if (mostRecentAppointment != null) {
           return if (ChronoUnit.DAYS.between(sentenceStartDate.atStartOfDay(ZoneId.systemDefault()), mostRecentAppointment.contactStart) >= 0) {
-            "Their induction has been booked and is due on ${mostRecentAppointment.contactStart.format(DateTimeFormatter.ISO_LOCAL_DATE)}"
+            "their initial appointment is scheduled for ${mostRecentAppointment.contactStart.format(DateTimeFormatter.ISO_LOCAL_DATE)}"
           } else {
-            "Their induction is overdue and was due on ${mostRecentAppointment.contactStart.format(DateTimeFormatter.ISO_LOCAL_DATE)}"
+            "their initial appointment was scheduled for ${mostRecentAppointment.contactStart.format(DateTimeFormatter.ISO_LOCAL_DATE)}"
           }
         }
-        val inductionDueDate = dateMapper.addBusinessDays(sentenceStartDate, 5L)
-        return "Their induction has not been booked and is due on ${inductionDueDate.format(DateTimeFormatter.ISO_LOCAL_DATE)}"
+        return "no date found for the initial appointment, please check with your team"
       }
     }
   }

@@ -32,7 +32,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.emailResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.DateMapper
 import uk.gov.service.notify.NotificationClientApi
 import uk.gov.service.notify.SendEmailResponse
 import java.math.BigDecimal
@@ -47,12 +46,11 @@ class EmailNotificationServiceTests {
   private val notificationClient = mockk<NotificationClientApi>()
   private val communityApiClient = mockk<CommunityApiClient>()
   private val hmppsCaseDetailsRepo = mockk<CaseDetailsRepository>()
-  private val dateMapper = mockk<DateMapper>()
   private val assessRisksNeedsApiClient = mockk<AssessRisksNeedsApiClient>()
   private val templateId = "templateId"
   private val notificationService = EmailNotificationService(
     notificationClient, templateId, communityApiClient,
-    dateMapper, assessRisksNeedsApiClient, hmppsCaseDetailsRepo
+    assessRisksNeedsApiClient, hmppsCaseDetailsRepo
   )
 
   @BeforeEach
@@ -206,7 +204,7 @@ class EmailNotificationServiceTests {
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
-    Assertions.assertEquals("No induction appointment is needed", parameters.captured["induction_statement"])
+    Assertions.assertEquals("no initial appointment needed", parameters.captured["induction_statement"])
   }
 
   @Test
@@ -240,7 +238,7 @@ class EmailNotificationServiceTests {
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
-    Assertions.assertEquals("Their induction has been booked and is due on ${appointment.contactStart.format(DateTimeFormatter.ISO_LOCAL_DATE)}", parameters.captured["induction_statement"])
+    Assertions.assertEquals("their initial appointment is scheduled for ${appointment.contactStart.format(DateTimeFormatter.ISO_LOCAL_DATE)}", parameters.captured["induction_statement"])
   }
 
   @Test
@@ -274,7 +272,7 @@ class EmailNotificationServiceTests {
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
-    Assertions.assertEquals("Their induction is overdue and was due on ${appointment.contactStart.format(DateTimeFormatter.ISO_LOCAL_DATE)}", parameters.captured["induction_statement"])
+    Assertions.assertEquals("their initial appointment was scheduled for ${appointment.contactStart.format(DateTimeFormatter.ISO_LOCAL_DATE)}", parameters.captured["induction_statement"])
   }
 
   @Test
@@ -304,14 +302,11 @@ class EmailNotificationServiceTests {
     )
     every { communityApiClient.getAllConvictions(any()) } returns Mono.just(listOf(activeConviction))
 
-    val dueDate = LocalDate.now().plusDays(10L)
-    every { dateMapper.addBusinessDays(activeConviction.sentence!!.startDate, any()) } returns dueDate
-
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
-    Assertions.assertEquals("Their induction has not been booked and is due on ${dueDate.format(DateTimeFormatter.ISO_LOCAL_DATE)}", parameters.captured["induction_statement"])
+    Assertions.assertEquals("no date found for the initial appointment, please check with your team", parameters.captured["induction_statement"])
   }
 
   @Test
@@ -415,23 +410,6 @@ class EmailNotificationServiceTests {
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals(listOf("${requirement.requirementTypeMainCategory.description}: ${requirement.requirementTypeSubCategory.description}"), parameters.captured["requirements"])
-  }
-
-  @Test
-  fun `must add tier`() {
-    val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
-    val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN)
-    val allocatingOfficerUsername = "ALLOCATOR"
-
-    val token = "token"
-
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
-      .block()
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
-    Assertions.assertEquals(Tier.B3, parameters.captured["tier"])
   }
 
   @Test

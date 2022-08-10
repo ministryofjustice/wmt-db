@@ -29,7 +29,6 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsAllocationMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.bankHolidayJsonResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.communityApiAssessmentResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.convictionNoSentenceResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.notFoundTierResponse
@@ -76,12 +75,7 @@ abstract class IntegrationTestBase {
   var communityApi: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8092)
   var hmppsTier: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8082)
   var offenderSearchApi: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8095)
-  var bankHolidayApi: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8093)
   var assessRisksNeedsApi: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8085)
-
-  init {
-    bankHolidayResponse()
-  }
 
   @Autowired
   protected lateinit var objectMapper: ObjectMapper
@@ -171,7 +165,6 @@ abstract class IntegrationTestBase {
     communityApi.reset()
     hmppsTier.reset()
     offenderSearchApi.reset()
-    bankHolidayApi.reset()
     assessRisksNeedsApi.reset()
     setupOauth()
     personManagerRepository.deleteAll()
@@ -199,7 +192,6 @@ abstract class IntegrationTestBase {
     communityApi.stop()
     oauthMock.stop()
     hmppsTier.stop()
-    bankHolidayApi.stop()
     offenderSearchApi.stop()
     assessRisksNeedsApi.stop()
     personManagerRepository.deleteAll()
@@ -235,15 +227,6 @@ abstract class IntegrationTestBase {
   protected fun offenderEvent(crn: String, sentenceId: BigInteger) = HmppsOffenderEvent(crn, sentenceId)
 
   protected fun jsonString(any: Any) = objectMapper.writeValueAsString(any) as String
-
-  private final fun bankHolidayResponse() {
-    val bankHolidayRequest = request()
-      .withPath("/bank-holidays.json")
-
-    bankHolidayApi.`when`(bankHolidayRequest, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(bankHolidayJsonResponse())
-    )
-  }
 
   fun setupOauth() {
     val response = response().withContentType(APPLICATION_JSON)

@@ -44,6 +44,6 @@ class SendEmail : IntegrationTestBase() {
       allocatingOfficerUsername,
       token
     ).block()
-    assertEquals(UUID.fromString("6c036f17-b8a8-46df-965d-6b33ff27b171"), emailSendResponse?.first()?.templateId)
+    assertEquals(UUID.fromString("d2708c23-d5d2-4455-b26c-7d5d1d5c5733"), emailSendResponse?.first()?.templateId)
   }
 }
