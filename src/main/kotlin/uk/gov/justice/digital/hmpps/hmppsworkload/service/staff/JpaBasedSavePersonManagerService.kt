@@ -7,16 +7,12 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.SaveResult
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.SuccessUpdater
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.TelemetryService
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.WorkloadCalculationService
 import javax.transaction.Transactional
 
 @Service
 class JpaBasedSavePersonManagerService(
   private val personManagerRepository: PersonManagerRepository,
-  private val telemetryService: TelemetryService,
-  private val successUpdater: SuccessUpdater,
   private val workloadCalculationService: WorkloadCalculationService,
   private val getPersonManager: GetPersonManager,
 ) : SavePersonManagerService {
@@ -57,8 +53,6 @@ class JpaBasedSavePersonManagerService(
       providerCode = providerCode
     )
     personManagerRepository.save(personManagerEntity)
-    telemetryService.trackPersonManagerAllocated(personManagerEntity)
-    successUpdater.updatePerson(personManagerEntity.crn, personManagerEntity.uuid, personManagerEntity.createdDate!!)
     workloadCalculationService.calculate(staff.staffCode, teamCode, providerCode, staff.grade)
     return SaveResult(personManagerEntity, true)
   }

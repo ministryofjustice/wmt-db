@@ -46,8 +46,6 @@ class JpaBasedSaveEventManagerService(
       providerCode = staff.probationArea!!.code
     )
     eventManagerRepository.save(eventManagerEntity)
-    telemetryService.trackEventManagerAllocated(eventManagerEntity)
-    successUpdater.updateEvent(eventManagerEntity.crn, eventManagerEntity.uuid, eventManagerEntity.createdDate!!)
     return SaveResult(eventManagerEntity, true)
   }
 }
