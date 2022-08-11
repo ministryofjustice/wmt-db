@@ -7,15 +7,11 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.SaveResult
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RequirementManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.RequirementManagerRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.SuccessUpdater
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.TelemetryService
 import javax.transaction.Transactional
 
 @Service
 class JpaBasedSaveRequirementManagerService(
-  private val requirementManagerRepository: RequirementManagerRepository,
-  private val telemetryService: TelemetryService,
-  private val successUpdater: SuccessUpdater
+  private val requirementManagerRepository: RequirementManagerRepository
 ) : SaveRequirementManagerService {
 
   @Transactional
@@ -57,8 +53,6 @@ class JpaBasedSaveRequirementManagerService(
       providerCode = staff.probationArea!!.code
     )
     requirementManagerRepository.save(requirementManagerEntity)
-    telemetryService.trackRequirementManagerAllocated(requirementManagerEntity)
-    successUpdater.updateRequirement(requirementManagerEntity.crn, requirementManagerEntity.uuid, requirementManagerEntity.createdDate!!)
     return SaveResult(requirementManagerEntity, true)
   }
 }
