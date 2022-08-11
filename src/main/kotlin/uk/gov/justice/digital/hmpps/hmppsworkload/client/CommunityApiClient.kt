@@ -100,7 +100,12 @@ class CommunityApiClient(private val webClient: WebClient) {
   fun getActiveRequirements(crn: String, convictionId: BigInteger): Mono<ConvictionRequirements> {
     return webClient
       .get()
-      .uri("/offenders/crn/$crn/convictions/$convictionId/requirements?activeOnly=true")
+      .uri { uriBuilder ->
+        uriBuilder.path("/offenders/crn/{crn}/convictions/{convictionId}/requirements")
+          .queryParam("activeOnly", true)
+          .queryParam("excludeSoftDeleted", true)
+          .build(crn, convictionId)
+      }
       .retrieve()
       .bodyToMono(ConvictionRequirements::class.java)
   }

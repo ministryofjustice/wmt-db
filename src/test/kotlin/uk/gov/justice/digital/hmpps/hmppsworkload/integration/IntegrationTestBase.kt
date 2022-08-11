@@ -414,8 +414,10 @@ abstract class IntegrationTestBase {
 
   protected fun singleActiveUnpaidRequirementResponse(crn: String, convictionId: BigInteger) {
     val convictionsRequest =
-      request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameter(Parameter("activeOnly", "true"))
-
+      request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameters(
+        Parameter("activeOnly", "true"),
+        Parameter("excludeSoftDeleted", "true")
+      )
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
       response().withContentType(APPLICATION_JSON).withBody(singleActiveUnpaidRequirementResponse())
     )
@@ -423,8 +425,10 @@ abstract class IntegrationTestBase {
 
   protected fun singleActiveRequirementResponse(crn: String, convictionId: BigInteger, requirementId: BigInteger = BigInteger.valueOf(123456789L)) {
     val convictionsRequest =
-      request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameter(Parameter("activeOnly", "true"))
-
+      request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameters(
+        Parameter("activeOnly", "true"),
+        Parameter("excludeSoftDeleted", "true")
+      )
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
       response().withContentType(APPLICATION_JSON).withBody(singleActiveRequirementResponse(requirementId))
     )
@@ -432,8 +436,10 @@ abstract class IntegrationTestBase {
 
   protected fun singleActiveRequirementNoLengthResponse(crn: String, convictionId: BigInteger, requirementId: BigInteger = BigInteger.valueOf(123456789L)) {
     val convictionsRequest =
-      request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameter(Parameter("activeOnly", "true"))
-
+      request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameters(
+        Parameter("activeOnly", "true"),
+        Parameter("excludeSoftDeleted", "true")
+      )
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
       response().withContentType(APPLICATION_JSON).withBody(singleActiveRequirementNoLengthResponse(requirementId))
     )
