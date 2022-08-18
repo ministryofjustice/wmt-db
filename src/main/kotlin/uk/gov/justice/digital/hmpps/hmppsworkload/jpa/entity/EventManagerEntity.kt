@@ -8,11 +8,30 @@ import java.util.UUID
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.EntityListeners
+import javax.persistence.EntityResult
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
+import javax.persistence.NamedNativeQuery
+import javax.persistence.SqlResultSetMapping
 import javax.persistence.Table
 
+@SqlResultSetMapping(
+  name = "EventManagerEntity",
+  entities = [
+    EntityResult(entityClass = EventManagerEntity::class)
+  ]
+)
+@NamedNativeQuery(
+  name = "EventManagerEntity.findByStaffCodeAndTeamCodeLatest",
+  resultSetMapping = "EventManagerEntity",
+  query = """
+  SELECT DISTINCT ON (crn) *
+  FROM event_manager em
+  WHERE em.staff_code = ?1 AND em.team_code = ?2
+  ORDER BY crn, created_date DESC;
+"""
+)
 @Entity
 @Table(name = "EVENT_MANAGER")
 @EntityListeners(AuditingEntityListener::class)
