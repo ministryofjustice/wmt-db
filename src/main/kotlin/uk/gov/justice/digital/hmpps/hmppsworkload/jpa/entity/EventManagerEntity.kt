@@ -26,10 +26,10 @@ import javax.persistence.Table
   name = "EventManagerEntity.findByStaffCodeAndTeamCodeLatest",
   resultSetMapping = "EventManagerEntity",
   query = """
-  SELECT DISTINCT ON (crn) *
+  select * from (SELECT DISTINCT ON (event_id) *
   FROM event_manager em
-  WHERE em.staff_code = ?1 AND em.team_code = ?2
-  ORDER BY crn, created_date DESC;
+  ORDER BY event_id, created_date DESC) dem 
+  WHERE dem.staff_code = ?1 AND dem.team_code = ?2
 """
 )
 @Entity

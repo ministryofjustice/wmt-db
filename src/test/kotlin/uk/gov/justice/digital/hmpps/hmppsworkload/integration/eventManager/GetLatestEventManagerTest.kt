@@ -114,4 +114,31 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
 
     Assertions.assertEquals(realtimeCase, result)
   }
+
+  @Test
+  fun `must not return event manager if allocated to another staff member`() {
+    val staffCode = "OM1"
+    val teamCode = "T1"
+
+    val savedEntity = eventManagerRepository.save(
+      EventManagerEntity(
+        crn = "CRN6634", eventId = BigInteger.TEN, staffCode = staffCode,
+        teamCode = teamCode, staffId = BigInteger.TEN, createdBy = "createdBy",
+        providerCode = "providerCode"
+      )
+    )
+    val eventManagerEntity = eventManagerRepository.findByIdOrNull(savedEntity.id!!)!!
+    val realtimeCase = EventCase(Tier.A1, CaseType.LICENSE, eventManagerEntity.crn, eventManagerEntity.createdDate!!)
+    caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, realtimeCase.type))
+
+    eventManagerRepository.save(
+      EventManagerEntity(
+        crn = eventManagerEntity.crn, eventId = eventManagerEntity.eventId, staffCode = "ADIFFEENTCODE",
+        teamCode = teamCode, staffId = BigInteger.ONE, createdBy = "createdBy",
+        providerCode = "providerCode"
+      )
+    )
+
+    Assertions.assertNull(getEventManager.findLatestByStaffAndTeam(staffCode, teamCode))
+  }
 }
