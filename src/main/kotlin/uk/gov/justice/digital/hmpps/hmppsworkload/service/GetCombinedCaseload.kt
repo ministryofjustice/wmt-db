@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
@@ -29,4 +30,12 @@ class GetCombinedCaseload(
     )
       .map { cde -> Case(cde.tier, cde.type, false, cde.crn) }
   }
+
+  override fun getLastAllocatedCase(staffCode: String, teamCode: String): Case? = personManagerRepository.findByStaffCodeAndTeamCodeLatest(staffCode, teamCode)
+    .filter { caseDetailsRepository.existsById(it.crn) }
+    .maxByOrNull { it.createdDate!! }?.let { personManagerEntity ->
+      caseDetailsRepository.findByIdOrNull(personManagerEntity.crn)?.let { caseDetails ->
+        Case(caseDetails.tier, caseDetails.type, false, caseDetails.crn, personManagerEntity.createdDate)
+      }
+    }
 }

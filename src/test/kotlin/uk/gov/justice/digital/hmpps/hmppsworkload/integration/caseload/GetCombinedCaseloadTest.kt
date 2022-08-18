@@ -86,4 +86,98 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
 
     Assertions.assertEquals(1, actualCases.size)
   }
+
+  @Test
+  fun `must return latest case allocated when last allocated case requested`() {
+    val staffCode = "OM1"
+    val teamCode = "T1"
+
+    val personManagerEntity = personManagerRepository.save(
+      PersonManagerEntity(
+        crn = "CRN6634", staffCode = staffCode,
+        teamCode = teamCode, staffId = BigInteger.TEN, offenderName = "offenderName", createdBy = "createdBy",
+        providerCode = "providerCode"
+      )
+    )
+    val realtimeCase = Case(Tier.A1, CaseType.LICENSE, false, personManagerEntity.crn, personManagerEntity.createdDate)
+    // realtime
+    caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, realtimeCase.type))
+    val result = getCaseLoad.getLastAllocatedCase(staffCode, teamCode)
+
+    Assertions.assertEquals(realtimeCase, result)
+  }
+
+  @Test
+  fun `must only return when case details are known`() {
+    val staffCode = "OM1"
+    val teamCode = "T1"
+    personManagerRepository.save(
+      PersonManagerEntity(
+        crn = "CRN6634", staffCode = staffCode,
+        teamCode = teamCode, staffId = BigInteger.TEN, offenderName = "offenderName", createdBy = "createdBy",
+        providerCode = "providerCode"
+      )
+    )
+
+    Assertions.assertNull(getCaseLoad.getLastAllocatedCase(staffCode, teamCode))
+  }
+
+  @Test
+  fun `must return latest case when multiple are allocated`() {
+    val staffCode = "OM1"
+    val teamCode = "T1"
+
+    val personManagerEntity = personManagerRepository.save(
+      PersonManagerEntity(
+        crn = "CRN6634", staffCode = staffCode,
+        teamCode = teamCode, staffId = BigInteger.TEN, offenderName = "offenderName", createdBy = "createdBy",
+        providerCode = "providerCode"
+      )
+    )
+
+    caseDetailsRepository.save(CaseDetailsEntity(personManagerEntity.crn, Tier.A1, CaseType.LICENSE))
+
+    val latestPersonManagerEntity = personManagerRepository.save(
+      PersonManagerEntity(
+        crn = "CRN9977", staffCode = staffCode,
+        teamCode = teamCode, staffId = BigInteger.TEN, offenderName = "offenderName", createdBy = "createdBy",
+        providerCode = "providerCode"
+      )
+    )
+    val realtimeCase = Case(Tier.C3, CaseType.COMMUNITY, false, latestPersonManagerEntity.crn, latestPersonManagerEntity.createdDate)
+    // realtime
+    caseDetailsRepository.save(CaseDetailsEntity(latestPersonManagerEntity.crn, realtimeCase.tier, realtimeCase.type))
+
+    val result = getCaseLoad.getLastAllocatedCase(staffCode, teamCode)
+
+    Assertions.assertEquals(realtimeCase, result)
+  }
+
+  @Test
+  fun `must return latest case which has case details`() {
+    val staffCode = "OM1"
+    val teamCode = "T1"
+
+    val personManagerEntity = personManagerRepository.save(
+      PersonManagerEntity(
+        crn = "CRN6634", staffCode = staffCode,
+        teamCode = teamCode, staffId = BigInteger.TEN, offenderName = "offenderName", createdBy = "createdBy",
+        providerCode = "providerCode"
+      )
+    )
+    val realtimeCase = Case(Tier.A1, CaseType.LICENSE, false, personManagerEntity.crn, personManagerEntity.createdDate)
+    caseDetailsRepository.save(CaseDetailsEntity(personManagerEntity.crn, realtimeCase.tier, realtimeCase.type))
+
+    personManagerRepository.save(
+      PersonManagerEntity(
+        crn = "CRN9977", staffCode = staffCode,
+        teamCode = teamCode, staffId = BigInteger.TEN, offenderName = "offenderName", createdBy = "createdBy",
+        providerCode = "providerCode"
+      )
+    )
+
+    val result = getCaseLoad.getLastAllocatedCase(staffCode, teamCode)
+
+    Assertions.assertEquals(realtimeCase, result)
+  }
 }
