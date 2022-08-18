@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration.caseload
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import org.springframework.data.repository.findByIdOrNull
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
@@ -92,13 +93,14 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
     val staffCode = "OM1"
     val teamCode = "T1"
 
-    val personManagerEntity = personManagerRepository.save(
+    val savedEntity = personManagerRepository.save(
       PersonManagerEntity(
         crn = "CRN6634", staffCode = staffCode,
         teamCode = teamCode, staffId = BigInteger.TEN, offenderName = "offenderName", createdBy = "createdBy",
         providerCode = "providerCode"
       )
     )
+    val personManagerEntity = personManagerRepository.findByIdOrNull(savedEntity.id!!)!!
     val realtimeCase = Case(Tier.A1, CaseType.LICENSE, false, personManagerEntity.crn, personManagerEntity.createdDate)
     // realtime
     caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, realtimeCase.type))
@@ -137,13 +139,14 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
 
     caseDetailsRepository.save(CaseDetailsEntity(personManagerEntity.crn, Tier.A1, CaseType.LICENSE))
 
-    val latestPersonManagerEntity = personManagerRepository.save(
+    val savedEntity = personManagerRepository.save(
       PersonManagerEntity(
         crn = "CRN9977", staffCode = staffCode,
         teamCode = teamCode, staffId = BigInteger.TEN, offenderName = "offenderName", createdBy = "createdBy",
         providerCode = "providerCode"
       )
     )
+    val latestPersonManagerEntity = personManagerRepository.findByIdOrNull(savedEntity.id!!)!!
     val realtimeCase = Case(Tier.C3, CaseType.COMMUNITY, false, latestPersonManagerEntity.crn, latestPersonManagerEntity.createdDate)
     // realtime
     caseDetailsRepository.save(CaseDetailsEntity(latestPersonManagerEntity.crn, realtimeCase.tier, realtimeCase.type))
@@ -158,13 +161,14 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
     val staffCode = "OM1"
     val teamCode = "T1"
 
-    val personManagerEntity = personManagerRepository.save(
+    val savedEntity = personManagerRepository.save(
       PersonManagerEntity(
         crn = "CRN6634", staffCode = staffCode,
         teamCode = teamCode, staffId = BigInteger.TEN, offenderName = "offenderName", createdBy = "createdBy",
         providerCode = "providerCode"
       )
     )
+    val personManagerEntity = personManagerRepository.findByIdOrNull(savedEntity.id!!)!!
     val realtimeCase = Case(Tier.A1, CaseType.LICENSE, false, personManagerEntity.crn, personManagerEntity.createdDate)
     caseDetailsRepository.save(CaseDetailsEntity(personManagerEntity.crn, realtimeCase.tier, realtimeCase.type))
 
