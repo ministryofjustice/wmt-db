@@ -13,7 +13,9 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RequirementManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.SentenceEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadCalculationEntity
 import java.math.BigInteger
@@ -160,6 +162,10 @@ class OffenderEventListenerTests : IntegrationTestBase() {
     val crn = "J678910"
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.C1, CaseType.COMMUNITY))
 
+    val personManagerEntity = personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "STFFCDE", teamCode = "TM1", offenderName = "Name", createdBy = "USER1", providerCode = "PV1", isActive = true))
+    val eventManagerEntity = eventManagerRepository.save(EventManagerEntity(crn = crn, eventId = BigInteger.TEN, staffId = BigInteger.ONE, staffCode = "STFFCDE", teamCode = "TM1", createdBy = "USER1", providerCode = "PV1", isActive = true))
+    val requirementManagerEntity = requirementManagerRepository.save(RequirementManagerEntity(crn = crn, eventId = BigInteger.TEN, requirementId = BigInteger.TWO, staffId = BigInteger.ONE, staffCode = "STFFCDE", teamCode = "TM1", createdBy = "USER1", providerCode = "PV1", isActive = true))
+
     val sentenceId = BigInteger.valueOf(2500278160L)
     singleInactiveConvictionsResponse(crn)
     noConvictionsResponse(crn)
@@ -177,6 +183,9 @@ class OffenderEventListenerTests : IntegrationTestBase() {
     val count = caseDetailsRepository.count()
 
     Assertions.assertEquals(0, count)
+    Assertions.assertFalse(personManagerRepository.findByIdOrNull(personManagerEntity.id!!)!!.isActive)
+    Assertions.assertFalse(eventManagerRepository.findByIdOrNull(eventManagerEntity.id!!)!!.isActive)
+    Assertions.assertFalse(requirementManagerRepository.findByIdOrNull(requirementManagerEntity.id!!)!!.isActive)
   }
 
   @Test

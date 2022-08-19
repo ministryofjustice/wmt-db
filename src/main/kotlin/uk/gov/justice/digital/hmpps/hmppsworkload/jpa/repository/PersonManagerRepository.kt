@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository
 
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
@@ -14,4 +15,8 @@ interface PersonManagerRepository : CrudRepository<PersonManagerEntity, Long> {
 
   @Query(nativeQuery = true)
   fun findByStaffCodeAndTeamCodeLatest(staffCode: String, teamCode: String): List<PersonManagerEntity>
+
+  @Modifying
+  @Query("update PersonManagerEntity p set p.isActive= false where p.crn = ?1")
+  fun setInactiveTrueFor(crn: String): Int
 }

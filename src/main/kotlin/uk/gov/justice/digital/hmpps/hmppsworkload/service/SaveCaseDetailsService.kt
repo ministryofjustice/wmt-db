@@ -20,8 +20,8 @@ class SaveCaseDetailsService(
   @Qualifier("hmppsTierApiClient") private val hmppsTierApiClient: HmppsTierApiClient,
   private val caseDetailsRepository: CaseDetailsRepository,
   private val workloadCalculationService: WorkloadCalculationService,
-  private val getPersonManager: GetPersonManager
-
+  private val getPersonManager: GetPersonManager,
+  private val updateWorkloadService: UpdateWorkloadService
 ) {
 
   fun save(crn: String) {
@@ -37,6 +37,9 @@ class SaveCaseDetailsService(
           workloadCalculationService.calculate(staff.staffCode, staff.teamCode, staff.providerCode, staff.staffGrade)
         }
       }
-    } ?: caseDetailsRepository.findByIdOrNull(crn)?.let { caseDetailsRepository.delete(it) }
+    } ?: caseDetailsRepository.findByIdOrNull(crn)?.let {
+      caseDetailsRepository.delete(it)
+      updateWorkloadService.setWorkloadInactive(crn)
+    }
   }
 }
