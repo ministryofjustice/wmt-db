@@ -11,7 +11,7 @@ import java.util.UUID
 @Service
 class JpaBasedGetEventManager(private val eventManagerRepository: EventManagerRepository, private val caseDetailsRepository: CaseDetailsRepository) : GetEventManager {
   override fun findById(id: UUID): EventManagerEntity? = eventManagerRepository.findByUuid(id)
-  override fun findLatestByStaffAndTeam(staffCode: String, teamCode: String): EventCase? = eventManagerRepository.findByStaffCodeAndTeamCodeLatest(staffCode, teamCode)
+  override fun findLatestByStaffAndTeam(staffCode: String, teamCode: String): EventCase? = eventManagerRepository.findByStaffCodeAndTeamCodeAndIsActiveTrue(staffCode, teamCode)
     .filter { caseDetailsRepository.existsById(it.crn) }
     .maxByOrNull { it.createdDate!! }?.let { eventManagerEntity ->
       caseDetailsRepository.findByIdOrNull(eventManagerEntity.crn)?.let { caseDetails ->

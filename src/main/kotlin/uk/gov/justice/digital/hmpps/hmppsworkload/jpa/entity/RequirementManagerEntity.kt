@@ -54,5 +54,8 @@ data class RequirementManagerEntity(
   var createdDate: ZonedDateTime? = null,
 
   @Column
-  var providerCode: String
+  var providerCode: String,
+
+  @Column
+  var isActive: Boolean
 )

@@ -53,7 +53,7 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
       PersonManagerEntity(
         crn = realtimeCase.crn, staffCode = staffCode,
         teamCode = teamCode, staffId = BigInteger.TEN, offenderName = "offenderName", createdBy = "createdBy",
-        providerCode = "providerCode"
+        providerCode = "providerCode", isActive = true
       )
     )
 
@@ -78,7 +78,7 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
       PersonManagerEntity(
         crn = realtimeCase.crn, staffCode = staffCode,
         teamCode = teamCode, staffId = BigInteger.TEN, offenderName = "offenderName", createdBy = "createdBy",
-        providerCode = "providerCode"
+        providerCode = "providerCode", isActive = true
       )
     )
 

@@ -10,7 +10,7 @@ class GetEventManagerById : IntegrationTestBase() {
 
   @Test
   fun `can get event manager by Id`() {
-    val storedEventManager = EventManagerEntity(crn = "CRN1", staffId = BigInteger.valueOf(123456789L), staffCode = "OM1", teamCode = "T1", createdBy = "USER1", providerCode = "PV1", eventId = BigInteger.valueOf(567891234L))
+    val storedEventManager = EventManagerEntity(crn = "CRN1", staffId = BigInteger.valueOf(123456789L), staffCode = "OM1", teamCode = "T1", createdBy = "USER1", providerCode = "PV1", eventId = BigInteger.valueOf(567891234L), isActive = true)
     eventManagerRepository.save(storedEventManager)
 
     webTestClient.get()

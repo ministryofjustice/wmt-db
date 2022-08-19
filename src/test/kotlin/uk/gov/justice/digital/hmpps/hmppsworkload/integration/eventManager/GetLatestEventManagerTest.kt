@@ -27,7 +27,7 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
       EventManagerEntity(
         crn = "CRN6634", eventId = BigInteger.TEN, staffCode = staffCode,
         teamCode = teamCode, staffId = BigInteger.TEN, createdBy = "createdBy",
-        providerCode = "providerCode"
+        providerCode = "providerCode", isActive = true
       )
     )
     val eventManagerEntity = eventManagerRepository.findByIdOrNull(savedEntity.id!!)!!
@@ -47,7 +47,7 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
       EventManagerEntity(
         crn = "CRN6634", eventId = BigInteger.TEN, staffCode = staffCode,
         teamCode = teamCode, staffId = BigInteger.TEN, createdBy = "createdBy",
-        providerCode = "providerCode"
+        providerCode = "providerCode", isActive = true
       )
     )
 
@@ -63,7 +63,7 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
       EventManagerEntity(
         crn = "CRN6634", eventId = BigInteger.TEN, staffCode = staffCode,
         teamCode = teamCode, staffId = BigInteger.TEN, createdBy = "createdBy",
-        providerCode = "providerCode"
+        providerCode = "providerCode", isActive = true
       )
     )
 
@@ -73,7 +73,7 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
       EventManagerEntity(
         crn = "CRN9977", eventId = BigInteger.TWO, staffCode = staffCode,
         teamCode = teamCode, staffId = BigInteger.TEN, createdBy = "createdBy",
-        providerCode = "providerCode"
+        providerCode = "providerCode", isActive = true
       )
     )
     val latestEventManagerEntity = eventManagerRepository.findByIdOrNull(savedEntity.id!!)!!
@@ -95,7 +95,7 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
       EventManagerEntity(
         crn = "CRN6634", eventId = BigInteger.TEN, staffCode = staffCode,
         teamCode = teamCode, staffId = BigInteger.TEN, createdBy = "createdBy",
-        providerCode = "providerCode"
+        providerCode = "providerCode", isActive = true
       )
     )
     val eventManagerEntity = eventManagerRepository.findByIdOrNull(savedEntity.id!!)!!
@@ -106,7 +106,7 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
       EventManagerEntity(
         crn = "CRN9977", eventId = BigInteger.TWO, staffCode = staffCode,
         teamCode = teamCode, staffId = BigInteger.TEN, createdBy = "createdBy",
-        providerCode = "providerCode"
+        providerCode = "providerCode", isActive = true
       )
     )
 
@@ -124,7 +124,7 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
       EventManagerEntity(
         crn = "CRN6634", eventId = BigInteger.TEN, staffCode = staffCode,
         teamCode = teamCode, staffId = BigInteger.TEN, createdBy = "createdBy",
-        providerCode = "providerCode"
+        providerCode = "providerCode", isActive = false
       )
     )
     val eventManagerEntity = eventManagerRepository.findByIdOrNull(savedEntity.id!!)!!
@@ -135,7 +135,7 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
       EventManagerEntity(
         crn = eventManagerEntity.crn, eventId = eventManagerEntity.eventId, staffCode = "ADIFFEENTCODE",
         teamCode = teamCode, staffId = BigInteger.ONE, createdBy = "createdBy",
-        providerCode = "providerCode"
+        providerCode = "providerCode", isActive = true
       )
     )
 

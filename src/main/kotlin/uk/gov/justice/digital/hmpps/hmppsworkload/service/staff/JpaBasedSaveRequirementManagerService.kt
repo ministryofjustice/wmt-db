@@ -29,6 +29,7 @@ class JpaBasedSaveRequirementManagerService(
           if (requirementManagerEntity.staffId == staff.staffIdentifier && requirementManagerEntity.teamCode == teamCode) {
             SaveResult(requirementManagerEntity, false)
           } else {
+            requirementManagerEntity.isActive = false
             saveRequirementManagerEntity(allocateCase, staff, teamCode, loggedInUser, requirement)
           }
         } ?: saveRequirementManagerEntity(allocateCase, staff, teamCode, loggedInUser, requirement)
@@ -50,7 +51,8 @@ class JpaBasedSaveRequirementManagerService(
       eventId = allocateCase.eventId,
       requirementId = requirement.requirementId,
       createdBy = loggedInUser,
-      providerCode = staff.probationArea!!.code
+      providerCode = staff.probationArea!!.code,
+      isActive = true
     )
     requirementManagerRepository.save(requirementManagerEntity)
     return SaveResult(requirementManagerEntity, true)

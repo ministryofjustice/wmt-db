@@ -6,10 +6,9 @@ import java.math.BigInteger
 import java.time.ZonedDateTime
 import java.util.UUID
 import javax.persistence.Column
-import javax.persistence.ColumnResult
-import javax.persistence.ConstructorResult
 import javax.persistence.Entity
 import javax.persistence.EntityListeners
+import javax.persistence.EntityResult
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
@@ -19,23 +18,8 @@ import javax.persistence.Table
 
 @SqlResultSetMapping(
   name = "PersonManagerEntity",
-  classes = [
-    ConstructorResult(
-      targetClass = PersonManagerEntity::class,
-      columns = [
-        ColumnResult(name = "id", type = Long::class),
-        ColumnResult(name = "uuid", type = UUID::class),
-        ColumnResult(name = "crn"),
-        ColumnResult(name = "staff_id", type = BigInteger::class),
-        ColumnResult(name = "staff_code"),
-        ColumnResult(name = "team_id", type = BigInteger::class),
-        ColumnResult(name = "team_code"),
-        ColumnResult(name = "offender_name"),
-        ColumnResult(name = "created_by"),
-        ColumnResult(name = "created_date", type = ZonedDateTime::class),
-        ColumnResult(name = "provider_code")
-      ]
-    )
+  entities = [
+    EntityResult(entityClass = PersonManagerEntity::class)
   ]
 )
 @NamedNativeQuery(
@@ -98,6 +82,9 @@ data class PersonManagerEntity(
   var createdDate: ZonedDateTime? = null,
 
   @Column
-  var providerCode: String
+  var providerCode: String,
+
+  @Column
+  var isActive: Boolean
 
 )
