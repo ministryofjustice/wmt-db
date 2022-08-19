@@ -11,9 +11,8 @@ import java.util.UUID
 @Service
 class JpaBasedGetEventManager(private val eventManagerRepository: EventManagerRepository, private val caseDetailsRepository: CaseDetailsRepository) {
   fun findById(id: UUID): EventManagerEntity? = eventManagerRepository.findByUuid(id)
-  fun findLatestByStaffAndTeam(staffCode: String, teamCode: String): EventDetails? = eventManagerRepository.findByStaffCodeAndTeamCodeAndIsActiveTrue(staffCode, teamCode)
-    .filter { caseDetailsRepository.existsById(it.crn) }
-    .maxByOrNull { it.createdDate!! }?.let { eventManagerEntity ->
+  fun findLatestByStaffAndTeam(staffCode: String, teamCode: String): EventDetails? =
+    eventManagerRepository.findFirstByStaffCodeAndTeamCodeAndIsActiveTrueOrderByCreatedDateDesc(staffCode, teamCode)?.let { eventManagerEntity ->
       caseDetailsRepository.findByIdOrNull(eventManagerEntity.crn)?.let { caseDetails ->
         EventDetails(caseDetails.tier, caseDetails.type, caseDetails.crn, eventManagerEntity.createdDate!!)
       }
