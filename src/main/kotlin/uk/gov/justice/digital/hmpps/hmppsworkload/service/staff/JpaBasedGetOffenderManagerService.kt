@@ -37,7 +37,8 @@ class JpaBasedGetOffenderManagerService(
   private val offenderSearchApiClient: OffenderSearchApiClient,
   private val getSentenceService: GetSentenceService,
   private val caseDetailsRepository: CaseDetailsRepository,
-  private val getWeeklyHours: GetWeeklyHours
+  private val getWeeklyHours: GetWeeklyHours,
+  private val getEventManager: GetEventManager
 ) : GetOffenderManagerService {
 
   override fun getPotentialWorkload(teamCode: String, staffCode: String, impactCase: ImpactCase): OffenderManagerOverview? {
@@ -99,6 +100,7 @@ class JpaBasedGetOffenderManagerService(
         it
       } ?: getDefaultOffenderManagerOverview(staff, team.description)
       overview.grade = staff.grade
+      overview.lastAllocatedEvent = getEventManager.findLatestByStaffAndTeam(offenderManagerCode, teamCode)
       overview
     }.block()
 

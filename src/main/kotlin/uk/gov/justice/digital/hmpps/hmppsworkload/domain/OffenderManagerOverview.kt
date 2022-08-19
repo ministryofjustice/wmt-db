@@ -43,7 +43,8 @@ data class OffenderManagerOverview @JsonCreator constructor(
   @Schema(description = "Probation Practitioner cases due to end in the next 30 days", example = "3")
   val caseEndDue: BigInteger,
   @Schema(description = "Probation Practitioner cases due to be released in the next 30 days", example = "6")
-  val releasesDue: BigInteger
+  val releasesDue: BigInteger,
+  val lastAllocatedEvent: LastAllocatedEvent?
 ) {
   companion object {
     fun from(offenderManagerOverview: OffenderManagerOverview): uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerOverview {
@@ -65,8 +66,19 @@ data class OffenderManagerOverview @JsonCreator constructor(
         offenderManagerOverview.tierCaseTotals,
         offenderManagerOverview.paroleReportsDue,
         offenderManagerOverview.caseEndDue,
-        offenderManagerOverview.releasesDue
+        offenderManagerOverview.releasesDue,
+        offenderManagerOverview.lastAllocatedEvent?.let { LastAllocatedEvent.from(it) }
       )
     }
+  }
+}
+
+data class LastAllocatedEvent @JsonCreator constructor(
+  val allocatedOn: ZonedDateTime,
+  val tier: Tier,
+  val sentenceType: CaseType
+) {
+  companion object {
+    fun from(eventCase: EventCase): LastAllocatedEvent = LastAllocatedEvent(eventCase.allocatedOn, eventCase.tier, eventCase.type)
   }
 }
