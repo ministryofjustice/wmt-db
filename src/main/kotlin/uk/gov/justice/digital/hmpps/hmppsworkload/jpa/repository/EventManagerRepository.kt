@@ -8,4 +8,6 @@ import java.util.UUID
 interface EventManagerRepository : CrudRepository<EventManagerEntity, Long> {
   fun findFirstByCrnAndEventIdOrderByCreatedDateDesc(crn: String, eventId: BigInteger): EventManagerEntity?
   fun findByUuid(id: UUID): EventManagerEntity?
+
+  fun findByStaffCodeAndTeamCodeAndIsActiveTrue(staffCode: String, teamCode: String): List<EventManagerEntity>
 }

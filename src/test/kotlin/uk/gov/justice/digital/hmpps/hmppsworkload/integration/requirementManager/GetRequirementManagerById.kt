@@ -10,7 +10,7 @@ class GetRequirementManagerById : IntegrationTestBase() {
 
   @Test
   fun `can get requirement manager by Id`() {
-    val storedRequirementManager = RequirementManagerEntity(crn = "CRN1", staffId = BigInteger.valueOf(123456789L), staffCode = "OM1", teamCode = "T1", createdBy = "USER1", providerCode = "PV1", eventId = BigInteger.valueOf(567891234L), requirementId = BigInteger.valueOf(24680L))
+    val storedRequirementManager = RequirementManagerEntity(crn = "CRN1", staffId = BigInteger.valueOf(123456789L), staffCode = "OM1", teamCode = "T1", createdBy = "USER1", providerCode = "PV1", eventId = BigInteger.valueOf(567891234L), requirementId = BigInteger.valueOf(24680L), isActive = true)
     requirementManagerRepository.save(storedRequirementManager)
 
     webTestClient.get()

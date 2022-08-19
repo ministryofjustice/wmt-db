@@ -10,7 +10,7 @@ class GetPersonManagerById : IntegrationTestBase() {
 
   @Test
   fun `can get person manager by Id`() {
-    val storedPersonManager = PersonManagerEntity(crn = "CRN1", staffId = BigInteger.valueOf(123456789L), staffCode = "OM1", teamCode = "T1", offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1")
+    val storedPersonManager = PersonManagerEntity(crn = "CRN1", staffId = BigInteger.valueOf(123456789L), staffCode = "OM1", teamCode = "T1", offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1", isActive = true)
     personManagerRepository.save(storedPersonManager)
     staffCodeResponse(storedPersonManager.staffCode, storedPersonManager.teamCode)
     webTestClient.get()

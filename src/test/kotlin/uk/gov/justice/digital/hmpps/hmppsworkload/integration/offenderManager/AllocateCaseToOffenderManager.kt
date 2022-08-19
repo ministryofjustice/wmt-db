@@ -12,6 +12,7 @@ import org.hamcrest.text.MatchesPattern
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.MediaType
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
@@ -207,11 +208,11 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     staffCodeResponse(staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveRequirementResponse(crn, eventId, requirementId)
-    val storedPersonManager = PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1")
+    val storedPersonManager = PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1", isActive = true)
     personManagerRepository.save(storedPersonManager)
-    val storedEventManager = EventManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, eventId = eventId, createdBy = "USER1", providerCode = "PV1")
+    val storedEventManager = EventManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, eventId = eventId, createdBy = "USER1", providerCode = "PV1", isActive = true)
     eventManagerRepository.save(storedEventManager)
-    val storedRequirementManager = RequirementManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, eventId = eventId, requirementId = requirementId, createdBy = "USER1", providerCode = "PV1")
+    val storedRequirementManager = RequirementManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, eventId = eventId, requirementId = requirementId, createdBy = "USER1", providerCode = "PV1", isActive = true)
     requirementManagerRepository.save(storedRequirementManager)
 
     webTestClient.post()
@@ -238,9 +239,10 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     staffCodeResponse(staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveUnpaidRequirementResponse(crn, eventId)
-    val storedPersonManager = PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1")
-    staffCodeResponse(storedPersonManager.staffCode, storedPersonManager.teamCode)
-    personManagerRepository.save(storedPersonManager)
+    val otherPersonManager = PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1", isActive = true)
+    staffCodeResponse(otherPersonManager.staffCode, otherPersonManager.teamCode)
+    val storedPersonManager = personManagerRepository.save(otherPersonManager)
+    val storedEventManager = eventManagerRepository.save(EventManagerEntity(crn = crn, eventId = eventId, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", createdBy = "USER1", providerCode = "PV1", isActive = true))
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
@@ -270,6 +272,12 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       { Assertions.assertEquals(storedPersonManager.teamCode, actualWorkloadCalcEntity!!.teamCode) },
       { Assertions.assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity!!.calculatedDate.dayOfMonth) }
     )
+
+    val previousPersonManager = personManagerRepository.findByIdOrNull(storedPersonManager.id!!)!!
+    Assertions.assertFalse(previousPersonManager.isActive)
+
+    val previousEventManager = eventManagerRepository.findByIdOrNull(storedEventManager.id!!)!!
+    Assertions.assertFalse(previousEventManager.isActive)
   }
 
   @Test

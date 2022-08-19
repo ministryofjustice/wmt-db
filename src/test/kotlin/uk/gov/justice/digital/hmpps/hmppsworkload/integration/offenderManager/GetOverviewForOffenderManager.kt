@@ -1,7 +1,12 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.offenderManager
 
 import org.junit.jupiter.api.Test
+import org.springframework.data.repository.findByIdOrNull
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.SentenceEntity
@@ -108,6 +113,8 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
       .isEqualTo(1)
       .jsonPath("$.releasesDue")
       .isEqualTo(1)
+      .jsonPath("$.lastAllocatedEvent")
+      .doesNotExist()
   }
 
   @Test
@@ -180,5 +187,34 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
       .isEqualTo(0)
       .jsonPath("$.caseTotals.untiered")
       .isEqualTo(0)
+  }
+
+  @Test
+  fun `get last allocated event`() {
+    val teamCode = "T1"
+    val offenderManagerCode = "NOWORKLOAD1"
+    staffCodeResponse(offenderManagerCode, teamCode)
+    val eventManager = eventManagerRepository.save(EventManagerEntity(crn = "CRN12345", eventId = BigInteger.TEN, staffId = BigInteger.ONE, staffCode = offenderManagerCode, teamCode = teamCode, createdBy = "USER1", providerCode = "PV1", isActive = true))
+    val storedEventManager = eventManagerRepository.findByIdOrNull(eventManager.id!!)!!
+    val caseDetails = caseDetailsRepository.save(CaseDetailsEntity(storedEventManager.crn, Tier.C3, CaseType.COMMUNITY))
+    webTestClient.get()
+      .uri("/team/$teamCode/offenderManagers/$offenderManagerCode")
+      .headers {
+        it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody()
+      .jsonPath("$.lastAllocatedEvent.allocatedOn")
+      .isEqualTo(
+        storedEventManager.createdDate!!.withZoneSameInstant(ZoneOffset.UTC).format(
+          DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        )
+      )
+      .jsonPath("$.lastAllocatedEvent.tier")
+      .isEqualTo(caseDetails.tier.name)
+      .jsonPath("$.lastAllocatedEvent.sentenceType")
+      .isEqualTo(caseDetails.type.name)
   }
 }

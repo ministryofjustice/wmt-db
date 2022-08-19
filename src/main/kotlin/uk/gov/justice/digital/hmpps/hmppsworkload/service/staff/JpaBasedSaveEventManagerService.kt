@@ -6,15 +6,11 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.SaveResult
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.EventManagerRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.SuccessUpdater
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.TelemetryService
 import javax.transaction.Transactional
 
 @Service
 class JpaBasedSaveEventManagerService(
-  private val eventManagerRepository: EventManagerRepository,
-  private val telemetryService: TelemetryService,
-  private val successUpdater: SuccessUpdater
+  private val eventManagerRepository: EventManagerRepository
 ) : SaveEventManagerService {
 
   @Transactional
@@ -27,6 +23,7 @@ class JpaBasedSaveEventManagerService(
     if (eventManager.staffId == staff.staffIdentifier && eventManager.teamCode == teamCode) {
       return SaveResult(eventManager, false)
     }
+    eventManager.isActive = false
     saveEventManagerEntity(allocateCase, staff, teamCode, loggedInUser)
   } ?: saveEventManagerEntity(allocateCase, staff, teamCode, loggedInUser)
 
@@ -43,7 +40,8 @@ class JpaBasedSaveEventManagerService(
       teamCode = teamCode,
       eventId = allocateCase.eventId,
       createdBy = loggedInUser,
-      providerCode = staff.probationArea!!.code
+      providerCode = staff.probationArea!!.code,
+      isActive = true
     )
     eventManagerRepository.save(eventManagerEntity)
     return SaveResult(eventManagerEntity, true)
