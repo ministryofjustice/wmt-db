@@ -5,18 +5,18 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.EventCase
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.EventDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.GetEventManager
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.JpaBasedGetEventManager
 import java.math.BigInteger
 
 class GetLatestEventManagerTest : IntegrationTestBase() {
 
   @Autowired
-  private lateinit var getEventManager: GetEventManager
+  private lateinit var getEventManager: JpaBasedGetEventManager
 
   @Test
   fun `must return latest case allocated when last allocated case requested`() {
@@ -31,7 +31,7 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
       )
     )
     val eventManagerEntity = eventManagerRepository.findByIdOrNull(savedEntity.id!!)!!
-    val realtimeCase = EventCase(Tier.A1, CaseType.LICENSE, eventManagerEntity.crn, eventManagerEntity.createdDate!!)
+    val realtimeCase = EventDetails(Tier.A1, CaseType.LICENSE, eventManagerEntity.crn, eventManagerEntity.createdDate!!)
     // realtime
     caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, realtimeCase.type))
     val result = getEventManager.findLatestByStaffAndTeam(staffCode, teamCode)
@@ -77,7 +77,7 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
       )
     )
     val latestEventManagerEntity = eventManagerRepository.findByIdOrNull(savedEntity.id!!)!!
-    val realtimeCase = EventCase(Tier.C3, CaseType.COMMUNITY, latestEventManagerEntity.crn, latestEventManagerEntity.createdDate!!)
+    val realtimeCase = EventDetails(Tier.C3, CaseType.COMMUNITY, latestEventManagerEntity.crn, latestEventManagerEntity.createdDate!!)
     // realtime
     caseDetailsRepository.save(CaseDetailsEntity(latestEventManagerEntity.crn, realtimeCase.tier, realtimeCase.type))
 
@@ -99,7 +99,7 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
       )
     )
     val eventManagerEntity = eventManagerRepository.findByIdOrNull(savedEntity.id!!)!!
-    val realtimeCase = EventCase(Tier.A1, CaseType.LICENSE, eventManagerEntity.crn, eventManagerEntity.createdDate!!)
+    val realtimeCase = EventDetails(Tier.A1, CaseType.LICENSE, eventManagerEntity.crn, eventManagerEntity.createdDate!!)
     caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, realtimeCase.type))
 
     eventManagerRepository.save(
@@ -128,7 +128,7 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
       )
     )
     val eventManagerEntity = eventManagerRepository.findByIdOrNull(savedEntity.id!!)!!
-    val realtimeCase = EventCase(Tier.A1, CaseType.LICENSE, eventManagerEntity.crn, eventManagerEntity.createdDate!!)
+    val realtimeCase = EventDetails(Tier.A1, CaseType.LICENSE, eventManagerEntity.crn, eventManagerEntity.createdDate!!)
     caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, realtimeCase.type))
 
     eventManagerRepository.save(

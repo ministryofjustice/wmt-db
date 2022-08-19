@@ -79,6 +79,6 @@ data class LastAllocatedEvent @JsonCreator constructor(
   val sentenceType: CaseType
 ) {
   companion object {
-    fun from(eventCase: EventCase): LastAllocatedEvent = LastAllocatedEvent(eventCase.allocatedOn, eventCase.tier, eventCase.type)
+    fun from(eventDetails: EventDetails): LastAllocatedEvent = LastAllocatedEvent(eventDetails.allocatedOn, eventDetails.tier, eventDetails.type)
   }
 }

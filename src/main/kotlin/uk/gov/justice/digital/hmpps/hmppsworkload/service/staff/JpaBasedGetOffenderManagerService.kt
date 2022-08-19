@@ -38,7 +38,7 @@ class JpaBasedGetOffenderManagerService(
   private val getSentenceService: GetSentenceService,
   private val caseDetailsRepository: CaseDetailsRepository,
   private val getWeeklyHours: GetWeeklyHours,
-  private val getEventManager: GetEventManager
+  private val getEventManager: JpaBasedGetEventManager
 ) : GetOffenderManagerService {
 
   override fun getPotentialWorkload(teamCode: String, staffCode: String, impactCase: ImpactCase): OffenderManagerOverview? {

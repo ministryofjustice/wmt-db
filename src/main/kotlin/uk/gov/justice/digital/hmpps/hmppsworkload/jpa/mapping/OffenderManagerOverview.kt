@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping
 
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.EventCase
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.EventDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.TierCaseTotals
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -29,5 +29,5 @@ data class OffenderManagerOverview(
   var caseEndDue = BigInteger.ZERO
   var releasesDue = BigInteger.ZERO
   var grade = ""
-  var lastAllocatedEvent: EventCase? = null
+  var lastAllocatedEvent: EventDetails? = null
 }
