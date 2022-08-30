@@ -58,6 +58,7 @@ class JpaBasedTeamService(
   }
 
   fun getWorkloadCases(teams: List<String>): Flux<WorkloadCase> {
-    return Flux.empty()
+    return Flux.fromIterable(teamRepository.findWorkloadCountCaseByCode(teams))
+      .map { WorkloadCase(it.teamCode, it.totalCases, capacityCalculator.calculate(it.totalPoints.toBigInteger(), it.availablePoints.toBigInteger()).toDouble()) }
   }
 }
