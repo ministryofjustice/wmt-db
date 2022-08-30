@@ -11,14 +11,16 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import reactor.core.publisher.Flux
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.TeamSummary
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.TeamService
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.WorkloadCase
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.JpaBasedTeamService
 import javax.persistence.EntityNotFoundException
 
 @RestController
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 class TeamController(
-  private val teamService: TeamService
+  private val teamService: JpaBasedTeamService
 ) {
 
   @Operation(summary = "Retrieve Team summary by Team Code")
@@ -36,5 +38,18 @@ class TeamController(
       return ResponseEntity.ok(TeamSummary.from(overviews))
     }
     throw EntityNotFoundException("Team not found for $teamCode")
+  }
+
+  @Operation(summary = "Retrieve Team workload and case count by Team Codes")
+  @ApiResponses(
+    value = [
+      ApiResponse(responseCode = "200", description = "OK"),
+      ApiResponse(responseCode = "404", description = "Result Not Found")
+    ]
+  )
+  @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT')")
+  @GetMapping("/team/workloadcases")
+  fun getTeamWorkloadAndCaseCount(@RequestParam(required = true) teams: List<String>): Flux<WorkloadCase> {
+    return teamService.getWorkloadCases(teams)
   }
 }
