@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity
 
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.TeamOverview
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.WorkloadCaseResult
 import javax.persistence.Column
 import javax.persistence.ColumnResult
 import javax.persistence.ConstructorResult
@@ -48,6 +49,30 @@ import javax.persistence.Table
     JOIN app.offender_manager AS om
         ON om.id = wo.offender_manager_id
     WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS NULL AND t.code = ?1"""
+)
+@SqlResultSetMapping(
+  name = "WorkloadCaseResult",
+  classes = [
+    ConstructorResult(
+      targetClass = WorkloadCaseResult::class,
+      columns = [
+        ColumnResult(name = "total_cases", type = Int::class),
+        ColumnResult(name = "available_points", type = Int::class),
+        ColumnResult(name = "total_points", type = Int::class),
+        ColumnResult(name = "team_code")
+      ]
+    )
+  ]
+)
+@NamedNativeQuery(
+  name = "TeamEntity.findWorkloadCountCaseByCode",
+  resultSetMapping = "WorkloadCaseResult",
+  query = """SELECT
+    total_cases, available_points, total_points, t.code AS team_code
+    FROM app.ldu_case_overview AS wo
+    JOIN app.team AS t
+        ON wo.link_id = t.id
+    WHERE t.code IN ?1"""
 )
 @Entity
 @Table(name = "team", schema = "app")

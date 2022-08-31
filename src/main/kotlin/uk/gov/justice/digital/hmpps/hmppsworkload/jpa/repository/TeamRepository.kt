@@ -5,6 +5,7 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.TeamEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.TeamOverview
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.WorkloadCaseResult
 
 @Repository
 interface TeamRepository : CrudRepository<TeamEntity, Long> {
@@ -12,4 +13,7 @@ interface TeamRepository : CrudRepository<TeamEntity, Long> {
   fun findByOverview(teamCode: String): List<TeamOverview>
 
   fun findByCode(code: String): TeamEntity
+
+  @Query(nativeQuery = true)
+  fun findWorkloadCountCaseByCode(code: List<String>): List<WorkloadCaseResult>
 }

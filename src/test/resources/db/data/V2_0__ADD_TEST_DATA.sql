@@ -9,7 +9,7 @@ INSERT INTO app.workload_report (status, status_description) VALUES ('COMPLETE',
 
 INSERT INTO app.workload
 (workload_owner_id, workload_report_id, total_filtered_community_cases, total_filtered_custody_cases, total_filtered_license_cases,  total_cases, total_community_cases, total_custody_cases, total_license_cases, monthly_sdrs, sdr_due_next_30_days, sdr_conversions_last_30_days, paroms_completed_last_30_days, paroms_due_next_30_days, license_last_16_weeks, community_last_16_weeks, arms_community_cases, arms_license_cases, staging_id, total_t2a_cases, total_t2a_community_cases, total_t2a_custody_cases, total_t2a_license_cases, total_filtered_cases)
-VALUES((select max(id) from app.workload_owner), (select max(id) from app.workload_report), 10, 20, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+VALUES((select max(id) from app.workload_owner), (select max(id) from app.workload_report), 10, 20, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2);
 
 INSERT INTO app.workload_points_calculations
 (workload_report_id, workload_points_id, workload_id, total_points, sdr_points, sdr_conversion_points, paroms_points, nominal_target, available_points, contracted_hours, t2a_workload_points_id, reduction_hours,last_updated_on)

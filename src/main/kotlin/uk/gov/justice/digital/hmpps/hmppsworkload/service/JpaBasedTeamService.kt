@@ -1,8 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
 import org.springframework.stereotype.Service
+import reactor.core.publisher.Flux
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.TeamStaff
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.WorkloadCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.TeamOverview
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.TeamRepository
@@ -19,9 +21,9 @@ class JpaBasedTeamService(
   private val communityApiClient: CommunityApiClient,
   private val workloadPointsRepository: WorkloadPointsRepository,
   private val personManagerRepository: PersonManagerRepository
-) : TeamService {
+) {
 
-  override fun getTeamOverview(teamCode: String, grades: List<String>?): List<TeamOverview>? = communityApiClient
+  fun getTeamOverview(teamCode: String, grades: List<String>?): List<TeamOverview>? = communityApiClient
     .getTeamStaff(teamCode)
     .map { staff ->
       val workloads = teamRepository.findByOverview(teamCode).associateBy { it.code }
@@ -53,5 +55,10 @@ class JpaBasedTeamService(
   private fun defaultAvailablePointsForGrade(teamStaff: TeamStaff): BigInteger {
     val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
     return workloadPoints.getDefaultPointsAvailable(teamStaff.grade).toBigInteger()
+  }
+
+  fun getWorkloadCases(teams: List<String>): Flux<WorkloadCase> {
+    return Flux.fromIterable(teamRepository.findWorkloadCountCaseByCode(teams))
+      .map { WorkloadCase(it.teamCode, it.totalCases, capacityCalculator.calculate(it.totalPoints.toBigInteger(), it.availablePoints.toBigInteger()).toDouble()) }
   }
 }
