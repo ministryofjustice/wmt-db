@@ -44,7 +44,6 @@ class TeamController(
   @ApiResponses(
     value = [
       ApiResponse(responseCode = "200", description = "OK"),
-      ApiResponse(responseCode = "404", description = "Result Not Found")
     ]
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT')")
