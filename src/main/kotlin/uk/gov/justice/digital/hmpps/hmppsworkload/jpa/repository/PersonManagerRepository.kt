@@ -12,10 +12,7 @@ interface PersonManagerRepository : CrudRepository<PersonManagerEntity, Long> {
   fun findByUuid(id: UUID): PersonManagerEntity?
   @Query(nativeQuery = true)
   fun findByTeamCodeAndCreatedDateGreaterThanEqualLatest(teamCode: String, createdDate: ZonedDateTime): List<PersonManagerEntity>
-
-  @Query(nativeQuery = true)
-  fun findByStaffCodeAndTeamCodeLatest(staffCode: String, teamCode: String): List<PersonManagerEntity>
-
+  fun findByStaffCodeAndTeamCodeAndIsActiveIsTrue(staffCode: String, teamCode: String): List<PersonManagerEntity>
   @Modifying
   @Query("update PersonManagerEntity p set p.isActive= false where p.crn = ?1")
   fun setInactiveTrueFor(crn: String): Int
