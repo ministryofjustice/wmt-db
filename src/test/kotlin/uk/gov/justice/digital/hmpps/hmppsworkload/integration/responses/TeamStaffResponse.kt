@@ -1,9 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses
 
-fun teamStaffResponse() = """
+fun teamStaffJsonResponse(staffCode: String) = """
   [
       {
-          "staffCode": "OM1",
+          "staffCode": "$staffCode",
           "staffIdentifier": 123456789,
           "staff": {
               "forenames": "Ben",

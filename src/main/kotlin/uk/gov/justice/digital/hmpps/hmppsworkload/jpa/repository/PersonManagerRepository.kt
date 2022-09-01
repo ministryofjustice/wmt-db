@@ -10,8 +10,7 @@ import java.util.UUID
 interface PersonManagerRepository : CrudRepository<PersonManagerEntity, Long> {
   fun findFirstByCrnOrderByCreatedDateDesc(crn: String): PersonManagerEntity?
   fun findByUuid(id: UUID): PersonManagerEntity?
-  @Query(nativeQuery = true)
-  fun findByTeamCodeAndCreatedDateGreaterThanEqualLatest(teamCode: String, createdDate: ZonedDateTime): List<PersonManagerEntity>
+  fun findByTeamCodeAndCreatedDateGreaterThanEqualAndIsActiveIsTrue(teamCode: String, createdDate: ZonedDateTime): List<PersonManagerEntity>
   fun findByStaffCodeAndTeamCodeAndIsActiveIsTrue(staffCode: String, teamCode: String): List<PersonManagerEntity>
   @Modifying
   @Query("update PersonManagerEntity p set p.isActive= false where p.crn = ?1")

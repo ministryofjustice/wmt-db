@@ -28,7 +28,7 @@ class JpaBasedTeamService(
     .map { staff ->
       val workloads = teamRepository.findByOverview(teamCode).associateBy { it.code }
       val caseCountAfter = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).minusDays(7L)
-      val caseCounts = personManagerRepository.findByTeamCodeAndCreatedDateGreaterThanEqualLatest(teamCode, caseCountAfter)
+      val caseCounts = personManagerRepository.findByTeamCodeAndCreatedDateGreaterThanEqualAndIsActiveIsTrue(teamCode, caseCountAfter)
         .groupBy { it.staffCode }
         .mapValues { countEntry -> countEntry.value.size }
       staff.map {

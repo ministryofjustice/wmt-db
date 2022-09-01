@@ -8,30 +8,10 @@ import java.util.UUID
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.EntityListeners
-import javax.persistence.EntityResult
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
-import javax.persistence.NamedNativeQuery
-import javax.persistence.SqlResultSetMapping
 import javax.persistence.Table
-
-@SqlResultSetMapping(
-  name = "PersonManagerEntity",
-  entities = [
-    EntityResult(entityClass = PersonManagerEntity::class)
-  ]
-)
-@NamedNativeQuery(
-  name = "PersonManagerEntity.findByTeamCodeAndCreatedDateGreaterThanEqualLatest",
-  resultSetMapping = "PersonManagerEntity",
-  query = """
-SELECT DISTINCT ON (crn) *
-FROM person_manager pm
-WHERE pm.team_code = ?1 AND pm.created_date >= ?2
-ORDER BY crn, created_date DESC;
-"""
-)
 
 @Entity
 @Table(name = "PERSON_MANAGER")
