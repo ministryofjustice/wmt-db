@@ -86,4 +86,34 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
 
     Assertions.assertEquals(1, actualCases.size)
   }
+  @Test
+  fun `must not be in caseload if allocated to another staff member`() {
+
+    val originalStaffCode = "STAFF1"
+    val teamCode = "TEAM!"
+    val newStaffCode = "STAFF2"
+
+    val realtimeCase = Case(Tier.A1, CaseType.LICENSE, false, "CRN9191")
+    caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, CaseType.LICENSE))
+
+    personManagerRepository.save(
+      PersonManagerEntity(
+        crn = realtimeCase.crn, staffCode = originalStaffCode,
+        teamCode = teamCode, staffId = BigInteger.TEN, offenderName = "offenderName", createdBy = "createdBy",
+        providerCode = "providerCode", isActive = false
+      )
+    )
+
+    personManagerRepository.save(
+      PersonManagerEntity(
+        crn = realtimeCase.crn, staffCode = newStaffCode,
+        teamCode = teamCode, staffId = BigInteger.ONE, offenderName = "offenderName", createdBy = "createdBy",
+        providerCode = "providerCode", isActive = true
+      )
+    )
+
+    val actualCases = getCaseLoad.getCases(originalStaffCode, teamCode)
+
+    Assertions.assertEquals(0, actualCases.size)
+  }
 }
