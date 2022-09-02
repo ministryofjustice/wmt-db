@@ -122,4 +122,26 @@ class GetTeamOverviewByTeamCode : IntegrationTestBase() {
       .expectStatus()
       .isForbidden
   }
+
+  @Test
+  fun `can get team overview of offender manager by team code when assigned to another staff member`() {
+    val teamCode = "TEAM1"
+    teamStaffResponse(teamCode, "STAFF1")
+
+    val movedPersonManager = PersonManagerEntity(crn = "CRN3", staffId = BigInteger.valueOf(123456789L), staffCode = "STAFF1", teamCode = teamCode, offenderName = "John Doe", createdBy = "USER1", providerCode = "R1", isActive = false)
+    personManagerRepository.save(movedPersonManager)
+
+    val newPersonManager = PersonManagerEntity(crn = "CRN3", staffId = BigInteger.valueOf(56789321L), staffCode = "STAFF2", teamCode = "TEAM2", offenderName = "John Doe", createdBy = "USER2", providerCode = "R1", isActive = true)
+    personManagerRepository.save(newPersonManager)
+
+    webTestClient.get()
+      .uri("/team/$teamCode/offenderManagers")
+      .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT")) }
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody()
+      .jsonPath("$.offenderManagers[0].totalCasesInLastWeek")
+      .isEqualTo(0)
+  }
 }
