@@ -187,7 +187,7 @@ class EmailNotificationServiceTests {
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
-    Assertions.assertEquals(activeConviction.courtAppearance!!.appearanceDate.format(DateTimeFormatter.ISO_LOCAL_DATE), parameters.captured["sentence_date"])
+    Assertions.assertEquals(activeConviction.courtAppearance!!.appearanceDate.format(DateTimeFormatter.ofPattern("d MMMM yyyy")), parameters.captured["sentence_date"])
   }
 
   @Test
@@ -238,7 +238,7 @@ class EmailNotificationServiceTests {
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
-    Assertions.assertEquals("their initial appointment is scheduled for ${appointment.contactStart.format(DateTimeFormatter.ISO_LOCAL_DATE)}", parameters.captured["induction_statement"])
+    Assertions.assertEquals("their initial appointment is scheduled for ${appointment.contactStart.format(DateTimeFormatter.ofPattern("d MMMM yyyy"))}", parameters.captured["induction_statement"])
   }
 
   @Test
@@ -272,7 +272,7 @@ class EmailNotificationServiceTests {
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
-    Assertions.assertEquals("their initial appointment was scheduled for ${appointment.contactStart.format(DateTimeFormatter.ISO_LOCAL_DATE)}", parameters.captured["induction_statement"])
+    Assertions.assertEquals("their initial appointment was scheduled for ${appointment.contactStart.format(DateTimeFormatter.ofPattern("d MMMM yyyy"))}", parameters.captured["induction_statement"])
   }
 
   @Test

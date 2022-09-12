@@ -19,6 +19,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.utils.DateUtils
 import uk.gov.justice.digital.hmpps.hmppsworkload.utils.capitalize
 import uk.gov.service.notify.NotificationClientApi
 import uk.gov.service.notify.SendEmailResponse
@@ -26,7 +27,6 @@ import java.math.BigInteger
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
 const val SCORE_UNAVAILABLE = "Score Unavailable"
@@ -71,7 +71,7 @@ class EmailNotificationService(
 
   private fun getConvictionParameters(conviction: Conviction, previousConvictions: List<Conviction>): Map<String, Any> = mapOf(
     "court_name" to conviction.courtAppearance!!.courtName,
-    "sentence_date" to conviction.courtAppearance.appearanceDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
+    "sentence_date" to conviction.courtAppearance.appearanceDate.format(DateUtils.notifyDateFormat),
     "offences" to mapOffences(conviction.offences!!),
     "order" to conviction.sentence!!.mapOrder(),
     "previousConvictions" to mapConvictionsToOffenceDescription(previousConvictions)
@@ -113,9 +113,9 @@ class EmailNotificationService(
         val mostRecentAppointment = appointments.maxByOrNull { it.contactStart }
         if (mostRecentAppointment != null) {
           return if (ChronoUnit.DAYS.between(sentenceStartDate.atStartOfDay(ZoneId.systemDefault()), mostRecentAppointment.contactStart) >= 0) {
-            "their initial appointment is scheduled for ${mostRecentAppointment.contactStart.format(DateTimeFormatter.ISO_LOCAL_DATE)}"
+            "their initial appointment is scheduled for ${mostRecentAppointment.contactStart.format(DateUtils.notifyDateFormat)}"
           } else {
-            "their initial appointment was scheduled for ${mostRecentAppointment.contactStart.format(DateTimeFormatter.ISO_LOCAL_DATE)}"
+            "their initial appointment was scheduled for ${mostRecentAppointment.contactStart.format(DateUtils.notifyDateFormat)}"
           }
         }
         return "no date found for the initial appointment, please check with your team"
