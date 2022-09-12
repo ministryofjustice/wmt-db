@@ -4,5 +4,5 @@ import java.time.format.DateTimeFormatter
 
 object DateUtils {
   @JvmStatic
-  val notifyDateFormat = DateTimeFormatter.ofPattern("dd MMMM yyyy")
+  val notifyDateFormat = DateTimeFormatter.ofPattern("d MMMM yyyy")
 }
