@@ -67,10 +67,8 @@ class TelemetryService(@Autowired private val telemetryClient: TelemetryClient) 
     trackEvent(
       TelemetryEventType.STAFF_GRADE_TIER_ALLOCATED,
       mapOf(
-        CRN to caseDetailsEntity?.crn,
         TEAM_CODE to teamCode,
         PROVIDER_CODE to staff.probationArea!!.code,
-        "staffCode" to staff.staffCode,
         "staffGrade" to staff.grade,
         "tier" to caseDetailsEntity?.tier?.name
       )

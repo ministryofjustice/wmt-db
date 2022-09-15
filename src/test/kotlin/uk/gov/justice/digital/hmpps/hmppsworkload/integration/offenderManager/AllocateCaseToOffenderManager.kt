@@ -339,10 +339,8 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       telemetryClient.trackEvent(
         TelemetryEventType.STAFF_GRADE_TIER_ALLOCATED.eventName,
         mapOf(
-          "crn" to crn,
           "teamCode" to teamCode,
           "providerCode" to "N01",
-          "staffCode" to staffCode,
           "staffGrade" to "PO",
           "tier" to caseDetailsEntity.tier.name,
         ),
@@ -372,10 +370,8 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       telemetryClient.trackEvent(
         TelemetryEventType.STAFF_GRADE_TIER_ALLOCATED.eventName,
         mapOf(
-          "crn" to null,
           "teamCode" to teamCode,
           "providerCode" to "N01",
-          "staffCode" to staffCode,
           "staffGrade" to "PO",
           "tier" to null,
         ),
