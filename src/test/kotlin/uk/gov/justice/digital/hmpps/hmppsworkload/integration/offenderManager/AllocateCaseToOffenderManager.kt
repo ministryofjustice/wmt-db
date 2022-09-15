@@ -186,7 +186,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     staffCodeResponse(staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveUnpaidRequirementResponse(crn, eventId)
-    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY))
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
       .bodyValue(allocateCase(crn, eventId))
@@ -240,7 +239,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     staffCodeResponse(staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveUnpaidRequirementResponse(crn, eventId)
-    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY))
     val otherPersonManager = PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1", isActive = true)
     staffCodeResponse(otherPersonManager.staffCode, otherPersonManager.teamCode)
     val storedPersonManager = personManagerRepository.save(otherPersonManager)
@@ -347,6 +345,39 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
           "staffCode" to staffCode,
           "staffGrade" to "PO",
           "tier" to caseDetailsEntity.tier.name,
+        ),
+        null
+      )
+    }
+  }
+
+  @Test
+  fun `must emit staff grade to tier allocation telemetry event without case details`() {
+    staffCodeResponse(staffCode, teamCode)
+    offenderSummaryResponse(crn)
+    singleActiveRequirementResponse(crn, eventId)
+
+    webTestClient.post()
+      .uri("/team/$teamCode/offenderManager/$staffCode/case")
+      .bodyValue(allocateCase(crn, eventId))
+      .headers {
+        it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
+        it.contentType = MediaType.APPLICATION_JSON
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+
+    verify(exactly = 1) {
+      telemetryClient.trackEvent(
+        TelemetryEventType.STAFF_GRADE_TIER_ALLOCATED.eventName,
+        mapOf(
+          "crn" to null,
+          "teamCode" to teamCode,
+          "providerCode" to "N01",
+          "staffCode" to staffCode,
+          "staffGrade" to "PO",
+          "tier" to null,
         ),
         null
       )

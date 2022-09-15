@@ -52,7 +52,7 @@ class DefaultSaveWorkloadService(
     if (personManagerSaveResult.hasChanged) {
       telemetryService.trackPersonManagerAllocated(personManagerSaveResult.entity)
       val caseDetails = caseDetailsRepository.findByIdOrNull(personManagerSaveResult.entity.crn)
-      telemetryService.trackStaffGradeToTierAllocated(caseDetails!!, staff, personManagerSaveResult.entity.teamCode)
+      telemetryService.trackStaffGradeToTierAllocated(caseDetails, staff, personManagerSaveResult.entity.teamCode)
       successUpdater.updatePerson(
         personManagerSaveResult.entity.crn,
         personManagerSaveResult.entity.uuid,
