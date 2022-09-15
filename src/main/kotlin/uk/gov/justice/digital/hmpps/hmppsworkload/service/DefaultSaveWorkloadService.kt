@@ -1,13 +1,16 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseAllocated
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.SaveResult
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RequirementManagerEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.SaveEventManagerService
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.SavePersonManagerService
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.SaveRequirementManagerService
@@ -21,6 +24,7 @@ class DefaultSaveWorkloadService(
   private val notificationService: NotificationService,
   private val telemetryService: TelemetryService,
   private val successUpdater: SuccessUpdater,
+  private val caseDetailsRepository: CaseDetailsRepository
 ) : SaveWorkloadService {
 
   override fun saveWorkload(
@@ -33,7 +37,7 @@ class DefaultSaveWorkloadService(
     val staff = communityApiClient.getStaffByCode(staffCode).block()!!
     val summary = communityApiClient.getSummaryByCrn(allocateCase.crn).block()!!
     val activeRequirements = communityApiClient.getActiveRequirements(allocateCase.crn, allocateCase.eventId).block()!!.requirements
-    val personManagerSaveResult = savePersonManagerService.savePersonManager(teamCode, staff, allocateCase, loggedInUser, summary).also { afterPersonManagerSaved(it) }
+    val personManagerSaveResult = savePersonManagerService.savePersonManager(teamCode, staff, allocateCase, loggedInUser, summary).also { afterPersonManagerSaved(it, staff) }
     val eventManagerSaveResult = saveEventManagerService.saveEventManager(teamCode, staff, allocateCase, loggedInUser).also { afterEventManagerSaved(it) }
     val requirementManagerSaveResults = saveRequirementManagerService.saveRequirementManagers(teamCode, staff, allocateCase, loggedInUser, activeRequirements).also { afterRequirementManagersSaved(it) }
     if (personManagerSaveResult.hasChanged || eventManagerSaveResult.hasChanged || requirementManagerSaveResults.any { it.hasChanged }) {
@@ -44,9 +48,11 @@ class DefaultSaveWorkloadService(
     return CaseAllocated(personManagerSaveResult.entity.uuid, eventManagerSaveResult.entity.uuid, requirementManagerSaveResults.map { it.entity.uuid })
   }
 
-  private fun afterPersonManagerSaved(personManagerSaveResult: SaveResult<PersonManagerEntity>) {
+  private fun afterPersonManagerSaved(personManagerSaveResult: SaveResult<PersonManagerEntity>, staff: Staff) {
     if (personManagerSaveResult.hasChanged) {
       telemetryService.trackPersonManagerAllocated(personManagerSaveResult.entity)
+      val caseDetails = caseDetailsRepository.findByIdOrNull(personManagerSaveResult.entity.crn)
+      telemetryService.trackStaffGradeToTierAllocated(caseDetails, staff, personManagerSaveResult.entity.teamCode)
       successUpdater.updatePerson(
         personManagerSaveResult.entity.crn,
         personManagerSaveResult.entity.uuid,

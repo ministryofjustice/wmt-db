@@ -26,6 +26,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RequirementManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadCalculationEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.NotificationService
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.TelemetryEventType
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.TelemetryEventType.PERSON_MANAGER_ALLOCATED
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.getWmtPeriod
 import uk.gov.service.notify.SendEmailResponse
@@ -185,7 +186,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     staffCodeResponse(staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveUnpaidRequirementResponse(crn, eventId)
-
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
       .bodyValue(allocateCase(crn, eventId))
@@ -314,5 +314,69 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .isOk
 
     verify(exactly = 1) { notificationService.notifyAllocation(any(), any(), any(), any(), any(), any()) }
+  }
+
+  @Test
+  fun `must emit staff grade to tier allocation telemetry event`() {
+    staffCodeResponse(staffCode, teamCode)
+    offenderSummaryResponse(crn)
+    singleActiveRequirementResponse(crn, eventId)
+
+    val caseDetailsEntity = CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY)
+    caseDetailsRepository.save(caseDetailsEntity)
+    webTestClient.post()
+      .uri("/team/$teamCode/offenderManager/$staffCode/case")
+      .bodyValue(allocateCase(crn, eventId))
+      .headers {
+        it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
+        it.contentType = MediaType.APPLICATION_JSON
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+
+    verify(exactly = 1) {
+      telemetryClient.trackEvent(
+        TelemetryEventType.STAFF_GRADE_TIER_ALLOCATED.eventName,
+        mapOf(
+          "teamCode" to teamCode,
+          "providerCode" to "N01",
+          "staffGrade" to "PO",
+          "tier" to caseDetailsEntity.tier.name,
+        ),
+        null
+      )
+    }
+  }
+
+  @Test
+  fun `must emit staff grade to tier allocation telemetry event without case details`() {
+    staffCodeResponse(staffCode, teamCode)
+    offenderSummaryResponse(crn)
+    singleActiveRequirementResponse(crn, eventId)
+
+    webTestClient.post()
+      .uri("/team/$teamCode/offenderManager/$staffCode/case")
+      .bodyValue(allocateCase(crn, eventId))
+      .headers {
+        it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
+        it.contentType = MediaType.APPLICATION_JSON
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+
+    verify(exactly = 1) {
+      telemetryClient.trackEvent(
+        TelemetryEventType.STAFF_GRADE_TIER_ALLOCATED.eventName,
+        mapOf(
+          "teamCode" to teamCode,
+          "providerCode" to "N01",
+          "staffGrade" to "PO",
+          "tier" to null,
+        ),
+        null
+      )
+    }
   }
 }
