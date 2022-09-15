@@ -26,6 +26,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RequirementManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadCalculationEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.NotificationService
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.TelemetryEventType
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.TelemetryEventType.PERSON_MANAGER_ALLOCATED
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.getWmtPeriod
 import uk.gov.service.notify.SendEmailResponse
@@ -185,7 +186,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     staffCodeResponse(staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveUnpaidRequirementResponse(crn, eventId)
-
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY))
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
       .bodyValue(allocateCase(crn, eventId))
@@ -239,6 +240,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     staffCodeResponse(staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveUnpaidRequirementResponse(crn, eventId)
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY))
     val otherPersonManager = PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1", isActive = true)
     staffCodeResponse(otherPersonManager.staffCode, otherPersonManager.teamCode)
     val storedPersonManager = personManagerRepository.save(otherPersonManager)
@@ -314,5 +316,40 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .isOk
 
     verify(exactly = 1) { notificationService.notifyAllocation(any(), any(), any(), any(), any(), any()) }
+  }
+
+  @Test
+  fun `must emit staff grade to tier allocation telemetry event`() {
+    staffCodeResponse(staffCode, teamCode)
+    offenderSummaryResponse(crn)
+    singleActiveRequirementResponse(crn, eventId)
+
+    val caseDetailsEntity = CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY)
+    caseDetailsRepository.save(caseDetailsEntity)
+    webTestClient.post()
+      .uri("/team/$teamCode/offenderManager/$staffCode/case")
+      .bodyValue(allocateCase(crn, eventId))
+      .headers {
+        it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
+        it.contentType = MediaType.APPLICATION_JSON
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+
+    verify(exactly = 1) {
+      telemetryClient.trackEvent(
+        TelemetryEventType.STAFF_GRADE_TIER_ALLOCATED.eventName,
+        mapOf(
+          "crn" to crn,
+          "teamCode" to teamCode,
+          "providerCode" to "N01",
+          "staffCode" to staffCode,
+          "staffGrade" to "PO",
+          "tier" to caseDetailsEntity.tier.name,
+        ),
+        null
+      )
+    }
   }
 }
