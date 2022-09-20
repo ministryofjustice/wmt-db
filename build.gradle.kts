@@ -14,7 +14,7 @@ allOpen {
   annotations("javax.persistence.Entity")
 }
 
-val springDocVersion by extra("1.6.7")
+val springDocVersion by extra("1.6.11")
 
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -29,8 +29,6 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("uk.gov.service.notify:notifications-java-client:3.17.3-RELEASE")
   implementation("com.vladmihalcea:hibernate-types-52:2.19.2")
-
-  implementation("com.opencsv:opencsv:5.7.0")
 
   runtimeOnly("com.zaxxer:HikariCP")
   runtimeOnly("org.flywaydb:flyway-core")
