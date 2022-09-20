@@ -23,7 +23,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 
-class OffenderEventListenerTests : IntegrationTestBase() {
+class SentenceChangedEventListenerTests : IntegrationTestBase() {
 
   @Test
   fun `case type is unknown if there is no sentence`() {

@@ -224,7 +224,7 @@ abstract class IntegrationTestBase {
     hmppsOffenderSqsDlqClient.getQueueAttributes(hmppsOffenderQueue.dlqUrl, listOf("ApproximateNumberOfMessages"))
       .let { it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0 }
 
-  protected fun offenderEvent(crn: String, sentenceId: BigInteger) = HmppsOffenderEvent(crn, sentenceId)
+  protected fun offenderEvent(crn: String, sentenceId: BigInteger? = null) = HmppsOffenderEvent(crn, sentenceId)
 
   protected fun jsonString(any: Any) = objectMapper.writeValueAsString(any) as String
 
