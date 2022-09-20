@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration
 import com.amazonaws.services.sqs.AmazonSQS
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model.PurgeQueueRequest
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.AfterAll
@@ -28,6 +29,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsAllocationMessage
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsAuditMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.communityApiAssessmentResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.convictionNoSentenceResponse
@@ -62,6 +64,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTInstitutiona
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTWorkloadOwnerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadCalculationRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.listener.HmppsOffenderEvent
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.AuditData
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
 import java.math.BigInteger
@@ -452,9 +455,23 @@ abstract class IntegrationTestBase {
   protected fun verifyAuditMessageOnQueue(): Boolean =
     hmppsAuditQueueClient.getQueueAttributes(hmppsAuditQueue.queueUrl, listOf("ApproximateNumberOfMessages"))
       .let { it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0 } == 1
+
+  protected fun getAuditMessages(): HmppsAuditMessage<AuditData> {
+    val message = hmppsAuditQueueClient.receiveMessage(hmppsAuditQueue.queueUrl)
+    return message.messages.map {
+      val sqsMessage = objectMapper.readValue(it.body, AuditSQSMessage::class.java)
+      val auditDataType = object : TypeReference<HmppsAuditMessage<AuditData>>() {}
+      objectMapper.readValue(sqsMessage.Message, auditDataType)
+    }.first()
+  }
 }
 
 data class SQSMessage(
   val Message: String,
   val MessageId: String
+)
+
+data class AuditSQSMessage(
+  @JsonProperty("Message")
+  val Message: String
 )

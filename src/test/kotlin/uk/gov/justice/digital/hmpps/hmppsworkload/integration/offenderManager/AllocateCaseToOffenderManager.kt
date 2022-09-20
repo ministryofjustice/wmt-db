@@ -25,6 +25,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RequirementManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadCalculationEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.AuditData
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.NotificationService
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.TelemetryEventType
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.TelemetryEventType.PERSON_MANAGER_ALLOCATED
@@ -60,6 +61,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     )
 
     every { telemetryClient.trackEvent(any(), any(), null) } returns Unit
+    every { telemetryClient.context.operation.id } returns "fakeId"
   }
 
   @Test
@@ -381,7 +383,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   }
 
   @Test
-  fun `can audit when allocating`() {
+  fun `can send audit data when allocating`() {
     staffCodeResponse(staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveRequirementResponse(crn, eventId)
@@ -398,5 +400,27 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .isOk
 
     await untilCallTo { verifyAuditMessageOnQueue() } matches { it == true }
+  }
+
+  @Test
+  fun `audit data contains required fields`() {
+    staffCodeResponse(staffCode, teamCode)
+    offenderSummaryResponse(crn)
+    singleActiveRequirementResponse(crn, eventId)
+
+    webTestClient.post()
+      .uri("/team/$teamCode/offenderManager/$staffCode/case")
+      .bodyValue(allocateCase(crn, eventId))
+      .headers {
+        it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
+        it.contentType = MediaType.APPLICATION_JSON
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+
+    await untilCallTo { verifyAuditMessageOnQueue() } matches { it == true }
+    val auditData = AuditData(crn, eventId, staffCode, teamCode)
+    Assertions.assertEquals(auditData, getAuditMessages().details)
   }
 }
