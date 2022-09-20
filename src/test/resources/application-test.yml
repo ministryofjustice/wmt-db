@@ -16,22 +16,26 @@ hmpps.sqs:
       secretAccessKey: foobar
       queueName: hmpps_workload_s3_extract_event_queue
       dlqName: hmpps_workload_s3_extract_event_dlq
+      dlqMaxReceiveCount: 1
     hmppsallocationcompletequeue:
       queueName: hmpps_allocation_complete_event_queue
       dlqName: hmpps_allocation_complete_event_dlq
       subscribeTopicId: hmmppsdomaintopic
       subscribeFilter: '{"eventType":[ "person.community.manager.allocated", "event.manager.allocated","requirement.manager.allocated"] }'
       asyncQueueClient: true
+      dlqMaxReceiveCount: 1
     hmppsoffenderqueue:
       queueName: hmpps_offender_event_queue
       dlqName: hmpps_offender_event_dlq
       subscribeTopicId: hmppsoffendertopic
       subscribeFilter: '{"eventType":[ "SENTENCE_CHANGED"] }'
+      dlqMaxReceiveCount: 1
     tiercalcqueue:
       queueName: tier_calc_event_queue
       dlqName: tier_calc_event_dlq
       subscribeTopicId: hmmppsdomaintopic
       subscribeFilter: '{"eventType":[ "TIER_CALCULATION_COMPLETE"] }'
+      dlqMaxReceiveCount: 1
   topics:
     hmmppsdomaintopic:
       arn: arn:aws:sns:eu-west-2:000000000000:${random.uuid}
