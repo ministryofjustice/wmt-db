@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsAllocationMessage
@@ -350,6 +351,15 @@ abstract class IntegrationTestBase {
 
     communityApi.`when`(summaryRequest, Times.exactly(1)).respond(
       response().withContentType(APPLICATION_JSON).withBody(offenderSummaryResponse())
+    )
+  }
+
+  protected fun forbiddenOffenderSummaryResponse(crn: String) {
+    val summaryRequest =
+      request().withPath("/offenders/crn/$crn")
+
+    communityApi.`when`(summaryRequest, Times.exactly(1)).respond(
+      response().withContentType(APPLICATION_JSON).withStatusCode(HttpStatus.FORBIDDEN.value())
     )
   }
 

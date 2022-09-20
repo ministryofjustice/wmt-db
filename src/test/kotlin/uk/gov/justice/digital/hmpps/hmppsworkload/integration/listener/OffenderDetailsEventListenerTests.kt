@@ -39,4 +39,28 @@ class OffenderDetailsEventListenerTests : IntegrationTestBase() {
     Assertions.assertEquals("Jane", caseDetail.firstName)
     Assertions.assertEquals("Doe", caseDetail.surname)
   }
+
+  @Test
+  fun `must save forbidden offender summary as restricted access`() {
+    val crn = "J678910"
+    singleActiveConvictionResponseForAllConvictions(crn)
+    singleActiveConvictionResponse(crn)
+    forbiddenOffenderSummaryResponse(crn)
+    tierCalculationResponse(crn)
+
+    hmppsOffenderSnsClient.publish(
+      PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("OFFENDER_DETAILS_CHANGED"))
+      )
+    )
+
+    await untilCallTo {
+      caseDetailsRepository.count()
+    } matches { it!! > 0 }
+
+    val caseDetail = caseDetailsRepository.findAll().first()
+
+    Assertions.assertEquals("Restricted", caseDetail.firstName)
+    Assertions.assertEquals("Access", caseDetail.surname)
+  }
 }
