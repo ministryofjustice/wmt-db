@@ -27,7 +27,7 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
     val teamCode = "T1"
 
     val realtimeCase = Case(Tier.A1, CaseType.LICENSE, false, "CRN1111")
-    caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, CaseType.LICENSE))
+    caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, CaseType.LICENSE, "Jane", "Doe"))
 
     val actualCases = getCaseLoad.getCases(staffCode, teamCode)
 
@@ -58,7 +58,7 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
     )
 
     // realtime
-    caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, CaseType.LICENSE))
+    caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, CaseType.LICENSE, "Jane", "Doe"))
 
     val actualCases = getCaseLoad.getCases(staffCode, teamCode)
 
@@ -72,7 +72,7 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
     val teamCode = "T1"
 
     val realtimeCase = Case(Tier.A1, CaseType.LICENSE, false, "CRN1111")
-    caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, CaseType.LICENSE))
+    caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, CaseType.LICENSE, "Jane", "Doe"))
 
     personManagerRepository.save(
       PersonManagerEntity(
@@ -94,7 +94,7 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
     val newStaffCode = "STAFF2"
 
     val realtimeCase = Case(Tier.A1, CaseType.LICENSE, false, "CRN9191")
-    caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, CaseType.LICENSE))
+    caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, CaseType.LICENSE, "Jane", "Doe"))
 
     personManagerRepository.save(
       PersonManagerEntity(

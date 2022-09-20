@@ -25,4 +25,10 @@ data class CaseDetailsEntity(
   @Enumerated(EnumType.STRING)
   var type: CaseType,
 
+  @Column
+  var firstName: String,
+
+  @Column
+  var surname: String,
+
 )

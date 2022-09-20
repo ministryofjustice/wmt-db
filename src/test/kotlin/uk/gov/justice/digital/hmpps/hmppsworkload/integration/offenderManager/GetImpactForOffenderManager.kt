@@ -16,7 +16,7 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
     val staffCode = "OM1"
     val teamCode = "T1"
     staffCodeResponse(staffCode, teamCode)
-    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY))
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Jane", "Doe"))
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/impact")
@@ -50,7 +50,7 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
     val staffCode = "OM1"
     val teamCode = "T1"
     staffCodeResponse(staffCode, teamCode)
-    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY))
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Jane", "Doe"))
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/impact")
       .bodyValue(impactCase(crn))
@@ -83,7 +83,7 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
     val staffCode = "NOWORKLOAD1"
     val teamCode = "T1"
     staffCodeResponse(staffCode, teamCode)
-    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY))
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Jane", "Doe"))
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/impact")
       .bodyValue(impactCase(crn))
@@ -115,7 +115,7 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
     val staffCode = "NOWORKLOAD1"
     val teamCode = "T1"
     staffCodeResponse(staffCode, teamCode, "UNKNOWNGRADECODE")
-    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY))
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Jane", "Doe"))
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/impact")
       .bodyValue(impactCase(crn))

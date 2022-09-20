@@ -35,7 +35,7 @@ class SendEmail : IntegrationTestBase() {
     riskSummaryErrorResponse(crn)
     riskPredictorResponse(crn)
     assessmentCommunityApiResponse(crn)
-    caseDetailsRepository.save(CaseDetailsEntity(crn, B3, COMMUNITY))
+    caseDetailsRepository.save(CaseDetailsEntity(crn, B3, COMMUNITY, "Jane", "Doe"))
     val emailSendResponse = emailNotificationService.notifyAllocation(
       allocatedOfficer,
       personSummary,

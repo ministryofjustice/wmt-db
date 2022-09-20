@@ -77,7 +77,7 @@ class EmailNotificationServiceTests {
     every { assessRisksNeedsApiClient.getRiskPredictors(any(), any()) } returns Mono.just(emptyList())
     every { communityApiClient.getAssessment(any()) } returns Mono.just(Optional.empty())
     every { notificationClient.sendEmail(any(), any(), any(), any()) } returns SendEmailResponse(emailResponse())
-    every { hmppsCaseDetailsRepo.findByIdOrNull(any()) } returns CaseDetailsEntity("", Tier.B3, CaseType.CUSTODY)
+    every { hmppsCaseDetailsRepo.findByIdOrNull(any()) } returns CaseDetailsEntity("", Tier.B3, CaseType.CUSTODY, "Jane", "Doe")
   }
 
   @Test
@@ -217,7 +217,7 @@ class EmailNotificationServiceTests {
 
     val token = "token"
 
-    every { hmppsCaseDetailsRepo.findByIdOrNull(any()) } returns CaseDetailsEntity("", Tier.B3, CaseType.COMMUNITY)
+    every { hmppsCaseDetailsRepo.findByIdOrNull(any()) } returns CaseDetailsEntity("", Tier.B3, CaseType.COMMUNITY, "Jane", "Doe")
     val appointment = Contact(ZonedDateTime.now().plusDays(5L))
     every { communityApiClient.getInductionContacts(any(), any()) } returns Mono.just(listOf(appointment))
 
@@ -251,7 +251,7 @@ class EmailNotificationServiceTests {
 
     val token = "token"
 
-    every { hmppsCaseDetailsRepo.findByIdOrNull(any()) } returns CaseDetailsEntity("", Tier.B3, CaseType.COMMUNITY)
+    every { hmppsCaseDetailsRepo.findByIdOrNull(any()) } returns CaseDetailsEntity("", Tier.B3, CaseType.COMMUNITY, "Jane", "Doe")
     val appointment = Contact(ZonedDateTime.now().minusDays(5L))
     every { communityApiClient.getInductionContacts(any(), any()) } returns Mono.just(listOf(appointment))
 
@@ -285,7 +285,7 @@ class EmailNotificationServiceTests {
 
     val token = "token"
 
-    every { hmppsCaseDetailsRepo.findByIdOrNull(any()) } returns CaseDetailsEntity("", Tier.B3, CaseType.COMMUNITY)
+    every { hmppsCaseDetailsRepo.findByIdOrNull(any()) } returns CaseDetailsEntity("", Tier.B3, CaseType.COMMUNITY, "Jane", "Doe")
 
     every { communityApiClient.getInductionContacts(any(), any()) } returns Mono.just(emptyList())
 
