@@ -379,4 +379,24 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       )
     }
   }
+
+  @Test
+  fun `can audit when allocating`() {
+    staffCodeResponse(staffCode, teamCode)
+    offenderSummaryResponse(crn)
+    singleActiveRequirementResponse(crn, eventId)
+
+    webTestClient.post()
+      .uri("/team/$teamCode/offenderManager/$staffCode/case")
+      .bodyValue(allocateCase(crn, eventId))
+      .headers {
+        it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
+        it.contentType = MediaType.APPLICATION_JSON
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+
+    await untilCallTo { verifyAuditMessageOnQueue() } matches { it == true }
+  }
 }

@@ -32,6 +32,11 @@ hmpps.sqs:
       dlqName: tier_calc_event_dlq
       subscribeTopicId: hmmppsdomaintopic
       subscribeFilter: '{"eventType":[ "TIER_CALCULATION_COMPLETE"] }'
+    hmppsauditqueue:
+      accessKeyId: foobar
+      secretAccessKey: foobar
+      queueName: hmpps_workload_audit_queue
+      asyncQueueClient: true
   topics:
     hmmppsdomaintopic:
       arn: arn:aws:sns:eu-west-2:000000000000:${random.uuid}
