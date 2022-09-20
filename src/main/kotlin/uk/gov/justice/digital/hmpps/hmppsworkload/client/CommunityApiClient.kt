@@ -94,7 +94,17 @@ class CommunityApiClient(private val webClient: WebClient) {
       .get()
       .uri("/offenders/crn/$crn")
       .retrieve()
+      .onStatus(
+        { httpStatus -> HttpStatus.FORBIDDEN == httpStatus },
+        { Mono.error(ForbiddenOffenderError("Unable to access offender details for $crn")) }
+      )
       .bodyToMono(PersonSummary::class.java)
+      .onErrorResume { ex ->
+        when (ex) {
+          is ForbiddenOffenderError -> Mono.just(PersonSummary("Restricted", "Access"))
+          else -> Mono.error(ex)
+        }
+      }
   }
 
   fun getActiveRequirements(crn: String, convictionId: BigInteger): Mono<ConvictionRequirements> {
@@ -143,3 +153,5 @@ class CommunityApiClient(private val webClient: WebClient) {
 class MissingTeamError(msg: String) : RuntimeException(msg)
 class MissingStaffError(msg: String) : RuntimeException(msg)
 private class MissingOffenderAssessmentError(msg: String) : RuntimeException(msg)
+
+private class ForbiddenOffenderError(msg: String) : RuntimeException(msg)
