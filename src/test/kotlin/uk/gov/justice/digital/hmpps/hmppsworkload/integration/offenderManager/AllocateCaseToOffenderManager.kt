@@ -403,7 +403,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   }
 
   @Test
-  fun `audit data contains required fields`() {
+  fun `audit data contain required fields`() {
     staffCodeResponse(staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveRequirementResponse(crn, eventId)
