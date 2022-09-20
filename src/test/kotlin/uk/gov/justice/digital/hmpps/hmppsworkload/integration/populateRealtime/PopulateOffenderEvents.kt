@@ -28,6 +28,7 @@ class PopulateOffenderEvents : IntegrationTestBase() {
     singleActiveConvictionResponse(crn)
     singleActiveConvictionResponseForAllConvictions(crn)
     singleActiveConvictionResponse(crn)
+    offenderSummaryResponse(crn)
     tierCalculationResponse(crn)
     val cases = listOf(CaseCsv(crn))
     val csvFile = generateCsv(cases)

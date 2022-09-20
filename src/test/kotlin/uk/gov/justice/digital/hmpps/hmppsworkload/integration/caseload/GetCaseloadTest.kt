@@ -43,7 +43,7 @@ class GetCaseloadTest : IntegrationTestBase() {
       )
     )
 
-    caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, realtimeCase.type))
+    caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, realtimeCase.type, "Jane", "Doe"))
 
     val actualCases = getCaseLoad.getCases(staffCode, teamCode)
 

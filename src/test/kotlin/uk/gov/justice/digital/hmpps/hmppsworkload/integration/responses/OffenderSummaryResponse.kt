@@ -3,12 +3,12 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses
 fun offenderSummaryResponse() = """
   {
       "offenderId": 9999999999,
-      "firstName": "Tester",
+      "firstName": "Jane",
       "middleNames": [
           "hi",
           "hi"
       ],
-      "surname": "TestSurname",
+      "surname": "Doe",
       "dateOfBirth": "2001-11-17",
       "gender": "Male",
       "otherIds": {
