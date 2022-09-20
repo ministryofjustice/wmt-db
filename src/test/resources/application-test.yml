@@ -28,7 +28,7 @@ hmpps.sqs:
       queueName: hmpps_offender_event_queue
       dlqName: hmpps_offender_event_dlq
       subscribeTopicId: hmppsoffendertopic
-      subscribeFilter: '{"eventType":[ "SENTENCE_CHANGED"] }'
+      subscribeFilter: '{"eventType":[ "SENTENCE_CHANGED", "OFFENDER_DETAILS_CHANGED"] }'
       dlqMaxReceiveCount: 1
     tiercalcqueue:
       queueName: tier_calc_event_queue

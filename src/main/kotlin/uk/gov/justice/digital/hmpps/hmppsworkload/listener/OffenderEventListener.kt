@@ -21,7 +21,9 @@ class OffenderEventListener(
   fun processMessage(rawMessage: String) {
     val (crn, sourceId) = getCase(rawMessage)
     log.info("received offender event for crn: {}", crn)
-    saveSentenceService.saveSentence(crn, sourceId)
+    sourceId?.run {
+      saveSentenceService.saveSentence(crn, this)
+    }
     saveCaseDetailsService.save(crn)
   }
 
@@ -43,7 +45,7 @@ class OffenderEventListener(
 
 data class HmppsOffenderEvent(
   val crn: String,
-  val sourceId: BigInteger
+  val sourceId: BigInteger?
 )
 
 data class SQSMessage(
