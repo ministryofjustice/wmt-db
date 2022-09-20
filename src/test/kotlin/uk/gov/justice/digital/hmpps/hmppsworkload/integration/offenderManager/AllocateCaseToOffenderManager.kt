@@ -70,7 +70,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     offenderSummaryResponse(crn)
     singleActiveRequirementResponse(crn, eventId)
 
-    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY))
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY, "Jane", "Doe"))
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
@@ -128,7 +128,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     val requirementId = BigInteger.valueOf(75315091L)
     singleActiveRequirementResponse(crn, eventId, requirementId)
     every { notificationService.notifyAllocation(any(), any(), any(), any(), any(), any()) } returns Mono.error(RuntimeException("An exception"))
-    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY))
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY, "Jane", "Doe"))
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
@@ -160,7 +160,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     offenderSummaryResponse(crn)
     singleActiveRequirementNoLengthResponse(crn, eventId)
 
-    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY))
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY, "Jane", "Doe"))
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
@@ -291,7 +291,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     singleActiveRequirementResponse(crn, eventId)
     singleActiveRequirementResponse(crn, eventId)
 
-    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY))
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY, "Jane", "Doe"))
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
@@ -324,7 +324,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     offenderSummaryResponse(crn)
     singleActiveRequirementResponse(crn, eventId)
 
-    val caseDetailsEntity = CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY)
+    val caseDetailsEntity = CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY, "Jane", "Doe")
     caseDetailsRepository.save(caseDetailsEntity)
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")

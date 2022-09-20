@@ -26,10 +26,11 @@ class SaveCaseDetailsService(
 
   fun save(crn: String) {
     val convictions = communityApiClient.getActiveConvictions(crn).block()!!
+    val personSummary = communityApiClient.getSummaryByCrn(crn).block()!!
     caseTypeMapper.getCaseType(convictions).takeUnless { it == CaseType.UNKNOWN }?.let { caseType ->
       hmppsTierApiClient.getTierByCrn(crn).map {
         val tier = Tier.valueOf(it)
-        CaseDetailsEntity(crn, tier, caseType)
+        CaseDetailsEntity(crn, tier, caseType, personSummary.firstName, personSummary.surname)
       }.block()?.let {
         caseDetailsRepository.save(it)
         val staff: PersonManager? = getPersonManager.findLatestByCrn(crn)

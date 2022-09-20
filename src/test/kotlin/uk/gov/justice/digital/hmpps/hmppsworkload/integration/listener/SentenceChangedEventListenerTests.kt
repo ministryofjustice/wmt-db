@@ -23,7 +23,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 
-class OffenderEventListenerTests : IntegrationTestBase() {
+class SentenceChangedEventListenerTests : IntegrationTestBase() {
 
   @Test
   fun `case type is unknown if there is no sentence`() {
@@ -31,6 +31,7 @@ class OffenderEventListenerTests : IntegrationTestBase() {
     val sentenceId = BigInteger.valueOf(2500278160L)
     singleActiveConvictionResponseForAllConvictions(crn)
     convictionWithNoSentenceResponse(crn)
+    offenderSummaryResponse(crn)
     tierCalculationResponse(crn)
     hmppsOffenderSnsClient.publish(
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn, sentenceId))).withMessageAttributes(
@@ -52,6 +53,7 @@ class OffenderEventListenerTests : IntegrationTestBase() {
     val sentenceId = BigInteger.valueOf(2500278160L)
     singleActiveConvictionResponseForAllConvictions(crn)
     singleActiveConvictionResponse(crn)
+    offenderSummaryResponse(crn)
     tierCalculationNotFoundResponse(crn)
     hmppsOffenderSnsClient.publish(
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn, sentenceId))).withMessageAttributes(
@@ -77,7 +79,7 @@ class OffenderEventListenerTests : IntegrationTestBase() {
     singleActiveConvictionResponseForAllConvictions(crn)
     singleActiveConvictionResponse(crn)
     tierCalculationResponse(crn)
-
+    offenderSummaryResponse(crn)
     staffCodeResponse(staffCode, teamCode)
     personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "offender", createdBy = "createdby", providerCode = "providerCode", isActive = true))
 
@@ -96,6 +98,8 @@ class OffenderEventListenerTests : IntegrationTestBase() {
     Assertions.assertEquals(crn, caseDetail.crn)
     Assertions.assertEquals(CaseType.CUSTODY, caseDetail.type)
     Assertions.assertEquals(Tier.B3, caseDetail.tier)
+    Assertions.assertEquals("Jane", caseDetail.firstName)
+    Assertions.assertEquals("Doe", caseDetail.surname)
   }
 
   @Test
@@ -107,10 +111,12 @@ class OffenderEventListenerTests : IntegrationTestBase() {
     val staffId = BigInteger.ONE
     singleActiveConvictionResponseForAllConvictions(crn)
     singleActiveConvictionResponse(crn)
+    offenderSummaryResponse(crn)
     tierCalculationResponse(crn)
 
     singleActiveConvictionResponseForAllConvictions(crn)
     singleActiveConvictionResponse(crn)
+    offenderSummaryResponse(crn)
     tierCalculationResponse(crn, Tier.C3.name)
 
     personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "offender", createdBy = "createdby", providerCode = "providerCode", isActive = true))
@@ -140,6 +146,7 @@ class OffenderEventListenerTests : IntegrationTestBase() {
     val crn = "J678910"
     val sentenceId = BigInteger.valueOf(2500278160L)
     singleInactiveConvictionsResponse(crn)
+    offenderSummaryResponse(crn)
     noConvictionsResponse(crn)
 
     val sentenceChangedEvent =
@@ -160,7 +167,7 @@ class OffenderEventListenerTests : IntegrationTestBase() {
   @Test
   fun `case details deleted if no active convictions exist`() {
     val crn = "J678910"
-    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.C1, CaseType.COMMUNITY))
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.C1, CaseType.COMMUNITY, "Jane", "Doe"))
 
     val personManagerEntity = personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "STFFCDE", teamCode = "TM1", offenderName = "Name", createdBy = "USER1", providerCode = "PV1", isActive = true))
     val eventManagerEntity = eventManagerRepository.save(EventManagerEntity(crn = crn, eventId = BigInteger.TEN, staffId = BigInteger.ONE, staffCode = "STFFCDE", teamCode = "TM1", createdBy = "USER1", providerCode = "PV1", isActive = true))
@@ -168,6 +175,7 @@ class OffenderEventListenerTests : IntegrationTestBase() {
 
     val sentenceId = BigInteger.valueOf(2500278160L)
     singleInactiveConvictionsResponse(crn)
+    offenderSummaryResponse(crn)
     noConvictionsResponse(crn)
 
     val sentenceChangedEvent =
@@ -220,6 +228,7 @@ class OffenderEventListenerTests : IntegrationTestBase() {
     val sentenceId = BigInteger.valueOf(2500278160L)
     singleInactiveConvictionsResponse(crn)
     singleActiveConvictionResponse(crn)
+    offenderSummaryResponse(crn)
     tierCalculationResponse(crn)
 
     hmppsOffenderSnsClient.publish(
@@ -241,6 +250,7 @@ class OffenderEventListenerTests : IntegrationTestBase() {
     val sentenceId = BigInteger.valueOf(2500278160L)
     singleInactiveConvictionsResponse(crn)
     singleActiveConvictionResponse(crn)
+    offenderSummaryResponse(crn)
     tierCalculationResponse(crn)
     val savedSentence = SentenceEntity(
       sentenceId, crn, LocalDate.of(2019, 11, 17).atStartOfDay(ZoneId.systemDefault()), LocalDate.of(2020, 5, 16).atStartOfDay(ZoneId.systemDefault()), "SC",
@@ -294,9 +304,10 @@ class OffenderEventListenerTests : IntegrationTestBase() {
     val staffId = BigInteger.ONE
     singleActiveConvictionResponseForAllConvictions(crn)
     singleActiveConvictionResponse(crn)
+    offenderSummaryResponse(crn)
     tierCalculationResponse(crn)
 
-    val caseDetailsEntity = CaseDetailsEntity(crn, Tier.C3, CaseType.COMMUNITY)
+    val caseDetailsEntity = CaseDetailsEntity(crn, Tier.C3, CaseType.COMMUNITY, "Jane", "Doe")
     staffCodeResponse(staffCode, teamCode)
     personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "offender", createdBy = "createdby", providerCode = "providerCode", isActive = true))
     caseDetailsRepository.save(caseDetailsEntity)
@@ -323,9 +334,10 @@ class OffenderEventListenerTests : IntegrationTestBase() {
     val sentenceId = BigInteger.valueOf(2500278160L)
     singleActiveConvictionResponseForAllConvictions(crn)
     singleActiveConvictionResponse(crn)
+    offenderSummaryResponse(crn)
     tierCalculationResponse(crn)
 
-    val caseDetailsEntity = CaseDetailsEntity(crn, Tier.C3, CaseType.COMMUNITY)
+    val caseDetailsEntity = CaseDetailsEntity(crn, Tier.C3, CaseType.COMMUNITY, "Jane", "Doe")
 
     caseDetailsRepository.save(caseDetailsEntity)
 

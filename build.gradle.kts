@@ -14,12 +14,12 @@ allOpen {
   annotations("javax.persistence.Entity")
 }
 
-val springDocVersion by extra("1.6.7")
+val springDocVersion by extra("1.6.11")
 
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:1.1.8")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:1.1.10")
 
   implementation("org.springdoc:springdoc-openapi-ui:$springDocVersion")
   implementation("org.springdoc:springdoc-openapi-kotlin:$springDocVersion")
@@ -29,8 +29,6 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("uk.gov.service.notify:notifications-java-client:3.17.3-RELEASE")
   implementation("com.vladmihalcea:hibernate-types-52:2.19.2")
-
-  implementation("com.opencsv:opencsv:5.7.0")
 
   runtimeOnly("com.zaxxer:HikariCP")
   runtimeOnly("org.flywaydb:flyway-core")

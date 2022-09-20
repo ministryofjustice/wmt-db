@@ -17,6 +17,7 @@ class TierCalculationEventListenerTest : IntegrationTestBase() {
   fun `saves updated tiers`() {
     val crn = "J678910"
     singleActiveConvictionResponse(crn)
+    offenderSummaryResponse(crn)
     tierCalculationResponse(crn)
     val calcEvent = "{\"crn\":\"J678910\",\"calculationId\":\"e45559d1-3460-4a0e-8281-c736de57c562\"}"
     hmppsDomainSnsClient.publish(
