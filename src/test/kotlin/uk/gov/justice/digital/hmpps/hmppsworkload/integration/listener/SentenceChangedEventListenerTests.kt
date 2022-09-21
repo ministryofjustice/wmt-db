@@ -7,6 +7,8 @@ import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 import org.springframework.data.repository.findByIdOrNull
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
@@ -39,12 +41,11 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
       )
     )
 
-    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
-    await untilCallTo { countMessagesOnOffenderEventDeadLetterQueue() } matches { it == 0 }
-
+    noMessagesOnOffenderEventsQueue()
+    noMessagesOnOffenderEventsDLQ()
     val caseCount = caseDetailsRepository.count()
 
-    Assertions.assertEquals(0, caseCount)
+    assertEquals(0, caseCount)
   }
 
   @Test
@@ -61,12 +62,11 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
       )
     )
 
-    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
-    await untilCallTo { countMessagesOnOffenderEventDeadLetterQueue() } matches { it == 0 }
-
+    noMessagesOnOffenderEventsQueue()
+    noMessagesOnOffenderEventsDLQ()
     val caseCount = caseDetailsRepository.count()
 
-    Assertions.assertEquals(0, caseCount)
+    assertEquals(0, caseCount)
   }
 
   @Test
@@ -95,11 +95,11 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
 
     val caseDetail = caseDetailsRepository.findAll().first()
 
-    Assertions.assertEquals(crn, caseDetail.crn)
-    Assertions.assertEquals(CaseType.CUSTODY, caseDetail.type)
-    Assertions.assertEquals(Tier.B3, caseDetail.tier)
-    Assertions.assertEquals("Jane", caseDetail.firstName)
-    Assertions.assertEquals("Doe", caseDetail.surname)
+    assertEquals(crn, caseDetail.crn)
+    assertEquals(CaseType.CUSTODY, caseDetail.type)
+    assertEquals(Tier.B3, caseDetail.tier)
+    assertEquals("Jane", caseDetail.firstName)
+    assertEquals("Doe", caseDetail.surname)
   }
 
   @Test
@@ -131,14 +131,14 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     hmppsOffenderSnsClient.publish(sentenceChangedEvent)
     hmppsOffenderSnsClient.publish(sentenceChangedEvent)
 
-    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+    noMessagesOnOffenderEventsQueue()
 
     val count = caseDetailsRepository.count()
 
-    Assertions.assertEquals(1, count)
+    assertEquals(1, count)
 
     val caseDetail = caseDetailsRepository.findByIdOrNull(crn)!!
-    Assertions.assertEquals(Tier.C3, caseDetail.tier)
+    assertEquals(Tier.C3, caseDetail.tier)
   }
 
   @Test
@@ -156,12 +156,10 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
 
     hmppsOffenderSnsClient.publish(sentenceChangedEvent)
 
-    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+    noMessagesOnOffenderEventsQueue()
+    noMessagesOnOffenderEventsDLQ()
 
-    Assertions.assertEquals(0, countMessagesOnOffenderEventDeadLetterQueue())
-    val count = caseDetailsRepository.count()
-
-    Assertions.assertEquals(0, count)
+    assertEquals(0, caseDetailsRepository.count())
   }
 
   @Test
@@ -185,15 +183,15 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
 
     hmppsOffenderSnsClient.publish(sentenceChangedEvent)
 
-    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+    noMessagesOnOffenderEventsQueue()
+    noMessagesOnOffenderEventsDLQ()
 
-    Assertions.assertEquals(0, countMessagesOnOffenderEventDeadLetterQueue())
     val count = caseDetailsRepository.count()
 
-    Assertions.assertEquals(0, count)
-    Assertions.assertFalse(personManagerRepository.findByIdOrNull(personManagerEntity.id!!)!!.isActive)
-    Assertions.assertFalse(eventManagerRepository.findByIdOrNull(eventManagerEntity.id!!)!!.isActive)
-    Assertions.assertFalse(requirementManagerRepository.findByIdOrNull(requirementManagerEntity.id!!)!!.isActive)
+    assertEquals(0, count)
+    assertFalse(personManagerRepository.findByIdOrNull(personManagerEntity.id!!)!!.isActive)
+    assertFalse(eventManagerRepository.findByIdOrNull(eventManagerEntity.id!!)!!.isActive)
+    assertFalse(requirementManagerRepository.findByIdOrNull(requirementManagerEntity.id!!)!!.isActive)
   }
 
   @Test
@@ -214,12 +212,12 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
 
     val sentence = sentenceRepository.findAll().first()
 
-    Assertions.assertEquals(sentenceId, sentence.sentenceId)
-    Assertions.assertEquals(crn, sentence.crn)
-    Assertions.assertEquals(LocalDate.of(2019, 11, 17).atStartOfDay(ZoneId.systemDefault()), sentence.startDate)
-    Assertions.assertEquals(LocalDate.of(2020, 5, 16).atStartOfDay(ZoneId.systemDefault()), sentence.expectedEndDate)
-    Assertions.assertEquals("SC", sentence.sentenceTypeCode)
-    Assertions.assertEquals(LocalDate.of(2020, 6, 23).atStartOfDay(ZoneId.systemDefault()), sentence.expectedReleaseDate)
+    assertEquals(sentenceId, sentence.sentenceId)
+    assertEquals(crn, sentence.crn)
+    assertEquals(LocalDate.of(2019, 11, 17).atStartOfDay(ZoneId.systemDefault()), sentence.startDate)
+    assertEquals(LocalDate.of(2020, 5, 16).atStartOfDay(ZoneId.systemDefault()), sentence.expectedEndDate)
+    assertEquals("SC", sentence.sentenceTypeCode)
+    assertEquals(LocalDate.of(2020, 6, 23).atStartOfDay(ZoneId.systemDefault()), sentence.expectedReleaseDate)
   }
 
   @Test
@@ -237,10 +235,9 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
       )
     )
 
-    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+    noMessagesOnOffenderEventsQueue()
 
-    Assertions.assertEquals(0, countMessagesOnOffenderEventDeadLetterQueue())
-
+    noMessagesOnOffenderEventsDLQ()
     Assertions.assertNull(sentenceRepository.findBySentenceId(sentenceId))
   }
 
@@ -264,10 +261,8 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
       )
     )
 
-    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
-
-    Assertions.assertEquals(0, countMessagesOnOffenderEventDeadLetterQueue())
-
+    noMessagesOnOffenderEventsQueue()
+    noMessagesOnOffenderEventsDLQ()
     Assertions.assertNull(sentenceRepository.findBySentenceId(sentenceId))
   }
 
@@ -290,7 +285,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
       )
     )
 
-    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+    noMessagesOnOffenderEventsQueue()
 
     assertThat(sentenceRepository.count()).isEqualTo(1)
   }
@@ -318,7 +313,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
       )
     )
 
-    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+    noMessagesOnOffenderEventsQueue()
 
     assertThat(caseDetailsRepository.count()).isEqualTo(1)
     assertThat(caseDetailsRepository.findByIdOrNull(crn)?.tier).isEqualTo(Tier.B3)
@@ -350,15 +345,15 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
       )
     )
 
-    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+    noMessagesOnOffenderEventsQueue()
 
     val actualWorkloadCalcEntity: WorkloadCalculationEntity? =
       workloadCalculationRepository.findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)
 
     Assertions.assertAll(
-      { Assertions.assertEquals(staffCode, actualWorkloadCalcEntity?.staffCode) },
-      { Assertions.assertEquals(teamCode, actualWorkloadCalcEntity?.teamCode) },
-      { Assertions.assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity?.calculatedDate?.dayOfMonth) }
+      { assertEquals(staffCode, actualWorkloadCalcEntity?.staffCode) },
+      { assertEquals(teamCode, actualWorkloadCalcEntity?.teamCode) },
+      { assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity?.calculatedDate?.dayOfMonth) }
     )
   }
 }

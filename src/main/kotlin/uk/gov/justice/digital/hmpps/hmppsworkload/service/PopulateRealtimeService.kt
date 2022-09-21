@@ -26,7 +26,7 @@ class PopulateRealtimeService(
 
   @Async
   fun populateEventsFromCaseDetails() {
-    caseDetailsRepository.findAll().forEach { caseDetailsEntity ->
+    caseDetailsRepository.findByFirstName("").forEach { caseDetailsEntity ->
       publishToHmppsOffenderQueue(caseDetailsEntity.crn)
     }
   }
