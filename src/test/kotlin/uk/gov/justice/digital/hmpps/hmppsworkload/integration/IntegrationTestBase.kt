@@ -19,7 +19,7 @@ import org.mockserver.matchers.Times
 import org.mockserver.model.HttpRequest.request
 import org.mockserver.model.HttpResponse
 import org.mockserver.model.HttpResponse.response
-import org.mockserver.model.HttpStatusCode
+import org.mockserver.model.HttpStatusCode.INTERNAL_SERVER_ERROR_500
 import org.mockserver.model.MediaType.APPLICATION_JSON
 import org.mockserver.model.Parameter
 import org.slf4j.event.Level
@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsAllocationMessage
@@ -227,7 +227,10 @@ abstract class IntegrationTestBase {
     hmppsOffenderSqsClient.getQueueAttributes(hmppsOffenderQueue.queueUrl, listOf("ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible"))
       .let { (it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0) }
 
-  protected fun countMessagesOnOffenderEventDeadLetterQueue(): Int =
+  protected fun noMessagesOnOffenderEventsDLQ() {
+    await untilCallTo { countMessagesOnOffenderEventDeadLetterQueue() } matches { it == 0 }
+  }
+  private fun countMessagesOnOffenderEventDeadLetterQueue(): Int =
     hmppsOffenderSqsDlqClient.getQueueAttributes(hmppsOffenderQueue.dlqUrl, listOf("ApproximateNumberOfMessages"))
       .let { it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0 }
 
@@ -283,7 +286,7 @@ abstract class IntegrationTestBase {
   protected fun riskSummaryErrorResponse(crn: String) {
     val request = request().withPath("/risks/crn/$crn/summary")
     assessRisksNeedsApi.`when`(request, Times.exactly(1)).respond(
-      response().withStatusCode(HttpStatusCode.INTERNAL_SERVER_ERROR_500.code()).withContentType(
+      response().withStatusCode(INTERNAL_SERVER_ERROR_500.code()).withContentType(
         APPLICATION_JSON
       ).withBody("{}")
     )
@@ -365,7 +368,7 @@ abstract class IntegrationTestBase {
       request().withPath("/offenders/crn/$crn")
 
     communityApi.`when`(summaryRequest, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withStatusCode(HttpStatus.FORBIDDEN.value())
+      response().withContentType(APPLICATION_JSON).withStatusCode(FORBIDDEN.value())
     )
   }
 
