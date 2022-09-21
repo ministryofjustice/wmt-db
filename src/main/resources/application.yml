@@ -4,6 +4,8 @@ hmpps:
     queues:
       hmppsoffenderqueue:
         asyncQueueClient: true
+      hmppsauditqueue:
+        asyncQueueClient: true
 spring:
   application:
     name: hmpps-workload

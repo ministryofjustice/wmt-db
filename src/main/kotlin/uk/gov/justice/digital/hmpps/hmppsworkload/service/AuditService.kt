@@ -18,7 +18,7 @@ class AuditService(
   private val hmppsQueueService: HmppsQueueService,
   private val telemetryClient: TelemetryClient,
   private val objectMapper: ObjectMapper,
-  @Qualifier("hmppsauditqueue-sqs-client") private val hmppsAuditSqsClient: AmazonSQSAsync,
+  @Qualifier("hmppsauditqueue-sqs-client") private val hmppsAuditSqsClient: AmazonSQSAsync
 ) {
 
   private val hmppsAuditQueueUrl by lazy { hmppsQueueService.findByQueueId("hmppsauditqueue")?.queueUrl ?: throw MissingQueueException("HmppsQueue hmppsauditqueue not found") }
