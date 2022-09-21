@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsAuditMessage
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.listener.SQSMessage
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
@@ -25,12 +24,11 @@ class AuditService(
   private val hmppsAuditQueueUrl by lazy { hmppsQueueService.findByQueueId("hmppsauditqueue")?.queueUrl ?: throw MissingQueueException("HmppsQueue hmppsauditqueue not found") }
 
   @Async
-  fun publishToHmppsAuditQueue(personManagerEntity: PersonManagerEntity, eventId: BigInteger, loggedInUser: String) {
+  fun publishToHmppsAuditQueue(crn: String, eventId: BigInteger, loggedInUser: String, requirementIds: List<BigInteger>) {
     val auditData = AuditData(
-      personManagerEntity.crn,
+      crn,
       eventId,
-      personManagerEntity.staffCode,
-      personManagerEntity.teamCode
+      requirementIds
     )
 
     val sendMessage = SendMessageRequest(
@@ -51,6 +49,5 @@ class AuditService(
 data class AuditData(
   val crn: String,
   val eventId: BigInteger,
-  val staffCode: String,
-  val teamCode: String
+  val requirementIds: List<BigInteger>
 )

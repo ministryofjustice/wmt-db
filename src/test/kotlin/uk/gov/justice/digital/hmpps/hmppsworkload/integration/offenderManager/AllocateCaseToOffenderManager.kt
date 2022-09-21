@@ -406,7 +406,8 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   fun `audit data contain required fields`() {
     staffCodeResponse(staffCode, teamCode)
     offenderSummaryResponse(crn)
-    singleActiveRequirementResponse(crn, eventId)
+    val requirementId = BigInteger.valueOf(75315091L)
+    singleActiveRequirementResponse(crn, eventId, requirementId)
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
@@ -420,7 +421,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .isOk
 
     await untilCallTo { verifyAuditMessageOnQueue() } matches { it == true }
-    val auditData = AuditData(crn, eventId, staffCode, teamCode)
+    val auditData = AuditData(crn, eventId, listOf(requirementId))
     Assertions.assertEquals(auditData, getAuditMessages().details)
   }
 }
