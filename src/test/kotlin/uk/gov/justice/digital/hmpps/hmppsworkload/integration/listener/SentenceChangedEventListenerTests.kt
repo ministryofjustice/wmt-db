@@ -39,7 +39,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
       )
     )
 
-    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+    noMessagesOnOffenderEventsQueue()
     await untilCallTo { countMessagesOnOffenderEventDeadLetterQueue() } matches { it == 0 }
 
     val caseCount = caseDetailsRepository.count()
@@ -61,7 +61,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
       )
     )
 
-    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+    noMessagesOnOffenderEventsQueue()
     await untilCallTo { countMessagesOnOffenderEventDeadLetterQueue() } matches { it == 0 }
 
     val caseCount = caseDetailsRepository.count()
@@ -131,7 +131,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     hmppsOffenderSnsClient.publish(sentenceChangedEvent)
     hmppsOffenderSnsClient.publish(sentenceChangedEvent)
 
-    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+    noMessagesOnOffenderEventsQueue()
 
     val count = caseDetailsRepository.count()
 
@@ -156,7 +156,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
 
     hmppsOffenderSnsClient.publish(sentenceChangedEvent)
 
-    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+    noMessagesOnOffenderEventsQueue()
 
     Assertions.assertEquals(0, countMessagesOnOffenderEventDeadLetterQueue())
     val count = caseDetailsRepository.count()
@@ -185,7 +185,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
 
     hmppsOffenderSnsClient.publish(sentenceChangedEvent)
 
-    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+    noMessagesOnOffenderEventsQueue()
 
     Assertions.assertEquals(0, countMessagesOnOffenderEventDeadLetterQueue())
     val count = caseDetailsRepository.count()
@@ -237,7 +237,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
       )
     )
 
-    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+    noMessagesOnOffenderEventsQueue()
 
     Assertions.assertEquals(0, countMessagesOnOffenderEventDeadLetterQueue())
 
@@ -264,7 +264,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
       )
     )
 
-    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+    noMessagesOnOffenderEventsQueue()
 
     Assertions.assertEquals(0, countMessagesOnOffenderEventDeadLetterQueue())
 
@@ -290,7 +290,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
       )
     )
 
-    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+    noMessagesOnOffenderEventsQueue()
 
     assertThat(sentenceRepository.count()).isEqualTo(1)
   }
@@ -318,7 +318,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
       )
     )
 
-    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+    noMessagesOnOffenderEventsQueue()
 
     assertThat(caseDetailsRepository.count()).isEqualTo(1)
     assertThat(caseDetailsRepository.findByIdOrNull(crn)?.tier).isEqualTo(Tier.B3)
@@ -350,7 +350,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
       )
     )
 
-    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+    noMessagesOnOffenderEventsQueue()
 
     val actualWorkloadCalcEntity: WorkloadCalculationEntity? =
       workloadCalculationRepository.findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)

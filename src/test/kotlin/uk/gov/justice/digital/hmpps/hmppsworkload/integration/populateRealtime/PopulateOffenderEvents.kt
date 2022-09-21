@@ -1,8 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.populateRealtime
 
-import org.awaitility.kotlin.await
-import org.awaitility.kotlin.matches
-import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
@@ -14,7 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 class PopulateOffenderEvents : IntegrationTestBase() {
 
   @Test
-  fun `populate offender events from csv upload of crns`() {
+  fun `repopulate case details`() {
     val crn = "CRN1"
     val caseDetailsEntity = CaseDetailsEntity(crn, Tier.A2, CaseType.CUSTODY, "", "")
     caseDetailsRepository.save(caseDetailsEntity)
@@ -31,9 +28,7 @@ class PopulateOffenderEvents : IntegrationTestBase() {
       .expectStatus()
       .isOk
 
-    await untilCallTo {
-      caseDetailsRepository.count()
-    } matches { it!! > 0 }
+    noMessagesOnOffenderEventsQueue()
 
     val caseDetail = caseDetailsRepository.findAll().first()
     Assertions.assertEquals(crn, caseDetail.crn)
