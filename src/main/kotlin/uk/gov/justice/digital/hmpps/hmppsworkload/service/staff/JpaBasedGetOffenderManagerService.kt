@@ -2,10 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service.staff
 
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.OffenderSearchApiClient
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
@@ -13,6 +10,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.ImpactCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerCases
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.TierCaseTotals
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.OffenderManagerRepository
@@ -34,7 +32,6 @@ class JpaBasedGetOffenderManagerService(
   private val getReductionService: GetReductionService,
   private val communityApiClient: CommunityApiClient,
   private val workloadPointsRepository: WorkloadPointsRepository,
-  private val offenderSearchApiClient: OffenderSearchApiClient,
   private val getSentenceService: GetSentenceService,
   private val caseDetailsRepository: CaseDetailsRepository,
   private val getWeeklyHours: GetWeeklyHours,
@@ -106,23 +103,15 @@ class JpaBasedGetOffenderManagerService(
 
   override fun getCases(teamCode: String, offenderManagerCode: String): OffenderManagerCases? =
     offenderManagerRepository.findCasesByTeamCodeAndStaffCode(offenderManagerCode, teamCode).let { cases ->
-      Mono.zip(
-        communityApiClient.getStaffSummaryByCode(offenderManagerCode),
-        getCrnToOffenderDetails(cases.map { it.crn })
-      ).map { results ->
-        val team = results.t1.teams?.first { team -> team.code == teamCode }
-        OffenderManagerCases.from(results.t1, team!!, cases, results.t2)
-      }.block()
+      val crnDetails = getCrnToCaseDetails(cases.map { it.crn })
+      communityApiClient.getStaffSummaryByCode(offenderManagerCode)
+        .map { staffSummary ->
+          val team = staffSummary.teams?.first { team -> team.code == teamCode }
+          OffenderManagerCases.from(staffSummary, team!!, cases, crnDetails)
+        }.block()
     }
 
-  private fun getCrnToOffenderDetails(crns: List<String>): Mono<Map<String, OffenderDetails>> {
-    return if (crns.isEmpty()) Mono.just(emptyMap()) else offenderSearchApiClient.getOffendersByCrns(crns)
-      .map { offenderDetails ->
-        offenderDetails.map { offenderDetail ->
-          {
-            offenderDetail.otherIds.crn to offenderDetail
-          }
-        }.associate { it.invoke() }
-      }
+  private fun getCrnToCaseDetails(crns: List<String>): Map<String, CaseDetailsEntity> {
+    return if (crns.isEmpty()) emptyMap() else caseDetailsRepository.findAllById(crns).associateBy { it.crn }
   }
 }

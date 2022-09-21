@@ -2,9 +2,9 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.domain
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import io.swagger.v3.oas.annotations.media.Schema
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Team
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerCase
 
 data class OffenderManagerCases @JsonCreator constructor(
@@ -21,7 +21,7 @@ data class OffenderManagerCases @JsonCreator constructor(
   val activeCases: List<OffenderManagerActiveCase>
 ) {
   companion object {
-    fun from(staff: StaffSummary, team: Team, cases: List<OffenderManagerCase>, offenderDetails: Map<String, OffenderDetails>): OffenderManagerCases {
+    fun from(staff: StaffSummary, team: Team, cases: List<OffenderManagerCase>, offenderDetails: Map<String, CaseDetailsEntity>): OffenderManagerCases {
       return OffenderManagerCases(staff.staff.forenames, staff.staff.surname, staff.grade, staff.staffCode, team.description, cases.map { OffenderManagerActiveCase.from(it, offenderDetails[it.crn]) })
     }
   }
@@ -40,8 +40,8 @@ data class OffenderManagerActiveCase(
   val surname: String?
 ) {
   companion object {
-    fun from(offenderManagerCase: OffenderManagerCase, offenderDetails: OffenderDetails?): OffenderManagerActiveCase {
-      return OffenderManagerActiveCase(offenderManagerCase.crn, offenderManagerCase.tier, offenderManagerCase.caseCategory, offenderDetails?.firstName, offenderDetails?.surname)
+    fun from(offenderManagerCase: OffenderManagerCase, caseDetails: CaseDetailsEntity?): OffenderManagerActiveCase {
+      return OffenderManagerActiveCase(offenderManagerCase.crn, offenderManagerCase.tier, offenderManagerCase.caseCategory, caseDetails?.firstName, caseDetails?.surname)
     }
   }
 }

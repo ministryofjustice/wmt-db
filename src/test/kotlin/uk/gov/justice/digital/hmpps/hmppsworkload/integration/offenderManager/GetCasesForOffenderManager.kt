@@ -1,8 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.offenderManager
 
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
-import java.util.Arrays.asList
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 
 class GetCasesForOffenderManager : IntegrationTestBase() {
 
@@ -11,7 +13,9 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
     val staffCode = "OM1"
     val teamCode = "T1"
     staffCodeResponse(staffCode, teamCode)
-    offenderSearchByCrnsResponse(asList("CRN2222", "CRN3333", "CRN1111"))
+    caseDetailsRepository.save(CaseDetailsEntity("CRN2222", Tier.B3, CaseType.CUSTODY, "Sally", "Smith"))
+    caseDetailsRepository.save(CaseDetailsEntity("CRN3333", Tier.C1, CaseType.COMMUNITY, "John", "Williams"))
+    caseDetailsRepository.save(CaseDetailsEntity("CRN1111", Tier.C1, CaseType.LICENSE, "John", "Doe"))
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers/$staffCode/cases")
       .headers {
@@ -31,35 +35,29 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
       .isEqualTo(staffCode)
       .jsonPath("$.teamName")
       .isEqualTo("Test Team")
-      .jsonPath("$.activeCases[0].crn")
-      .isEqualTo("CRN2222")
-      .jsonPath("$.activeCases[0].tier")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN2222')].tier")
       .isEqualTo("B3")
-      .jsonPath("$.activeCases[0].caseCategory")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN2222')].caseCategory")
       .isEqualTo("CUSTODY")
-      .jsonPath("$.activeCases[0].forename")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN2222')].forename")
       .isEqualTo("Sally")
-      .jsonPath("$.activeCases[0].surname")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN2222')].surname")
       .isEqualTo("Smith")
-      .jsonPath("$.activeCases[1].crn")
-      .isEqualTo("CRN3333")
-      .jsonPath("$.activeCases[1].tier")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN3333')].tier")
       .isEqualTo("C1")
-      .jsonPath("$.activeCases[1].caseCategory")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN3333')].caseCategory")
       .isEqualTo("COMMUNITY")
-      .jsonPath("$.activeCases[1].forename")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN3333')].forename")
       .isEqualTo("John")
-      .jsonPath("$.activeCases[1].surname")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN3333')].surname")
       .isEqualTo("Williams")
-      .jsonPath("$.activeCases[2].crn")
-      .isEqualTo("CRN1111")
-      .jsonPath("$.activeCases[2].tier")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN1111')].tier")
       .isEqualTo("C1")
-      .jsonPath("$.activeCases[2].caseCategory")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN1111')].caseCategory")
       .isEqualTo("LICENSE")
-      .jsonPath("$.activeCases[2].forename")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN1111')].forename")
       .isEqualTo("John")
-      .jsonPath("$.activeCases[2].surname")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN1111')].surname")
       .isEqualTo("Doe")
   }
 
@@ -96,7 +94,7 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
     val staffCode = "OM1"
     val teamCode = "T1"
     staffCodeResponse(staffCode, teamCode)
-    oneOffenderReturnedWhenSearchByCrnsResponse(asList("CRN2222", "CRN3333", "CRN1111"))
+    caseDetailsRepository.save(CaseDetailsEntity("CRN1111", Tier.C1, CaseType.LICENSE, "John", "Doe"))
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers/$staffCode/cases")
       .headers {
@@ -116,27 +114,21 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
       .isEqualTo(staffCode)
       .jsonPath("$.teamName")
       .isEqualTo("Test Team")
-      .jsonPath("$.activeCases[0].crn")
-      .isEqualTo("CRN2222")
-      .jsonPath("$.activeCases[0].tier")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN2222')].tier")
       .isEqualTo("B3")
-      .jsonPath("$.activeCases[0].caseCategory")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN2222')].caseCategory")
       .isEqualTo("CUSTODY")
-      .jsonPath("$.activeCases[1].crn")
-      .isEqualTo("CRN3333")
-      .jsonPath("$.activeCases[1].tier")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN3333')].tier")
       .isEqualTo("C1")
-      .jsonPath("$.activeCases[1].caseCategory")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN3333')].caseCategory")
       .isEqualTo("COMMUNITY")
-      .jsonPath("$.activeCases[2].crn")
-      .isEqualTo("CRN1111")
-      .jsonPath("$.activeCases[2].tier")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN1111')].tier")
       .isEqualTo("C1")
-      .jsonPath("$.activeCases[2].caseCategory")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN1111')].caseCategory")
       .isEqualTo("LICENSE")
-      .jsonPath("$.activeCases[2].forename")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN1111')].forename")
       .isEqualTo("John")
-      .jsonPath("$.activeCases[2].surname")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN1111')].surname")
       .isEqualTo("Doe")
   }
 }
