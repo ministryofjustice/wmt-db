@@ -58,7 +58,7 @@ class OffenderManagerController(
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/team/{teamCode}/offenderManagers/{offenderManagerCode}")
   fun getOverview(@PathVariable(required = true) teamCode: String, @PathVariable(required = true) offenderManagerCode: String): OffenderManagerOverview {
-    return getOffenderManagerService.getOverview(teamCode, offenderManagerCode)?.let {
+    return getOffenderManagerService.getOverview(offenderManagerCode, teamCode)?.let {
       OffenderManagerOverview.from(it)
     } ?: run {
       throw EntityNotFoundException("Team $teamCode and offender manager $offenderManagerCode combination not found")

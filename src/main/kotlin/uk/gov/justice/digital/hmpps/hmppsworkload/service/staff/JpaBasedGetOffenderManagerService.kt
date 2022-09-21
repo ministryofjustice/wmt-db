@@ -39,7 +39,7 @@ class JpaBasedGetOffenderManagerService(
 ) : GetOffenderManagerService {
 
   override fun getPotentialWorkload(staffCode: String, teamCode: String, impactCase: ImpactCase): OffenderManagerOverview? {
-    return getOverview(teamCode, staffCode)?.let { overview ->
+    return getOverview(staffCode, teamCode)?.let { overview ->
       val currentCaseImpact = getCurrentCasePoints(teamCode, overview.code, impactCase.crn)
       overview.potentialCapacity = capacityCalculator.calculate(
         overview.totalPoints.minus(currentCaseImpact)
@@ -77,7 +77,7 @@ class JpaBasedGetOffenderManagerService(
     return overview
   }
 
-  override fun getOverview(teamCode: String, offenderManagerCode: String): OffenderManagerOverview? =
+  override fun getOverview(offenderManagerCode: String, teamCode: String): OffenderManagerOverview? =
     communityApiClient.getStaffSummaryByCode(offenderManagerCode).map { staff ->
       val team = staff.teams!!.first { team -> team.code == teamCode }
       val overview = offenderManagerRepository.findByOverview(team.code, staff.staffCode)?.let {
