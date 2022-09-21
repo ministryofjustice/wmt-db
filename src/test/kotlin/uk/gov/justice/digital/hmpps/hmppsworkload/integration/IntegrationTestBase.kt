@@ -5,6 +5,9 @@ import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model.PurgeQueueRequest
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.awaitility.kotlin.await
+import org.awaitility.kotlin.matches
+import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -217,7 +220,10 @@ abstract class IntegrationTestBase {
     )
   }
 
-  protected fun countMessagesOnOffenderEventQueue(): Int =
+  protected fun noMessagesOnOffenderEventsQueue() {
+    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+  }
+  private fun countMessagesOnOffenderEventQueue(): Int =
     hmppsOffenderSqsClient.getQueueAttributes(hmppsOffenderQueue.queueUrl, listOf("ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible"))
       .let { (it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0) }
 
