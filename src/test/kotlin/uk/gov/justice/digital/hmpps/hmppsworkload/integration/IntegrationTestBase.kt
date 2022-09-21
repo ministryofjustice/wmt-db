@@ -36,9 +36,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.communityApiAssessmentResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.convictionNoSentenceResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.notFoundTierResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSearchByCrnsResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSummaryResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.oneOffenderSearchByCrnsResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveConvictionResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveInductionResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveRequirementNoLengthResponse
@@ -78,7 +76,6 @@ abstract class IntegrationTestBase {
   private var oauthMock: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 9090)
   var communityApi: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8092)
   var hmppsTier: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8082)
-  var offenderSearchApi: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8095)
   var assessRisksNeedsApi: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8085)
 
   @Autowired
@@ -168,7 +165,6 @@ abstract class IntegrationTestBase {
 
     communityApi.reset()
     hmppsTier.reset()
-    offenderSearchApi.reset()
     assessRisksNeedsApi.reset()
     setupOauth()
     personManagerRepository.deleteAll()
@@ -196,7 +192,6 @@ abstract class IntegrationTestBase {
     communityApi.stop()
     oauthMock.stop()
     hmppsTier.stop()
-    offenderSearchApi.stop()
     assessRisksNeedsApi.stop()
     personManagerRepository.deleteAll()
     eventManagerRepository.deleteAll()
@@ -414,20 +409,6 @@ abstract class IntegrationTestBase {
     val request = request().withPath("/staff/username/$userName")
     communityApi.`when`(request, Times.exactly(1)).respond(
       response().withContentType(APPLICATION_JSON).withBody(staffByUserNameResponse(userName))
-    )
-  }
-
-  protected fun offenderSearchByCrnsResponse(crns: List<String>) {
-    val request = request().withPath("/crns").withBody(objectMapper.writeValueAsString(crns))
-    offenderSearchApi.`when`(request, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(offenderSearchByCrnsResponse())
-    )
-  }
-
-  protected fun oneOffenderReturnedWhenSearchByCrnsResponse(crns: List<String>) {
-    val request = request().withPath("/crns").withBody(objectMapper.writeValueAsString(crns))
-    offenderSearchApi.`when`(request, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(oneOffenderSearchByCrnsResponse())
     )
   }
 
