@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration
 import com.amazonaws.services.sqs.AmazonSQS
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model.PurgeQueueRequest
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.awaitility.kotlin.await
@@ -64,6 +65,8 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTInstitutiona
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTWorkloadOwnerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadCalculationRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.listener.HmppsOffenderEvent
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.AuditData
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.HmppsAuditMessage
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
 import java.math.BigInteger
@@ -144,6 +147,7 @@ abstract class IntegrationTestBase {
   private val offenderEventTopic by lazy { hmppsQueueService.findByTopicId("hmppsoffendertopic") ?: throw MissingQueueException("HmppsTopic hmppsoffendertopic not found") }
 
   private val hmppsDomainQueue by lazy { hmppsQueueService.findByQueueId("tiercalcqueue") ?: throw MissingQueueException("HmppsQueue tiercalcqueue not found") }
+  private val hmppsAuditQueue by lazy { hmppsQueueService.findByQueueId("hmppsauditqueue") ?: throw MissingQueueException("HmppsQueue hmppsauditqueue not found") }
 
   private val hmppsOffenderSqsDlqClient by lazy { hmppsOffenderQueue.sqsDlqClient as AmazonSQS }
   protected val hmppsOffenderSqsClient by lazy { hmppsOffenderQueue.sqsClient }
@@ -156,6 +160,8 @@ abstract class IntegrationTestBase {
 
   private val hmppsDomainSqsDlqClient by lazy { hmppsDomainQueue.sqsDlqClient as AmazonSQS }
   protected val hmppsDomainSqsClient by lazy { hmppsDomainQueue.sqsClient }
+
+  protected val hmppsAuditQueueClient by lazy { hmppsAuditQueue.sqsClient }
 
   @Autowired
   protected lateinit var hmppsQueueService: HmppsQueueService
@@ -184,6 +190,7 @@ abstract class IntegrationTestBase {
 
     hmppsDomainSqsClient.purgeQueue(PurgeQueueRequest(hmppsDomainQueue.queueUrl))
     hmppsDomainSqsDlqClient.purgeQueue(PurgeQueueRequest(hmppsDomainQueue.dlqUrl))
+    hmppsAuditQueueClient.purgeQueue(PurgeQueueRequest(hmppsAuditQueue.queueUrl))
     workloadCalculationRepository.deleteAll()
   }
 
@@ -444,9 +451,27 @@ abstract class IntegrationTestBase {
       response().withContentType(APPLICATION_JSON).withBody(singleActiveRequirementNoLengthResponse(requirementId))
     )
   }
+
+  protected fun verifyAuditMessageOnQueue(): Boolean =
+    hmppsAuditQueueClient.getQueueAttributes(hmppsAuditQueue.queueUrl, listOf("ApproximateNumberOfMessages"))
+      .let { it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0 } == 1
+
+  protected fun getAuditMessages(): HmppsAuditMessage<AuditData> {
+    val message = hmppsAuditQueueClient.receiveMessage(hmppsAuditQueue.queueUrl)
+    return message.messages.map {
+      val sqsMessage = objectMapper.readValue(it.body, AuditSQSMessage::class.java)
+      val auditDataType = object : TypeReference<HmppsAuditMessage<AuditData>>() {}
+      objectMapper.readValue(sqsMessage.Message, auditDataType)
+    }.first()
+  }
 }
 
 data class SQSMessage(
   val Message: String,
   val MessageId: String
+)
+
+data class AuditSQSMessage(
+  @JsonProperty("Message")
+  val Message: String
 )
