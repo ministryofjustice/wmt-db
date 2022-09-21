@@ -47,9 +47,6 @@ community:
 hmpps-tier:
   endpoint:
     url: http://localhost:8082
-offender-search:
-  endpoint:
-    url: http://localhost:8095
 assess-risks-needs:
   endpoint:
     url: http://localhost:8085
