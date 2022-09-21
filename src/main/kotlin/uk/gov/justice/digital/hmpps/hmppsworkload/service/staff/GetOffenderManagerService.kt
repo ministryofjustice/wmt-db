@@ -6,7 +6,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOve
 
 interface GetOffenderManagerService {
 
-  fun getPotentialWorkload(teamCode: String, staffCode: String, impactCase: ImpactCase): OffenderManagerOverview?
+  fun getPotentialWorkload(staffCode: String, teamCode: String, impactCase: ImpactCase): OffenderManagerOverview?
   fun getOverview(teamCode: String, offenderManagerCode: String): OffenderManagerOverview?
   fun getCases(teamCode: String, offenderManagerCode: String): OffenderManagerCases?
 }

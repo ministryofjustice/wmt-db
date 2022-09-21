@@ -38,7 +38,7 @@ class JpaBasedGetOffenderManagerService(
   private val getEventManager: JpaBasedGetEventManager
 ) : GetOffenderManagerService {
 
-  override fun getPotentialWorkload(teamCode: String, staffCode: String, impactCase: ImpactCase): OffenderManagerOverview? {
+  override fun getPotentialWorkload(staffCode: String, teamCode: String, impactCase: ImpactCase): OffenderManagerOverview? {
     return getOverview(teamCode, staffCode)?.let { overview ->
       val currentCaseImpact = getCurrentCasePoints(teamCode, overview.code, impactCase.crn)
       overview.potentialCapacity = capacityCalculator.calculate(

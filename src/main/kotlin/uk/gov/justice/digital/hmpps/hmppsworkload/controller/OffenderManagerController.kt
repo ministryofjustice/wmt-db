@@ -41,7 +41,7 @@ class OffenderManagerController(
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @PostMapping("/team/{teamCode}/offenderManager/{staffCode}/impact")
   fun getImpactOfAllocation(@PathVariable(required = true) teamCode: String, @PathVariable(required = true) staffCode: String, @RequestBody impactCase: ImpactCase): OffenderManagerPotentialWorkload {
-    val potentialWorkload = getOffenderManagerService.getPotentialWorkload(teamCode, staffCode, impactCase)
+    val potentialWorkload = getOffenderManagerService.getPotentialWorkload(staffCode, teamCode, impactCase)
     if (potentialWorkload != null) {
       return OffenderManagerPotentialWorkload.from(potentialWorkload)
     }
