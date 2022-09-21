@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.EnrichedEventManagerDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.EventManagerDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.JpaBasedGetEventManager
 import java.math.BigInteger
@@ -32,7 +33,7 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
     getEventManager.findById(id)?.let { eventManagerEntity -> EventManagerDetails.from(eventManagerEntity) }
       ?: throw EntityNotFoundException("Event Manager not found for id $id")
 
-  @Operation(summary = "Get current Event Manager by event ID")
+  @Operation(summary = "Get details of Event Manager by event ID")
   @ApiResponses(
     value = [
       ApiResponse(responseCode = "200", description = "OK"),
@@ -40,8 +41,7 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
     ]
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
-  @GetMapping("/allocation/event/eventId/{eventId}/latest")
-  fun getCurrentEventManagerByEventId(@PathVariable(required = true) eventId: BigInteger): EventManagerDetails =
-    getEventManager.findLatestByEventId(eventId)?.let { eventManagerEntity -> EventManagerDetails.from(eventManagerEntity) }
-      ?: throw EntityNotFoundException("Event Manager not found for eventId $eventId")
+  @GetMapping("/allocation/event/eventId/{eventId}/details")
+  fun getEventManagerDetailsByEventId(@PathVariable(required = true) eventId: BigInteger): EnrichedEventManagerDetails =
+    getEventManager.findDetailsByEventId(eventId) ?: throw EntityNotFoundException("Event Manager details not found for eventId $eventId")
 }
