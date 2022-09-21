@@ -5,5 +5,11 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseAllocated
 
 interface SaveWorkloadService {
 
-  fun saveWorkload(teamCode: String, staffCode: String, allocateCase: AllocateCase, loggedInUser: String, authToken: String): CaseAllocated
+  fun saveWorkload(
+    staffCode: String,
+    teamCode: String,
+    allocateCase: AllocateCase,
+    loggedInUser: String,
+    authToken: String
+  ): CaseAllocated
 }

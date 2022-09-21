@@ -83,7 +83,7 @@ class OffenderManagerController(
       HttpHeaders.AUTHORIZATION
     ) authToken: String
   ): CaseAllocated {
-    return saveWorkloadService.saveWorkload(teamCode, staffCode, allocateCase, authentication.name, authToken)
+    return saveWorkloadService.saveWorkload(staffCode, teamCode, allocateCase, authentication.name, authToken)
   }
 
   @Operation(summary = "Retrieves all cases allocated to an Offender Manager")

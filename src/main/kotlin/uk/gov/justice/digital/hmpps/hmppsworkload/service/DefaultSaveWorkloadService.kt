@@ -28,8 +28,8 @@ class DefaultSaveWorkloadService(
 ) : SaveWorkloadService {
 
   override fun saveWorkload(
-    teamCode: String,
     staffCode: String,
+    teamCode: String,
     allocateCase: AllocateCase,
     loggedInUser: String,
     authToken: String
