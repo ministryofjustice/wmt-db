@@ -26,23 +26,23 @@ class AuditService(
     val auditData = AuditData(
       crn,
       eventId,
-      requirementIds.first()
+      requirementIds
     )
 
     val sendMessage = SendMessageRequest(
       hmppsAuditQueueUrl,
       objectMapper.writeValueAsString(
-        AuditMessage(operationId = UUID.randomUUID().toString(), who = loggedInUser, details = auditData)
+        AuditMessage(operationId = UUID.randomUUID().toString(), who = loggedInUser, details = objectMapper.writeValueAsString(auditData))
       )
     )
     sqsClient.sendMessage(sendMessage)
   }
 }
 
-data class AuditMessage<AuditData>(val operationId: String, val what: String = "CASE_ALLOCATED", val `when`: Instant = Instant.now(), val who: String, val service: String = "hmpps-workload", val details: AuditData)
+data class AuditMessage(val operationId: String, val what: String = "CASE_ALLOCATED", val `when`: Instant = Instant.now(), val who: String, val service: String = "hmpps-workload", val details: String)
 
 data class AuditData(
   val crn: String,
   val eventId: BigInteger,
-  val requirementIds: BigInteger
+  val requirementIds: List<BigInteger>
 )
