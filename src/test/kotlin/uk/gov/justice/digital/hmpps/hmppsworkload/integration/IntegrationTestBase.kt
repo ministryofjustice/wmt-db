@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration
 import com.amazonaws.services.sqs.AmazonSQS
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model.PurgeQueueRequest
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.awaitility.kotlin.await
@@ -459,9 +458,8 @@ abstract class IntegrationTestBase {
   protected fun getAuditMessages(): AuditMessage<AuditData> {
     val message = hmppsAuditQueueClient.receiveMessage(hmppsAuditQueue.queueUrl)
     return message.messages.map {
-      val sqsMessage = objectMapper.readValue(it.body, AuditSQSMessage::class.java)
       val auditDataType = object : TypeReference<AuditMessage<AuditData>>() {}
-      objectMapper.readValue(sqsMessage.Message, auditDataType)
+      objectMapper.readValue(it.body, auditDataType)
     }.first()
   }
 }
@@ -469,9 +467,4 @@ abstract class IntegrationTestBase {
 data class SQSMessage(
   val Message: String,
   val MessageId: String
-)
-
-data class AuditSQSMessage(
-  @JsonProperty("Message")
-  val Message: String
 )
