@@ -66,7 +66,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTWorkloadOwne
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadCalculationRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.listener.HmppsOffenderEvent
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.AuditData
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.HmppsAuditMessage
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.AuditMessage
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
 import java.math.BigInteger
@@ -456,11 +456,11 @@ abstract class IntegrationTestBase {
     hmppsAuditQueueClient.getQueueAttributes(hmppsAuditQueue.queueUrl, listOf("ApproximateNumberOfMessages"))
       .let { it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0 } == 1
 
-  protected fun getAuditMessages(): HmppsAuditMessage<AuditData> {
+  protected fun getAuditMessages(): AuditMessage<AuditData> {
     val message = hmppsAuditQueueClient.receiveMessage(hmppsAuditQueue.queueUrl)
     return message.messages.map {
       val sqsMessage = objectMapper.readValue(it.body, AuditSQSMessage::class.java)
-      val auditDataType = object : TypeReference<HmppsAuditMessage<AuditData>>() {}
+      val auditDataType = object : TypeReference<AuditMessage<AuditData>>() {}
       objectMapper.readValue(sqsMessage.Message, auditDataType)
     }.first()
   }
