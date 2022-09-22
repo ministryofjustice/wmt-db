@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
 import java.math.BigInteger
-import java.time.LocalDateTime
+import java.time.Instant
 import java.util.UUID
 
 @Service
@@ -39,7 +39,7 @@ class AuditService(
   }
 }
 
-data class AuditMessage<AuditData>(val operationId: String, val what: String = "CASE_ALLOCATED", val `when`: LocalDateTime = LocalDateTime.now(), val who: String, val service: String = "hmpps-workload", val details: AuditData)
+data class AuditMessage<AuditData>(val operationId: String, val what: String = "CASE_ALLOCATED", val `when`: Instant = Instant.now(), val who: String, val service: String = "hmpps-workload", val details: AuditData)
 
 data class AuditData(
   val crn: String,
