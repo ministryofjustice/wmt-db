@@ -46,7 +46,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleIn
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByCodeResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByUserNameResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.successfulRiskPredictorResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.successfulRiskSummaryResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.teamStaffJsonResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.AdjustmentReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
@@ -259,13 +258,6 @@ abstract class IntegrationTestBase {
     val request = request().withPath("/crn/$crn/tier")
     hmppsTier.`when`(request, Times.exactly(1)).respond(
       response().withContentType(APPLICATION_JSON).withBody("{\"tierScore\":\"${tier}\"}")
-    )
-  }
-
-  protected fun riskSummaryResponse(crn: String) {
-    val request = request().withPath("/risks/crn/$crn/summary")
-    assessRisksNeedsApi.`when`(request, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(successfulRiskSummaryResponse())
     )
   }
 

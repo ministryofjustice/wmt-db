@@ -26,7 +26,7 @@ class AuditService(
     val auditData = AuditData(
       crn,
       eventId,
-      requirementIds
+      requirementIds.first()
     )
 
     val sendMessage = SendMessageRequest(
@@ -44,5 +44,5 @@ data class AuditMessage<AuditData>(val operationId: String, val what: String = "
 data class AuditData(
   val crn: String,
   val eventId: BigInteger,
-  val requirementIds: List<BigInteger>
+  val requirementIds: BigInteger
 )
