@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration
 import com.amazonaws.services.sqs.AmazonSQS
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model.PurgeQueueRequest
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.awaitility.kotlin.await
@@ -47,7 +46,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleIn
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByCodeResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByUserNameResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.successfulRiskPredictorResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.successfulRiskSummaryResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.teamStaffJsonResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.AdjustmentReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
@@ -65,7 +63,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTInstitutiona
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTWorkloadOwnerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadCalculationRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.listener.HmppsOffenderEvent
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.AuditData
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.AuditMessage
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
@@ -263,13 +260,6 @@ abstract class IntegrationTestBase {
     )
   }
 
-  protected fun riskSummaryResponse(crn: String) {
-    val request = request().withPath("/risks/crn/$crn/summary")
-    assessRisksNeedsApi.`when`(request, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(successfulRiskSummaryResponse())
-    )
-  }
-
   protected fun riskPredictorResponse(crn: String) {
     val request = request().withPath("/risks/crn/$crn/predictors/rsr/history")
     assessRisksNeedsApi.`when`(request, Times.exactly(1)).respond(
@@ -456,12 +446,11 @@ abstract class IntegrationTestBase {
     hmppsAuditQueueClient.getQueueAttributes(hmppsAuditQueue.queueUrl, listOf("ApproximateNumberOfMessages"))
       .let { it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0 } == 1
 
-  protected fun getAuditMessages(): AuditMessage<AuditData> {
+  protected fun getAuditMessages(): AuditMessage {
     val message = hmppsAuditQueueClient.receiveMessage(hmppsAuditQueue.queueUrl)
     return message.messages.map {
-      val sqsMessage = objectMapper.readValue(it.body, AuditSQSMessage::class.java)
-      val auditDataType = object : TypeReference<AuditMessage<AuditData>>() {}
-      objectMapper.readValue(sqsMessage.Message, auditDataType)
+      val auditDataType = object : TypeReference<AuditMessage>() {}
+      objectMapper.readValue(it.body, auditDataType)
     }.first()
   }
 }
@@ -469,9 +458,4 @@ abstract class IntegrationTestBase {
 data class SQSMessage(
   val Message: String,
   val MessageId: String
-)
-
-data class AuditSQSMessage(
-  @JsonProperty("Message")
-  val Message: String
 )

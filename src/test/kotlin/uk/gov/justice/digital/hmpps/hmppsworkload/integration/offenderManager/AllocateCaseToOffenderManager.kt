@@ -422,6 +422,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
     await untilCallTo { verifyAuditMessageOnQueue() } matches { it == true }
     val auditData = AuditData(crn, eventId, listOf(requirementId))
-    Assertions.assertEquals(auditData, getAuditMessages().details)
+    Assertions.assertEquals(objectMapper.writeValueAsString(auditData), getAuditMessages().details)
   }
 }

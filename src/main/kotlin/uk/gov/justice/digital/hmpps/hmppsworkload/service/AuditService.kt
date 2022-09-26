@@ -6,11 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.hmppsworkload.listener.SQSMessage
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
 import java.math.BigInteger
-import java.time.LocalDateTime
+import java.time.Instant
 import java.util.UUID
 
 @Service
@@ -33,19 +32,14 @@ class AuditService(
     val sendMessage = SendMessageRequest(
       hmppsAuditQueueUrl,
       objectMapper.writeValueAsString(
-        sqsMessage(
-          AuditMessage(operationId = UUID.randomUUID().toString(), who = loggedInUser, details = auditData)
-        )
+        AuditMessage(operationId = UUID.randomUUID().toString(), who = loggedInUser, details = objectMapper.writeValueAsString(auditData))
       )
     )
     sqsClient.sendMessage(sendMessage)
   }
-
-  private fun sqsMessage(auditMessage: AuditMessage<AuditData>) =
-    SQSMessage(objectMapper.writeValueAsString(auditMessage))
 }
 
-data class AuditMessage<AuditData>(val operationId: String, val what: String = "CASE_ALLOCATED", val `when`: LocalDateTime = LocalDateTime.now(), val who: String, val service: String = "hmpps-workload", val details: AuditData)
+data class AuditMessage(val operationId: String, val what: String = "CASE_ALLOCATED", val `when`: Instant = Instant.now(), val who: String, val service: String = "hmpps-workload", val details: String)
 
 data class AuditData(
   val crn: String,
