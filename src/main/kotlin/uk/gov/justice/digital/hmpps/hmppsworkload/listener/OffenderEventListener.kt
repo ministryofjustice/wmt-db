@@ -2,9 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.listener
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.slf4j.LoggerFactory
 import org.springframework.jms.annotation.JmsListener
-import org.springframework.messaging.handler.annotation.MessageExceptionHandler
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.SaveCaseDetailsService
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.SaveSentenceService
@@ -19,36 +17,24 @@ class OffenderEventListener(
 
   @JmsListener(destination = "hmppsoffenderqueue", containerFactory = "hmppsQueueContainerFactoryProxy")
   fun processMessage(rawMessage: String) {
-    val (crn, sourceId) = getCase(rawMessage)
-    log.info("received offender event for crn: {}", crn)
-    sourceId?.run {
-      saveSentenceService.saveSentence(crn, this)
+    val (crn, sentenceId) = getCase(rawMessage)
+    sentenceId?.run {
+      saveSentenceService.saveSentence(crn, sentenceId)
     }
     saveCaseDetailsService.save(crn)
-  }
-
-  @MessageExceptionHandler()
-  fun errorHandler(e: Exception, msg: String) {
-    log.warn("Failed to process sentence change with CRN ${getCase(msg).crn} with error: ${e.message}")
-    throw e
   }
 
   private fun getCase(rawMessage: String): HmppsOffenderEvent {
     val (message) = objectMapper.readValue(rawMessage, SQSMessage::class.java)
     return objectMapper.readValue(message, HmppsOffenderEvent::class.java)
   }
-
-  companion object {
-    private val log = LoggerFactory.getLogger(this::class.java)
-  }
 }
 
 data class HmppsOffenderEvent(
   val crn: String,
-  val sourceId: BigInteger?
+  @JsonProperty("sourceId") val sentenceId: BigInteger?
 )
 
 data class SQSMessage(
   @JsonProperty("Message") val message: String,
-
 )
