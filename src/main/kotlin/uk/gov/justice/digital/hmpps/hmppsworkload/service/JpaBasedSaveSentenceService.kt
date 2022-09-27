@@ -16,16 +16,19 @@ class JpaBasedSaveSentenceService(
 ) : SaveSentenceService {
 
   override fun saveSentence(crn: String, sentenceId: BigInteger) {
-    communityApiClient.getAllConvictions(crn)
-      .mapNotNull { convictions ->
-        convictions.firstOrNull { it.sentence?.sentenceId == sentenceId && it.sentence.terminationDate == null }
-      }
+    communityApiClient.getAllConvictionsFlux(crn)
+      .filter { isCurrentSentence(it, sentenceId) }
       .map { conviction ->
         convictionToSentenceEntity(conviction!!, crn)
-      }.block()?.let {
+      }.blockFirst()?.let {
         sentenceRepository.save(it)
       } ?: sentenceRepository.findBySentenceId(sentenceId)?.let { sentenceRepository.delete(it) }
   }
+
+  private fun isCurrentSentence(
+    it: Conviction,
+    sentenceId: BigInteger
+  ) = it.sentence?.sentenceId == sentenceId && it.sentence.terminationDate == null
 
   private fun convictionToSentenceEntity(conviction: Conviction, crn: String): SentenceEntity = SentenceEntity(
     conviction.sentence!!.sentenceId,

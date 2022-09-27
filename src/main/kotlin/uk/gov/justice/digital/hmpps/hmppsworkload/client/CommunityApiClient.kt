@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.client
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.client.WebClient
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Contact
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Conviction
@@ -88,6 +89,12 @@ class CommunityApiClient(private val webClient: WebClient) {
       .retrieve()
       .bodyToMono(responseType)
   }
+
+  fun getAllConvictionsFlux(crn: String): Flux<Conviction> = webClient
+    .get()
+    .uri("/offenders/crn/$crn/convictions")
+    .retrieve()
+    .bodyToFlux(Conviction::class.java)
 
   fun getSummaryByCrn(crn: String): Mono<PersonSummary> {
     return webClient
