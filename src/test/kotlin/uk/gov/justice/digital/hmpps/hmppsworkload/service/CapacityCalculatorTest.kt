@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.math.BigInteger
 
-class DefaultCapacityCalculatorTest {
-  private val capacityCalculator = DefaultCapacityCalculator()
+class CapacityCalculatorTest {
+  private val capacityCalculator = CapacityCalculator()
 
   @Test
   fun `can calculate available points`() {
