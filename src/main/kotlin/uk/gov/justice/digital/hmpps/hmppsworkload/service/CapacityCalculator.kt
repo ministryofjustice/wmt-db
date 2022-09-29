@@ -23,9 +23,7 @@ class CapacityCalculator {
     contractedHoursForGrade: BigDecimal
   ): BigInteger {
     if (currentHours != ZERO && contractedHoursForGrade != ZERO) {
-      val availablePointsForCurrentHours = availablePoints.multiply(currentHours.divide(contractedHoursForGrade, 15, HALF_UP))
-      val currentHoursWorked = (currentHours.minus(reductionHours)).divide(currentHours, 15, HALF_UP)
-      return availablePointsForCurrentHours.multiply(currentHoursWorked).toBigInteger()
+      return (availablePoints * ((currentHours - reductionHours).divide(contractedHoursForGrade, 15, HALF_UP))).toBigInteger()
     }
     return BigInteger.ZERO
   }
