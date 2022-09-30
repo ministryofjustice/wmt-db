@@ -30,10 +30,9 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
 
     val staffCode = "STAFF1"
     val teamCode = "TM1"
-    val providerCode = "SC1"
     val staffGrade = "PO"
 
-    workloadCalculation.calculate(staffCode, teamCode, providerCode, staffGrade)
+    workloadCalculation.calculate(staffCode, teamCode, staffGrade)
 
     await untilCallTo {
       workloadCalculationRepository.count()
@@ -46,14 +45,13 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
   fun `breakdown data should include court report count`() {
     val staffCode = "STAFF1"
     val teamCode = "TM1"
-    val providerCode = "SC1"
     val staffGrade = "PO"
     val standardDeliveryReportCount = 10
     val fastDeliveryReportCount = 0
 
     wmtCourtReportsRepository
       .save(WMTCourtReportsEntity(staffCode = staffCode, teamCode = teamCode, fastDeliveryReportCount = fastDeliveryReportCount, standardDeliveryReportCount = standardDeliveryReportCount))
-    workloadCalculation.calculate(staffCode, teamCode, providerCode, staffGrade)
+    workloadCalculation.calculate(staffCode, teamCode, staffGrade)
 
     await untilCallTo {
       workloadCalculationRepository.count()
@@ -72,13 +70,12 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
   fun `breakdown data should include parole report count`() {
     val staffCode = "STAFF1"
     val teamCode = "TM1"
-    val providerCode = "SC1"
     val staffGrade = "PO"
     val paroleReportsCount = 4
 
     wmtInstitutionalReportRepository.save(WMTInstitutionalReportEntity(staffCode = staffCode, teamCode = teamCode, paroleReports = paroleReportsCount))
 
-    workloadCalculation.calculate(staffCode, teamCode, providerCode, staffGrade)
+    workloadCalculation.calculate(staffCode, teamCode, staffGrade)
     await untilCallTo {
       workloadCalculationRepository.count()
     } matches { it == 1L }
@@ -93,14 +90,13 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
   fun `breakdown data should include case assessment count`() {
     val staffCode = "STAFF1"
     val teamCode = "TM1"
-    val providerCode = "SC1"
     val staffGrade = "PO"
     val communityAssessmentCount = 1
     val licenseAssessmentCount = 1
 
     wmtAssessmentRepository.save(WMTAssessmentEntity(staffCode = staffCode, teamCode = teamCode, sentenceType = "Community"))
     wmtAssessmentRepository.save(WMTAssessmentEntity(staffCode = staffCode, teamCode = teamCode, sentenceType = "License"))
-    workloadCalculation.calculate(staffCode, teamCode, providerCode, staffGrade)
+    workloadCalculation.calculate(staffCode, teamCode, staffGrade)
 
     await untilCallTo {
       workloadCalculationRepository.count()
@@ -119,7 +115,6 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
   fun `breakdown data should include contacts performed outside and by others`() {
     val staffCode = "STAFF1"
     val teamCode = "TM1"
-    val providerCode = "SC1"
     val staffGrade = "PO"
     val contactTypeCode = "CONTACT1"
 
@@ -129,7 +124,7 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
     wmtcmsRepository
       .save(WMTCMSEntity(staffCode = "StaffCode", staffTeamCode = "TM2", personManagerStaffCode = staffCode, personManagerTeamCode = teamCode, contactTypeCode = contactTypeCode))
 
-    workloadCalculation.calculate(staffCode, teamCode, providerCode, staffGrade)
+    workloadCalculation.calculate(staffCode, teamCode, staffGrade)
 
     await untilCallTo {
       workloadCalculationRepository.count()
@@ -147,13 +142,12 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
   fun `must include contact type weightings in breakdown`() {
     val staffCode = "STAFF1"
     val teamCode = "TM1"
-    val providerCode = "SC1"
     val staffGrade = "PO"
 
     val adjustmentReason = AdjustmentReasonEntity(typeCode = "ADJUSTMENT_REASON1", points = 10)
     adjustmentReasonRepository.save(adjustmentReason)
 
-    workloadCalculation.calculate(staffCode, teamCode, providerCode, staffGrade)
+    workloadCalculation.calculate(staffCode, teamCode, staffGrade)
 
     await untilCallTo {
       workloadCalculationRepository.count()
@@ -176,7 +170,7 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
 
     caseDetailsRepository.save(CaseDetailsEntity("CRN1", Tier.B2, CaseType.COMMUNITY, "Jane", "Doe"))
 
-    workloadCalculation.calculate(staffCode, teamCode, providerCode, staffGrade)
+    workloadCalculation.calculate(staffCode, teamCode, staffGrade)
 
     await untilCallTo {
       workloadCalculationRepository.count()

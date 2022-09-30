@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadCalculation
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadPointsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadCalculationRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadPointsRepository
+import java.math.BigDecimal
 
 @Service
 class WorkloadCalculationService(
@@ -28,7 +29,14 @@ class WorkloadCalculationService(
   private val getCaseLoad: GetCaseload
 ) {
 
-  fun calculate(staffCode: String, teamCode: String, providerCode: String, staffGrade: String): WorkloadCalculationEntity {
+  fun calculate(staffCode: String, teamCode: String, staffGrade: String): WorkloadCalculationEntity {
+    val weeklyHours = weeklyHours.findWeeklyHours(staffCode, teamCode, staffGrade)
+    val reductions = getReductionService.findReductionHours(staffCode, teamCode)
+    val availableHours = weeklyHours - reductions
+    return calculate(staffCode, teamCode, staffGrade, availableHours)
+  }
+
+  fun calculate(staffCode: String, teamCode: String, staffGrade: String, availableHours: BigDecimal): WorkloadCalculationEntity {
     val cases = getCaseLoad.getCases(staffCode, teamCode)
     val courtReports = getCourtReports.getCourtReports(staffCode, teamCode)
     val paroleReports = getParoleReports.getParoleReports(staffCode, teamCode)
@@ -38,11 +46,13 @@ class WorkloadCalculationService(
     val contactTypeWeightings = getContactTypeWeightings.findAll()
     val t2aWorkloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(true)
     val workloadPointsWeighting: WorkloadPointsEntity = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
-    val weeklyHours = weeklyHours.findWeeklyHours(staffCode, teamCode, staffGrade)
-    val reductions = getReductionService.findReductionHours(staffCode, teamCode)
-    val availablePoints = capacityCalculator.calculateAvailablePoints(workloadPointsWeighting.getDefaultPointsAvailable(staffGrade), weeklyHours, reductions, workloadPointsWeighting.getDefaultContractedHours(staffGrade))
+    val availablePoints = capacityCalculator.calculateAvailablePoints(
+      workloadPointsWeighting.getDefaultPointsAvailable(staffGrade),
+      workloadPointsWeighting.getDefaultContractedHours(staffGrade),
+      availableHours
+    )
     val workloadPoints = workloadCalculator.getWorkloadPoints(cases, courtReports, paroleReports, assessments, contactsPerformedOutsideCaseload, contactsPerformedByOthers, contactTypeWeightings, t2aWorkloadPoints, workloadPointsWeighting)
-    return workloadCalculationRepository.save(WorkloadCalculationEntity(weeklyHours = weeklyHours, reductions = reductions, availablePoints = availablePoints, workloadPoints = workloadPoints, staffCode = staffCode, teamCode = teamCode, providerCode = providerCode, breakdownData = BreakdownDataEntity(getCourtReportCounts(courtReports, CourtReportType.STANDARD), getCourtReportCounts(courtReports, CourtReportType.FAST), paroleReports, getAssessmentCounts(assessments, CaseType.COMMUNITY), getAssessmentCounts(assessments, CaseType.LICENSE), getContactTypeCodeCounts(contactsPerformedOutsideCaseload), getContactTypeCodeCounts(contactsPerformedByOthers), contactTypeWeightings, cases.size)))
+    return workloadCalculationRepository.save(WorkloadCalculationEntity(availablePoints = availablePoints, workloadPoints = workloadPoints, staffCode = staffCode, teamCode = teamCode, breakdownData = BreakdownDataEntity(getCourtReportCounts(courtReports, CourtReportType.STANDARD), getCourtReportCounts(courtReports, CourtReportType.FAST), paroleReports, getAssessmentCounts(assessments, CaseType.COMMUNITY), getAssessmentCounts(assessments, CaseType.LICENSE), getContactTypeCodeCounts(contactsPerformedOutsideCaseload), getContactTypeCodeCounts(contactsPerformedByOthers), contactTypeWeightings, cases.size, availableHours)))
   }
 
   private fun getCourtReportCounts(courtReports: List<CourtReport>, type: CourtReportType): Int =
