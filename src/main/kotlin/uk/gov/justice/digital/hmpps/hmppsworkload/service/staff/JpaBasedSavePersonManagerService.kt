@@ -31,7 +31,7 @@ class JpaBasedSavePersonManagerService(
         val currentPersonManager = getPersonManager.findLatestByCrn(allocateCase.crn)
         createPersonManager(allocateCase, staff, teamCode, personSummary, loggedInUser).also {
           personManager.isActive = false
-          workloadCalculationService.calculate(currentPersonManager!!.staffCode, currentPersonManager.teamCode, currentPersonManager.providerCode, currentPersonManager.staffGrade)
+          workloadCalculationService.calculate(currentPersonManager!!.staffCode, currentPersonManager.teamCode, currentPersonManager.staffGrade)
         }
       }
     } ?: createPersonManager(allocateCase, staff, teamCode, personSummary, loggedInUser)
@@ -43,7 +43,6 @@ class JpaBasedSavePersonManagerService(
     personSummary: PersonSummary,
     loggedInUser: String
   ): SaveResult<PersonManagerEntity> {
-    val providerCode = staff.probationArea!!.code
     val personManagerEntity = PersonManagerEntity(
       crn = allocateCase.crn,
       staffId = staff.staffIdentifier,
@@ -51,11 +50,11 @@ class JpaBasedSavePersonManagerService(
       teamCode = teamCode,
       offenderName = "${personSummary.firstName} ${personSummary.surname}",
       createdBy = loggedInUser,
-      providerCode = providerCode,
+      providerCode = staff.probationArea!!.code,
       isActive = true
     )
     personManagerRepository.save(personManagerEntity)
-    workloadCalculationService.calculate(staff.staffCode, teamCode, providerCode, staff.grade)
+    workloadCalculationService.calculate(staff.staffCode, teamCode, staff.grade)
     return SaveResult(personManagerEntity, true)
   }
 }
