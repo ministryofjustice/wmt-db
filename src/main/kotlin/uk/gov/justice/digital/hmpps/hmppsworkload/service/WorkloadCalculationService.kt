@@ -31,6 +31,7 @@ class WorkloadCalculationService(
   fun calculate(staffCode: String, teamCode: String, providerCode: String, staffGrade: String): WorkloadCalculationEntity {
     val weeklyHours = weeklyHours.findWeeklyHours(staffCode, teamCode, staffGrade)
     val reductions = getReductionService.findReductionHours(staffCode, teamCode)
+    val availableHours = weeklyHours - reductions
     // new method call and definition here
     val cases = getCaseLoad.getCases(staffCode, teamCode)
     val courtReports = getCourtReports.getCourtReports(staffCode, teamCode)
@@ -44,11 +45,11 @@ class WorkloadCalculationService(
     val availablePoints = capacityCalculator.calculateAvailablePoints(
       workloadPointsWeighting.getDefaultPointsAvailable(staffGrade),
       workloadPointsWeighting.getDefaultContractedHours(staffGrade),
-      weeklyHours - reductions
+      availableHours
     )
     val workloadPoints = workloadCalculator.getWorkloadPoints(cases, courtReports, paroleReports, assessments, contactsPerformedOutsideCaseload, contactsPerformedByOthers, contactTypeWeightings, t2aWorkloadPoints, workloadPointsWeighting)
     // just pass in availableHours
-    return workloadCalculationRepository.save(WorkloadCalculationEntity(weeklyHours = weeklyHours, reductions = reductions, availablePoints = availablePoints, workloadPoints = workloadPoints, staffCode = staffCode, teamCode = teamCode, providerCode = providerCode, breakdownData = BreakdownDataEntity(getCourtReportCounts(courtReports, CourtReportType.STANDARD), getCourtReportCounts(courtReports, CourtReportType.FAST), paroleReports, getAssessmentCounts(assessments, CaseType.COMMUNITY), getAssessmentCounts(assessments, CaseType.LICENSE), getContactTypeCodeCounts(contactsPerformedOutsideCaseload), getContactTypeCodeCounts(contactsPerformedByOthers), contactTypeWeightings, cases.size)))
+    return workloadCalculationRepository.save(WorkloadCalculationEntity(availablePoints = availablePoints, workloadPoints = workloadPoints, staffCode = staffCode, teamCode = teamCode, breakdownData = BreakdownDataEntity(getCourtReportCounts(courtReports, CourtReportType.STANDARD), getCourtReportCounts(courtReports, CourtReportType.FAST), paroleReports, getAssessmentCounts(assessments, CaseType.COMMUNITY), getAssessmentCounts(assessments, CaseType.LICENSE), getContactTypeCodeCounts(contactsPerformedOutsideCaseload), getContactTypeCodeCounts(contactsPerformedByOthers), contactTypeWeightings, cases.size, availableHours)))
   }
 
   private fun getCourtReportCounts(courtReports: List<CourtReport>, type: CourtReportType): Int =

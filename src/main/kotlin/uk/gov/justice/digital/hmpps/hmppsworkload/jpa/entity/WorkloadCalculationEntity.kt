@@ -5,7 +5,6 @@ import com.vladmihalcea.hibernate.type.json.JsonStringType
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.TypeDef
 import org.hibernate.annotations.TypeDefs
-import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.ZonedDateTime
 import javax.persistence.Column
@@ -30,14 +29,6 @@ data class WorkloadCalculationEntity(
   @Column
   val calculatedDate: ZonedDateTime = ZonedDateTime.now(),
 
-  // remove
-  @Column
-  val weeklyHours: BigDecimal,
-
-  // remove
-  @Column
-  val reductions: BigDecimal,
-
   @Column
   val availablePoints: BigInteger,
 
@@ -50,13 +41,9 @@ data class WorkloadCalculationEntity(
   @Column
   val teamCode: String,
 
-  // get rid
-  @Column
-  val providerCode: String,
-
   // add available hours
   @Type(type = "jsonb")
   @Column(columnDefinition = "jsonb")
-  val breakdownData: BreakdownDataEntity
+  val breakdownData: BreakdownDataEntity,
 
 )
