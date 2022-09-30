@@ -17,9 +17,8 @@ class CapacityCalculatorTest {
 
     val calculatedAvailablePoints = capacityCalculator.calculateAvailablePoints(
       availablePoints,
-      currentHours,
-      reductionHours,
-      defaultContractedHoursForGrade
+      defaultContractedHoursForGrade,
+      currentHours - reductionHours
     )
 
     Assertions.assertEquals(BigInteger.valueOf(2070), calculatedAvailablePoints)
@@ -34,9 +33,8 @@ class CapacityCalculatorTest {
 
     val calculatedAvailablePoints = capacityCalculator.calculateAvailablePoints(
       availablePoints,
-      currentHours,
-      reductionHours,
-      defaultContractedHoursForGrade
+      defaultContractedHoursForGrade,
+      currentHours - reductionHours
     )
 
     Assertions.assertEquals(BigInteger.valueOf(1658), calculatedAvailablePoints)

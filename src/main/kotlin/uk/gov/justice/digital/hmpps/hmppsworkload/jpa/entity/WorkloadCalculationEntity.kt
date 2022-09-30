@@ -30,9 +30,11 @@ data class WorkloadCalculationEntity(
   @Column
   val calculatedDate: ZonedDateTime = ZonedDateTime.now(),
 
+  // remove
   @Column
   val weeklyHours: BigDecimal,
 
+  // remove
   @Column
   val reductions: BigDecimal,
 
@@ -48,9 +50,11 @@ data class WorkloadCalculationEntity(
   @Column
   val teamCode: String,
 
+  // get rid
   @Column
   val providerCode: String,
 
+  // add available hours
   @Type(type = "jsonb")
   @Column(columnDefinition = "jsonb")
   val breakdownData: BreakdownDataEntity

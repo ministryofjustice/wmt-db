@@ -17,13 +17,13 @@ class CapacityCalculator {
   }
 
   fun calculateAvailablePoints(
-    availablePoints: BigDecimal,
-    currentHours: BigDecimal,
-    reductionHours: BigDecimal,
-    contractedHoursForGrade: BigDecimal
+    pointsForGrade: BigDecimal,
+    contractedHoursForGrade: BigDecimal,
+    availableHours: BigDecimal
   ): BigInteger {
-    if (currentHours != ZERO && contractedHoursForGrade != ZERO) {
-      return (availablePoints * ((currentHours - reductionHours).divide(contractedHoursForGrade, 15, HALF_UP))).toBigInteger()
+    if (availableHours > ZERO && contractedHoursForGrade != ZERO) {
+      val percentageToWork = availableHours.divide(contractedHoursForGrade, 15, HALF_UP)
+      return (pointsForGrade * percentageToWork).toBigInteger()
     }
     return BigInteger.ZERO
   }
