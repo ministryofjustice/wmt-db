@@ -138,6 +138,6 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
       .jsonPath("$.code")
       .isEqualTo(staffCode)
       .jsonPath("$.potentialCapacity")
-      .isEqualTo(0)
+      .isEqualTo(2)
   }
 }
