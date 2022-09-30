@@ -41,7 +41,6 @@ data class WorkloadCalculationEntity(
   @Column
   val teamCode: String,
 
-  // add available hours
   @Type(type = "jsonb")
   @Column(columnDefinition = "jsonb")
   val breakdownData: BreakdownDataEntity,
