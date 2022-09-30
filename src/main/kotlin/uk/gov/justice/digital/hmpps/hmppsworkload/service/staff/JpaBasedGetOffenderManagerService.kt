@@ -64,14 +64,10 @@ class JpaBasedGetOffenderManagerService(
     teamName: String
   ): OffenderManagerOverview {
     val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
-    val defaultAvailablePointsForGrade = workloadPoints.getDefaultPointsAvailable(staff.grade)
-
+    val availablePoints = workloadPoints.getDefaultPointsAvailable(staff.grade)
     val defaultContractedHours = workloadPoints.getDefaultContractedHours(staff.grade)
-    val availablePoints = capacityCalculator.calculateAvailablePoints(
-      defaultAvailablePointsForGrade, defaultContractedHours,
-      BigDecimal.ZERO, defaultContractedHours
-    )
-    val overview = OffenderManagerOverview(staff.staff.forenames, staff.staff.surname, 0, 0, availablePoints, BigInteger.ZERO, staff.staffCode, teamName, LocalDateTime.now(), -1, BigInteger.ZERO)
+
+    val overview = OffenderManagerOverview(staff.staff.forenames, staff.staff.surname, 0, 0, availablePoints.toBigInteger(), BigInteger.ZERO, staff.staffCode, teamName, LocalDateTime.now(), -1, BigInteger.ZERO)
     overview.capacity = capacityCalculator.calculate(overview.totalPoints, overview.availablePoints)
     overview.contractedHours = defaultContractedHours
     return overview
