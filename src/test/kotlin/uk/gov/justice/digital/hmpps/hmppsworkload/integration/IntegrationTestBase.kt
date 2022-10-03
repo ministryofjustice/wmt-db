@@ -143,8 +143,9 @@ abstract class IntegrationTestBase {
   private val domainEventsTopic by lazy { hmppsQueueService.findByTopicId("hmmppsdomaintopic") ?: throw MissingQueueException("HmppsTopic hmmppsdomaintopic not found") }
   private val offenderEventTopic by lazy { hmppsQueueService.findByTopicId("hmppsoffendertopic") ?: throw MissingQueueException("HmppsTopic hmppsoffendertopic not found") }
 
-  private val hmppsDomainQueue by lazy { hmppsQueueService.findByQueueId("tiercalcqueue") ?: throw MissingQueueException("HmppsQueue tiercalcqueue not found") }
+  private val tierCalculationQueue by lazy { hmppsQueueService.findByQueueId("tiercalcqueue") ?: throw MissingQueueException("HmppsQueue tiercalcqueue not found") }
   private val hmppsAuditQueue by lazy { hmppsQueueService.findByQueueId("hmppsauditqueue") ?: throw MissingQueueException("HmppsQueue hmppsauditqueue not found") }
+  private val workloadCalculationQueue by lazy { hmppsQueueService.findByQueueId("workloadcalculationqueue") ?: throw MissingQueueException("HmppsQueue workloadcalculationqueue not found") }
 
   private val hmppsOffenderSqsDlqClient by lazy { hmppsOffenderQueue.sqsDlqClient as AmazonSQS }
   protected val hmppsOffenderSqsClient by lazy { hmppsOffenderQueue.sqsClient }
@@ -155,8 +156,11 @@ abstract class IntegrationTestBase {
   protected val hmppsDomainSnsClient by lazy { domainEventsTopic.snsClient }
   protected val hmppsDomainTopicArn by lazy { domainEventsTopic.arn }
 
-  private val hmppsDomainSqsDlqClient by lazy { hmppsDomainQueue.sqsDlqClient as AmazonSQS }
-  protected val hmppsDomainSqsClient by lazy { hmppsDomainQueue.sqsClient }
+  private val tierCalculationSqsDlqClient by lazy { tierCalculationQueue.sqsDlqClient as AmazonSQS }
+  protected val tierCalculationSqsClient by lazy { tierCalculationQueue.sqsClient }
+
+  private val workloadCalculationSqsDlqClient by lazy { workloadCalculationQueue.sqsDlqClient as AmazonSQS }
+  protected val workloadCalculationSqsClient by lazy { workloadCalculationQueue.sqsClient }
 
   protected val hmppsAuditQueueClient by lazy { hmppsAuditQueue.sqsClient }
 
@@ -184,9 +188,10 @@ abstract class IntegrationTestBase {
     allocationCompleteClient.purgeQueue(PurgeQueueRequest(allocationCompleteUrl))
     hmppsOffenderSqsClient.purgeQueue(PurgeQueueRequest(hmppsOffenderQueue.queueUrl))
     hmppsOffenderSqsDlqClient.purgeQueue(PurgeQueueRequest(hmppsOffenderQueue.dlqUrl))
-
-    hmppsDomainSqsClient.purgeQueue(PurgeQueueRequest(hmppsDomainQueue.queueUrl))
-    hmppsDomainSqsDlqClient.purgeQueue(PurgeQueueRequest(hmppsDomainQueue.dlqUrl))
+    workloadCalculationSqsClient.purgeQueue(PurgeQueueRequest(workloadCalculationQueue.queueUrl))
+    workloadCalculationSqsDlqClient.purgeQueue(PurgeQueueRequest(workloadCalculationQueue.dlqUrl))
+    tierCalculationSqsClient.purgeQueue(PurgeQueueRequest(tierCalculationQueue.queueUrl))
+    tierCalculationSqsDlqClient.purgeQueue(PurgeQueueRequest(tierCalculationQueue.dlqUrl))
     hmppsAuditQueueClient.purgeQueue(PurgeQueueRequest(hmppsAuditQueue.queueUrl))
     workloadCalculationRepository.deleteAll()
   }
@@ -222,8 +227,16 @@ abstract class IntegrationTestBase {
   protected fun noMessagesOnOffenderEventsQueue() {
     await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
   }
+
   private fun countMessagesOnOffenderEventQueue(): Int =
     hmppsOffenderSqsClient.getQueueAttributes(hmppsOffenderQueue.queueUrl, listOf("ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible"))
+      .let { (it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0) }
+
+  protected fun noMessagesOnWorkloadCalculationEventsQueue() {
+    await untilCallTo { countMessagesOnWorkloadCalculationEventQueue() } matches { it == 0 }
+  }
+  private fun countMessagesOnWorkloadCalculationEventQueue(): Int =
+    workloadCalculationSqsClient.getQueueAttributes(workloadCalculationQueue.queueUrl, listOf("ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible"))
       .let { (it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0) }
 
   protected fun noMessagesOnOffenderEventsDLQ() {

@@ -14,5 +14,3 @@ data class StaffSummary @JsonCreator constructor(
 ) {
   var grade: String = deliusToStaffGrade(staffGrade?.code)
 }
-
-fun staffToStaffSummary(staff: Staff): StaffSummary = StaffSummary(staff.staffIdentifier, staff.staffCode, staff.staff, staff.staffGrade, staff.teams, staff.probationArea)
