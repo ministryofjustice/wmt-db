@@ -73,7 +73,7 @@ class WorkloadCalculationListenerTests : IntegrationTestBase() {
 
     noMessagesOnWorkloadCalculationEventsQueue()
 
-    Assertions.assertEquals(1, countMessagesOnWorkloadCalculationDeadLetterQueue())
+    oneMessageOnWorkloadCalculationDeadLetterQueue()
   }
 
   private fun staffAvailableHoursChangedEvent(staffCode: String, teamCode: String, availableHours: BigDecimal) = WorkloadCalculationEvent(

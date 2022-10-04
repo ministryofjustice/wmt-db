@@ -239,7 +239,11 @@ abstract class IntegrationTestBase {
     workloadCalculationSqsClient.getQueueAttributes(workloadCalculationQueue.queueUrl, listOf("ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible"))
       .let { (it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0) }
 
-  protected fun countMessagesOnWorkloadCalculationDeadLetterQueue(): Int =
+  protected fun oneMessageOnWorkloadCalculationDeadLetterQueue() {
+    await untilCallTo { countMessagesOnWorkloadCalculationDeadLetterQueue() } matches { it == 0 }
+  }
+
+  private fun countMessagesOnWorkloadCalculationDeadLetterQueue(): Int =
     workloadCalculationSqsDlqClient.getQueueAttributes(workloadCalculationQueue.dlqUrl, listOf("ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible"))
       .let { (it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0) }
 
