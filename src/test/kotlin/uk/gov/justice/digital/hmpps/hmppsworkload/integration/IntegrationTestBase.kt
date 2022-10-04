@@ -240,7 +240,7 @@ abstract class IntegrationTestBase {
       .let { (it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0) }
 
   protected fun oneMessageOnWorkloadCalculationDeadLetterQueue() {
-    await untilCallTo { countMessagesOnWorkloadCalculationDeadLetterQueue() } matches { it == 0 }
+    await untilCallTo { countMessagesOnWorkloadCalculationDeadLetterQueue() } matches { it == 1 }
   }
 
   private fun countMessagesOnWorkloadCalculationDeadLetterQueue(): Int =
