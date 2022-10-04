@@ -239,6 +239,10 @@ abstract class IntegrationTestBase {
     workloadCalculationSqsClient.getQueueAttributes(workloadCalculationQueue.queueUrl, listOf("ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible"))
       .let { (it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0) }
 
+  protected fun countMessagesOnWorkloadCalculationDeadLetterQueue(): Int =
+    workloadCalculationSqsDlqClient.getQueueAttributes(workloadCalculationQueue.dlqUrl, listOf("ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible"))
+      .let { (it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0) }
+
   protected fun noMessagesOnOffenderEventsDLQ() {
     await untilCallTo { countMessagesOnOffenderEventDeadLetterQueue() } matches { it == 0 }
   }
@@ -412,6 +416,13 @@ abstract class IntegrationTestBase {
     val request = request().withPath("/staff/staffCode/$staffCode")
     communityApi.`when`(request, Times.exactly(1)).respond(
       response().withContentType(APPLICATION_JSON).withBody(staffByCodeResponse(staffCode, teamCode, staffGrade))
+    )
+  }
+
+  protected fun staffCodeErrorResponse(staffCode: String, teamCode: String) {
+    val request = request().withPath("/staff/staffCode/$staffCode")
+    communityApi.`when`(request, Times.exactly(1)).respond(
+      response().withContentType(APPLICATION_JSON).withStatusCode(503)
     )
   }
 

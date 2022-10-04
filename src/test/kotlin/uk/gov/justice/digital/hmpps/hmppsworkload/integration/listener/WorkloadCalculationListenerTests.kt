@@ -25,7 +25,7 @@ class WorkloadCalculationListenerTests : IntegrationTestBase() {
     val crn = "J678910"
     val staffCode = "staff1"
     val teamCode = "team1"
-
+    val availableHours = BigDecimal.TEN
     val caseDetailsEntity = CaseDetailsEntity(crn, Tier.C3, CaseType.COMMUNITY, "Jane", "Doe")
 
     caseDetailsRepository.save(caseDetailsEntity)
@@ -34,7 +34,7 @@ class WorkloadCalculationListenerTests : IntegrationTestBase() {
     personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = staffCode, teamCode = teamCode, offenderName = "offender", createdBy = "createdby", providerCode = "providerCode", isActive = true))
 
     hmppsDomainSnsClient.publish(
-      PublishRequest(hmppsDomainTopicArn, jsonString(staffAvailableHoursChangedEvent(staffCode, teamCode, BigDecimal.TEN))).withMessageAttributes(
+      PublishRequest(hmppsDomainTopicArn, jsonString(staffAvailableHoursChangedEvent(staffCode, teamCode, availableHours))).withMessageAttributes(
         mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("staff.available.hours.changed"))
       )
     )
@@ -47,8 +47,33 @@ class WorkloadCalculationListenerTests : IntegrationTestBase() {
     Assertions.assertAll(
       { Assertions.assertEquals(staffCode, actualWorkloadCalcEntity?.staffCode) },
       { Assertions.assertEquals(teamCode, actualWorkloadCalcEntity?.teamCode) },
+      { Assertions.assertEquals(availableHours, actualWorkloadCalcEntity?.breakdownData?.availableHours) },
       { Assertions.assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity?.calculatedDate?.dayOfMonth) }
     )
+  }
+
+  @Test
+  fun `move event onto dlq when retrieving grade fails`() {
+    val crn = "J678910"
+    val staffCode = "staff1"
+    val teamCode = "team1"
+    val availableHours = BigDecimal.TEN
+    val caseDetailsEntity = CaseDetailsEntity(crn, Tier.C3, CaseType.COMMUNITY, "Jane", "Doe")
+
+    caseDetailsRepository.save(caseDetailsEntity)
+
+    staffCodeErrorResponse(staffCode, teamCode)
+    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = staffCode, teamCode = teamCode, offenderName = "offender", createdBy = "createdby", providerCode = "providerCode", isActive = true))
+
+    hmppsDomainSnsClient.publish(
+      PublishRequest(hmppsDomainTopicArn, jsonString(staffAvailableHoursChangedEvent(staffCode, teamCode, availableHours))).withMessageAttributes(
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("staff.available.hours.changed"))
+      )
+    )
+
+    noMessagesOnWorkloadCalculationEventsQueue()
+
+    Assertions.assertEquals(1, countMessagesOnWorkloadCalculationDeadLetterQueue())
   }
 
   private fun staffAvailableHoursChangedEvent(staffCode: String, teamCode: String, availableHours: BigDecimal) = WorkloadCalculationEvent(
