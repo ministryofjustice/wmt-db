@@ -19,7 +19,7 @@ val springDocVersion by extra("1.6.11")
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:1.1.10")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:1.1.11")
 
   implementation("org.springdoc:springdoc-openapi-ui:$springDocVersion")
   implementation("org.springdoc:springdoc-openapi-kotlin:$springDocVersion")
@@ -37,7 +37,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt:0.9.1")
   testImplementation("org.mock-server:mockserver-netty:5.14.0")
   testImplementation("org.awaitility:awaitility-kotlin:4.2.0")
-  testImplementation("io.mockk:mockk:1.13.1")
+  testImplementation("io.mockk:mockk:1.13.2")
   testImplementation("com.ninja-squad:springmockk:3.1.1")
 }
 

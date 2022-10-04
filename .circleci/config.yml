@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  hmpps: ministryofjustice/hmpps@5.1.1
+  hmpps: ministryofjustice/hmpps@5.2.0
   slack: circleci/slack@4.10.1
 
 parameters:
@@ -18,7 +18,7 @@ jobs:
       name: hmpps/java_localstack_postgres
       jdk_tag: "18.0"
       localstack_tag: "0.14.1"
-      postgres_tag: "11"
+      postgres_tag: "14"
     steps:
       - checkout
       - restore_cache:
