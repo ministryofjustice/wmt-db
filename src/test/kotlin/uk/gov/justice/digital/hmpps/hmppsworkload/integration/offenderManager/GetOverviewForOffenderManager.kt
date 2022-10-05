@@ -38,7 +38,7 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
     val secondWorkloadOwner = wmtWorkloadOwnerRepository.save(WMTWorkloadOwnerEntity(team = team, offenderManager = offenderManager, contractedHours = BigDecimal.valueOf(5)))
 
     val reduction = ReductionEntity(
-      workloadOwnerId = secondWorkloadOwner.id!!, hours = BigDecimal.valueOf(5),
+      workloadOwner = secondWorkloadOwner, hours = BigDecimal.valueOf(5),
       effectiveFrom = LocalDate.now().minusDays(2).atStartOfDay(
         ZoneId.systemDefault()
       ),
@@ -48,7 +48,7 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
 
     reductionsRepository.save(
       ReductionEntity(
-        workloadOwnerId = secondWorkloadOwner.id!!, hours = BigDecimal.valueOf(5),
+        workloadOwner = secondWorkloadOwner, hours = BigDecimal.valueOf(5),
         effectiveFrom = LocalDate.now().minusDays(2).atStartOfDay(
           ZoneId.systemDefault()
         ),

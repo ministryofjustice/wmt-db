@@ -9,6 +9,8 @@ import javax.persistence.Enumerated
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
 import javax.persistence.Table
 
 @Entity
@@ -19,8 +21,9 @@ data class ReductionEntity(
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   val id: Long? = null,
 
-  @Column(name = "workload_owner_id")
-  val workloadOwnerId: Long,
+  @ManyToOne
+  @JoinColumn(name = "workload_owner_id")
+  val workloadOwner: WMTWorkloadOwnerEntity,
 
   @Column(name = "hours")
   val hours: BigDecimal,

@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsworkload.service
+package uk.gov.justice.digital.hmpps.hmppsworkload.service.reduction
 
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
@@ -15,8 +15,8 @@ class GetReductionService(private val reductionsRepository: ReductionsRepository
   )
 
   fun findNextReductionChange(staffCode: String, teamCode: String): ZonedDateTime? = workloadOwnerRepository.findFirstByOffenderManagerCodeAndTeamCodeOrderByIdDesc(staffCode, teamCode)?.let { workloadOwner ->
-    reductionsRepository.findByWorkloadOwnerIdAndEffectiveFromGreaterThanOrEffectiveToGreaterThanAndStatusNotIn(
-      workloadOwner.id!!, ZonedDateTime.now(), ZonedDateTime.now(), excludeStatuses
+    reductionsRepository.findByWorkloadOwnerAndEffectiveFromGreaterThanOrEffectiveToGreaterThanAndStatusNotIn(
+      workloadOwner, ZonedDateTime.now(), ZonedDateTime.now(), excludeStatuses
     )
       .flatMap { reduction ->
         listOf(
@@ -29,8 +29,8 @@ class GetReductionService(private val reductionsRepository: ReductionsRepository
 
   fun findReductionHours(staffCode: String, teamCode: String): BigDecimal = (
     workloadOwnerRepository.findFirstByOffenderManagerCodeAndTeamCodeOrderByIdDesc(staffCode, teamCode)?.let { workloadOwner ->
-      reductionsRepository.findByWorkloadOwnerIdAndEffectiveFromLessThanAndEffectiveToGreaterThanAndStatusNotIn(
-        workloadOwner.id!!, ZonedDateTime.now(), ZonedDateTime.now(), excludeStatuses
+      reductionsRepository.findByWorkloadOwnerAndEffectiveFromLessThanAndEffectiveToGreaterThanAndStatusNotIn(
+        workloadOwner, ZonedDateTime.now(), ZonedDateTime.now(), excludeStatuses
       )
         .map { it.hours }
         .fold(BigDecimal.ZERO) { first, second -> first.add(second) }
