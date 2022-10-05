@@ -17,9 +17,9 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.OffenderManager
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadPointsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.CapacityCalculator
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.CaseCalculator
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetReductionService
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetSentenceService
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetWeeklyHours
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.reduction.GetReductionService
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.LocalDateTime

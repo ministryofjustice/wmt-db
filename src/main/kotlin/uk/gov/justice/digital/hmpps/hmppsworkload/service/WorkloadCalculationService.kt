@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadCalculation
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadPointsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadCalculationRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadPointsRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.reduction.GetReductionService
 import java.math.BigDecimal
 
 @Service
