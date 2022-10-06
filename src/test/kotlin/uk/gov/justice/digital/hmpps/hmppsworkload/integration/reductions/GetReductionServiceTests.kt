@@ -45,10 +45,17 @@ class GetReductionServiceTests : IntegrationTestBase() {
 
     val activeReductionInPast = reductionsRepository.save(ReductionEntity(workloadOwner = workloadOwner, hours = BigDecimal.valueOf(3.2), effectiveFrom = ZonedDateTime.now().minusDays(7), effectiveTo = ZonedDateTime.now().minusDays(1), status = ReductionStatus.ACTIVE, reductionReasonId = 1))
 
+    val activeReduction = reductionsRepository.save(ReductionEntity(workloadOwner = workloadOwner, hours = BigDecimal.valueOf(5), effectiveFrom = ZonedDateTime.now().minusDays(7), effectiveTo = ZonedDateTime.now().plusDays(7), status = ReductionStatus.ACTIVE, reductionReasonId = 1))
+
+    val deletedReductionInPast = reductionsRepository.save(ReductionEntity(workloadOwner = workloadOwner, hours = BigDecimal.valueOf(3.2), effectiveFrom = ZonedDateTime.now().minusDays(7), effectiveTo = ZonedDateTime.now().minusDays(1), status = ReductionStatus.DELETED, reductionReasonId = 1))
+
     val results = getReductionService.findOutOfDateReductions()
 
     Assertions.assertThat(results).extracting("id")
       .contains(activeReductionInPast.id!!)
+
+    Assertions.assertThat(results).extracting("id")
+      .doesNotContain(activeReduction.id!!, deletedReductionInPast.id!!)
   }
 
   @Test
