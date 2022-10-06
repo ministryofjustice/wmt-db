@@ -25,7 +25,7 @@ import java.time.ZonedDateTime
        2.b run calculation for staff code, team code combo
    4. emit event for reduction status finished to kick off wmt-worker ETL process
  */
-class GetReductionService : IntegrationTestBase() {
+class GetReductionServiceTests : IntegrationTestBase() {
 
   @Autowired
   protected lateinit var regionRepository: RegionRepository
