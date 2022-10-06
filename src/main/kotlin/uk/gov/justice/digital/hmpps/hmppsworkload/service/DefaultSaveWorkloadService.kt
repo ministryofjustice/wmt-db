@@ -38,7 +38,13 @@ class DefaultSaveWorkloadService(
     val staff = communityApiClient.getStaffByCode(staffCode).block()!!
     val summary = communityApiClient.getSummaryByCrn(allocateCase.crn).block()!!
     val activeRequirements = communityApiClient.getActiveRequirements(allocateCase.crn, allocateCase.eventId).block()!!.requirements
-    val personManagerSaveResult = savePersonManagerService.savePersonManager(teamCode, staff, allocateCase, loggedInUser, summary).also { afterPersonManagerSaved(it, staff) }
+    val personManagerSaveResult = savePersonManagerService.savePersonManager(
+      teamCode,
+      staff,
+      loggedInUser,
+      summary,
+      allocateCase.crn
+    ).also { afterPersonManagerSaved(it, staff) }
     val eventManagerSaveResult = saveEventManagerService.saveEventManager(teamCode, staff, allocateCase, loggedInUser).also { afterEventManagerSaved(it) }
     val requirementManagerSaveResults = saveRequirementManagerService.saveRequirementManagers(teamCode, staff, allocateCase, loggedInUser, activeRequirements).also { afterRequirementManagersSaved(it) }
     if (personManagerSaveResult.hasChanged || eventManagerSaveResult.hasChanged || requirementManagerSaveResults.any { it.hasChanged }) {
