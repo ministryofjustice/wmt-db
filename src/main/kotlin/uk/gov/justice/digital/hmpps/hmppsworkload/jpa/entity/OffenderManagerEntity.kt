@@ -163,5 +163,8 @@ data class OffenderManagerEntity(
   val forename: String,
 
   @Column
-  val surname: String
+  val surname: String,
+
+  @Column
+  val typeId: Long
 )

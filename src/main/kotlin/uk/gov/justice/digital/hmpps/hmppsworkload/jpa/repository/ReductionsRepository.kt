@@ -13,4 +13,8 @@ interface ReductionsRepository : CrudRepository<ReductionEntity, Long> {
   fun findByWorkloadOwnerAndEffectiveFromGreaterThanOrEffectiveToGreaterThanAndStatusNotIn(workloadOwner: WMTWorkloadOwnerEntity, effectiveFrom: ZonedDateTime, effectiveTo: ZonedDateTime, statuses: List<ReductionStatus>): List<ReductionEntity>
 
   fun findByWorkloadOwnerAndEffectiveFromLessThanAndEffectiveToGreaterThanAndStatusNotIn(workloadOwner: WMTWorkloadOwnerEntity, effectiveFrom: ZonedDateTime, effectiveTo: ZonedDateTime, statuses: List<ReductionStatus>): List<ReductionEntity>
+
+  fun findByEffectiveToLessThanAndStatus(effectiveTo: ZonedDateTime, status: ReductionStatus): List<ReductionEntity>
+
+  fun findByEffectiveFromLessThanAndEffectiveToGreaterThanAndStatus(effectiveFrom: ZonedDateTime, effectiveTo: ZonedDateTime, status: ReductionStatus): List<ReductionEntity>
 }
