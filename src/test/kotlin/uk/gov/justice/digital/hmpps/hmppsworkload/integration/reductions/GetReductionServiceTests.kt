@@ -21,8 +21,7 @@ import java.time.ZonedDateTime
    temporary test until we have an orchestrator. For orchestrator, I thought:
    1. get all out of date reductions
    2. Update all out of date reductions
-   3. Map them to a distinct list of staff code, team code, loop through
-       2.b run calculation for staff code, team code combo
+   3. Map them to a distinct list of staff code, team code, loop through, run calculation
    4. emit event for reduction status finished to kick off wmt-worker ETL process
  */
 class GetReductionServiceTests : IntegrationTestBase() {
