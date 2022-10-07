@@ -58,5 +58,3 @@ with the following structure:
   }
 }
 ```
-
-TODO consider moving migration and helm_deploy_cron and pipeline to a separate project
