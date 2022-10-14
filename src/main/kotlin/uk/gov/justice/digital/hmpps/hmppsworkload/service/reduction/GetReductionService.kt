@@ -39,7 +39,7 @@ class GetReductionService(private val reductionsRepository: ReductionsRepository
     ).stripTrailingZeros()
 
   fun findOutOfDateReductions(): OutOfDateReductions = OutOfDateReductions(
-    reductionsRepository.findByEffectiveFromLessThanAndEffectiveToGreaterThanAndStatus(ZonedDateTime.now(), ZonedDateTime.now(), ReductionStatus.SCHEDULED),
-    reductionsRepository.findByEffectiveToLessThanAndStatus(ZonedDateTime.now(), ReductionStatus.ACTIVE)
+    reductionsRepository.findByEffectiveFromBeforeAndEffectiveToAfterAndStatus(ZonedDateTime.now(), ZonedDateTime.now(), ReductionStatus.SCHEDULED),
+    reductionsRepository.findByEffectiveToBeforeAndStatus(ZonedDateTime.now(), ReductionStatus.ACTIVE)
   )
 }
