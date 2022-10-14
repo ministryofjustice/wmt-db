@@ -51,10 +51,10 @@ class GetReductionServiceTests : IntegrationTestBase() {
 
     val results = getReductionService.findOutOfDateReductions()
 
-    Assertions.assertThat(results).extracting("id")
+    Assertions.assertThat(results.activeNowArchived).extracting("id")
       .contains(activeReductionInPast.id!!)
 
-    Assertions.assertThat(results).extracting("id")
+    Assertions.assertThat(results.activeNowArchived).extracting("id")
       .doesNotContain(activeReduction.id!!, deletedReductionInPast.id!!)
   }
 
@@ -70,7 +70,7 @@ class GetReductionServiceTests : IntegrationTestBase() {
 
     val results = getReductionService.findOutOfDateReductions()
 
-    Assertions.assertThat(results).extracting("id")
+    Assertions.assertThat(results.scheduledNowActive).extracting("id")
       .contains(scheduledReductionWhichIsNowActive.id!!)
   }
 }

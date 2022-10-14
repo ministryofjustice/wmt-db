@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service.reduction
 
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OutOfDateReductions
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.ReductionsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTWorkloadOwnerRepository
@@ -38,7 +38,8 @@ class GetReductionService(private val reductionsRepository: ReductionsRepository
     } ?: BigDecimal.ZERO
     ).stripTrailingZeros()
 
-  fun findOutOfDateReductions(): List<ReductionEntity> = reductionsRepository.findByEffectiveToLessThanAndStatus(
-    ZonedDateTime.now(), ReductionStatus.ACTIVE
-  ) + reductionsRepository.findByEffectiveFromLessThanAndEffectiveToGreaterThanAndStatus(ZonedDateTime.now(), ZonedDateTime.now(), ReductionStatus.SCHEDULED)
+  fun findOutOfDateReductions(): OutOfDateReductions = OutOfDateReductions(
+    reductionsRepository.findByEffectiveFromLessThanAndEffectiveToGreaterThanAndStatus(ZonedDateTime.now(), ZonedDateTime.now(), ReductionStatus.SCHEDULED),
+    reductionsRepository.findByEffectiveToLessThanAndStatus(ZonedDateTime.now(), ReductionStatus.ACTIVE)
+  )
 }
