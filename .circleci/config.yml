@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  hmpps: ministryofjustice/hmpps@5.2.0
+  hmpps: ministryofjustice/hmpps@6.0.0
   slack: circleci/slack@4.10.1
 
 parameters:
@@ -108,33 +108,6 @@ workflows:
             - hmpps-workload-prod
           requires:
             - request-prod-approval
-
-  build-deploy-migration:
-    jobs:
-      - hmpps/build_docker:
-          name: build_migration_docker
-          image_name: "quay.io/hmpps/wmt-migration"
-          dockerfile_dir: "migration/."
-          filters:
-            branches:
-              only:
-                - main
-      - hmpps/deploy_env:
-          name: deploy_migration_preprod
-          helm_dir: helm_deploy_cron
-          chart_name: wmt-migration
-          release_name: wmt-migration
-          k8s_deployment_name: wmt-migration
-          filters:
-            branches:
-              only:
-                - main
-          env: "preprod"
-          requires:
-            - build_migration_docker
-          context:
-            - hmpps-common-vars
-            - hmpps-workload-preprod
 
   security:
     triggers:
