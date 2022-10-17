@@ -12,7 +12,7 @@ import javax.persistence.Table
 
 @Entity
 @Table(name = "workload", schema = "app")
-data class WorkloadEntity(
+data class WMTWorkloadEntity(
   @Id
   @Column
   @GeneratedValue(strategy = GenerationType.IDENTITY)

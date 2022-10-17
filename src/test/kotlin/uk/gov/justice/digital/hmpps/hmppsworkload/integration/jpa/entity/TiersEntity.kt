@@ -22,7 +22,7 @@ data class TiersEntity(
 
   @OneToOne
   @JoinColumn(name = "workload_id")
-  val workload: WorkloadEntity,
+  val workload: WMTWorkloadEntity,
 
   @Column(name = "location")
   @Enumerated(EnumType.STRING)

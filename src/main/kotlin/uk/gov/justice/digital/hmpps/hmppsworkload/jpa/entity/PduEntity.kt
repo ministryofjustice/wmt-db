@@ -11,7 +11,7 @@ import javax.persistence.Table
 
 @Entity
 @Table(name = "ldu", schema = "app")
-data class LduEntity(
+data class PduEntity(
   @Id
   @Column
   @GeneratedValue(strategy = GenerationType.IDENTITY)

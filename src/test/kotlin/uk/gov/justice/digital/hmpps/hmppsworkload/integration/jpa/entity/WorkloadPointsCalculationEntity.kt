@@ -34,7 +34,7 @@ data class WorkloadPointsCalculationEntity(
 
   @OneToOne
   @JoinColumn(name = "workload_id")
-  val workload: WorkloadEntity,
+  val workload: WMTWorkloadEntity,
 
   @Column
   val totalPoints: Int = 0,

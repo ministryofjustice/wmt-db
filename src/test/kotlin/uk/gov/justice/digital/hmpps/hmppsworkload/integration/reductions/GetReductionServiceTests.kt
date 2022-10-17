@@ -4,10 +4,10 @@ import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.LduRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.PduRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.RegionRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.LduEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.OffenderManagerEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PduEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RegionEntity
@@ -30,7 +30,7 @@ class GetReductionServiceTests : IntegrationTestBase() {
   protected lateinit var regionRepository: RegionRepository
 
   @Autowired
-  protected lateinit var lduRepository: LduRepository
+  protected lateinit var pduRepository: PduRepository
 
   @Autowired
   protected lateinit var getReductionService: GetReductionService
@@ -38,7 +38,7 @@ class GetReductionServiceTests : IntegrationTestBase() {
   @Test
   fun `must return all active reductions which have an effective to in the past`() {
     val region = regionRepository.save(RegionEntity(code = "REGION1", description = "Region 1"))
-    val pdu = lduRepository.save(LduEntity(code = "LDU1", description = "Local Delivery Unit (Actually a Probation Delivery Unit)", region = region))
+    val pdu = pduRepository.save(PduEntity(code = "LDU1", description = "Local Delivery Unit (Actually a Probation Delivery Unit)", region = region))
     val team = teamRepository.save(TeamEntity(code = "TEAM1", description = "Team 1", ldu = pdu))
     val offenderManager = offenderManagerRepository.save(OffenderManagerEntity(code = "STAFFCODE1", forename = "Jane", surname = "Doe", typeId = 1))
     val workloadOwner = wmtWorkloadOwnerRepository.save(WMTWorkloadOwnerEntity(offenderManager = offenderManager, team = team, contractedHours = BigDecimal.valueOf(37.5)))
@@ -61,7 +61,7 @@ class GetReductionServiceTests : IntegrationTestBase() {
   @Test
   fun `must return all scheduled reductions which have an effective from in the past and effective to in the future`() {
     val region = regionRepository.save(RegionEntity(code = "REGION2", description = "Region 2"))
-    val pdu = lduRepository.save(LduEntity(code = "LDU2", description = "Local Delivery Unit 2(Actually a Probation Delivery Unit)", region = region))
+    val pdu = pduRepository.save(PduEntity(code = "LDU2", description = "Local Delivery Unit 2(Actually a Probation Delivery Unit)", region = region))
     val team = teamRepository.save(TeamEntity(code = "TEAM2", description = "Team 2", ldu = pdu))
     val offenderManager = offenderManagerRepository.save(OffenderManagerEntity(code = "STAFFCODE2", forename = "Jane", surname = "Doe", typeId = 1))
     val workloadOwner = wmtWorkloadOwnerRepository.save(WMTWorkloadOwnerEntity(offenderManager = offenderManager, team = team, contractedHours = BigDecimal.valueOf(37.5)))
