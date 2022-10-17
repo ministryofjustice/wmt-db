@@ -12,7 +12,7 @@ interface TeamRepository : CrudRepository<TeamEntity, Long> {
   @Query(nativeQuery = true)
   fun findByOverview(teamCode: String): List<TeamOverview>
 
-  fun findByCode(code: String): TeamEntity
+  fun findByCode(code: String): TeamEntity?
 
   @Query(nativeQuery = true)
   fun findWorkloadCountCaseByCode(code: List<String>): List<WorkloadCaseResult>

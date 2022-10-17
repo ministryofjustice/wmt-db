@@ -39,6 +39,9 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
     val sentenceAfter30Days = SentenceEntity(BigInteger.ONE, "CRN2222", ZonedDateTime.now().minusMonths(2L), ZonedDateTime.now().plusDays(45L), "SC", ZonedDateTime.now().plusDays(15L))
     sentenceRepository.save(sentenceAfter30Days)
 
+    setupWmtManagedCase(wmtStaff, Tier.A2, sentenceWithin30Days.crn, CaseType.COMMUNITY)
+    setupWmtManagedCase(wmtStaff, Tier.D2, sentenceAfter30Days.crn, CaseType.CUSTODY)
+
     val reductionCategory = reductionCategoryRepository.save(ReductionCategoryEntity())
     val reductionReason = reductionReasonRepository.save(ReductionReasonEntity(reductionCategoryEntity = reductionCategory))
     val reduction = ReductionEntity(

@@ -7,7 +7,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WMTCaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetCombinedCaseload
@@ -22,20 +21,14 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
     getCaseLoad = GetCombinedCaseload(offenderManagerRepository, personManagerRepository, caseDetailsRepository)
   }
 
-  private fun setupWmtOffenderManager(staffCode: String, teamCode: String, tier: Tier, crn: String, caseType: CaseType) {
-    val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
-    val tierCategory = setupWmtCaseCategoryTier(tier)
-    wmtCaseDetailsRepository.save(WMTCaseDetailsEntity(workload = wmtStaff.workload, crn = crn, tierCategory = tierCategory, caseType = caseType, teamCode = teamCode))
-  }
-
   @Test
   fun `must return list of wmt cases`() {
     val staffCode = "OM1"
     val teamCode = "T1"
     val realtimeCase = Case(Tier.A1, CaseType.LICENSE, false, "CRN1111")
     caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, realtimeCase.type, "Jane", "Doe"))
-
-    setupWmtOffenderManager(staffCode, teamCode, realtimeCase.tier, realtimeCase.crn, realtimeCase.type)
+    val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
+    setupWmtManagedCase(wmtStaff, realtimeCase.tier, realtimeCase.crn, realtimeCase.type)
 
     val actualCases = getCaseLoad.getCases(staffCode, teamCode)
 
@@ -46,8 +39,8 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
   fun `must not return list of cases if no realtime data exist`() {
     val staffCode = "OM1"
     val teamCode = "T1"
-
-    setupWmtOffenderManager(staffCode, teamCode, Tier.C2, "CRN12345", CaseType.COMMUNITY)
+    val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
+    setupWmtManagedCase(wmtStaff, Tier.C2, "CRN12345", CaseType.COMMUNITY)
 
     Assertions.assertEquals(0, getCaseLoad.getCases(staffCode, teamCode).size)
   }
@@ -92,7 +85,8 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
       )
     )
 
-    setupWmtOffenderManager(staffCode, teamCode, realtimeCase.tier, realtimeCase.crn, realtimeCase.type)
+    val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
+    setupWmtManagedCase(wmtStaff, realtimeCase.tier, realtimeCase.crn, realtimeCase.type)
 
     val actualCases = getCaseLoad.getCases(staffCode, teamCode)
 

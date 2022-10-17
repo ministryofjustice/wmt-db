@@ -31,12 +31,14 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsAllocationMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.domain.WMTPointsWeightings
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.domain.WMTStaff
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.CaseCategoryEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WMTCaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WMTWorkloadEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WorkloadPointsCalculationEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WorkloadReportEntity
@@ -294,40 +296,27 @@ abstract class IntegrationTestBase {
   }
 
   protected fun setupCurrentWmtStaff(staffCode: String, teamCode: String): WMTStaff {
-    val region = regionRepository.save(RegionEntity(code = "REGION1", description = "Region 1"))
-    val pdu = pduRepository.save(PduEntity(code = "LDU1", description = "Local Delivery Unit (Actually a Probation Delivery Unit)", region = region))
-    val team = teamRepository.save(TeamEntity(code = teamCode, description = "Team 1", ldu = pdu))
+    val region = regionRepository.findByCode("REGION1") ?: regionRepository.save(RegionEntity(code = "REGION1", description = "Region 1"))
+    val pdu = pduRepository.findByCode("PDU1") ?: pduRepository.save(PduEntity(code = "PDU1", description = "Local Delivery Unit (Actually a Probation Delivery Unit)", region = region))
+    val team = teamRepository.findByCode(teamCode) ?: teamRepository.save(TeamEntity(code = teamCode, description = "Team 1", ldu = pdu))
     val offenderManager = offenderManagerRepository.save(OffenderManagerEntity(code = staffCode, forename = "Jane", surname = "Doe", typeId = 1))
     val workloadOwner = wmtWorkloadOwnerRepository.save(WMTWorkloadOwnerEntity(offenderManager = offenderManager, team = team, contractedHours = BigDecimal.valueOf(37.5)))
     val workloadReport = workloadReportRepository.findByEffectiveFromIsNotNullAndEffectiveToIsNull() ?: workloadReportRepository.save((WorkloadReportEntity()))
-    val wmtWorkload = wmtWorkloadRepository.save(WMTWorkloadEntity(workloadOwner = workloadOwner, workloadReport = workloadReport, totalFilteredCommunityCases = 5, totalFilteredCustodyCases = 20, totalFilteredLicenseCases = 10, institutionalReportsDueInNextThirtyDays = 5))
+    val wmtWorkload = wmtWorkloadRepository.save(WMTWorkloadEntity(workloadOwner = workloadOwner, workloadReport = workloadReport, totalFilteredCommunityCases = 10, totalFilteredCustodyCases = 20, totalFilteredLicenseCases = 5, institutionalReportsDueInNextThirtyDays = 5))
     val currentWmtPointsWeightings = getWmtWorkloadWeightings()
     val workloadPointsCalculation = workloadPointsCalculationRepository.save(WorkloadPointsCalculationEntity(workloadReport = workloadReport, workloadPoints = currentWmtPointsWeightings.normalWeightings, t2aWorkloadPoints = currentWmtPointsWeightings.t2aWeightings, workload = wmtWorkload, totalPoints = 500, availablePoints = 1000))
     return WMTStaff(offenderManager, team, workloadOwner, wmtWorkload, workloadPointsCalculation)
   }
 
-  protected fun setupWmtCaseCategoryTier(tier: Tier): CaseCategoryEntity = caseCategoryRepository.findByCategoryName(tier.name) ?: caseCategoryRepository.save(CaseCategoryEntity(categoryName = tier.name, categoryId = getWmtTierCategoryId(tier)))
-
-  protected fun setupWmtUntiered(): CaseCategoryEntity = caseCategoryRepository.findByCategoryName("Untiered") ?: caseCategoryRepository.save(CaseCategoryEntity(categoryName = "Untiered", categoryId = getWmtTierCategoryId(null)))
-  private fun getWmtTierCategoryId(tier: Tier?): Int = when (tier) {
-    Tier.A3 -> 1
-    Tier.A2 -> 2
-    Tier.A1 -> 3
-    Tier.A0 -> 4
-    Tier.B3 -> 5
-    Tier.B2 -> 6
-    Tier.B1 -> 7
-    Tier.B0 -> 8
-    Tier.C3 -> 9
-    Tier.C2 -> 10
-    Tier.C1 -> 11
-    Tier.C0 -> 12
-    Tier.D3 -> 13
-    Tier.D2 -> 14
-    Tier.D1 -> 15
-    Tier.D0 -> 16
-    else -> 0
+  protected fun setupWmtManagedCase(wmtStaff: WMTStaff, tier: Tier, crn: String, caseType: CaseType) {
+    val tierCategory = setupWmtCaseCategoryTier(tier)
+    wmtCaseDetailsRepository.save(WMTCaseDetailsEntity(workload = wmtStaff.workload, crn = crn, tierCategory = tierCategory, caseType = caseType, teamCode = wmtStaff.team.code))
   }
+
+  protected fun setupWmtCaseCategoryTier(tier: Tier): CaseCategoryEntity = caseCategoryRepository.findByCategoryName(tier.name) ?: caseCategoryRepository.save(CaseCategoryEntity(categoryName = tier.name, categoryId = tier.ordinal))
+
+  protected fun setupWmtUntiered(): CaseCategoryEntity = caseCategoryRepository.findByCategoryName("Untiered") ?: caseCategoryRepository.save(CaseCategoryEntity(categoryName = "Untiered", categoryId = 0))
+
   protected fun getWmtWorkloadWeightings(): WMTPointsWeightings = WMTPointsWeightings(workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(true), workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false))
   internal fun HttpHeaders.authToken(roles: List<String> = emptyList()) {
     this.setBearerAuth(
