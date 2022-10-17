@@ -33,6 +33,16 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsAllocationMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.CaseCategoryRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.PduRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.ReductionCategoryRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.ReductionReasonRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.RegionRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.TiersRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WMTCaseDetailsRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WMTWorkloadRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WorkloadPointsCalculationRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WorkloadReportRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.communityApiAssessmentResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.convictionNoSentenceResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.notFoundTierResponse
@@ -167,6 +177,36 @@ abstract class IntegrationTestBase {
   @Autowired
   protected lateinit var hmppsQueueService: HmppsQueueService
 
+  @Autowired
+  protected lateinit var tiersRepository: TiersRepository
+
+  @Autowired
+  protected lateinit var wmtCaseDetailsRepository: WMTCaseDetailsRepository
+
+  @Autowired
+  protected lateinit var workloadPointsCaseDetailsRepository: WorkloadPointsCalculationRepository
+
+  @Autowired
+  protected lateinit var wmtWorkloadRepository: WMTWorkloadRepository
+
+  @Autowired
+  protected lateinit var workloadReportRepository: WorkloadReportRepository
+
+  @Autowired
+  protected lateinit var reductionReasonRepository: ReductionReasonRepository
+
+  @Autowired
+  protected lateinit var reductionCategoryRepository: ReductionCategoryRepository
+
+  @Autowired
+  protected lateinit var regionRepository: RegionRepository
+
+  @Autowired
+  protected lateinit var pduRepository: PduRepository
+
+  @Autowired
+  protected lateinit var caseCategoryRepository: CaseCategoryRepository
+
   @BeforeEach
   fun setupDependentServices() {
 
@@ -194,6 +234,7 @@ abstract class IntegrationTestBase {
     tierCalculationSqsDlqClient.purgeQueue(PurgeQueueRequest(tierCalculationQueue.dlqUrl))
     hmppsAuditQueueClient.purgeQueue(PurgeQueueRequest(hmppsAuditQueue.queueUrl))
     workloadCalculationRepository.deleteAll()
+    clearWMT()
   }
 
   @AfterAll
@@ -212,6 +253,24 @@ abstract class IntegrationTestBase {
     reductionsRepository.deleteAll()
     adjustmentReasonRepository.deleteAll()
     workloadCalculationRepository.deleteAll()
+  }
+
+  fun clearWMT() {
+    tiersRepository.deleteAll()
+    wmtCaseDetailsRepository.deleteAll()
+    caseCategoryRepository.deleteAll()
+    workloadPointsCaseDetailsRepository.deleteAll()
+    wmtWorkloadRepository.deleteAll()
+    workloadReportRepository.deleteAll()
+    reductionsRepository.deleteAll()
+    reductionReasonRepository.deleteAll()
+    reductionCategoryRepository.deleteAll()
+    wmtWorkloadOwnerRepository.deleteAll()
+    offenderManagerRepository.deleteAll()
+
+    teamRepository.deleteAll()
+    pduRepository.deleteAll()
+    regionRepository.deleteAll()
   }
 
   internal fun HttpHeaders.authToken(roles: List<String> = emptyList()) {

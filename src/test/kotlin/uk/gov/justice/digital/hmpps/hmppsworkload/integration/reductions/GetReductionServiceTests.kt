@@ -4,8 +4,8 @@ import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.PduRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.RegionRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.ReductionCategoryEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.ReductionReasonEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.OffenderManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PduEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionEntity
@@ -27,12 +27,6 @@ import java.time.ZonedDateTime
 class GetReductionServiceTests : IntegrationTestBase() {
 
   @Autowired
-  protected lateinit var regionRepository: RegionRepository
-
-  @Autowired
-  protected lateinit var pduRepository: PduRepository
-
-  @Autowired
   protected lateinit var getReductionService: GetReductionService
 
   @Test
@@ -42,12 +36,14 @@ class GetReductionServiceTests : IntegrationTestBase() {
     val team = teamRepository.save(TeamEntity(code = "TEAM1", description = "Team 1", ldu = pdu))
     val offenderManager = offenderManagerRepository.save(OffenderManagerEntity(code = "STAFFCODE1", forename = "Jane", surname = "Doe", typeId = 1))
     val workloadOwner = wmtWorkloadOwnerRepository.save(WMTWorkloadOwnerEntity(offenderManager = offenderManager, team = team, contractedHours = BigDecimal.valueOf(37.5)))
+    val reductionCategory = reductionCategoryRepository.save(ReductionCategoryEntity())
+    val reductionReason = reductionReasonRepository.save(ReductionReasonEntity(reductionCategoryEntity = reductionCategory))
 
-    val activeReductionInPast = reductionsRepository.save(ReductionEntity(workloadOwner = workloadOwner, hours = BigDecimal.valueOf(3.2), effectiveFrom = ZonedDateTime.now().minusDays(7), effectiveTo = ZonedDateTime.now().minusDays(1), status = ReductionStatus.ACTIVE, reductionReasonId = 1))
+    val activeReductionInPast = reductionsRepository.save(ReductionEntity(workloadOwner = workloadOwner, hours = BigDecimal.valueOf(3.2), effectiveFrom = ZonedDateTime.now().minusDays(7), effectiveTo = ZonedDateTime.now().minusDays(1), status = ReductionStatus.ACTIVE, reductionReasonId = reductionReason.id!!))
 
-    val activeReduction = reductionsRepository.save(ReductionEntity(workloadOwner = workloadOwner, hours = BigDecimal.valueOf(5), effectiveFrom = ZonedDateTime.now().minusDays(7), effectiveTo = ZonedDateTime.now().plusDays(7), status = ReductionStatus.ACTIVE, reductionReasonId = 1))
+    val activeReduction = reductionsRepository.save(ReductionEntity(workloadOwner = workloadOwner, hours = BigDecimal.valueOf(5), effectiveFrom = ZonedDateTime.now().minusDays(7), effectiveTo = ZonedDateTime.now().plusDays(7), status = ReductionStatus.ACTIVE, reductionReasonId = reductionReason.id!!))
 
-    val deletedReductionInPast = reductionsRepository.save(ReductionEntity(workloadOwner = workloadOwner, hours = BigDecimal.valueOf(3.2), effectiveFrom = ZonedDateTime.now().minusDays(7), effectiveTo = ZonedDateTime.now().minusDays(1), status = ReductionStatus.DELETED, reductionReasonId = 1))
+    val deletedReductionInPast = reductionsRepository.save(ReductionEntity(workloadOwner = workloadOwner, hours = BigDecimal.valueOf(3.2), effectiveFrom = ZonedDateTime.now().minusDays(7), effectiveTo = ZonedDateTime.now().minusDays(1), status = ReductionStatus.DELETED, reductionReasonId = reductionReason.id!!))
 
     val results = getReductionService.findOutOfDateReductions()
 
@@ -65,8 +61,10 @@ class GetReductionServiceTests : IntegrationTestBase() {
     val team = teamRepository.save(TeamEntity(code = "TEAM2", description = "Team 2", ldu = pdu))
     val offenderManager = offenderManagerRepository.save(OffenderManagerEntity(code = "STAFFCODE2", forename = "Jane", surname = "Doe", typeId = 1))
     val workloadOwner = wmtWorkloadOwnerRepository.save(WMTWorkloadOwnerEntity(offenderManager = offenderManager, team = team, contractedHours = BigDecimal.valueOf(37.5)))
+    val reductionCategory = reductionCategoryRepository.save(ReductionCategoryEntity())
+    val reductionReason = reductionReasonRepository.save(ReductionReasonEntity(reductionCategoryEntity = reductionCategory))
 
-    val scheduledReductionWhichIsNowActive = reductionsRepository.save(ReductionEntity(workloadOwner = workloadOwner, hours = BigDecimal.valueOf(3.2), effectiveFrom = ZonedDateTime.now().minusDays(1), effectiveTo = ZonedDateTime.now().plusDays(3), status = ReductionStatus.SCHEDULED, reductionReasonId = 1))
+    val scheduledReductionWhichIsNowActive = reductionsRepository.save(ReductionEntity(workloadOwner = workloadOwner, hours = BigDecimal.valueOf(3.2), effectiveFrom = ZonedDateTime.now().minusDays(1), effectiveTo = ZonedDateTime.now().plusDays(3), status = ReductionStatus.SCHEDULED, reductionReasonId = reductionReason.id!!))
 
     val results = getReductionService.findOutOfDateReductions()
 
