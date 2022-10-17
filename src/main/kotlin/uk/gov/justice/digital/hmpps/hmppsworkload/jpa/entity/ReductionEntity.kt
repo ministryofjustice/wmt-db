@@ -36,7 +36,7 @@ data class ReductionEntity(
 
   @Column(name = "status")
   @Enumerated(EnumType.STRING)
-  val status: ReductionStatus,
+  var status: ReductionStatus,
 
   @Column(name = "reduction_reason_id")
   val reductionReasonId: Long
