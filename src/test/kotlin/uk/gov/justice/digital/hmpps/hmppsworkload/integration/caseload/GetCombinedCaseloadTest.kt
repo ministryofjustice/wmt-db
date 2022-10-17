@@ -7,7 +7,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.CaseCategoryEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WMTCaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
@@ -23,9 +22,9 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
     getCaseLoad = GetCombinedCaseload(offenderManagerRepository, personManagerRepository, caseDetailsRepository)
   }
 
-  private fun setupWmtOffenderManager(staffCode: String, teamCode: String, tier: String, crn: String, caseType: CaseType) {
+  private fun setupWmtOffenderManager(staffCode: String, teamCode: String, tier: Tier, crn: String, caseType: CaseType) {
     val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
-    val tierCategory = caseCategoryRepository.save(CaseCategoryEntity(categoryId = 1, categoryName = tier))
+    val tierCategory = setupWmtCaseCategoryTier(tier)
     wmtCaseDetailsRepository.save(WMTCaseDetailsEntity(workload = wmtStaff.workload, crn = crn, tierCategory = tierCategory, caseType = caseType, teamCode = teamCode))
   }
 
@@ -36,7 +35,7 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
     val realtimeCase = Case(Tier.A1, CaseType.LICENSE, false, "CRN1111")
     caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, realtimeCase.type, "Jane", "Doe"))
 
-    setupWmtOffenderManager(staffCode, teamCode, realtimeCase.tier.name, realtimeCase.crn, realtimeCase.type)
+    setupWmtOffenderManager(staffCode, teamCode, realtimeCase.tier, realtimeCase.crn, realtimeCase.type)
 
     val actualCases = getCaseLoad.getCases(staffCode, teamCode)
 
@@ -48,7 +47,7 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
     val staffCode = "OM1"
     val teamCode = "T1"
 
-    setupWmtOffenderManager(staffCode, teamCode, Tier.C2.name, "CRN12345", CaseType.COMMUNITY)
+    setupWmtOffenderManager(staffCode, teamCode, Tier.C2, "CRN12345", CaseType.COMMUNITY)
 
     Assertions.assertEquals(0, getCaseLoad.getCases(staffCode, teamCode).size)
   }
@@ -93,7 +92,7 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
       )
     )
 
-    setupWmtOffenderManager(staffCode, teamCode, realtimeCase.tier.name, realtimeCase.crn, realtimeCase.type)
+    setupWmtOffenderManager(staffCode, teamCode, realtimeCase.tier, realtimeCase.crn, realtimeCase.type)
 
     val actualCases = getCaseLoad.getCases(staffCode, teamCode)
 

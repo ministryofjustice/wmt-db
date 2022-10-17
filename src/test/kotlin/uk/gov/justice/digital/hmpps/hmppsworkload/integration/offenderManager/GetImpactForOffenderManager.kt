@@ -5,6 +5,7 @@ import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WMTCaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.request.impactCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 
@@ -16,6 +17,7 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
     val staffCode = "OM1"
     val teamCode = "T1"
     staffCodeResponse(staffCode, teamCode)
+    val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Jane", "Doe"))
 
     webTestClient.post()
@@ -30,7 +32,7 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
       .isOk
       .expectBody()
       .jsonPath("$.forename")
-      .isEqualTo("Ben")
+      .isEqualTo("Jane")
       .jsonPath("$.surname")
       .isEqualTo("Doe")
       .jsonPath("$.grade")
@@ -50,7 +52,10 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
     val staffCode = "OM1"
     val teamCode = "T1"
     staffCodeResponse(staffCode, teamCode)
-    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Jane", "Doe"))
+    val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
+    val caseDetails = caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Jane", "Doe"))
+    val wmtCaseCategoryTier = setupWmtCaseCategoryTier(caseDetails.tier)
+    wmtCaseDetailsRepository.save(WMTCaseDetailsEntity(workload = wmtStaff.workload, crn = caseDetails.crn, tierCategory = wmtCaseCategoryTier, caseType = caseDetails.type, teamCode = teamCode))
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/impact")
       .bodyValue(impactCase(crn))
@@ -63,7 +68,7 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
       .isOk
       .expectBody()
       .jsonPath("$.forename")
-      .isEqualTo("Ben")
+      .isEqualTo("Jane")
       .jsonPath("$.surname")
       .isEqualTo("Doe")
       .jsonPath("$.grade")

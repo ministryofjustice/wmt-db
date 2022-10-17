@@ -31,10 +31,14 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsAllocationMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.domain.WMTPointsWeightings
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.domain.WMTStaff
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.CaseCategoryEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WMTWorkloadEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WorkloadPointsCalculationEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WorkloadReportEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.CaseCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.PduRepository
@@ -80,6 +84,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTCourtReports
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTInstitutionalReportRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTWorkloadOwnerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadCalculationRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadPointsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.listener.HmppsOffenderEvent
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.AuditMessage
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
@@ -216,6 +221,12 @@ abstract class IntegrationTestBase {
   @Autowired
   protected lateinit var caseCategoryRepository: CaseCategoryRepository
 
+  @Autowired
+  protected lateinit var workloadPointsCalculationRepository: WorkloadPointsCalculationRepository
+
+  @Autowired
+  protected lateinit var workloadPointsRepository: WorkloadPointsRepository
+
   @BeforeEach
   fun setupDependentServices() {
 
@@ -269,6 +280,7 @@ abstract class IntegrationTestBase {
     wmtCaseDetailsRepository.deleteAll()
     caseCategoryRepository.deleteAll()
     workloadPointsCaseDetailsRepository.deleteAll()
+    workloadPointsCalculationRepository.deleteAll()
     wmtWorkloadRepository.deleteAll()
     workloadReportRepository.deleteAll()
     reductionsRepository.deleteAll()
@@ -276,7 +288,6 @@ abstract class IntegrationTestBase {
     reductionCategoryRepository.deleteAll()
     wmtWorkloadOwnerRepository.deleteAll()
     offenderManagerRepository.deleteAll()
-
     teamRepository.deleteAll()
     pduRepository.deleteAll()
     regionRepository.deleteAll()
@@ -289,10 +300,35 @@ abstract class IntegrationTestBase {
     val offenderManager = offenderManagerRepository.save(OffenderManagerEntity(code = staffCode, forename = "Jane", surname = "Doe", typeId = 1))
     val workloadOwner = wmtWorkloadOwnerRepository.save(WMTWorkloadOwnerEntity(offenderManager = offenderManager, team = team, contractedHours = BigDecimal.valueOf(37.5)))
     val workloadReport = workloadReportRepository.findByEffectiveFromIsNotNullAndEffectiveToIsNull() ?: workloadReportRepository.save((WorkloadReportEntity()))
-    val wmtWorkload = wmtWorkloadRepository.save(WMTWorkloadEntity(workloadOwner = workloadOwner, workloadReport = workloadReport))
-    return WMTStaff(offenderManager, team, workloadOwner, wmtWorkload)
+    val wmtWorkload = wmtWorkloadRepository.save(WMTWorkloadEntity(workloadOwner = workloadOwner, workloadReport = workloadReport, totalFilteredCommunityCases = 5, totalFilteredCustodyCases = 20, totalFilteredLicenseCases = 10, institutionalReportsDueInNextThirtyDays = 5))
+    val currentWmtPointsWeightings = getWmtWorkloadWeightings()
+    val workloadPointsCalculation = workloadPointsCalculationRepository.save(WorkloadPointsCalculationEntity(workloadReport = workloadReport, workloadPoints = currentWmtPointsWeightings.normalWeightings, t2aWorkloadPoints = currentWmtPointsWeightings.t2aWeightings, workload = wmtWorkload, totalPoints = 500, availablePoints = 1000))
+    return WMTStaff(offenderManager, team, workloadOwner, wmtWorkload, workloadPointsCalculation)
   }
 
+  protected fun setupWmtCaseCategoryTier(tier: Tier): CaseCategoryEntity = caseCategoryRepository.findByCategoryName(tier.name) ?: caseCategoryRepository.save(CaseCategoryEntity(categoryName = tier.name, categoryId = getWmtTierCategoryId(tier)))
+
+  protected fun setupWmtUntiered(): CaseCategoryEntity = caseCategoryRepository.findByCategoryName("Untiered") ?: caseCategoryRepository.save(CaseCategoryEntity(categoryName = "Untiered", categoryId = getWmtTierCategoryId(null)))
+  private fun getWmtTierCategoryId(tier: Tier?): Int = when (tier) {
+    Tier.A3 -> 1
+    Tier.A2 -> 2
+    Tier.A1 -> 3
+    Tier.A0 -> 4
+    Tier.B3 -> 5
+    Tier.B2 -> 6
+    Tier.B1 -> 7
+    Tier.B0 -> 8
+    Tier.C3 -> 9
+    Tier.C2 -> 10
+    Tier.C1 -> 11
+    Tier.C0 -> 12
+    Tier.D3 -> 13
+    Tier.D2 -> 14
+    Tier.D1 -> 15
+    Tier.D0 -> 16
+    else -> 0
+  }
+  protected fun getWmtWorkloadWeightings(): WMTPointsWeightings = WMTPointsWeightings(workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(true), workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false))
   internal fun HttpHeaders.authToken(roles: List<String> = emptyList()) {
     this.setBearerAuth(
       jwtAuthHelper.createJwt(

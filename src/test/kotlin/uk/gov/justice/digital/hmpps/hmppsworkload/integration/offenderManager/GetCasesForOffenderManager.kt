@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WMTCaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 
 class GetCasesForOffenderManager : IntegrationTestBase() {
@@ -13,9 +14,14 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
     val staffCode = "OM1"
     val teamCode = "T1"
     staffCodeResponse(staffCode, teamCode)
-    caseDetailsRepository.save(CaseDetailsEntity("CRN2222", Tier.B3, CaseType.CUSTODY, "Sally", "Smith"))
-    caseDetailsRepository.save(CaseDetailsEntity("CRN3333", Tier.C1, CaseType.COMMUNITY, "John", "Williams"))
-    caseDetailsRepository.save(CaseDetailsEntity("CRN1111", Tier.C1, CaseType.LICENSE, "John", "Doe"))
+    val realTimeCaseDetails = caseDetailsRepository.saveAll(listOf(CaseDetailsEntity("CRN2222", Tier.B3, CaseType.CUSTODY, "Sally", "Smith"), CaseDetailsEntity("CRN3333", Tier.C1, CaseType.COMMUNITY, "John", "Williams"), CaseDetailsEntity("CRN1111", Tier.C1, CaseType.LICENSE, "John", "Doe")))
+    val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
+
+    realTimeCaseDetails.forEach { caseDetails ->
+      val wmtTier = setupWmtCaseCategoryTier(caseDetails.tier)
+      wmtCaseDetailsRepository.save(WMTCaseDetailsEntity(workload = wmtStaff.workload, crn = caseDetails.crn, tierCategory = wmtTier, caseType = caseDetails.type, teamCode = teamCode))
+    }
+
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers/$staffCode/cases")
       .headers {
@@ -94,7 +100,13 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
     val staffCode = "OM1"
     val teamCode = "T1"
     staffCodeResponse(staffCode, teamCode)
-    caseDetailsRepository.save(CaseDetailsEntity("CRN1111", Tier.C1, CaseType.LICENSE, "John", "Doe"))
+    val caseDetails = caseDetailsRepository.save(CaseDetailsEntity("CRN1111", Tier.C1, CaseType.LICENSE, "John", "Doe"))
+    val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
+    val wmtTier = setupWmtCaseCategoryTier(caseDetails.tier)
+    wmtCaseDetailsRepository.save(WMTCaseDetailsEntity(workload = wmtStaff.workload, crn = caseDetails.crn, tierCategory = wmtTier, caseType = caseDetails.type, teamCode = teamCode))
+    wmtCaseDetailsRepository.save(WMTCaseDetailsEntity(workload = wmtStaff.workload, crn = "CRN2222", tierCategory = setupWmtCaseCategoryTier(Tier.B3), caseType = CaseType.CUSTODY, teamCode = teamCode))
+    wmtCaseDetailsRepository.save(WMTCaseDetailsEntity(workload = wmtStaff.workload, crn = "CRN3333", tierCategory = setupWmtCaseCategoryTier(Tier.C1), caseType = CaseType.COMMUNITY, teamCode = teamCode))
+
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers/$staffCode/cases")
       .headers {
