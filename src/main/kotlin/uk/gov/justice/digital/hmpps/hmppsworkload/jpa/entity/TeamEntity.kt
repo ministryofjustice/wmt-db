@@ -90,5 +90,5 @@ data class TeamEntity(
 
   @ManyToOne
   @JoinColumn(name = "ldu_id")
-  val ldu: LduEntity,
+  val ldu: PduEntity,
 )

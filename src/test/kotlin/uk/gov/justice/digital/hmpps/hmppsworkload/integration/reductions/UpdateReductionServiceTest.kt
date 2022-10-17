@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.LduRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.PduRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.RegionRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.LduEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.OffenderManagerEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PduEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RegionEntity
@@ -25,7 +25,7 @@ class UpdateReductionServiceTest : IntegrationTestBase() {
   lateinit var regionRepository: RegionRepository
 
   @Autowired
-  lateinit var lduRepository: LduRepository
+  lateinit var pduRepository: PduRepository
 
   @Autowired
   lateinit var getReductionService: GetReductionService
@@ -38,7 +38,7 @@ class UpdateReductionServiceTest : IntegrationTestBase() {
   @BeforeEach
   fun setupReductionTestData() {
     val region = regionRepository.save(RegionEntity(code = "REGION2", description = "Region 2"))
-    val pdu = lduRepository.save(LduEntity(code = "LDU2", description = "Local Delivery Unit 2(Actually a Probation Delivery Unit)", region = region))
+    val pdu = pduRepository.save(PduEntity(code = "LDU2", description = "Local Delivery Unit 2(Actually a Probation Delivery Unit)", region = region))
     val team = teamRepository.save(TeamEntity(code = "TEAM2", description = "Team 2", ldu = pdu))
     val offenderManager = offenderManagerRepository.save(OffenderManagerEntity(code = "STAFFCODE2", forename = "Jane", surname = "Doe", typeId = 1))
     workloadOwner = wmtWorkloadOwnerRepository.save(WMTWorkloadOwnerEntity(offenderManager = offenderManager, team = team, contractedHours = BigDecimal.valueOf(37.5)))

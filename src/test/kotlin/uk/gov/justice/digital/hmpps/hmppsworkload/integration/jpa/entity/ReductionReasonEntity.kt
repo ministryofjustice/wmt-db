@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity
+package uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity
 
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -10,20 +10,21 @@ import javax.persistence.ManyToOne
 import javax.persistence.Table
 
 @Entity
-@Table(name = "ldu", schema = "app")
-data class LduEntity(
+@Table(name = "reduction_reason", schema = "app")
+data class ReductionReasonEntity(
   @Id
   @Column
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   val id: Long? = null,
 
   @Column
-  val code: String,
+  val reason: String = "",
 
   @Column
-  val description: String,
+  val reasonShortName: String = "",
 
   @ManyToOne
-  @JoinColumn(name = "region_id")
-  val region: RegionEntity,
+  @JoinColumn(name = "category_id")
+  val reductionCategoryEntity: ReductionCategoryEntity,
+
 )
