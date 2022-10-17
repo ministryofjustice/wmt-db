@@ -33,6 +33,9 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsAllocationMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.domain.WMTStaff
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WMTWorkloadEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WorkloadReportEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.CaseCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.PduRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.ReductionCategoryRepository
@@ -57,6 +60,11 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByC
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByUserNameResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.successfulRiskPredictorResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.teamStaffJsonResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.OffenderManagerEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PduEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RegionEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.TeamEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTWorkloadOwnerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.AdjustmentReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.EventManagerRepository
@@ -76,6 +84,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.listener.HmppsOffenderEvent
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.AuditMessage
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
+import java.math.BigDecimal
 import java.math.BigInteger
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
@@ -271,6 +280,17 @@ abstract class IntegrationTestBase {
     teamRepository.deleteAll()
     pduRepository.deleteAll()
     regionRepository.deleteAll()
+  }
+
+  protected fun setupCurrentWmtStaff(staffCode: String, teamCode: String): WMTStaff {
+    val region = regionRepository.save(RegionEntity(code = "REGION1", description = "Region 1"))
+    val pdu = pduRepository.save(PduEntity(code = "LDU1", description = "Local Delivery Unit (Actually a Probation Delivery Unit)", region = region))
+    val team = teamRepository.save(TeamEntity(code = teamCode, description = "Team 1", ldu = pdu))
+    val offenderManager = offenderManagerRepository.save(OffenderManagerEntity(code = staffCode, forename = "Jane", surname = "Doe", typeId = 1))
+    val workloadOwner = wmtWorkloadOwnerRepository.save(WMTWorkloadOwnerEntity(offenderManager = offenderManager, team = team, contractedHours = BigDecimal.valueOf(37.5)))
+    val workloadReport = workloadReportRepository.findByEffectiveFromIsNotNullAndEffectiveToIsNull() ?: workloadReportRepository.save((WorkloadReportEntity()))
+    val wmtWorkload = wmtWorkloadRepository.save(WMTWorkloadEntity(workloadOwner = workloadOwner, workloadReport = workloadReport))
+    return WMTStaff(offenderManager, team, workloadOwner, wmtWorkload)
   }
 
   internal fun HttpHeaders.authToken(roles: List<String> = emptyList()) {
