@@ -16,7 +16,7 @@ class UpdateReductionService(private val reductionsRepository: ReductionsReposit
       .let { reductionsRepository.saveAll(it) }
 
     outOfDateReductions.scheduledNowActive
-      .takeIf { it.isNotEmpty() }?.onEach { it.status = ReductionStatus.ACTIVE }
-      ?.let { reductionsRepository.saveAll(it) }
+      .onEach { it.status = ReductionStatus.ACTIVE }
+      .let { reductionsRepository.saveAll(it) }
   }
 }
