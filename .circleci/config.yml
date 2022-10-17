@@ -17,8 +17,8 @@ jobs:
     executor:
       name: hmpps/java_localstack_postgres
       jdk_tag: "18.0"
-      localstack_tag: "0.14.1"
-      postgres_tag: "14"
+      localstack_tag: "1.2.0"
+      postgres_tag: "15"
     steps:
       - checkout
       - restore_cache:
