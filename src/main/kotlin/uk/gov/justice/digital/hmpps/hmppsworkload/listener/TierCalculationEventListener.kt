@@ -1,10 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.listener
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.slf4j.LoggerFactory
 import org.springframework.jms.annotation.JmsListener
-import org.springframework.messaging.handler.annotation.MessageExceptionHandler
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.SaveCaseDetailsService
 
 @Component
@@ -15,27 +15,19 @@ class TierCalculationEventListener(
 
   @JmsListener(destination = "tiercalcqueue", containerFactory = "hmppsQueueContainerFactoryProxy")
   fun processMessage(rawMessage: String) {
-    val crn = getCrn(rawMessage)
-    log.info("received tier calculation for crn: {}", crn)
-    saveCaseDetailsService.save(crn)
+    val calculationEventData = readMessage(rawMessage)
+    saveCaseDetailsService.save(crnFrom(calculationEventData))
   }
 
-  @MessageExceptionHandler()
-  fun errorHandler(e: Exception, msg: String) {
-    log.warn("Failed to process sentence change with CRN ${getCrn(msg)} with error: ${e.message}")
-    throw e
+  private fun readMessage(wrapper: String?): CalculationEventData {
+    val (message) = objectMapper.readValue(wrapper, Message::class.java)
+    return objectMapper.readValue(message, CalculationEventData::class.java)
   }
 
-  private fun getCrn(rawMessage: String): String {
-    val (message) = objectMapper.readValue(rawMessage, SQSMessage::class.java)
-    return objectMapper.readValue(message, TierCalculationEvent::class.java).crn
-  }
+  private fun crnFrom(calculationEventData: CalculationEventData) =
+    calculationEventData.personReference.identifiers.first { it.type == "CRN" }.value
 
-  companion object {
-    private val log = LoggerFactory.getLogger(this::class.java)
-  }
+  data class CalculationEventData(val personReference: PersonReference)
+
+  data class Message(@JsonProperty("Message") val message: String)
 }
-
-data class TierCalculationEvent(
-  val crn: String
-)
