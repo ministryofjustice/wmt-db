@@ -16,6 +16,7 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
     val staffCode = "OM1"
     val teamCode = "T1"
     staffCodeResponse(staffCode, teamCode)
+    val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Jane", "Doe"))
 
     webTestClient.post()
@@ -30,7 +31,7 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
       .isOk
       .expectBody()
       .jsonPath("$.forename")
-      .isEqualTo("Ben")
+      .isEqualTo("Jane")
       .jsonPath("$.surname")
       .isEqualTo("Doe")
       .jsonPath("$.grade")
@@ -50,7 +51,10 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
     val staffCode = "OM1"
     val teamCode = "T1"
     staffCodeResponse(staffCode, teamCode)
-    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Jane", "Doe"))
+    val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
+    val caseDetails = caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Jane", "Doe"))
+    setupWmtManagedCase(wmtStaff, caseDetails.tier, crn, caseDetails.type)
+
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/impact")
       .bodyValue(impactCase(crn))
@@ -63,7 +67,7 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
       .isOk
       .expectBody()
       .jsonPath("$.forename")
-      .isEqualTo("Ben")
+      .isEqualTo("Jane")
       .jsonPath("$.surname")
       .isEqualTo("Doe")
       .jsonPath("$.grade")

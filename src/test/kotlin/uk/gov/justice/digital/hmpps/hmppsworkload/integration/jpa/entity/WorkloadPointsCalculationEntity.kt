@@ -2,6 +2,8 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity
 
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadPointsEntity
 import java.math.BigDecimal
+import java.time.LocalDateTime
+import java.time.LocalTime
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -64,6 +66,8 @@ data class WorkloadPointsCalculationEntity(
   val cmsAdjustmentPoints: Int = 0,
 
   @Column(name = "arms_total_cases")
-  val assessmentPoints: Int = 0
+  val assessmentPoints: Int = 0,
 
+  @Column
+  val lastUpdatedOn: LocalDateTime = LocalDateTime.now().with(LocalTime.of(9, 30))
 )

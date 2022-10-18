@@ -22,7 +22,7 @@ fun teamStaffJsonResponse(staffCode: String) = """
               "surname": "Socks"
           },
           "staffGrade": {
-            "code": "PSM",
+            "code": "PSP",
             "description": "Some description"
           }
       },

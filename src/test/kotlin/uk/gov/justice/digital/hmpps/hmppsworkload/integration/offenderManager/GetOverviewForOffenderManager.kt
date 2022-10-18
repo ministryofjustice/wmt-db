@@ -5,12 +5,15 @@ import org.springframework.data.repository.findByIdOrNull
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.ReductionCategoryEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.ReductionReasonEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.TiersEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WMTWorkloadEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.SentenceEntity
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTWorkloadOwnerEntity
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.LocalDate
@@ -21,40 +24,50 @@ import java.time.format.DateTimeFormatter
 
 class GetOverviewForOffenderManager : IntegrationTestBase() {
 
+  private fun setupWmtTierTotal(tier: Tier?, workload: WMTWorkloadEntity, total: Int): TiersEntity {
+    val wmtTier = if (tier != null) setupWmtCaseCategoryTier(tier) else setupWmtUntiered()
+    return tiersRepository.save(TiersEntity(workload = workload, caseType = CaseType.CUSTODY, tierCategory = wmtTier, totalFilteredCases = total))
+  }
   @Test
   fun `can get overview for an offender manager`() {
     val teamCode = "T1"
     val offenderManagerCode = "OM1"
     staffCodeResponse(offenderManagerCode, teamCode)
+    val wmtStaff = setupCurrentWmtStaff(offenderManagerCode, teamCode)
     val sentenceWithin30Days = SentenceEntity(BigInteger.TEN, "CRN3333", ZonedDateTime.now().minusMonths(2L), ZonedDateTime.now().plusDays(15L), "SP", null)
     sentenceRepository.save(sentenceWithin30Days)
     val sentenceAfter30Days = SentenceEntity(BigInteger.ONE, "CRN2222", ZonedDateTime.now().minusMonths(2L), ZonedDateTime.now().plusDays(45L), "SC", ZonedDateTime.now().plusDays(15L))
     sentenceRepository.save(sentenceAfter30Days)
 
-    val team = teamRepository.findByCode(teamCode)
+    setupWmtManagedCase(wmtStaff, Tier.A2, sentenceWithin30Days.crn, CaseType.COMMUNITY)
+    setupWmtManagedCase(wmtStaff, Tier.D2, sentenceAfter30Days.crn, CaseType.CUSTODY)
 
-    val offenderManager = offenderManagerRepository.findByCode(offenderManagerCode)
-
-    val secondWorkloadOwner = wmtWorkloadOwnerRepository.save(WMTWorkloadOwnerEntity(team = team, offenderManager = offenderManager, contractedHours = BigDecimal.valueOf(5)))
-
+    val reductionCategory = reductionCategoryRepository.save(ReductionCategoryEntity())
+    val reductionReason = reductionReasonRepository.save(ReductionReasonEntity(reductionCategoryEntity = reductionCategory))
     val reduction = ReductionEntity(
-      workloadOwner = secondWorkloadOwner, hours = BigDecimal.valueOf(5),
+      workloadOwner = wmtStaff.wmtWorkloadOwnerEntity, hours = BigDecimal.valueOf(5),
       effectiveFrom = LocalDate.now().minusDays(2).atStartOfDay(
         ZoneId.systemDefault()
       ),
-      effectiveTo = LocalDate.now().plusDays(2).atStartOfDay(ZoneId.systemDefault()), status = ReductionStatus.ACTIVE, reductionReasonId = 1
+      effectiveTo = LocalDate.now().plusDays(2).atStartOfDay(ZoneId.systemDefault()), status = ReductionStatus.ACTIVE, reductionReasonId = reductionReason.id!!
     )
     reductionsRepository.save(reduction)
 
     reductionsRepository.save(
       ReductionEntity(
-        workloadOwner = secondWorkloadOwner, hours = BigDecimal.valueOf(5),
+        workloadOwner = wmtStaff.wmtWorkloadOwnerEntity, hours = BigDecimal.valueOf(5),
         effectiveFrom = LocalDate.now().minusDays(2).atStartOfDay(
           ZoneId.systemDefault()
         ),
-        effectiveTo = LocalDate.now().plusDays(2).atStartOfDay(ZoneId.systemDefault()), status = ReductionStatus.DELETED, reductionReasonId = 1
+        effectiveTo = LocalDate.now().plusDays(2).atStartOfDay(ZoneId.systemDefault()), status = ReductionStatus.DELETED, reductionReasonId = reductionReason.id!!
       )
     )
+
+    val aTierTotal = setupWmtTierTotal(Tier.A2, wmtStaff.workload, 6)
+    val bTierTotal = setupWmtTierTotal(Tier.B2, wmtStaff.workload, 6)
+    val cTierTotal = setupWmtTierTotal(Tier.C2, wmtStaff.workload, 6)
+    val dTierTotal = setupWmtTierTotal(Tier.D2, wmtStaff.workload, 6)
+    val untieredTotal = setupWmtTierTotal(null, wmtStaff.workload, 6)
 
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers/$offenderManagerCode")
@@ -66,7 +79,7 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
       .isOk
       .expectBody()
       .jsonPath("$.forename")
-      .isEqualTo("Ben")
+      .isEqualTo("Jane")
       .jsonPath("$.surname")
       .isEqualTo("Doe")
       .jsonPath("$.grade")
@@ -76,21 +89,25 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
       .jsonPath("$.code")
       .isEqualTo("OM1")
       .jsonPath("$.teamName")
-      .isEqualTo("Test Team")
+      .isEqualTo(wmtStaff.team.description)
       .jsonPath("$.totalCases")
       .isEqualTo(35)
       .jsonPath("$.weeklyHours")
-      .isEqualTo(secondWorkloadOwner.contractedHours)
+      .isEqualTo(wmtStaff.wmtWorkloadOwnerEntity.contractedHours)
       .jsonPath("$.totalReductionHours")
       .isEqualTo(reduction.hours)
       .jsonPath("$.pointsAvailable")
-      .isEqualTo(1000)
+      .isEqualTo(wmtStaff.workloadPointsCalculation.availablePoints)
       .jsonPath("$.pointsUsed")
-      .isEqualTo(500)
+      .isEqualTo(wmtStaff.workloadPointsCalculation.totalPoints)
       .jsonPath("$.pointsRemaining")
-      .isEqualTo(500)
+      .isEqualTo(wmtStaff.workloadPointsCalculation.availablePoints - wmtStaff.workloadPointsCalculation.totalPoints)
       .jsonPath("$.lastUpdatedOn")
-      .isEqualTo("2013-11-03T09:00:00")
+      .isEqualTo(
+        wmtStaff.workloadPointsCalculation.lastUpdatedOn.format(
+          DateTimeFormatter.ISO_LOCAL_DATE_TIME
+        )
+      )
       .jsonPath("$.nextReductionChange")
       .isEqualTo(
         reduction.effectiveTo.withZoneSameInstant(ZoneOffset.UTC).format(
@@ -98,17 +115,17 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
         )
       )
       .jsonPath("$.caseTotals.a")
-      .isEqualTo(6)
+      .isEqualTo(aTierTotal.totalFilteredCases)
       .jsonPath("$.caseTotals.b")
-      .isEqualTo(6)
+      .isEqualTo(bTierTotal.totalFilteredCases)
       .jsonPath("$.caseTotals.c")
-      .isEqualTo(6)
+      .isEqualTo(cTierTotal.totalFilteredCases)
       .jsonPath("$.caseTotals.d")
-      .isEqualTo(6)
+      .isEqualTo(dTierTotal.totalFilteredCases)
       .jsonPath("$.caseTotals.untiered")
-      .isEqualTo(6)
+      .isEqualTo(untieredTotal.totalFilteredCases)
       .jsonPath("$.paroleReportsDue")
-      .isEqualTo(5)
+      .isEqualTo(wmtStaff.workload.institutionalReportsDueInNextThirtyDays)
       .jsonPath("$.caseEndDue")
       .isEqualTo(1)
       .jsonPath("$.releasesDue")
@@ -121,6 +138,7 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
   fun `can get overview for an offender manager without any reductions`() {
     val teamCode = "T1"
     val offenderManagerCode = "OM2"
+    setupCurrentWmtStaff(offenderManagerCode, teamCode)
     staffCodeResponse(offenderManagerCode, teamCode)
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers/$offenderManagerCode")

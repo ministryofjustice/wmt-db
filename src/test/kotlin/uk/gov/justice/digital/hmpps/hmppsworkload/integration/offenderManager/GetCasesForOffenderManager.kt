@@ -13,9 +13,13 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
     val staffCode = "OM1"
     val teamCode = "T1"
     staffCodeResponse(staffCode, teamCode)
-    caseDetailsRepository.save(CaseDetailsEntity("CRN2222", Tier.B3, CaseType.CUSTODY, "Sally", "Smith"))
-    caseDetailsRepository.save(CaseDetailsEntity("CRN3333", Tier.C1, CaseType.COMMUNITY, "John", "Williams"))
-    caseDetailsRepository.save(CaseDetailsEntity("CRN1111", Tier.C1, CaseType.LICENSE, "John", "Doe"))
+    val realTimeCaseDetails = caseDetailsRepository.saveAll(listOf(CaseDetailsEntity("CRN2222", Tier.B3, CaseType.CUSTODY, "Sally", "Smith"), CaseDetailsEntity("CRN3333", Tier.C1, CaseType.COMMUNITY, "John", "Williams"), CaseDetailsEntity("CRN1111", Tier.C1, CaseType.LICENSE, "John", "Doe")))
+    val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
+
+    realTimeCaseDetails.forEach { caseDetails ->
+      setupWmtManagedCase(wmtStaff, caseDetails.tier, caseDetails.crn, caseDetails.type)
+    }
+
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers/$staffCode/cases")
       .headers {
@@ -94,7 +98,12 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
     val staffCode = "OM1"
     val teamCode = "T1"
     staffCodeResponse(staffCode, teamCode)
-    caseDetailsRepository.save(CaseDetailsEntity("CRN1111", Tier.C1, CaseType.LICENSE, "John", "Doe"))
+    val caseDetails = caseDetailsRepository.save(CaseDetailsEntity("CRN1111", Tier.C1, CaseType.LICENSE, "John", "Doe"))
+    val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
+    setupWmtManagedCase(wmtStaff, caseDetails.tier, caseDetails.crn, caseDetails.type)
+    setupWmtManagedCase(wmtStaff, Tier.B3, "CRN2222", CaseType.CUSTODY)
+    setupWmtManagedCase(wmtStaff, Tier.C1, "CRN3333", CaseType.COMMUNITY)
+
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers/$staffCode/cases")
       .headers {

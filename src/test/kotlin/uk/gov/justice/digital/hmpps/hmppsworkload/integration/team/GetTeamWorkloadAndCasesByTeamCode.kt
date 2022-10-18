@@ -7,7 +7,7 @@ class GetTeamWorkloadAndCasesByTeamCode : IntegrationTestBase() {
   val teamCode = "T1"
   @Test
   fun `can get workload and cases by team code`() {
-
+    val wmtStaff = setupCurrentWmtStaff("STAFF1", teamCode)
     webTestClient.get()
       .uri("/team/workloadcases?teams=$teamCode")
       .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT")) }
@@ -18,9 +18,9 @@ class GetTeamWorkloadAndCasesByTeamCode : IntegrationTestBase() {
       .jsonPath("$.[0].teamCode")
       .isEqualTo("T1")
       .jsonPath("$.[0].workload")
-      .isEqualTo("74.0")
+      .isEqualTo(50.toDouble())
       .jsonPath("$.[0].totalCases")
-      .isEqualTo("2")
+      .isEqualTo(wmtStaff.workload.totalFilteredCases)
   }
 
   @Test

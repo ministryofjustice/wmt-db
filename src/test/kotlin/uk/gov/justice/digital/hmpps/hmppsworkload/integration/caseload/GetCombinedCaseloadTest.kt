@@ -25,9 +25,10 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
   fun `must return list of wmt cases`() {
     val staffCode = "OM1"
     val teamCode = "T1"
-
     val realtimeCase = Case(Tier.A1, CaseType.LICENSE, false, "CRN1111")
-    caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, CaseType.LICENSE, "Jane", "Doe"))
+    caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, realtimeCase.type, "Jane", "Doe"))
+    val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
+    setupWmtManagedCase(wmtStaff, realtimeCase.tier, realtimeCase.crn, realtimeCase.type)
 
     val actualCases = getCaseLoad.getCases(staffCode, teamCode)
 
@@ -38,6 +39,8 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
   fun `must not return list of cases if no realtime data exist`() {
     val staffCode = "OM1"
     val teamCode = "T1"
+    val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
+    setupWmtManagedCase(wmtStaff, Tier.C2, "CRN12345", CaseType.COMMUNITY)
 
     Assertions.assertEquals(0, getCaseLoad.getCases(staffCode, teamCode).size)
   }
@@ -72,7 +75,7 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
     val teamCode = "T1"
 
     val realtimeCase = Case(Tier.A1, CaseType.LICENSE, false, "CRN1111")
-    caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, CaseType.LICENSE, "Jane", "Doe"))
+    caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, realtimeCase.type, "Jane", "Doe"))
 
     personManagerRepository.save(
       PersonManagerEntity(
@@ -81,6 +84,9 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
         providerCode = "providerCode", isActive = true
       )
     )
+
+    val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
+    setupWmtManagedCase(wmtStaff, realtimeCase.tier, realtimeCase.crn, realtimeCase.type)
 
     val actualCases = getCaseLoad.getCases(staffCode, teamCode)
 

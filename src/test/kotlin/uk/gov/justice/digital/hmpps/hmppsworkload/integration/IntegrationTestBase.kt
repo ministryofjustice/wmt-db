@@ -31,8 +31,27 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsAllocationMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.domain.WMTPointsWeightings
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.domain.WMTStaff
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.CaseCategoryEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WMTCaseDetailsEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WMTWorkloadEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WorkloadPointsCalculationEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WorkloadReportEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.CaseCategoryRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.PduRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.ReductionCategoryRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.ReductionReasonRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.RegionRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.TiersRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WMTCaseDetailsRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WMTWorkloadRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WorkloadPointsCalculationRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WorkloadReportRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.communityApiAssessmentResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.convictionNoSentenceResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.notFoundTierResponse
@@ -47,6 +66,11 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByC
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByUserNameResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.successfulRiskPredictorResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.teamStaffJsonResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.OffenderManagerEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PduEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RegionEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.TeamEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTWorkloadOwnerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.AdjustmentReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.EventManagerRepository
@@ -62,10 +86,12 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTCourtReports
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTInstitutionalReportRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTWorkloadOwnerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadCalculationRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadPointsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.listener.HmppsOffenderEvent
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.AuditMessage
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
+import java.math.BigDecimal
 import java.math.BigInteger
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
@@ -167,6 +193,42 @@ abstract class IntegrationTestBase {
   @Autowired
   protected lateinit var hmppsQueueService: HmppsQueueService
 
+  @Autowired
+  protected lateinit var tiersRepository: TiersRepository
+
+  @Autowired
+  protected lateinit var wmtCaseDetailsRepository: WMTCaseDetailsRepository
+
+  @Autowired
+  protected lateinit var workloadPointsCaseDetailsRepository: WorkloadPointsCalculationRepository
+
+  @Autowired
+  protected lateinit var wmtWorkloadRepository: WMTWorkloadRepository
+
+  @Autowired
+  protected lateinit var workloadReportRepository: WorkloadReportRepository
+
+  @Autowired
+  protected lateinit var reductionReasonRepository: ReductionReasonRepository
+
+  @Autowired
+  protected lateinit var reductionCategoryRepository: ReductionCategoryRepository
+
+  @Autowired
+  protected lateinit var regionRepository: RegionRepository
+
+  @Autowired
+  protected lateinit var pduRepository: PduRepository
+
+  @Autowired
+  protected lateinit var caseCategoryRepository: CaseCategoryRepository
+
+  @Autowired
+  protected lateinit var workloadPointsCalculationRepository: WorkloadPointsCalculationRepository
+
+  @Autowired
+  protected lateinit var workloadPointsRepository: WorkloadPointsRepository
+
   @BeforeEach
   fun setupDependentServices() {
 
@@ -194,6 +256,7 @@ abstract class IntegrationTestBase {
     tierCalculationSqsDlqClient.purgeQueue(PurgeQueueRequest(tierCalculationQueue.dlqUrl))
     hmppsAuditQueueClient.purgeQueue(PurgeQueueRequest(hmppsAuditQueue.queueUrl))
     workloadCalculationRepository.deleteAll()
+    clearWMT()
   }
 
   @AfterAll
@@ -214,6 +277,47 @@ abstract class IntegrationTestBase {
     workloadCalculationRepository.deleteAll()
   }
 
+  fun clearWMT() {
+    tiersRepository.deleteAll()
+    wmtCaseDetailsRepository.deleteAll()
+    caseCategoryRepository.deleteAll()
+    workloadPointsCaseDetailsRepository.deleteAll()
+    workloadPointsCalculationRepository.deleteAll()
+    wmtWorkloadRepository.deleteAll()
+    workloadReportRepository.deleteAll()
+    reductionsRepository.deleteAll()
+    reductionReasonRepository.deleteAll()
+    reductionCategoryRepository.deleteAll()
+    wmtWorkloadOwnerRepository.deleteAll()
+    offenderManagerRepository.deleteAll()
+    teamRepository.deleteAll()
+    pduRepository.deleteAll()
+    regionRepository.deleteAll()
+  }
+
+  protected fun setupCurrentWmtStaff(staffCode: String, teamCode: String): WMTStaff {
+    val region = regionRepository.findByCode("REGION1") ?: regionRepository.save(RegionEntity(code = "REGION1", description = "Region 1"))
+    val pdu = pduRepository.findByCode("PDU1") ?: pduRepository.save(PduEntity(code = "PDU1", description = "Local Delivery Unit (Actually a Probation Delivery Unit)", region = region))
+    val team = teamRepository.findByCode(teamCode) ?: teamRepository.save(TeamEntity(code = teamCode, description = "Team 1", ldu = pdu))
+    val offenderManager = offenderManagerRepository.save(OffenderManagerEntity(code = staffCode, forename = "Jane", surname = "Doe", typeId = 1))
+    val workloadOwner = wmtWorkloadOwnerRepository.save(WMTWorkloadOwnerEntity(offenderManager = offenderManager, team = team, contractedHours = BigDecimal.valueOf(37.5)))
+    val workloadReport = workloadReportRepository.findByEffectiveFromIsNotNullAndEffectiveToIsNull() ?: workloadReportRepository.save((WorkloadReportEntity()))
+    val wmtWorkload = wmtWorkloadRepository.save(WMTWorkloadEntity(workloadOwner = workloadOwner, workloadReport = workloadReport, totalFilteredCommunityCases = 10, totalFilteredCustodyCases = 20, totalFilteredLicenseCases = 5, institutionalReportsDueInNextThirtyDays = 5, totalFilteredCases = 35))
+    val currentWmtPointsWeightings = getWmtWorkloadWeightings()
+    val workloadPointsCalculation = workloadPointsCalculationRepository.save(WorkloadPointsCalculationEntity(workloadReport = workloadReport, workloadPoints = currentWmtPointsWeightings.normalWeightings, t2aWorkloadPoints = currentWmtPointsWeightings.t2aWeightings, workload = wmtWorkload, totalPoints = 500, availablePoints = 1000))
+    return WMTStaff(offenderManager, team, workloadOwner, wmtWorkload, workloadPointsCalculation)
+  }
+
+  protected fun setupWmtManagedCase(wmtStaff: WMTStaff, tier: Tier, crn: String, caseType: CaseType) {
+    val tierCategory = setupWmtCaseCategoryTier(tier)
+    wmtCaseDetailsRepository.save(WMTCaseDetailsEntity(workload = wmtStaff.workload, crn = crn, tierCategory = tierCategory, caseType = caseType, teamCode = wmtStaff.team.code))
+  }
+
+  protected fun setupWmtCaseCategoryTier(tier: Tier): CaseCategoryEntity = caseCategoryRepository.findByCategoryName(tier.name) ?: caseCategoryRepository.save(CaseCategoryEntity(categoryName = tier.name, categoryId = tier.ordinal))
+
+  protected fun setupWmtUntiered(): CaseCategoryEntity = caseCategoryRepository.findByCategoryName("Untiered") ?: caseCategoryRepository.save(CaseCategoryEntity(categoryName = "Untiered", categoryId = 0))
+
+  protected fun getWmtWorkloadWeightings(): WMTPointsWeightings = WMTPointsWeightings(workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(true), workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false))
   internal fun HttpHeaders.authToken(roles: List<String> = emptyList()) {
     this.setBearerAuth(
       jwtAuthHelper.createJwt(

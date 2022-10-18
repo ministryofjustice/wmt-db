@@ -31,7 +31,7 @@ data class WMTCaseDetailsEntity(
   val crn: String,
 
   @OneToOne
-  @JoinColumn(name = "tier_code")
+  @JoinColumn(name = "tier_code", referencedColumnName = "categoryId")
   val tierCategory: CaseCategoryEntity,
 
   @Column
@@ -41,4 +41,6 @@ data class WMTCaseDetailsEntity(
   @Enumerated(EnumType.STRING)
   val caseType: CaseType,
 
+  @Column
+  val teamCode: String
 )

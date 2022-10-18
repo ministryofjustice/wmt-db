@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity
 
+import java.io.Serializable
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -15,7 +16,7 @@ data class CaseCategoryEntity(
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   val id: Long? = null,
   @Column
-  val categoryId: Int,
+  val categoryId: Int = 1,
   @Column
-  val categoryName: String
-)
+  val categoryName: String = "A1"
+) : Serializable

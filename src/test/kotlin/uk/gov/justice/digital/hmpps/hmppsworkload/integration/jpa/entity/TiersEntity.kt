@@ -29,7 +29,7 @@ data class TiersEntity(
   val caseType: CaseType,
 
   @OneToOne
-  @JoinColumn(name = "tier_number")
+  @JoinColumn(name = "tier_number", referencedColumnName = "categoryId")
   val tierCategory: CaseCategoryEntity,
 
   @Column
