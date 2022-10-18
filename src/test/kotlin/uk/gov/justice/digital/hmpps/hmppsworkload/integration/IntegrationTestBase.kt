@@ -302,7 +302,7 @@ abstract class IntegrationTestBase {
     val offenderManager = offenderManagerRepository.save(OffenderManagerEntity(code = staffCode, forename = "Jane", surname = "Doe", typeId = 1))
     val workloadOwner = wmtWorkloadOwnerRepository.save(WMTWorkloadOwnerEntity(offenderManager = offenderManager, team = team, contractedHours = BigDecimal.valueOf(37.5)))
     val workloadReport = workloadReportRepository.findByEffectiveFromIsNotNullAndEffectiveToIsNull() ?: workloadReportRepository.save((WorkloadReportEntity()))
-    val wmtWorkload = wmtWorkloadRepository.save(WMTWorkloadEntity(workloadOwner = workloadOwner, workloadReport = workloadReport, totalFilteredCommunityCases = 10, totalFilteredCustodyCases = 20, totalFilteredLicenseCases = 5, institutionalReportsDueInNextThirtyDays = 5))
+    val wmtWorkload = wmtWorkloadRepository.save(WMTWorkloadEntity(workloadOwner = workloadOwner, workloadReport = workloadReport, totalFilteredCommunityCases = 10, totalFilteredCustodyCases = 20, totalFilteredLicenseCases = 5, institutionalReportsDueInNextThirtyDays = 5, totalFilteredCases = 35))
     val currentWmtPointsWeightings = getWmtWorkloadWeightings()
     val workloadPointsCalculation = workloadPointsCalculationRepository.save(WorkloadPointsCalculationEntity(workloadReport = workloadReport, workloadPoints = currentWmtPointsWeightings.normalWeightings, t2aWorkloadPoints = currentWmtPointsWeightings.t2aWeightings, workload = wmtWorkload, totalPoints = 500, availablePoints = 1000))
     return WMTStaff(offenderManager, team, workloadOwner, wmtWorkload, workloadPointsCalculation)

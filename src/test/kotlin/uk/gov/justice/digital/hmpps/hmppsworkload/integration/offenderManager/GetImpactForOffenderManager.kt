@@ -5,7 +5,6 @@ import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WMTCaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.request.impactCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 
@@ -54,8 +53,8 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
     staffCodeResponse(staffCode, teamCode)
     val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
     val caseDetails = caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Jane", "Doe"))
-    val wmtCaseCategoryTier = setupWmtCaseCategoryTier(caseDetails.tier)
-    wmtCaseDetailsRepository.save(WMTCaseDetailsEntity(workload = wmtStaff.workload, crn = caseDetails.crn, tierCategory = wmtCaseCategoryTier, caseType = caseDetails.type, teamCode = teamCode))
+    setupWmtManagedCase(wmtStaff, caseDetails.tier, crn, caseDetails.type)
+
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/impact")
       .bodyValue(impactCase(crn))

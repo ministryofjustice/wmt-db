@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WMTCaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 
 class GetCasesForOffenderManager : IntegrationTestBase() {
@@ -18,8 +17,7 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
     val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
 
     realTimeCaseDetails.forEach { caseDetails ->
-      val wmtTier = setupWmtCaseCategoryTier(caseDetails.tier)
-      wmtCaseDetailsRepository.save(WMTCaseDetailsEntity(workload = wmtStaff.workload, crn = caseDetails.crn, tierCategory = wmtTier, caseType = caseDetails.type, teamCode = teamCode))
+      setupWmtManagedCase(wmtStaff, caseDetails.tier, caseDetails.crn, caseDetails.type)
     }
 
     webTestClient.get()
@@ -102,10 +100,9 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
     staffCodeResponse(staffCode, teamCode)
     val caseDetails = caseDetailsRepository.save(CaseDetailsEntity("CRN1111", Tier.C1, CaseType.LICENSE, "John", "Doe"))
     val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
-    val wmtTier = setupWmtCaseCategoryTier(caseDetails.tier)
-    wmtCaseDetailsRepository.save(WMTCaseDetailsEntity(workload = wmtStaff.workload, crn = caseDetails.crn, tierCategory = wmtTier, caseType = caseDetails.type, teamCode = teamCode))
-    wmtCaseDetailsRepository.save(WMTCaseDetailsEntity(workload = wmtStaff.workload, crn = "CRN2222", tierCategory = setupWmtCaseCategoryTier(Tier.B3), caseType = CaseType.CUSTODY, teamCode = teamCode))
-    wmtCaseDetailsRepository.save(WMTCaseDetailsEntity(workload = wmtStaff.workload, crn = "CRN3333", tierCategory = setupWmtCaseCategoryTier(Tier.C1), caseType = CaseType.COMMUNITY, teamCode = teamCode))
+    setupWmtManagedCase(wmtStaff, caseDetails.tier, caseDetails.crn, caseDetails.type)
+    setupWmtManagedCase(wmtStaff, Tier.B3, "CRN2222", CaseType.CUSTODY)
+    setupWmtManagedCase(wmtStaff, Tier.C1, "CRN3333", CaseType.COMMUNITY)
 
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers/$staffCode/cases")

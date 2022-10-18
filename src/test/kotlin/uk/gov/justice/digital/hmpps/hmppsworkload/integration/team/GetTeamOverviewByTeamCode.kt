@@ -45,7 +45,7 @@ class GetTeamOverviewByTeamCode : IntegrationTestBase() {
       .jsonPath("$.offenderManagers[?(@.code == '${firstWmtStaff.offenderManager.code}')].totalCustodyCases")
       .isEqualTo(20)
       .jsonPath("$.offenderManagers[?(@.code == '${firstWmtStaff.offenderManager.code}')].capacity")
-      .isEqualTo(50)
+      .isEqualTo(50.toDouble())
       .jsonPath("$.offenderManagers[?(@.code == '${firstWmtStaff.offenderManager.code}')].staffId")
       .isEqualTo(123456789)
       .jsonPath("$.offenderManagers[?(@.code == '${firstWmtStaff.offenderManager.code}')].totalCasesInLastWeek")
@@ -84,7 +84,7 @@ class GetTeamOverviewByTeamCode : IntegrationTestBase() {
       .isOk
       .expectBody()
       .jsonPath("$.offenderManagers[?(@.code == '${firstWmtStaff.offenderManager.code}')].forename")
-      .isEqualTo("Ben")
+      .isEqualTo("Jane")
       .jsonPath("$.offenderManagers[?(@.code == '${firstWmtStaff.offenderManager.code}')].surname")
       .isEqualTo("Doe")
       .jsonPath("$.offenderManagers[?(@.code == '${firstWmtStaff.offenderManager.code}')].grade")
@@ -94,13 +94,13 @@ class GetTeamOverviewByTeamCode : IntegrationTestBase() {
       .jsonPath("$.offenderManagers[?(@.code == '${firstWmtStaff.offenderManager.code}')].totalCustodyCases")
       .isEqualTo(20)
       .jsonPath("$.offenderManagers[?(@.code == '${firstWmtStaff.offenderManager.code}')].capacity")
-      .isEqualTo(50)
+      .isEqualTo(50.toDouble())
       .jsonPath("$.offenderManagers[?(@.code == '${firstWmtStaff.offenderManager.code}')].code")
       .isEqualTo("OM1")
       .jsonPath("$.offenderManagers[?(@.code == '${firstWmtStaff.offenderManager.code}')].staffId")
       .isEqualTo(123456789)
-      .jsonPath("$.offenderManagers[?(@.code == 'NOWORKLOAD1')].grade")
-      .isEqualTo("PQiP")
+      .jsonPath("$.offenderManagers[?(@.code == 'NOWORKLOAD1')]")
+      .doesNotExist()
   }
 
   @Test
