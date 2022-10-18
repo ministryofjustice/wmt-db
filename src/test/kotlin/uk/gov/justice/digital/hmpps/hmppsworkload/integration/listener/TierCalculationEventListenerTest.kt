@@ -35,9 +35,9 @@ class TierCalculationEventListenerTest : IntegrationTestBase() {
 
     val caseDetail = caseDetailsRepository.findAll().first()
 
-      Assertions.assertEquals(crn, caseDetail.crn)
-      Assertions.assertEquals(CaseType.CUSTODY, caseDetail.type)
-      Assertions.assertEquals(Tier.B3, caseDetail.tier)
+    Assertions.assertEquals(crn, caseDetail.crn)
+    Assertions.assertEquals(CaseType.CUSTODY, caseDetail.type)
+    Assertions.assertEquals(Tier.B3, caseDetail.tier)
   }
 
   private fun tierCalculationEvent(crn: String) = CalculationEventData(
