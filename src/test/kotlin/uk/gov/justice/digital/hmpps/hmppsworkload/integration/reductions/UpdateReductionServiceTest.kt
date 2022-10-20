@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OutOfDateReductions
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.domain.WMTStaff
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.ReductionCategoryEntity
@@ -78,11 +77,9 @@ class UpdateReductionServiceTest : IntegrationTestBase() {
 
     await untilCallTo { verifyReductionsCompletedOnQueue() } matches { it == true }
 
-    val outOfDateReductions = OutOfDateReductions(
-      reductionsRepository.findByEffectiveFromBeforeAndEffectiveToAfterAndStatus(ZonedDateTime.now(), ZonedDateTime.now(), ReductionStatus.SCHEDULED),
-      reductionsRepository.findByEffectiveToBeforeAndStatus(ZonedDateTime.now(), ReductionStatus.ACTIVE)
-    )
+    val findOutOfDateReductions = getReductionService.findOutOfDateReductions()
 
-    Assertions.assertEquals(outOfDateReductions, getReductionsCompletedMessages())
+    Assertions.assertEquals(findOutOfDateReductions.activeNowArchived.size, 0)
+    Assertions.assertEquals(findOutOfDateReductions.scheduledNowActive.size, 0)
   }
 }
