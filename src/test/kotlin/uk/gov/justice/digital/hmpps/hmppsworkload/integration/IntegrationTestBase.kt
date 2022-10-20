@@ -32,6 +32,7 @@ import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OutOfDateReductions
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsAllocationMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
@@ -171,6 +172,7 @@ abstract class IntegrationTestBase {
 
   private val tierCalculationQueue by lazy { hmppsQueueService.findByQueueId("tiercalcqueue") ?: throw MissingQueueException("HmppsQueue tiercalcqueue not found") }
   private val hmppsAuditQueue by lazy { hmppsQueueService.findByQueueId("hmppsauditqueue") ?: throw MissingQueueException("HmppsQueue hmppsauditqueue not found") }
+  private val hmppsReductionsCompletedQueue by lazy { hmppsQueueService.findByQueueId("hmppsreductionscompletedqueue") ?: throw MissingQueueException("HmppsQueue hmppsreductionsCompletedqueue not found") }
   private val workloadCalculationQueue by lazy { hmppsQueueService.findByQueueId("workloadcalculationqueue") ?: throw MissingQueueException("HmppsQueue workloadcalculationqueue not found") }
 
   private val hmppsOffenderSqsDlqClient by lazy { hmppsOffenderQueue.sqsDlqClient as AmazonSQS }
@@ -189,6 +191,8 @@ abstract class IntegrationTestBase {
   protected val workloadCalculationSqsClient by lazy { workloadCalculationQueue.sqsClient }
 
   protected val hmppsAuditQueueClient by lazy { hmppsAuditQueue.sqsClient }
+
+  protected val hmppsReductionsCompletedClient by lazy { hmppsReductionsCompletedQueue.sqsClient }
 
   @Autowired
   protected lateinit var hmppsQueueService: HmppsQueueService
@@ -255,6 +259,7 @@ abstract class IntegrationTestBase {
     tierCalculationSqsClient.purgeQueue(PurgeQueueRequest(tierCalculationQueue.queueUrl))
     tierCalculationSqsDlqClient.purgeQueue(PurgeQueueRequest(tierCalculationQueue.dlqUrl))
     hmppsAuditQueueClient.purgeQueue(PurgeQueueRequest(hmppsAuditQueue.queueUrl))
+    hmppsReductionsCompletedClient.purgeQueue(PurgeQueueRequest(hmppsReductionsCompletedQueue.queueUrl))
     workloadCalculationRepository.deleteAll()
     clearWMT()
   }
@@ -583,6 +588,18 @@ abstract class IntegrationTestBase {
     return message.messages.map {
       val auditDataType = object : TypeReference<AuditMessage>() {}
       objectMapper.readValue(it.body, auditDataType)
+    }.first()
+  }
+
+  protected fun verifyReductionsCompletedOnQueue(): Boolean =
+    hmppsReductionsCompletedClient.getQueueAttributes(hmppsReductionsCompletedQueue.queueUrl, listOf("ApproximateNumberOfMessages"))
+      .let { it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0 } == 1
+
+  protected fun getReductionsCompletedMessages(): OutOfDateReductions {
+    val message = hmppsReductionsCompletedClient.receiveMessage(hmppsReductionsCompletedQueue.queueUrl)
+    return message.messages.map {
+      val reductionsCompletedMessageDataType = object : TypeReference<OutOfDateReductions>() {}
+      objectMapper.readValue(it.body, reductionsCompletedMessageDataType)
     }.first()
   }
 }

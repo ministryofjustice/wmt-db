@@ -1,10 +1,14 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.reductions
 
+import org.awaitility.kotlin.await
+import org.awaitility.kotlin.matches
+import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OutOfDateReductions
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.domain.WMTStaff
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.ReductionCategoryEntity
@@ -57,5 +61,28 @@ class UpdateReductionServiceTest : IntegrationTestBase() {
     updateReductionService.updateReductionStatus(getReductionService.findOutOfDateReductions())
 
     Assertions.assertEquals(ReductionStatus.ACTIVE, reductionsRepository.findByIdOrNull(activeReduction.id!!)?.status)
+  }
+
+  @Test
+  fun `can publish out of date reductions when updating reduction status`() {
+    reductionsRepository.save(ReductionEntity(workloadOwner = wmtStaff.wmtWorkloadOwnerEntity, hours = BigDecimal.valueOf(3.2), effectiveFrom = ZonedDateTime.now().minusDays(1), effectiveTo = ZonedDateTime.now().plusDays(1), status = ReductionStatus.SCHEDULED, reductionReasonId = reductionReason.id!!))
+    updateReductionService.updateReductionStatus(getReductionService.findOutOfDateReductions())
+
+    await untilCallTo { verifyReductionsCompletedOnQueue() } matches { it == true }
+  }
+
+  @Test
+  fun `out of date reductions message contain required data`() {
+    reductionsRepository.save(ReductionEntity(workloadOwner = wmtStaff.wmtWorkloadOwnerEntity, hours = BigDecimal.valueOf(3.2), effectiveFrom = ZonedDateTime.now().minusDays(1), effectiveTo = ZonedDateTime.now().plusDays(1), status = ReductionStatus.SCHEDULED, reductionReasonId = reductionReason.id!!))
+    updateReductionService.updateReductionStatus(getReductionService.findOutOfDateReductions())
+
+    await untilCallTo { verifyReductionsCompletedOnQueue() } matches { it == true }
+
+    val outOfDateReductions = OutOfDateReductions(
+      reductionsRepository.findByEffectiveFromBeforeAndEffectiveToAfterAndStatus(ZonedDateTime.now(), ZonedDateTime.now(), ReductionStatus.SCHEDULED),
+      reductionsRepository.findByEffectiveToBeforeAndStatus(ZonedDateTime.now(), ReductionStatus.ACTIVE)
+    )
+
+    Assertions.assertEquals(outOfDateReductions, getReductionsCompletedMessages())
   }
 }
