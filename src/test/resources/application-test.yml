@@ -48,6 +48,18 @@ hmpps.sqs:
       subscribeFilter: '{"eventType":[ "staff.available.hours.changed"] }'
       asyncQueueClient: true
       dlqMaxReceiveCount: 1
+    hmppsreductionsqueue:
+      accessKeyId: foobar
+      secretAccessKey: foobar
+      queueName: hmpps_reductions_queue
+      asyncQueueClient: true
+      dlqMaxReceiveCount: 1
+    hmppsreductionscompletedqueue:
+      accessKeyId: foobar
+      secretAccessKey: foobar
+      queueName: hmpps_reductions_completed_queue
+      asyncQueueClient: true
+      dlqMaxReceiveCount: 1
   topics:
     hmmppsdomaintopic:
       arn: arn:aws:sns:eu-west-2:000000000000:${random.uuid}

@@ -33,6 +33,11 @@ hmpps.sqs:
       dlqName: workload_calculation_event_dlq
       subscribeTopicId: hmmppsdomaintopic
       subscribeFilter: '{"eventType":[ "staff.available.hours.changed"] }'
+    hmppsreductionscompletedqueue:
+      accessKeyId: foobar
+      secretAccessKey: foobar
+      queueName: hmpps_reductions_completed_queue
+      asyncQueueClient: true
   topics:
     hmmppsdomaintopic:
       arn: arn:aws:sns:eu-west-2:000000000000:${random.uuid}
