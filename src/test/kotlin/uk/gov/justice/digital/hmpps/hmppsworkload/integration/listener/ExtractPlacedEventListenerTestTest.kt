@@ -41,10 +41,16 @@ class ExtractPlacedEventListenerTestTest : IntegrationTestBase() {
   @Test
   fun `can update incorrect Active reduction to Archived`() {
     val activeReductionWhichIsNowArchived = reductionsRepository.save(ReductionEntity(workloadOwner = wmtStaff.wmtWorkloadOwnerEntity, hours = BigDecimal.valueOf(3.2), effectiveFrom = ZonedDateTime.now().minusDays(2), effectiveTo = ZonedDateTime.now().minusDays(1), status = ReductionStatus.ACTIVE, reductionReasonId = reductionReason.id!!))
+    val activeReduction = reductionsRepository.save(ReductionEntity(workloadOwner = wmtStaff.wmtWorkloadOwnerEntity, hours = BigDecimal.valueOf(5), effectiveFrom = ZonedDateTime.now().minusDays(7), effectiveTo = ZonedDateTime.now().plusDays(7), status = ReductionStatus.ACTIVE, reductionReasonId = reductionReason.id!!))
+    val deletedReductionInPast = reductionsRepository.save(ReductionEntity(workloadOwner = wmtStaff.wmtWorkloadOwnerEntity, hours = BigDecimal.valueOf(3.2), effectiveFrom = ZonedDateTime.now().minusDays(7), effectiveTo = ZonedDateTime.now().minusDays(1), status = ReductionStatus.DELETED, reductionReasonId = reductionReason.id!!))
+
     hmppsExtractPlacedClient.sendMessage(SendMessageRequest(hmppsExtractPlacedQueue.queueUrl, "{}"))
 
     noMessagesOnExtractPlacedQueue()
     Assertions.assertEquals(ReductionStatus.ARCHIVED, reductionsRepository.findByIdOrNull(activeReductionWhichIsNowArchived.id!!)?.status)
+
+    Assertions.assertEquals(activeReduction.status, reductionsRepository.findByIdOrNull(activeReduction.id!!)?.status)
+    Assertions.assertEquals(deletedReductionInPast.status, reductionsRepository.findByIdOrNull(deletedReductionInPast.id!!)?.status)
   }
 
   @Test
