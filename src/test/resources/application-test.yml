@@ -39,7 +39,6 @@ hmpps.sqs:
       accessKeyId: foobar
       secretAccessKey: foobar
       queueName: hmpps_workload_audit_queue
-      asyncQueueClient: true
       dlqMaxReceiveCount: 1
     workloadcalculationqueue:
       queueName: workload_calculation_event_queue
@@ -48,17 +47,10 @@ hmpps.sqs:
       subscribeFilter: '{"eventType":[ "staff.available.hours.changed"] }'
       asyncQueueClient: true
       dlqMaxReceiveCount: 1
-    hmppsreductionsqueue:
-      accessKeyId: foobar
-      secretAccessKey: foobar
-      queueName: hmpps_reductions_queue
-      asyncQueueClient: true
-      dlqMaxReceiveCount: 1
     hmppsreductionscompletedqueue:
       accessKeyId: foobar
       secretAccessKey: foobar
       queueName: hmpps_reductions_completed_queue
-      asyncQueueClient: true
       dlqMaxReceiveCount: 1
   topics:
     hmmppsdomaintopic:

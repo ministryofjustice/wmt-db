@@ -77,9 +77,8 @@ class UpdateReductionServiceTest : IntegrationTestBase() {
 
     await untilCallTo { verifyReductionsCompletedOnQueue() } matches { it == true }
 
-    val findOutOfDateReductions = getReductionService.findOutOfDateReductions()
+    val reductionCompleteMessage = getReductionsCompletedMessages()
 
-    Assertions.assertEquals(findOutOfDateReductions.activeNowArchived.size, 0)
-    Assertions.assertEquals(findOutOfDateReductions.scheduledNowActive.size, 0)
+    Assertions.assertEquals("OUT_OF_DATE_REDUCTIONS", reductionCompleteMessage.eventType)
   }
 }

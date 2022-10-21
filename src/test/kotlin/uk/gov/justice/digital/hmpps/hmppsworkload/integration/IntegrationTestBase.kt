@@ -4,6 +4,7 @@ import com.amazonaws.services.sqs.AmazonSQS
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model.PurgeQueueRequest
 import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
@@ -32,7 +33,6 @@ import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OutOfDateReductions
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsAllocationMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
@@ -595,10 +595,11 @@ abstract class IntegrationTestBase {
     hmppsReductionsCompletedClient.getQueueAttributes(hmppsReductionsCompletedQueue.queueUrl, listOf("ApproximateNumberOfMessages"))
       .let { it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0 } == 1
 
-  protected fun getReductionsCompletedMessages(): OutOfDateReductions {
+  protected fun getReductionsCompletedMessages(): HmppsMessage<JsonNode> {
     val message = hmppsReductionsCompletedClient.receiveMessage(hmppsReductionsCompletedQueue.queueUrl)
     return message.messages.map {
-      val reductionsCompletedMessageDataType = object : TypeReference<OutOfDateReductions>() {}
+      val reductionsCompletedMessageDataType = object : TypeReference<HmppsMessage<JsonNode>>() {}
+
       objectMapper.readValue(it.body, reductionsCompletedMessageDataType)
     }.first()
   }
