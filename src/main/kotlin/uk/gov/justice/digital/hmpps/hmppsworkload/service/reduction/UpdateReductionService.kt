@@ -29,7 +29,8 @@ class UpdateReductionService(
   private val hmppsReductionsCompletedQueueUrl by lazy { hmppsQueueService.findByQueueId("hmppsreductionscompletedqueue")?.queueUrl ?: throw MissingQueueException("HmppsQueue hmppsreductionscompletedqueue not found") }
 
   @Transactional
-  fun updateReductionStatus(outOfDateReductions: OutOfDateReductions) {
+  fun updateOutOfDateReductionStatus() {
+    val outOfDateReductions = findOutOfDateReductions()
 
     outOfDateReductions.activeNowArchived
       .onEach { it.status = ReductionStatus.ARCHIVED }
@@ -63,7 +64,10 @@ class UpdateReductionService(
       PersonReference(emptyList())
     )
   )
-
+  private fun findOutOfDateReductions(): OutOfDateReductions = OutOfDateReductions(
+    reductionsRepository.findByEffectiveFromBeforeAndEffectiveToAfterAndStatus(ZonedDateTime.now(), ZonedDateTime.now(), ReductionStatus.SCHEDULED),
+    reductionsRepository.findByEffectiveToBeforeAndStatus(ZonedDateTime.now(), ReductionStatus.ACTIVE)
+  )
   companion object {
     private val log = LoggerFactory.getLogger(this::class.java)
   }

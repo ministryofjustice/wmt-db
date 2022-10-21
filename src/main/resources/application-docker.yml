@@ -38,6 +38,10 @@ hmpps.sqs:
       secretAccessKey: foobar
       queueName: hmpps_reductions_completed_queue
       asyncQueueClient: true
+    hmppsextractplacedqueue:
+      accessKeyId: foobar
+      secretAccessKey: foobar
+      queueName: hmpps_extract_placed_queue
   topics:
     hmmppsdomaintopic:
       arn: arn:aws:sns:eu-west-2:000000000000:${random.uuid}

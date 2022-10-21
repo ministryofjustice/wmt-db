@@ -100,10 +100,12 @@ import java.math.BigInteger
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class IntegrationTestBase {
 
-  private var oauthMock: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 9090)
+  private var oauthMock: ClientAndServer =
+    startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 9090)
   var communityApi: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8092)
   var hmppsTier: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8082)
-  var assessRisksNeedsApi: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8085)
+  var assessRisksNeedsApi: ClientAndServer =
+    startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8085)
 
   @Autowired
   protected lateinit var objectMapper: ObjectMapper
@@ -164,16 +166,44 @@ abstract class IntegrationTestBase {
   @Autowired
   lateinit var allocationCompleteClient: AmazonSQSAsync
 
-  protected val allocationCompleteUrl by lazy { hmppsQueueService.findByQueueId("hmppsallocationcompletequeue")?.queueUrl ?: throw MissingQueueException("HmppsQueue allocationcompletequeue not found") }
+  protected val allocationCompleteUrl by lazy {
+    hmppsQueueService.findByQueueId("hmppsallocationcompletequeue")?.queueUrl
+      ?: throw MissingQueueException("HmppsQueue allocationcompletequeue not found")
+  }
 
-  private val hmppsOffenderQueue by lazy { hmppsQueueService.findByQueueId("hmppsoffenderqueue") ?: throw MissingQueueException("HmppsQueue hmppsoffenderqueue not found") }
-  private val domainEventsTopic by lazy { hmppsQueueService.findByTopicId("hmmppsdomaintopic") ?: throw MissingQueueException("HmppsTopic hmmppsdomaintopic not found") }
-  private val offenderEventTopic by lazy { hmppsQueueService.findByTopicId("hmppsoffendertopic") ?: throw MissingQueueException("HmppsTopic hmppsoffendertopic not found") }
+  private val hmppsOffenderQueue by lazy {
+    hmppsQueueService.findByQueueId("hmppsoffenderqueue")
+      ?: throw MissingQueueException("HmppsQueue hmppsoffenderqueue not found")
+  }
+  private val domainEventsTopic by lazy {
+    hmppsQueueService.findByTopicId("hmmppsdomaintopic")
+      ?: throw MissingQueueException("HmppsTopic hmmppsdomaintopic not found")
+  }
+  private val offenderEventTopic by lazy {
+    hmppsQueueService.findByTopicId("hmppsoffendertopic")
+      ?: throw MissingQueueException("HmppsTopic hmppsoffendertopic not found")
+  }
 
-  private val tierCalculationQueue by lazy { hmppsQueueService.findByQueueId("tiercalcqueue") ?: throw MissingQueueException("HmppsQueue tiercalcqueue not found") }
-  private val hmppsAuditQueue by lazy { hmppsQueueService.findByQueueId("hmppsauditqueue") ?: throw MissingQueueException("HmppsQueue hmppsauditqueue not found") }
-  private val hmppsReductionsCompletedQueue by lazy { hmppsQueueService.findByQueueId("hmppsreductionscompletedqueue") ?: throw MissingQueueException("HmppsQueue hmppsreductionsCompletedqueue not found") }
-  private val workloadCalculationQueue by lazy { hmppsQueueService.findByQueueId("workloadcalculationqueue") ?: throw MissingQueueException("HmppsQueue workloadcalculationqueue not found") }
+  private val tierCalculationQueue by lazy {
+    hmppsQueueService.findByQueueId("tiercalcqueue")
+      ?: throw MissingQueueException("HmppsQueue tiercalcqueue not found")
+  }
+  private val hmppsAuditQueue by lazy {
+    hmppsQueueService.findByQueueId("hmppsauditqueue")
+      ?: throw MissingQueueException("HmppsQueue hmppsauditqueue not found")
+  }
+  private val hmppsReductionsCompletedQueue by lazy {
+    hmppsQueueService.findByQueueId("hmppsreductionscompletedqueue")
+      ?: throw MissingQueueException("HmppsQueue hmppsreductionsCompletedqueue not found")
+  }
+  private val workloadCalculationQueue by lazy {
+    hmppsQueueService.findByQueueId("workloadcalculationqueue")
+      ?: throw MissingQueueException("HmppsQueue workloadcalculationqueue not found")
+  }
+  protected val hmppsExtractPlacedQueue by lazy {
+    hmppsQueueService.findByQueueId("hmppsextractplacedqueue")
+      ?: throw MissingQueueException("HmppsQueue hmppsextractplacedqueue not found")
+  }
 
   private val hmppsOffenderSqsDlqClient by lazy { hmppsOffenderQueue.sqsDlqClient as AmazonSQS }
   protected val hmppsOffenderSqsClient by lazy { hmppsOffenderQueue.sqsClient }
@@ -193,6 +223,9 @@ abstract class IntegrationTestBase {
   protected val hmppsAuditQueueClient by lazy { hmppsAuditQueue.sqsClient }
 
   protected val hmppsReductionsCompletedClient by lazy { hmppsReductionsCompletedQueue.sqsClient }
+
+  protected val hmppsExtractPlacedClient by lazy { hmppsExtractPlacedQueue.sqsClient }
+  private val hmppsExtractPlacedDlqClient by lazy { hmppsExtractPlacedQueue.sqsDlqClient as AmazonSQS }
 
   @Autowired
   protected lateinit var hmppsQueueService: HmppsQueueService
@@ -260,6 +293,8 @@ abstract class IntegrationTestBase {
     tierCalculationSqsDlqClient.purgeQueue(PurgeQueueRequest(tierCalculationQueue.dlqUrl))
     hmppsAuditQueueClient.purgeQueue(PurgeQueueRequest(hmppsAuditQueue.queueUrl))
     hmppsReductionsCompletedClient.purgeQueue(PurgeQueueRequest(hmppsReductionsCompletedQueue.queueUrl))
+    hmppsExtractPlacedClient.purgeQueue(PurgeQueueRequest(hmppsExtractPlacedQueue.queueUrl))
+    hmppsExtractPlacedDlqClient.purgeQueue(PurgeQueueRequest(hmppsExtractPlacedQueue.dlqUrl))
     workloadCalculationRepository.deleteAll()
     clearWMT()
   }
@@ -301,28 +336,93 @@ abstract class IntegrationTestBase {
   }
 
   protected fun setupCurrentWmtStaff(staffCode: String, teamCode: String): WMTStaff {
-    val region = regionRepository.findByCode("REGION1") ?: regionRepository.save(RegionEntity(code = "REGION1", description = "Region 1"))
-    val pdu = pduRepository.findByCode("PDU1") ?: pduRepository.save(PduEntity(code = "PDU1", description = "Local Delivery Unit (Actually a Probation Delivery Unit)", region = region))
-    val team = teamRepository.findByCode(teamCode) ?: teamRepository.save(TeamEntity(code = teamCode, description = "Team 1", ldu = pdu))
-    val offenderManager = offenderManagerRepository.save(OffenderManagerEntity(code = staffCode, forename = "Jane", surname = "Doe", typeId = 1))
-    val workloadOwner = wmtWorkloadOwnerRepository.save(WMTWorkloadOwnerEntity(offenderManager = offenderManager, team = team, contractedHours = BigDecimal.valueOf(37.5)))
-    val workloadReport = workloadReportRepository.findByEffectiveFromIsNotNullAndEffectiveToIsNull() ?: workloadReportRepository.save((WorkloadReportEntity()))
-    val wmtWorkload = wmtWorkloadRepository.save(WMTWorkloadEntity(workloadOwner = workloadOwner, workloadReport = workloadReport, totalFilteredCommunityCases = 10, totalFilteredCustodyCases = 20, totalFilteredLicenseCases = 5, institutionalReportsDueInNextThirtyDays = 5, totalFilteredCases = 35))
+    val region = regionRepository.findByCode("REGION1") ?: regionRepository.save(
+      RegionEntity(
+        code = "REGION1",
+        description = "Region 1"
+      )
+    )
+    val pdu = pduRepository.findByCode("PDU1") ?: pduRepository.save(
+      PduEntity(
+        code = "PDU1",
+        description = "Local Delivery Unit (Actually a Probation Delivery Unit)",
+        region = region
+      )
+    )
+    val team = teamRepository.findByCode(teamCode) ?: teamRepository.save(
+      TeamEntity(
+        code = teamCode,
+        description = "Team 1",
+        ldu = pdu
+      )
+    )
+    val offenderManager = offenderManagerRepository.save(
+      OffenderManagerEntity(
+        code = staffCode,
+        forename = "Jane",
+        surname = "Doe",
+        typeId = 1
+      )
+    )
+    val workloadOwner = wmtWorkloadOwnerRepository.save(
+      WMTWorkloadOwnerEntity(
+        offenderManager = offenderManager,
+        team = team,
+        contractedHours = BigDecimal.valueOf(37.5)
+      )
+    )
+    val workloadReport = workloadReportRepository.findByEffectiveFromIsNotNullAndEffectiveToIsNull()
+      ?: workloadReportRepository.save((WorkloadReportEntity()))
+    val wmtWorkload = wmtWorkloadRepository.save(
+      WMTWorkloadEntity(
+        workloadOwner = workloadOwner,
+        workloadReport = workloadReport,
+        totalFilteredCommunityCases = 10,
+        totalFilteredCustodyCases = 20,
+        totalFilteredLicenseCases = 5,
+        institutionalReportsDueInNextThirtyDays = 5,
+        totalFilteredCases = 35
+      )
+    )
     val currentWmtPointsWeightings = getWmtWorkloadWeightings()
-    val workloadPointsCalculation = workloadPointsCalculationRepository.save(WorkloadPointsCalculationEntity(workloadReport = workloadReport, workloadPoints = currentWmtPointsWeightings.normalWeightings, t2aWorkloadPoints = currentWmtPointsWeightings.t2aWeightings, workload = wmtWorkload, totalPoints = 500, availablePoints = 1000))
+    val workloadPointsCalculation = workloadPointsCalculationRepository.save(
+      WorkloadPointsCalculationEntity(
+        workloadReport = workloadReport,
+        workloadPoints = currentWmtPointsWeightings.normalWeightings,
+        t2aWorkloadPoints = currentWmtPointsWeightings.t2aWeightings,
+        workload = wmtWorkload,
+        totalPoints = 500,
+        availablePoints = 1000
+      )
+    )
     return WMTStaff(offenderManager, team, workloadOwner, wmtWorkload, workloadPointsCalculation)
   }
 
   protected fun setupWmtManagedCase(wmtStaff: WMTStaff, tier: Tier, crn: String, caseType: CaseType) {
     val tierCategory = setupWmtCaseCategoryTier(tier)
-    wmtCaseDetailsRepository.save(WMTCaseDetailsEntity(workload = wmtStaff.workload, crn = crn, tierCategory = tierCategory, caseType = caseType, teamCode = wmtStaff.team.code))
+    wmtCaseDetailsRepository.save(
+      WMTCaseDetailsEntity(
+        workload = wmtStaff.workload,
+        crn = crn,
+        tierCategory = tierCategory,
+        caseType = caseType,
+        teamCode = wmtStaff.team.code
+      )
+    )
   }
 
-  protected fun setupWmtCaseCategoryTier(tier: Tier): CaseCategoryEntity = caseCategoryRepository.findByCategoryName(tier.name) ?: caseCategoryRepository.save(CaseCategoryEntity(categoryName = tier.name, categoryId = tier.ordinal))
+  protected fun setupWmtCaseCategoryTier(tier: Tier): CaseCategoryEntity =
+    caseCategoryRepository.findByCategoryName(tier.name)
+      ?: caseCategoryRepository.save(CaseCategoryEntity(categoryName = tier.name, categoryId = tier.ordinal))
 
-  protected fun setupWmtUntiered(): CaseCategoryEntity = caseCategoryRepository.findByCategoryName("Untiered") ?: caseCategoryRepository.save(CaseCategoryEntity(categoryName = "Untiered", categoryId = 0))
+  protected fun setupWmtUntiered(): CaseCategoryEntity = caseCategoryRepository.findByCategoryName("Untiered")
+    ?: caseCategoryRepository.save(CaseCategoryEntity(categoryName = "Untiered", categoryId = 0))
 
-  protected fun getWmtWorkloadWeightings(): WMTPointsWeightings = WMTPointsWeightings(workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(true), workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false))
+  protected fun getWmtWorkloadWeightings(): WMTPointsWeightings = WMTPointsWeightings(
+    workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(true),
+    workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
+  )
+
   internal fun HttpHeaders.authToken(roles: List<String> = emptyList()) {
     this.setBearerAuth(
       jwtAuthHelper.createJwt(
@@ -337,30 +437,83 @@ abstract class IntegrationTestBase {
     await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
   }
 
+  protected fun noMessagesOnExtractPlacedQueue() {
+    await untilCallTo { countMessagesOnExtractPlacedQueue() } matches { it == 0 }
+  }
+
   private fun countMessagesOnOffenderEventQueue(): Int =
-    hmppsOffenderSqsClient.getQueueAttributes(hmppsOffenderQueue.queueUrl, listOf("ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible"))
-      .let { (it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0) }
+    hmppsOffenderSqsClient.getQueueAttributes(
+      hmppsOffenderQueue.queueUrl,
+      listOf("ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible")
+    )
+      .let {
+        (
+          it.attributes["ApproximateNumberOfMessages"]?.toInt()
+            ?: 0
+          ) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0)
+      }
+
+  private fun countMessagesOnExtractPlacedQueue(): Int =
+    hmppsExtractPlacedClient.getQueueAttributes(
+      hmppsExtractPlacedQueue.queueUrl,
+      listOf("ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible")
+    )
+      .let {
+        (
+          it.attributes["ApproximateNumberOfMessages"]?.toInt()
+            ?: 0
+          ) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0)
+      }
 
   protected fun noMessagesOnWorkloadCalculationEventsQueue() {
     await untilCallTo { countMessagesOnWorkloadCalculationEventQueue() } matches { it == 0 }
   }
+
   private fun countMessagesOnWorkloadCalculationEventQueue(): Int =
-    workloadCalculationSqsClient.getQueueAttributes(workloadCalculationQueue.queueUrl, listOf("ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible"))
-      .let { (it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0) }
+    workloadCalculationSqsClient.getQueueAttributes(
+      workloadCalculationQueue.queueUrl,
+      listOf("ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible")
+    )
+      .let {
+        (
+          it.attributes["ApproximateNumberOfMessages"]?.toInt()
+            ?: 0
+          ) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0)
+      }
 
   protected fun oneMessageOnWorkloadCalculationDeadLetterQueue() {
     await untilCallTo { countMessagesOnWorkloadCalculationDeadLetterQueue() } matches { it == 1 }
   }
 
   private fun countMessagesOnWorkloadCalculationDeadLetterQueue(): Int =
-    workloadCalculationSqsDlqClient.getQueueAttributes(workloadCalculationQueue.dlqUrl, listOf("ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible"))
-      .let { (it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0) }
+    workloadCalculationSqsDlqClient.getQueueAttributes(
+      workloadCalculationQueue.dlqUrl,
+      listOf("ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible")
+    )
+      .let {
+        (
+          it.attributes["ApproximateNumberOfMessages"]?.toInt()
+            ?: 0
+          ) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0)
+      }
 
   protected fun noMessagesOnOffenderEventsDLQ() {
     await untilCallTo { countMessagesOnOffenderEventDeadLetterQueue() } matches { it == 0 }
   }
+
+  protected fun noMessagesOnExtractPlacedDLQ() {
+    await untilCallTo { countMessagesOnExtractPlacedDeadLetterQueue() } matches { it == 0 }
+  }
+
   private fun countMessagesOnOffenderEventDeadLetterQueue(): Int =
     hmppsOffenderSqsDlqClient.getQueueAttributes(hmppsOffenderQueue.dlqUrl, listOf("ApproximateNumberOfMessages"))
+      .let { it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0 }
+
+  private fun countMessagesOnExtractPlacedDeadLetterQueue(): Int =
+    hmppsExtractPlacedDlqClient.getQueueAttributes(
+      hmppsExtractPlacedQueue.dlqUrl,
+      listOf("ApproximateNumberOfMessages")
+    )
       .let { it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0 }
 
   protected fun offenderEvent(crn: String, sentenceId: BigInteger? = null) = HmppsOffenderEvent(crn, sentenceId)
@@ -405,6 +558,7 @@ abstract class IntegrationTestBase {
       response().withContentType(APPLICATION_JSON).withBody(communityApiAssessmentResponse())
     )
   }
+
   protected fun riskSummaryErrorResponse(crn: String) {
     val request = request().withPath("/risks/crn/$crn/summary")
     assessRisksNeedsApi.`when`(request, Times.exactly(1)).respond(
@@ -557,7 +711,11 @@ abstract class IntegrationTestBase {
     )
   }
 
-  protected fun singleActiveRequirementResponse(crn: String, convictionId: BigInteger, requirementId: BigInteger = BigInteger.valueOf(123456789L)) {
+  protected fun singleActiveRequirementResponse(
+    crn: String,
+    convictionId: BigInteger,
+    requirementId: BigInteger = BigInteger.valueOf(123456789L)
+  ) {
     val convictionsRequest =
       request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameters(
         Parameter("activeOnly", "true"),
@@ -568,7 +726,11 @@ abstract class IntegrationTestBase {
     )
   }
 
-  protected fun singleActiveRequirementNoLengthResponse(crn: String, convictionId: BigInteger, requirementId: BigInteger = BigInteger.valueOf(123456789L)) {
+  protected fun singleActiveRequirementNoLengthResponse(
+    crn: String,
+    convictionId: BigInteger,
+    requirementId: BigInteger = BigInteger.valueOf(123456789L)
+  ) {
     val convictionsRequest =
       request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameters(
         Parameter("activeOnly", "true"),
@@ -592,7 +754,10 @@ abstract class IntegrationTestBase {
   }
 
   protected fun verifyReductionsCompletedOnQueue(): Boolean =
-    hmppsReductionsCompletedClient.getQueueAttributes(hmppsReductionsCompletedQueue.queueUrl, listOf("ApproximateNumberOfMessages"))
+    hmppsReductionsCompletedClient.getQueueAttributes(
+      hmppsReductionsCompletedQueue.queueUrl,
+      listOf("ApproximateNumberOfMessages")
+    )
       .let { it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0 } == 1
 
   protected fun getReductionsCompletedMessages(): HmppsMessage<JsonNode> {
