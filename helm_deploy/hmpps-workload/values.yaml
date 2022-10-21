@@ -92,11 +92,11 @@ generic-service:
       HMPPS_SQS_QUEUES_WORKLOADCALCULATIONQUEUE_DLQ_ACCESS_KEY_ID: "access_key_id"
       HMPPS_SQS_QUEUES_WORKLOADCALCULATIONQUEUE_DLQ_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_WORKLOADCALCULATIONQUEUE_DLQ_NAME: "sqs_queue_name"
-    hmpps-reductions-completed-events-sqs-instance-output:
+    hmpps-reductions-completed-sqs-output:
       HMPPS_SQS_QUEUES_HMPPSREDUCTIONSCOMPLETEDQUEUE_QUEUE_ACCESS_KEY_ID: "access_key_id"
       HMPPS_SQS_QUEUES_HMPPSREDUCTIONSCOMPLETEDQUEUE_QUEUE_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_HMPPSREDUCTIONSCOMPLETEDQUEUE_QUEUE_NAME: "sqs_queue_name"
-    hmpps-reductions-completed-events-dlq-secret:
+    hmpps-reductions-completed-sqs-dl-output:
       HMPPS_SQS_QUEUES_HMPPSREDUCTIONSCOMPLETEDQUEUE_DLQ_ACCESS_KEY_ID: "access_key_id"
       HMPPS_SQS_QUEUES_HMPPSREDUCTIONSCOMPLETEDQUEUE_DLQ_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_HMPPSREDUCTIONSCOMPLETEDQUEUE_DLQ_NAME: "sqs_queue_name"
