@@ -6,6 +6,8 @@ hmpps:
         asyncQueueClient: true
       hmppsauditqueue:
         asyncQueueClient: true
+      hmppsreductionscompletedqueue:
+        asyncQueueClient: true
 spring:
   application:
     name: hmpps-workload
