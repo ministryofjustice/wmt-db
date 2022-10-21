@@ -52,6 +52,12 @@ hmpps.sqs:
       secretAccessKey: foobar
       queueName: hmpps_reductions_completed_queue
       dlqMaxReceiveCount: 1
+    hmppsextractplacedqueue:
+      queueName: hmpps_extract_placed_queue
+      dlqName: hmpps_extract_placed_dlq
+      accessKeyId: foobar
+      secretAccessKey: foobar
+      dlqMaxReceiveCount: 1
   topics:
     hmmppsdomaintopic:
       arn: arn:aws:sns:eu-west-2:000000000000:${random.uuid}
