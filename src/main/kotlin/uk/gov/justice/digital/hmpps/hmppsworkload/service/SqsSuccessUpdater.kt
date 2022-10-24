@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
 import com.amazonaws.services.sns.model.MessageAttributeValue
 import com.amazonaws.services.sns.model.PublishRequest
+import com.amazonaws.services.sqs.model.SendMessageRequest
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -14,6 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReferenceType
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
+import uk.gov.justice.hmpps.sqs.MissingQueueException
 import uk.gov.justice.hmpps.sqs.MissingTopicException
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -39,6 +41,11 @@ class SqsSuccessUpdater(
   private val allocationCompleteTopic by lazy {
     hmppsQueueService.findByTopicId("hmmppsdomaintopic")
       ?: throw MissingTopicException("hmmppsdomaintopic not found")
+  }
+
+  private val hmppsReductionsCompletedQueue by lazy {
+    hmppsQueueService.findByQueueId("hmppsreductionscompletedqueue")
+      ?: throw MissingQueueException("HmppsQueue hmppsreductionsCompletedqueue not found")
   }
 
   override fun updatePerson(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
@@ -96,6 +103,29 @@ class SqsSuccessUpdater(
       log.info(LOG_TEMPLATE, hmppsRequirementAllocatedEvent.eventType, crn, allocationId)
     }
   }
+
+  override fun outOfDateReductionsProcessed() {
+    val sendMessage = SendMessageRequest(
+      hmppsReductionsCompletedQueue.queueUrl,
+      getReductionChangeMessage()
+    ).withMessageAttributes(
+      mapOf("eventType" to com.amazonaws.services.sqs.model.MessageAttributeValue().withDataType("String").withStringValue("OUT_OF_DATE_REDUCTIONS"))
+    )
+    log.info("publishing event type OUT_OF_DATE_REDUCTIONS")
+    hmppsReductionsCompletedQueue.sqsClient.sendMessage(sendMessage)
+  }
+
+  private fun getReductionChangeMessage(): String = objectMapper.writeValueAsString(
+    HmppsMessage(
+      "OUT_OF_DATE_REDUCTIONS",
+      1,
+      "Out of date reduction status are now correct",
+      "",
+      ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+      objectMapper.createObjectNode(),
+      PersonReference(emptyList())
+    )
+  )
 
   companion object {
     val log: Logger = LoggerFactory.getLogger(this::class.java)

@@ -24,6 +24,10 @@ class LogSuccessUpdater : SuccessUpdater {
     logUpdate(crn, allocationId, timeUpdated)
   }
 
+  override fun outOfDateReductionsProcessed() {
+    log.info("out of date reductions processed")
+  }
+
   private fun logUpdate(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
     log.info("crn {} with allocationId {} updated at {}", crn, allocationId, timeUpdated)
   }
