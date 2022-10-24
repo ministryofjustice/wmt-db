@@ -17,6 +17,8 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReferenceTy
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
 import uk.gov.justice.hmpps.sqs.MissingTopicException
+import java.math.BigInteger
+import java.time.Instant
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -47,6 +49,8 @@ class SqsSuccessUpdater(
     hmppsQueueService.findByQueueId("hmppsreductionscompletedqueue")
       ?: throw MissingQueueException("HmppsQueue hmppsreductionsCompletedqueue not found")
   }
+
+  private val hmppsAuditQueue by lazy { hmppsQueueService.findByQueueId("hmppsauditqueue") ?: throw MissingQueueException("HmppsQueue hmppsauditqueue not found") }
 
   override fun updatePerson(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
     val hmppsPersonEvent = HmppsMessage(
@@ -115,6 +119,27 @@ class SqsSuccessUpdater(
     hmppsReductionsCompletedQueue.sqsClient.sendMessage(sendMessage)
   }
 
+  override fun auditAllocation(
+    crn: String,
+    eventId: BigInteger,
+    loggedInUser: String,
+    requirementIds: List<BigInteger>
+  ) {
+    val auditData = AuditData(
+      crn,
+      eventId,
+      requirementIds
+    )
+
+    val sendMessage = SendMessageRequest(
+      hmppsAuditQueue.queueUrl,
+      objectMapper.writeValueAsString(
+        AuditMessage(operationId = UUID.randomUUID().toString(), who = loggedInUser, details = objectMapper.writeValueAsString(auditData))
+      )
+    )
+    hmppsAuditQueue.sqsClient.sendMessage(sendMessage)
+  }
+
   private fun getReductionChangeMessage(): String = objectMapper.writeValueAsString(
     HmppsMessage(
       "OUT_OF_DATE_REDUCTIONS",
@@ -131,3 +156,11 @@ class SqsSuccessUpdater(
     val log: Logger = LoggerFactory.getLogger(this::class.java)
   }
 }
+
+data class AuditMessage(val operationId: String, val what: String = "CASE_ALLOCATED", val `when`: Instant = Instant.now(), val who: String, val service: String = "hmpps-workload", val details: String)
+
+data class AuditData(
+  val crn: String,
+  val eventId: BigInteger,
+  val requirementIds: List<BigInteger>
+)
