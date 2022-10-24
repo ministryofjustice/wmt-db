@@ -24,7 +24,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.HmppsTierApiClient
 class WebClientUserEnhancementConfiguration(
   @Value("\${community.endpoint.url}") private val communityApiRootUri: String,
   @Value("\${hmpps-tier.endpoint.url}") private val hmppsTierApiRootUri: String,
-  @Value("\${bank-holiday-api.endpoint.url:https://www.gov.uk}") private val bankholidayApiRootUri: String,
   @Value("\${assess-risks-needs.endpoint.url}") private val assessRisksNeedsApiRootUri: String,
 ) {
 
@@ -94,9 +93,6 @@ class WebClientUserEnhancementConfiguration(
       .apply(oauth2Client.oauth2Configuration())
       .build()
   }
-
-  @Bean
-  fun bankHolidayApiWebClient(builder: WebClient.Builder): WebClient = builder.baseUrl(bankholidayApiRootUri).build()
 
   @Bean
   fun assessRiskNeedsApiWebClient(builder: WebClient.Builder): WebClient = builder.baseUrl(assessRisksNeedsApiRootUri).build()
