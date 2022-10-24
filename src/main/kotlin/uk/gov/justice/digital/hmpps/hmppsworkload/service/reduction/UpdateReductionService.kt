@@ -15,7 +15,7 @@ class UpdateReductionService(
 ) {
 
   @Transactional
-  fun updateOutOfDateReductionStatus() {
+  fun updateOutOfDateReductionStatus(): OutOfDateReductions {
     val outOfDateReductions = findOutOfDateReductions()
 
     outOfDateReductions.activeNowArchived
@@ -26,6 +26,7 @@ class UpdateReductionService(
       .let { reductionsRepository.saveAll(it) }
 
     successUpdater.outOfDateReductionsProcessed()
+    return outOfDateReductions
   }
 
   private fun findOutOfDateReductions(): OutOfDateReductions = OutOfDateReductions(
