@@ -95,7 +95,6 @@ class ExtractPlacedEventListenerTestTest : IntegrationTestBase() {
 
     hmppsExtractPlacedClient.sendMessage(SendMessageRequest(hmppsExtractPlacedQueue.queueUrl, "{}"))
     noMessagesOnExtractPlacedQueue()
-    noMessagesOnWorkloadCalculationEventsQueue()
 
     val actualWorkloadCalcEntity: WorkloadCalculationEntity? =
       workloadCalculationRepository.findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(wmtStaff.offenderManager.code, wmtStaff.team.code)

@@ -11,7 +11,9 @@ import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
+import javax.persistence.JoinColumn
 import javax.persistence.NamedNativeQuery
+import javax.persistence.OneToOne
 import javax.persistence.SqlResultSetMapping
 import javax.persistence.Table
 
@@ -165,6 +167,7 @@ data class OffenderManagerEntity(
   @Column
   val surname: String,
 
-  @Column
-  val typeId: Long
+  @OneToOne
+  @JoinColumn(name = "type_id")
+  val offenderManagerType: OffenderManagerTypeEntity
 )
