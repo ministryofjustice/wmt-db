@@ -57,8 +57,5 @@ hmpps-tier:
 assess-risks-needs:
   endpoint:
     url: http://localhost:8099
-offender-search:
-  endpoint:
-    url: http://localhost:8099
 ingress:
   url: localhost:8080
