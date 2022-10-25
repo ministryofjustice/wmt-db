@@ -741,9 +741,9 @@ abstract class IntegrationTestBase {
     )
   }
 
-  protected fun verifyAuditMessageOnQueue(): Boolean =
+  protected fun verifyAuditMessageOnQueue(numberOfMessages: Int = 1): Boolean =
     hmppsAuditQueueClient.getQueueAttributes(hmppsAuditQueue.queueUrl, listOf("ApproximateNumberOfMessages"))
-      .let { it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0 } == 1
+      .let { it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0 } == numberOfMessages
 
   protected fun getAuditMessages(): AuditMessage {
     val message = hmppsAuditQueueClient.receiveMessage(hmppsAuditQueue.queueUrl)

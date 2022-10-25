@@ -20,7 +20,6 @@ class AuditService(
 ) {
 
   private val hmppsAuditQueueUrl by lazy { queueService.findByQueueId("hmppsauditqueue")?.queueUrl ?: throw MissingQueueException("HmppsQueue hmppsauditqueue not found") }
-
   @Async
   fun publishToAuditQueue(crn: String, eventId: BigInteger, loggedInUser: String, requirementIds: List<BigInteger>) {
     val auditData = AuditData(
@@ -37,12 +36,31 @@ class AuditService(
     )
     sqsClient.sendMessage(sendMessage)
   }
+
+  fun publishReductionsStatusUpdatesToAuditQueue(recordIds: List<String>, reductionStatusToAuditAction: String, loggedInUser: String = "system worker") {
+    val reductionsAuditData = ReductionsAuditData(
+      recordIds,
+      reductionStatusToAuditAction
+    )
+
+    val sendMessage = SendMessageRequest(
+      hmppsAuditQueueUrl,
+      objectMapper.writeValueAsString(
+        AuditMessage(operationId = UUID.randomUUID().toString(), what = "REDUCTION_UPDATE", who = loggedInUser, details = objectMapper.writeValueAsString(reductionsAuditData))
+      )
+    )
+    sqsClient.sendMessage(sendMessage)
+  }
 }
 
 data class AuditMessage(val operationId: String, val what: String = "CASE_ALLOCATED", val `when`: Instant = Instant.now(), val who: String, val service: String = "hmpps-workload", val details: String)
-
 data class AuditData(
   val crn: String,
   val eventId: BigInteger,
   val requirementIds: List<BigInteger>
+)
+
+data class ReductionsAuditData(
+  val recordIds: List<String>,
+  val reductionStatus: String,
 )
