@@ -44,7 +44,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WMTWork
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WorkloadPointsCalculationEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WorkloadReportEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.CaseCategoryRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.OffenderManagerTypeRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.PduRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.ReductionCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.ReductionReasonRepository
@@ -69,7 +68,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByU
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.successfulRiskPredictorResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.teamStaffJsonResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.OffenderManagerEntity
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.OffenderManagerTypeEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PduEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RegionEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.TeamEntity
@@ -268,9 +266,6 @@ abstract class IntegrationTestBase {
   @Autowired
   protected lateinit var workloadPointsRepository: WorkloadPointsRepository
 
-  @Autowired
-  protected lateinit var offenderManagerTypeRepository: OffenderManagerTypeRepository
-
   @BeforeEach
   fun setupDependentServices() {
 
@@ -361,15 +356,12 @@ abstract class IntegrationTestBase {
         ldu = pdu
       )
     )
-    val offenderManagerType = offenderManagerTypeRepository.findByGradeCode("PO") ?: offenderManagerTypeRepository.save(
-      OffenderManagerTypeEntity(gradeCode = "PO")
-    )
     val offenderManager = offenderManagerRepository.save(
       OffenderManagerEntity(
         code = staffCode,
         forename = "Jane",
         surname = "Doe",
-        offenderManagerType = offenderManagerType
+        typeId = 1
       )
     )
     val workloadOwner = wmtWorkloadOwnerRepository.save(

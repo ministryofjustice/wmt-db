@@ -16,10 +16,15 @@ class RequestStaffCalculationService(
 ) {
 
   fun requestStaffCalculation(staffCode: String, teamCode: String) {
-    val staffGrade = communityApiClient.getStaffSummaryByCode(staffCode).block()!!.grade
-    val weeklyHours = weeklyHours.findWeeklyHours(staffCode, teamCode, staffGrade)
-    val reductions = getReductionService.findReductionHours(staffCode, teamCode)
-    val availableHours = weeklyHours - reductions
-    successUpdater.staffAvailableHoursChange(staffCode, teamCode, availableHours)
+    communityApiClient.getStaffSummaryByCode(staffCode)
+      .map { it.grade }
+      .map { staffGrade ->
+        val weeklyHours = weeklyHours.findWeeklyHours(staffCode, teamCode, staffGrade)
+        val reductions = getReductionService.findReductionHours(staffCode, teamCode)
+        val availableHours = weeklyHours - reductions
+        successUpdater.staffAvailableHoursChange(staffCode, teamCode, availableHours)
+      }
+      .onErrorComplete()
+      .block()
   }
 }
