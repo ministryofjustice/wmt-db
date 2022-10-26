@@ -4,14 +4,13 @@ import org.springframework.jms.annotation.JmsListener
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OutOfDateReductions
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTWorkloadOwnerEntity
-import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.deliusToStaffGrade
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.WorkloadCalculationService
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.reduction.UpdateReductionService
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.RequestStaffCalculationService
 
 @Component
 class ExtractPlacedEventListener(
   private val updateReductionService: UpdateReductionService,
-  private val workloadCalculationService: WorkloadCalculationService,
+  private val requestStaffCalculationService: RequestStaffCalculationService
 ) {
 
   @JmsListener(destination = "hmppsextractplacedqueue", containerFactory = "hmppsQueueContainerFactoryProxy")
@@ -21,7 +20,7 @@ class ExtractPlacedEventListener(
     val staffChanged = getDistinctStaffChanged(outOfDateReductions)
 
     staffChanged.forEach { workloadOwner ->
-      workloadCalculationService.calculate(workloadOwner.offenderManager.code, workloadOwner.team.code, deliusToStaffGrade(workloadOwner.offenderManager.offenderManagerType.gradeCode))
+      requestStaffCalculationService.requestStaffCalculation(workloadOwner.offenderManager.code, workloadOwner.team.code)
     }
   }
 

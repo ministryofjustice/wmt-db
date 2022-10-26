@@ -30,6 +30,8 @@ class ExtractPlacedEventListenerTest : IntegrationTestBase() {
     reductionReason = reductionReasonRepository.save(ReductionReasonEntity(reductionCategoryEntity = reductionCategory))
 
     wmtStaff = setupCurrentWmtStaff("STAFF2", "TEAM2")
+    staffCodeResponse(wmtStaff.offenderManager.code, wmtStaff.team.code)
+    staffCodeResponse(wmtStaff.offenderManager.code, wmtStaff.team.code)
   }
 
   @Test
@@ -96,7 +98,9 @@ class ExtractPlacedEventListenerTest : IntegrationTestBase() {
 
     hmppsExtractPlacedClient.sendMessage(SendMessageRequest(hmppsExtractPlacedQueue.queueUrl, "{}"))
     noMessagesOnExtractPlacedQueue()
+    noMessagesOnExtractPlacedDLQ()
     noMessagesOnWorkloadCalculationEventsQueue()
+    noMessagesOnWorkloadCalculationEventsDLQ()
 
     val actualWorkloadCalcEntity: WorkloadCalculationEntity? =
       workloadCalculationRepository.findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(wmtStaff.offenderManager.code, wmtStaff.team.code)
