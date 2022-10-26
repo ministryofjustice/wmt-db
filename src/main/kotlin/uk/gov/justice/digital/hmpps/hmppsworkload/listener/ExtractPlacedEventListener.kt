@@ -17,7 +17,9 @@ class ExtractPlacedEventListener(
   @JmsListener(destination = "hmppsextractplacedqueue", containerFactory = "hmppsQueueContainerFactoryProxy")
   fun processMessage(rawMessage: String) {
     val outOfDateReductions = updateReductionService.updateOutOfDateReductionStatus()
+
     val staffChanged = getDistinctStaffChanged(outOfDateReductions)
+
     staffChanged.forEach { workloadOwner ->
       workloadCalculationService.calculate(workloadOwner.offenderManager.code, workloadOwner.team.code, deliusToStaffGrade(workloadOwner.offenderManager.offenderManagerType.gradeCode))
     }

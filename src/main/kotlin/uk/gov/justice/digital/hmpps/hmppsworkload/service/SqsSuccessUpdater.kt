@@ -38,7 +38,7 @@ class SqsSuccessUpdater(
   @Value("\${requirement.manager.getByIdPath}") private val requirementManagerLookupPath: String
 ) : SuccessUpdater {
 
-  private val allocationCompleteTopic by lazy {
+  private val domainTopic by lazy {
     hmppsQueueService.findByTopicId("hmmppsdomaintopic")
       ?: throw MissingTopicException("hmmppsdomaintopic not found")
   }
@@ -60,8 +60,8 @@ class SqsSuccessUpdater(
       HmppsAllocationMessage(allocationId),
       PersonReference(listOf(PersonReferenceType("CRN", crn)))
     )
-    allocationCompleteTopic.snsClient.publish(
-      PublishRequest(allocationCompleteTopic.arn, objectMapper.writeValueAsString(hmppsPersonEvent))
+    domainTopic.snsClient.publish(
+      PublishRequest(domainTopic.arn, objectMapper.writeValueAsString(hmppsPersonEvent))
         .withMessageAttributes(mapOf(EVENT_TYPE to MessageAttributeValue().withDataType(STRING).withStringValue(hmppsPersonEvent.eventType)))
     ).also {
       log.info(LOG_TEMPLATE, hmppsPersonEvent.eventType, crn, allocationId)
@@ -79,8 +79,8 @@ class SqsSuccessUpdater(
       HmppsAllocationMessage(allocationId),
       PersonReference(listOf(PersonReferenceType("CRN", crn)))
     )
-    allocationCompleteTopic.snsClient.publish(
-      PublishRequest(allocationCompleteTopic.arn, objectMapper.writeValueAsString(hmppsEventAllocatedEvent))
+    domainTopic.snsClient.publish(
+      PublishRequest(domainTopic.arn, objectMapper.writeValueAsString(hmppsEventAllocatedEvent))
         .withMessageAttributes(mapOf(EVENT_TYPE to MessageAttributeValue().withDataType(STRING).withStringValue(hmppsEventAllocatedEvent.eventType)))
     ).also {
       log.info(LOG_TEMPLATE, hmppsEventAllocatedEvent.eventType, crn, allocationId)
@@ -96,8 +96,8 @@ class SqsSuccessUpdater(
       HmppsAllocationMessage(allocationId),
       PersonReference(listOf(PersonReferenceType("CRN", crn)))
     )
-    allocationCompleteTopic.snsClient.publish(
-      PublishRequest(allocationCompleteTopic.arn, objectMapper.writeValueAsString(hmppsRequirementAllocatedEvent))
+    domainTopic.snsClient.publish(
+      PublishRequest(domainTopic.arn, objectMapper.writeValueAsString(hmppsRequirementAllocatedEvent))
         .withMessageAttributes(mapOf(EVENT_TYPE to MessageAttributeValue().withDataType(STRING).withStringValue(hmppsRequirementAllocatedEvent.eventType)))
     ).also {
       log.info(LOG_TEMPLATE, hmppsRequirementAllocatedEvent.eventType, crn, allocationId)

@@ -19,7 +19,7 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
-class ExtractPlacedEventListenerTestTest : IntegrationTestBase() {
+class ExtractPlacedEventListenerTest : IntegrationTestBase() {
 
   lateinit var wmtStaff: WMTStaff
   lateinit var reductionReason: ReductionReasonEntity
@@ -96,6 +96,7 @@ class ExtractPlacedEventListenerTestTest : IntegrationTestBase() {
 
     hmppsExtractPlacedClient.sendMessage(SendMessageRequest(hmppsExtractPlacedQueue.queueUrl, "{}"))
     noMessagesOnExtractPlacedQueue()
+    noMessagesOnWorkloadCalculationEventsQueue()
 
     val actualWorkloadCalcEntity: WorkloadCalculationEntity? =
       workloadCalculationRepository.findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(wmtStaff.offenderManager.code, wmtStaff.team.code)
