@@ -14,9 +14,11 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsAllocationMe
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReferenceType
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.StaffAvailableHours
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
 import uk.gov.justice.hmpps.sqs.MissingTopicException
+import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.Instant
 import java.time.ZonedDateTime
@@ -31,7 +33,7 @@ private const val LOG_TEMPLATE = "Published event {} to topic for CRN {} and id 
 
 @Service
 @ConditionalOnProperty("hmpps.sqs.topics.hmmppsdomaintopic.arn")
-class SqsSuccessUpdater(
+class SqsSuccessPublisher(
   val hmppsQueueService: HmppsQueueService,
   val objectMapper: ObjectMapper,
   @Value("\${ingress.url}") private val ingressUrl: String,
@@ -40,7 +42,7 @@ class SqsSuccessUpdater(
   @Value("\${requirement.manager.getByIdPath}") private val requirementManagerLookupPath: String
 ) : SuccessUpdater {
 
-  private val allocationCompleteTopic by lazy {
+  private val domainTopic by lazy {
     hmppsQueueService.findByTopicId("hmmppsdomaintopic")
       ?: throw MissingTopicException("hmmppsdomaintopic not found")
   }
@@ -64,8 +66,8 @@ class SqsSuccessUpdater(
       HmppsAllocationMessage(allocationId),
       PersonReference(listOf(PersonReferenceType("CRN", crn)))
     )
-    allocationCompleteTopic.snsClient.publish(
-      PublishRequest(allocationCompleteTopic.arn, objectMapper.writeValueAsString(hmppsPersonEvent))
+    domainTopic.snsClient.publish(
+      PublishRequest(domainTopic.arn, objectMapper.writeValueAsString(hmppsPersonEvent))
         .withMessageAttributes(mapOf(EVENT_TYPE to MessageAttributeValue().withDataType(STRING).withStringValue(hmppsPersonEvent.eventType)))
     ).also {
       log.info(LOG_TEMPLATE, hmppsPersonEvent.eventType, crn, allocationId)
@@ -83,8 +85,8 @@ class SqsSuccessUpdater(
       HmppsAllocationMessage(allocationId),
       PersonReference(listOf(PersonReferenceType("CRN", crn)))
     )
-    allocationCompleteTopic.snsClient.publish(
-      PublishRequest(allocationCompleteTopic.arn, objectMapper.writeValueAsString(hmppsEventAllocatedEvent))
+    domainTopic.snsClient.publish(
+      PublishRequest(domainTopic.arn, objectMapper.writeValueAsString(hmppsEventAllocatedEvent))
         .withMessageAttributes(mapOf(EVENT_TYPE to MessageAttributeValue().withDataType(STRING).withStringValue(hmppsEventAllocatedEvent.eventType)))
     ).also {
       log.info(LOG_TEMPLATE, hmppsEventAllocatedEvent.eventType, crn, allocationId)
@@ -100,8 +102,8 @@ class SqsSuccessUpdater(
       HmppsAllocationMessage(allocationId),
       PersonReference(listOf(PersonReferenceType("CRN", crn)))
     )
-    allocationCompleteTopic.snsClient.publish(
-      PublishRequest(allocationCompleteTopic.arn, objectMapper.writeValueAsString(hmppsRequirementAllocatedEvent))
+    domainTopic.snsClient.publish(
+      PublishRequest(domainTopic.arn, objectMapper.writeValueAsString(hmppsRequirementAllocatedEvent))
         .withMessageAttributes(mapOf(EVENT_TYPE to MessageAttributeValue().withDataType(STRING).withStringValue(hmppsRequirementAllocatedEvent.eventType)))
     ).also {
       log.info(LOG_TEMPLATE, hmppsRequirementAllocatedEvent.eventType, crn, allocationId)
@@ -138,6 +140,23 @@ class SqsSuccessUpdater(
       )
     )
     hmppsAuditQueue.sqsClient.sendMessage(sendMessage)
+  }
+
+  override fun staffAvailableHoursChange(staffCode: String, teamCode: String, availableHours: BigDecimal) {
+    val staffAvailableHoursChangeMessage = HmppsMessage(
+      "staff.available.hours.changed", 1, "Staff Available hours changed", "",
+      ZonedDateTime.now().format(
+        DateTimeFormatter.ISO_OFFSET_DATE_TIME
+      ),
+      StaffAvailableHours(availableHours),
+      PersonReference(listOf(PersonReferenceType("staffCode", staffCode), PersonReferenceType("teamCode", teamCode)))
+    )
+    domainTopic.snsClient.publish(
+      PublishRequest(domainTopic.arn, objectMapper.writeValueAsString(staffAvailableHoursChangeMessage))
+        .withMessageAttributes(mapOf(EVENT_TYPE to MessageAttributeValue().withDataType(STRING).withStringValue(staffAvailableHoursChangeMessage.eventType)))
+    ).also {
+      log.info("staff available hours changed message for {} in team {}", staffCode, teamCode)
+    }
   }
 
   private fun getReductionChangeMessage(): String = objectMapper.writeValueAsString(

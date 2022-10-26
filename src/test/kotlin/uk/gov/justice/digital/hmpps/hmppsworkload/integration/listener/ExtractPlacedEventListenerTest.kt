@@ -14,10 +14,12 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.Reducti
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.ReductionReasonEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadCalculationEntity
 import java.math.BigDecimal
+import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
-class ExtractPlacedEventListenerTestTest : IntegrationTestBase() {
+class ExtractPlacedEventListenerTest : IntegrationTestBase() {
 
   lateinit var wmtStaff: WMTStaff
   lateinit var reductionReason: ReductionReasonEntity
@@ -28,6 +30,7 @@ class ExtractPlacedEventListenerTestTest : IntegrationTestBase() {
     reductionReason = reductionReasonRepository.save(ReductionReasonEntity(reductionCategoryEntity = reductionCategory))
 
     wmtStaff = setupCurrentWmtStaff("STAFF2", "TEAM2")
+    staffCodeResponse(wmtStaff.offenderManager.code, wmtStaff.team.code)
   }
 
   @Test
@@ -85,5 +88,26 @@ class ExtractPlacedEventListenerTestTest : IntegrationTestBase() {
     await untilCallTo { verifyReductionsCompletedOnQueue() } matches { it == true }
 
     Assertions.assertEquals("OUT_OF_DATE_REDUCTIONS", getReductionsCompletedMessages().eventType)
+  }
+
+  @Test
+  fun `calculate workload when updating case details for realtime offender manager`() {
+    reductionsRepository.save(ReductionEntity(workloadOwner = wmtStaff.wmtWorkloadOwnerEntity, hours = BigDecimal.valueOf(3.2), effectiveFrom = ZonedDateTime.now().minusDays(1), effectiveTo = ZonedDateTime.now().plusDays(1), status = ReductionStatus.SCHEDULED, reductionReasonId = reductionReason.id!!))
+    reductionsRepository.save(ReductionEntity(workloadOwner = wmtStaff.wmtWorkloadOwnerEntity, hours = BigDecimal.valueOf(3.2), effectiveFrom = ZonedDateTime.now().minusDays(2), effectiveTo = ZonedDateTime.now().minusDays(1), status = ReductionStatus.ACTIVE, reductionReasonId = reductionReason.id!!))
+
+    hmppsExtractPlacedClient.sendMessage(SendMessageRequest(hmppsExtractPlacedQueue.queueUrl, "{}"))
+    noMessagesOnExtractPlacedQueue()
+    noMessagesOnExtractPlacedDLQ()
+    noMessagesOnWorkloadCalculationEventsQueue()
+    noMessagesOnWorkloadCalculationEventsDLQ()
+
+    val actualWorkloadCalcEntity: WorkloadCalculationEntity? =
+      workloadCalculationRepository.findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(wmtStaff.offenderManager.code, wmtStaff.team.code)
+
+    Assertions.assertAll(
+      { Assertions.assertEquals(wmtStaff.offenderManager.code, actualWorkloadCalcEntity?.staffCode) },
+      { Assertions.assertEquals(wmtStaff.team.code, actualWorkloadCalcEntity?.teamCode) },
+      { Assertions.assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity?.calculatedDate?.dayOfMonth) }
+    )
   }
 }
