@@ -40,7 +40,7 @@ class LogSuccessUpdater : SuccessUpdater {
   }
 
   override fun staffAvailableHoursChange(staffCode: String, teamCode: String, availableHours: BigDecimal) {
-    SqsSuccessPublisher.log.info("staff available hours changed message for {} in team {} with hours {}", staffCode, teamCode, availableHours)
+    log.info("staff available hours changed message for {} in team {} with hours {}", staffCode, teamCode, availableHours)
   }
 
   private fun logUpdate(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
