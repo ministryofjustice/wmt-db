@@ -31,7 +31,6 @@ class ExtractPlacedEventListenerTest : IntegrationTestBase() {
 
     wmtStaff = setupCurrentWmtStaff("STAFF2", "TEAM2")
     staffCodeResponse(wmtStaff.offenderManager.code, wmtStaff.team.code)
-    staffCodeResponse(wmtStaff.offenderManager.code, wmtStaff.team.code)
   }
 
   @Test

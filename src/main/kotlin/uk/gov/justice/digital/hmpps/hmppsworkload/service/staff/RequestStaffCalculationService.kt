@@ -1,30 +1,20 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service.staff
 
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetWeeklyHours
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTWorkloadOwnerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.SuccessUpdater
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.reduction.GetReductionService
 
 @Service
 class RequestStaffCalculationService(
-  private val weeklyHours: GetWeeklyHours,
   private val getReductionService: GetReductionService,
-  @Qualifier("communityApiClient") private val communityApiClient: CommunityApiClient,
   private val successUpdater: SuccessUpdater
 ) {
 
-  fun requestStaffCalculation(staffCode: String, teamCode: String) {
-    communityApiClient.getStaffSummaryByCode(staffCode)
-      .map { it.grade }
-      .map { staffGrade ->
-        val weeklyHours = weeklyHours.findWeeklyHours(staffCode, teamCode, staffGrade)
-        val reductions = getReductionService.findReductionHours(staffCode, teamCode)
-        val availableHours = weeklyHours - reductions
-        successUpdater.staffAvailableHoursChange(staffCode, teamCode, availableHours)
-      }
-      .onErrorComplete()
-      .block()
+  fun requestStaffCalculation(workloadOwner: WMTWorkloadOwnerEntity) {
+    val weeklyHours = workloadOwner.contractedHours
+    val reductions = getReductionService.findReductionHours(workloadOwner.offenderManager.code, workloadOwner.team.code)
+    val availableHours = weeklyHours - reductions
+    successUpdater.staffAvailableHoursChange(workloadOwner.offenderManager.code, workloadOwner.team.code, availableHours)
   }
 }
