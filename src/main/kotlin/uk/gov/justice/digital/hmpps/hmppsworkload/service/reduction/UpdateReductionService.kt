@@ -18,7 +18,7 @@ class UpdateReductionService(
 ) {
 
   @Transactional
-  fun updateOutOfDateReductionStatus(): OutOfDateReductions {
+  fun updateOutOfDateReductionStatus() {
     val outOfDateReductions = findOutOfDateReductions()
 
     outOfDateReductions.activeNowArchived
@@ -33,7 +33,6 @@ class UpdateReductionService(
     }
 
     successUpdater.outOfDateReductionsProcessed()
-    return outOfDateReductions
   }
 
   private fun getDistinctStaffChanged(outOfDateReductions: OutOfDateReductions): Set<WMTWorkloadOwnerEntity> = (outOfDateReductions.activeNowArchived + outOfDateReductions.scheduledNowActive)
