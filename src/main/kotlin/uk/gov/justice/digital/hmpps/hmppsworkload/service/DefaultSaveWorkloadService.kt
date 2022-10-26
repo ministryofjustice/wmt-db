@@ -23,7 +23,6 @@ class DefaultSaveWorkloadService(
   private val saveRequirementManagerService: SaveRequirementManagerService,
   private val notificationService: NotificationService,
   private val telemetryService: TelemetryService,
-  private val auditService: AuditService,
   private val successUpdater: SuccessUpdater,
   private val caseDetailsRepository: CaseDetailsRepository
 ) : SaveWorkloadService {
@@ -50,7 +49,7 @@ class DefaultSaveWorkloadService(
     if (personManagerSaveResult.hasChanged || eventManagerSaveResult.hasChanged || requirementManagerSaveResults.any { it.hasChanged }) {
       notificationService.notifyAllocation(staff, summary, activeRequirements, allocateCase, loggedInUser, authToken)
         .block()
-      auditService.publishToAuditQueue(allocateCase.crn, allocateCase.eventId, loggedInUser, activeRequirements.map { it.requirementId })
+      successUpdater.auditAllocation(allocateCase.crn, allocateCase.eventId, loggedInUser, activeRequirements.map { it.requirementId })
     }
     return CaseAllocated(personManagerSaveResult.entity.uuid, eventManagerSaveResult.entity.uuid, requirementManagerSaveResults.map { it.entity.uuid })
   }
