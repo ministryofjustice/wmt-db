@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Conditional
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.config.NoAllocationCompleteTopicCondition
+import java.math.BigInteger
 import java.time.ZonedDateTime
 import java.util.UUID
 
@@ -26,6 +27,15 @@ class LogSuccessUpdater : SuccessUpdater {
 
   override fun outOfDateReductionsProcessed() {
     log.info("out of date reductions processed")
+  }
+
+  override fun auditAllocation(
+    crn: String,
+    eventId: BigInteger,
+    loggedInUser: String,
+    requirementIds: List<BigInteger>
+  ) {
+    log.info("allocation audited")
   }
 
   private fun logUpdate(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
