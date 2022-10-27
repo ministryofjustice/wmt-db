@@ -92,6 +92,6 @@ class ExtractPlacedEventListenerTestTest : IntegrationTestBase() {
     reductionsRepository.save(ReductionEntity(workloadOwner = wmtStaff.wmtWorkloadOwnerEntity, hours = BigDecimal.valueOf(3.2), effectiveFrom = ZonedDateTime.now().minusDays(1), effectiveTo = ZonedDateTime.now().plusDays(1), status = ReductionStatus.SCHEDULED, reductionReasonId = reductionReason.id!!))
     hmppsExtractPlacedClient.sendMessage(SendMessageRequest(hmppsExtractPlacedQueue.queueUrl, "{}"))
 
-    await untilCallTo { verifyAuditMessageOnQueue(2) } matches { it == true }
+    await untilCallTo { verifyAuditMessageOnQueue() } matches { it == true }
   }
 }

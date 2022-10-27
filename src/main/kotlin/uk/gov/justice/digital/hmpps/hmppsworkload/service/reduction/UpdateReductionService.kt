@@ -19,16 +19,15 @@ class UpdateReductionService(
   @Transactional
   fun updateOutOfDateReductionStatus() {
     val outOfDateReductions = findOutOfDateReductions()
-    val reductionStatusToAuditAction = mapOf(ReductionStatus.ACTIVE to "REDUCTION_STARTED", ReductionStatus.ARCHIVED to "REDUCTION_ENDED")
 
     outOfDateReductions.activeNowArchived
       .onEach { it.status = ReductionStatus.ARCHIVED }
       .let { reductionsRepository.saveAll(it) }
-      .let { reductionEntities -> auditService.publishReductionsStatusUpdatesToAuditQueue(reductionEntities.map { it.id!! }, reductionStatusToAuditAction[ReductionStatus.ARCHIVED]!!, outOfDateReductions = outOfDateReductions) }
+      .forEach { auditService.publishReductionsStatusUpdatesToAuditQueue(it, reductionStatus = "REDUCTION_ENDED") }
     outOfDateReductions.scheduledNowActive
       .onEach { it.status = ReductionStatus.ACTIVE }
       .let { reductionsRepository.saveAll(it) }
-      .let { reductionEntities -> auditService.publishReductionsStatusUpdatesToAuditQueue(reductionEntities.map { it.id!! }, reductionStatusToAuditAction[ReductionStatus.ACTIVE]!!, outOfDateReductions = outOfDateReductions) }
+      .forEach { auditService.publishReductionsStatusUpdatesToAuditQueue(it, reductionStatus = "REDUCTION_STARTED") }
 
     successUpdater.outOfDateReductionsProcessed()
   }
