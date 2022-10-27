@@ -24,16 +24,16 @@ class UpdateReductionService(
     outOfDateReductions.activeNowArchived
       .onEach { it.status = ReductionStatus.ARCHIVED }
       .let { reductionsRepository.saveAll(it) }
-      .let { reductionEntities -> auditService.publishReductionsStatusUpdatesToAuditQueue(reductionEntities.map { it.id.toString() }, reductionStatusToAuditAction[ReductionStatus.ARCHIVED]!!) }
+      .let { reductionEntities -> auditService.publishReductionsStatusUpdatesToAuditQueue(reductionEntities.map { it.id!! }, reductionStatusToAuditAction[ReductionStatus.ARCHIVED]!!, outOfDateReductions = outOfDateReductions) }
     outOfDateReductions.scheduledNowActive
       .onEach { it.status = ReductionStatus.ACTIVE }
       .let { reductionsRepository.saveAll(it) }
-      .let { reductionEntities -> auditService.publishReductionsStatusUpdatesToAuditQueue(reductionEntities.map { it.id.toString() }, reductionStatusToAuditAction[ReductionStatus.ACTIVE]!!) }
+      .let { reductionEntities -> auditService.publishReductionsStatusUpdatesToAuditQueue(reductionEntities.map { it.id!! }, reductionStatusToAuditAction[ReductionStatus.ACTIVE]!!, outOfDateReductions = outOfDateReductions) }
 
     successUpdater.outOfDateReductionsProcessed()
   }
 
-  private fun findOutOfDateReductions(): OutOfDateReductions = OutOfDateReductions(
+  fun findOutOfDateReductions(): OutOfDateReductions = OutOfDateReductions(
     reductionsRepository.findByEffectiveFromBeforeAndEffectiveToAfterAndStatus(ZonedDateTime.now(), ZonedDateTime.now(), ReductionStatus.SCHEDULED),
     reductionsRepository.findByEffectiveToBeforeAndStatus(ZonedDateTime.now(), ReductionStatus.ACTIVE)
   )

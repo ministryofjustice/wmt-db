@@ -44,9 +44,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WMTWork
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WorkloadPointsCalculationEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WorkloadReportEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.CaseCategoryRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.PduRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.ReductionCategoryRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.ReductionReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.RegionRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.TiersRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WMTCaseDetailsRepository
@@ -76,7 +73,10 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.AdjustmentReaso
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.EventManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.OffenderManagerRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PduRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.ReductionCategoryRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.ReductionReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.ReductionsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.RequirementManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.SentenceRepository

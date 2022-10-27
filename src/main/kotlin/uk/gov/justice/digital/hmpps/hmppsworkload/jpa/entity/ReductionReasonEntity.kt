@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity
+package uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity
 
 import javax.persistence.Column
 import javax.persistence.Entity
