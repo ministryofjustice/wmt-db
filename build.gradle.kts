@@ -19,7 +19,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:1.1.12")
 
-  implementation("org.springdoc:springdoc-openapi-ui:1.6.11")
+  implementation("org.springdoc:springdoc-openapi-ui:1.6.12")
   implementation("org.springdoc:springdoc-openapi-kotlin:1.6.12")
   implementation("org.springdoc:springdoc-openapi-data-rest:1.6.12")
 
