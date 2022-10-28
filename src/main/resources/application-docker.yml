@@ -2,11 +2,6 @@ hmpps.sqs:
   provider: localstack
   localstackUrl: http://localhost:4566
   queues:
-    extractqueue:
-      accessKeyId: foobar
-      secretAccessKey: foobar
-      queueName: hmpps_workload_s3_extract_event_queue
-      dlqName: hmpps_workload_s3_extract_event_dlq
     hmppsallocationcompletequeue:
       queueName: hmpps_allocation_complete_event_queue
       dlqName: hmpps_allocation_complete_event_dlq
