@@ -23,12 +23,10 @@ class UpdateReductionService(
 
     outOfDateReductions.activeNowArchived
       .onEach { it.status = ReductionStatus.ARCHIVED }
-      .let { reductionsRepository.saveAll(it) }
-      .forEach { successUpdater.auditReduction(it, reductionStatus = "REDUCTION_ENDED") }
+      .let { reductionsRepository.saveAll(it).forEach { successUpdater.auditReduction(it, "REDUCTION_ENDED") } }
     outOfDateReductions.scheduledNowActive
       .onEach { it.status = ReductionStatus.ACTIVE }
-      .let { reductionsRepository.saveAll(it) }
-      .forEach { successUpdater.auditReduction(it, reductionStatus = "REDUCTION_STARTED") }
+      .let { reductionsRepository.saveAll(it).forEach { successUpdater.auditReduction(it, "REDUCTION_STARTED") } }
 
     getDistinctStaffChanged(outOfDateReductions).forEach { workloadOwner ->
       requestStaffCalculationService.requestStaffCalculation(workloadOwner)

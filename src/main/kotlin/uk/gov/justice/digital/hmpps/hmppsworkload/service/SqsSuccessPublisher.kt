@@ -142,7 +142,6 @@ class SqsSuccessPublisher(
     )
     hmppsAuditQueue.sqsClient.sendMessage(sendMessage)
   }
-
   override fun auditReduction(reductionEntity: ReductionEntity, reductionStatus: String) {
     val reductionsAuditData = ReductionsAuditData(
       reductionEntity.workloadOwner.offenderManager.code,
