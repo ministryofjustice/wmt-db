@@ -32,7 +32,11 @@ class AuditService(
     val sendMessage = SendMessageRequest(
       hmppsAuditQueueUrl,
       objectMapper.writeValueAsString(
-        AuditMessage(operationId = UUID.randomUUID().toString(), who = loggedInUser, details = objectMapper.writeValueAsString(auditData))
+        AuditMessage(
+          operationId = UUID.randomUUID().toString(),
+          who = loggedInUser,
+          details = objectMapper.writeValueAsString(auditData)
+        )
       )
     )
     sqsClient.sendMessage(sendMessage)
@@ -40,7 +44,7 @@ class AuditService(
 
   fun publishReductionsStatusUpdatesToAuditQueue(reductionEntity: ReductionEntity, loggedInUser: String = "system worker", reductionStatus: String) {
 
-    val reductionsDetailsAuditData = ReductionsDetails(
+    val reductionsAuditData = ReductionsAuditData(
       reductionEntity.workloadOwner.id,
       reductionEntity.id
     )
@@ -48,22 +52,34 @@ class AuditService(
     val sendMessage = SendMessageRequest(
       hmppsAuditQueueUrl,
       objectMapper.writeValueAsString(
-        // reduction ended - reduction started
-        AuditMessage(operationId = UUID.randomUUID().toString(), what = reductionStatus, who = loggedInUser, details = objectMapper.writeValueAsString(reductionsDetailsAuditData))
+        AuditMessage(
+          operationId = UUID.randomUUID().toString(),
+          what = reductionStatus,
+          who = loggedInUser,
+          details = objectMapper.writeValueAsString(reductionsAuditData)
+        )
       )
     )
     sqsClient.sendMessage(sendMessage)
   }
 }
 
-data class AuditMessage(val operationId: String, val what: String = "CASE_ALLOCATED", val `when`: Instant = Instant.now(), val who: String, val service: String = "hmpps-workload", val details: String)
+data class AuditMessage(
+  val operationId: String,
+  val what: String = "CASE_ALLOCATED",
+  val `when`: Instant = Instant.now(),
+  val who: String,
+  val service: String = "hmpps-workload",
+  val details: String
+)
+
 data class AuditData(
   val crn: String,
   val eventId: BigInteger,
   val requirementIds: List<BigInteger>
 )
 
-data class ReductionsDetails(
+data class ReductionsAuditData(
   val offenderManagerCode: Long?,
   val reductionId: Long?,
 )
