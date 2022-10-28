@@ -41,7 +41,7 @@ class SqsSuccessPublisher(
   @Value("\${person.manager.getByIdPath}") private val personManagerLookupPath: String,
   @Value("\${event.manager.getByIdPath}") private val eventManagerLookupPath: String,
   @Value("\${requirement.manager.getByIdPath}") private val requirementManagerLookupPath: String
-) : SuccessUpdater {
+) {
 
   private val domainTopic by lazy {
     hmppsQueueService.findByTopicId("hmppsdomaintopic")
@@ -55,7 +55,7 @@ class SqsSuccessPublisher(
 
   private val hmppsAuditQueue by lazy { hmppsQueueService.findByQueueId("hmppsauditqueue") ?: throw MissingQueueException("HmppsQueue hmppsauditqueue not found") }
 
-  override fun updatePerson(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
+  fun updatePerson(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
     val hmppsPersonEvent = HmppsMessage(
       "person.community.manager.allocated",
       1,
@@ -77,7 +77,7 @@ class SqsSuccessPublisher(
 
   private fun generateDetailsUri(path: String, allocationId: UUID): String = UriComponentsBuilder.newInstance().scheme("https").host(ingressUrl).path(path).buildAndExpand(allocationId).toUriString()
 
-  override fun updateEvent(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
+  fun updateEvent(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
     val hmppsEventAllocatedEvent = HmppsMessage(
       "event.manager.allocated", 1, "Event allocated event", generateDetailsUri(eventManagerLookupPath, allocationId),
       timeUpdated.format(
@@ -94,7 +94,7 @@ class SqsSuccessPublisher(
     }
   }
 
-  override fun updateRequirement(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
+  fun updateRequirement(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
     val hmppsRequirementAllocatedEvent = HmppsMessage(
       "requirement.manager.allocated", 1, "Requirement allocated event", generateDetailsUri(requirementManagerLookupPath, allocationId),
       timeUpdated.format(
@@ -111,7 +111,7 @@ class SqsSuccessPublisher(
     }
   }
 
-  override fun outOfDateReductionsProcessed() {
+  fun outOfDateReductionsProcessed() {
     val sendMessage = SendMessageRequest(
       hmppsReductionsCompletedQueue.queueUrl,
       getReductionChangeMessage()
@@ -122,7 +122,7 @@ class SqsSuccessPublisher(
     hmppsReductionsCompletedQueue.sqsClient.sendMessage(sendMessage)
   }
 
-  override fun auditAllocation(
+  fun auditAllocation(
     crn: String,
     eventId: BigInteger,
     loggedInUser: String,
@@ -142,7 +142,7 @@ class SqsSuccessPublisher(
     )
     hmppsAuditQueue.sqsClient.sendMessage(sendMessage)
   }
-  override fun auditReduction(reductionEntity: ReductionEntity, reductionStatus: String) {
+  fun auditReduction(reductionEntity: ReductionEntity, reductionStatus: String) {
     val reductionsAuditData = ReductionsAuditData(
       reductionEntity.workloadOwner.offenderManager.code,
       reductionEntity.id!!
@@ -156,7 +156,7 @@ class SqsSuccessPublisher(
     )
     hmppsAuditQueue.sqsClient.sendMessage(sendMessage)
   }
-  override fun staffAvailableHoursChange(staffCode: String, teamCode: String, availableHours: BigDecimal) {
+  fun staffAvailableHoursChange(staffCode: String, teamCode: String, availableHours: BigDecimal) {
     val staffAvailableHoursChangeMessage = HmppsMessage(
       "staff.available.hours.changed", 1, "Staff Available hours changed", "",
       ZonedDateTime.now().format(

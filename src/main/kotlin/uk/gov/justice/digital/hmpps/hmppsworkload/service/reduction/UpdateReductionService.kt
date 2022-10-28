@@ -5,7 +5,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OutOfDateReductions
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTWorkloadOwnerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.ReductionsRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.SuccessUpdater
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.SqsSuccessPublisher
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.RequestStaffCalculationService
 import java.time.ZonedDateTime
 import javax.transaction.Transactional
@@ -13,7 +13,7 @@ import javax.transaction.Transactional
 @Service
 class UpdateReductionService(
   private val reductionsRepository: ReductionsRepository,
-  private val successUpdater: SuccessUpdater,
+  private val sqsSuccessPublisher: SqsSuccessPublisher,
   private val requestStaffCalculationService: RequestStaffCalculationService
 ) {
 
@@ -23,16 +23,16 @@ class UpdateReductionService(
 
     outOfDateReductions.activeNowArchived
       .onEach { it.status = ReductionStatus.ARCHIVED }
-      .let { reductionsRepository.saveAll(it).forEach { successUpdater.auditReduction(it, "REDUCTION_ENDED") } }
+      .let { reductionsRepository.saveAll(it).forEach { sqsSuccessPublisher.auditReduction(it, "REDUCTION_ENDED") } }
     outOfDateReductions.scheduledNowActive
       .onEach { it.status = ReductionStatus.ACTIVE }
-      .let { reductionsRepository.saveAll(it).forEach { successUpdater.auditReduction(it, "REDUCTION_STARTED") } }
+      .let { reductionsRepository.saveAll(it).forEach { sqsSuccessPublisher.auditReduction(it, "REDUCTION_STARTED") } }
 
     getDistinctStaffChanged(outOfDateReductions).forEach { workloadOwner ->
       requestStaffCalculationService.requestStaffCalculation(workloadOwner)
     }
 
-    successUpdater.outOfDateReductionsProcessed()
+    sqsSuccessPublisher.outOfDateReductionsProcessed()
   }
 
   private fun getDistinctStaffChanged(outOfDateReductions: OutOfDateReductions): Set<WMTWorkloadOwnerEntity> = (outOfDateReductions.activeNowArchived + outOfDateReductions.scheduledNowActive)

@@ -23,7 +23,7 @@ class DefaultSaveWorkloadService(
   private val saveRequirementManagerService: SaveRequirementManagerService,
   private val notificationService: NotificationService,
   private val telemetryService: TelemetryService,
-  private val successUpdater: SuccessUpdater,
+  private val sqsSuccessPublisher: SqsSuccessPublisher,
   private val caseDetailsRepository: CaseDetailsRepository
 ) : SaveWorkloadService {
 
@@ -49,7 +49,7 @@ class DefaultSaveWorkloadService(
     if (personManagerSaveResult.hasChanged || eventManagerSaveResult.hasChanged || requirementManagerSaveResults.any { it.hasChanged }) {
       notificationService.notifyAllocation(staff, summary, activeRequirements, allocateCase, loggedInUser, authToken)
         .block()
-      successUpdater.auditAllocation(allocateCase.crn, allocateCase.eventId, loggedInUser, activeRequirements.map { it.requirementId })
+      sqsSuccessPublisher.auditAllocation(allocateCase.crn, allocateCase.eventId, loggedInUser, activeRequirements.map { it.requirementId })
     }
     return CaseAllocated(personManagerSaveResult.entity.uuid, eventManagerSaveResult.entity.uuid, requirementManagerSaveResults.map { it.entity.uuid })
   }
@@ -59,7 +59,7 @@ class DefaultSaveWorkloadService(
       telemetryService.trackPersonManagerAllocated(personManagerSaveResult.entity)
       val caseDetails = caseDetailsRepository.findByIdOrNull(personManagerSaveResult.entity.crn)
       telemetryService.trackStaffGradeToTierAllocated(caseDetails, staff, personManagerSaveResult.entity.teamCode)
-      successUpdater.updatePerson(
+      sqsSuccessPublisher.updatePerson(
         personManagerSaveResult.entity.crn,
         personManagerSaveResult.entity.uuid,
         personManagerSaveResult.entity.createdDate!!
@@ -70,14 +70,14 @@ class DefaultSaveWorkloadService(
   private fun afterEventManagerSaved(eventManagerSaveResult: SaveResult<EventManagerEntity>) {
     if (eventManagerSaveResult.hasChanged) {
       telemetryService.trackEventManagerAllocated(eventManagerSaveResult.entity)
-      successUpdater.updateEvent(eventManagerSaveResult.entity.crn, eventManagerSaveResult.entity.uuid, eventManagerSaveResult.entity.createdDate!!)
+      sqsSuccessPublisher.updateEvent(eventManagerSaveResult.entity.crn, eventManagerSaveResult.entity.uuid, eventManagerSaveResult.entity.createdDate!!)
     }
   }
 
   private fun afterRequirementManagersSaved(requirementManagerSaveResults: List<SaveResult<RequirementManagerEntity>>) {
     requirementManagerSaveResults.filter { it.hasChanged }.forEach { saveResult ->
       telemetryService.trackRequirementManagerAllocated(saveResult.entity)
-      successUpdater.updateRequirement(saveResult.entity.crn, saveResult.entity.uuid, saveResult.entity.createdDate!!)
+      sqsSuccessPublisher.updateRequirement(saveResult.entity.crn, saveResult.entity.uuid, saveResult.entity.createdDate!!)
     }
   }
 }
