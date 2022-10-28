@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.Reducti
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadCalculationEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.ReductionsAuditData
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
@@ -109,5 +110,36 @@ class ExtractPlacedEventListenerTest : IntegrationTestBase() {
       { Assertions.assertEquals(wmtStaff.team.code, actualWorkloadCalcEntity?.teamCode) },
       { Assertions.assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity?.calculatedDate?.dayOfMonth) }
     )
+  }
+
+  @Test
+  fun `reductions audit message contain required data`() {
+    val savedReduction = reductionsRepository.save(
+      ReductionEntity(
+        workloadOwner = wmtStaff.wmtWorkloadOwnerEntity,
+        hours = BigDecimal.valueOf(3.2),
+        effectiveFrom = ZonedDateTime.now().minusDays(1),
+        effectiveTo = ZonedDateTime.now().plusDays(1),
+        status = ReductionStatus.SCHEDULED,
+        reductionReasonId = reductionReason.id!!
+      )
+    )
+    hmppsExtractPlacedClient.sendMessage(SendMessageRequest(hmppsExtractPlacedQueue.queueUrl, "{}"))
+    noMessagesOnExtractPlacedQueue()
+    await untilCallTo { verifyReductionsCompletedOnQueue() } matches { it == true }
+
+    val auditMessages = getAuditMessages()
+
+    Assertions.assertEquals(
+      objectMapper.writeValueAsString(
+        ReductionsAuditData(
+          savedReduction.workloadOwner.offenderManager.code,
+          savedReduction.id!!
+        )
+      ),
+      auditMessages.details
+    )
+    Assertions.assertEquals("system_user", auditMessages.who)
+    Assertions.assertEquals("REDUCTION_STARTED", auditMessages.what)
   }
 }

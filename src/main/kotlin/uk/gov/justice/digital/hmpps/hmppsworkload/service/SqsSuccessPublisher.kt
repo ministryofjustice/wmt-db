@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReferenceType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.StaffAvailableHours
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionEntity
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
 import uk.gov.justice.hmpps.sqs.MissingTopicException
@@ -142,6 +143,20 @@ class SqsSuccessPublisher(
     hmppsAuditQueue.sqsClient.sendMessage(sendMessage)
   }
 
+  override fun auditReduction(reductionEntity: ReductionEntity, reductionStatus: String) {
+    val reductionsAuditData = ReductionsAuditData(
+      reductionEntity.workloadOwner.offenderManager.code,
+      reductionEntity.id!!
+    )
+
+    val sendMessage = SendMessageRequest(
+      hmppsAuditQueue.queueUrl,
+      objectMapper.writeValueAsString(
+        AuditMessage(operationId = UUID.randomUUID().toString(), who = "system_user", details = objectMapper.writeValueAsString(reductionsAuditData), what = reductionStatus)
+      )
+    )
+    hmppsAuditQueue.sqsClient.sendMessage(sendMessage)
+  }
   override fun staffAvailableHoursChange(staffCode: String, teamCode: String, availableHours: BigDecimal) {
     val staffAvailableHoursChangeMessage = HmppsMessage(
       "staff.available.hours.changed", 1, "Staff Available hours changed", "",
@@ -182,4 +197,9 @@ data class AuditData(
   val crn: String,
   val eventId: BigInteger,
   val requirementIds: List<BigInteger>
+)
+
+data class ReductionsAuditData(
+  val staffCode: String,
+  val reductionId: Long
 )

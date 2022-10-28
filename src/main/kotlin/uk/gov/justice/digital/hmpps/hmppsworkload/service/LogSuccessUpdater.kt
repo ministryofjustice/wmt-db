@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Conditional
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.config.NoAllocationCompleteTopicCondition
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionEntity
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.ZonedDateTime
@@ -37,6 +38,10 @@ class LogSuccessUpdater : SuccessUpdater {
     requirementIds: List<BigInteger>
   ) {
     log.info("allocation audited")
+  }
+
+  override fun auditReduction(reductionEntity: ReductionEntity, reductionStatus: String) {
+    log.info("Reduction Updated")
   }
 
   override fun staffAvailableHoursChange(staffCode: String, teamCode: String, availableHours: BigDecimal) {
