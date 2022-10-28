@@ -469,6 +469,10 @@ abstract class IntegrationTestBase {
     await untilCallTo { countMessagesOnWorkloadCalculationEventQueue() } matches { it == 0 }
   }
 
+  protected fun noMessagesOnWorkloadCalculationEventsDLQ() {
+    await untilCallTo { countMessagesOnWorkloadCalculationDeadLetterQueue() } matches { it == 0 }
+  }
+
   private fun countMessagesOnWorkloadCalculationEventQueue(): Int =
     workloadCalculationSqsClient.getQueueAttributes(
       workloadCalculationQueue.queueUrl,
