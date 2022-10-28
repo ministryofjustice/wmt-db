@@ -176,8 +176,8 @@ abstract class IntegrationTestBase {
       ?: throw MissingQueueException("HmppsQueue hmppsoffenderqueue not found")
   }
   private val domainEventsTopic by lazy {
-    hmppsQueueService.findByTopicId("hmmppsdomaintopic")
-      ?: throw MissingQueueException("HmppsTopic hmmppsdomaintopic not found")
+    hmppsQueueService.findByTopicId("hmppsdomaintopic")
+      ?: throw MissingQueueException("HmppsTopic hmppsdomaintopic not found")
   }
   private val offenderEventTopic by lazy {
     hmppsQueueService.findByTopicId("hmppsoffendertopic")

@@ -16,7 +16,7 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
     val staffCode = "OM1"
     val teamCode = "T1"
     staffCodeResponse(staffCode, teamCode)
-    val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
+    setupCurrentWmtStaff(staffCode, teamCode)
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Jane", "Doe"))
 
     webTestClient.post()

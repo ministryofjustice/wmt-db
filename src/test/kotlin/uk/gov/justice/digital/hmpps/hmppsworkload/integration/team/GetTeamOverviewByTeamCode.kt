@@ -75,7 +75,7 @@ class GetTeamOverviewByTeamCode : IntegrationTestBase() {
     val teamCode = "T1"
     teamStaffResponse(teamCode)
     val firstWmtStaff = setupCurrentWmtStaff("OM1", teamCode)
-    val secondWmtStaff = setupCurrentWmtStaff("OM2", teamCode)
+    setupCurrentWmtStaff("OM2", teamCode)
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers?grades=PO,PQiP")
       .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT")) }

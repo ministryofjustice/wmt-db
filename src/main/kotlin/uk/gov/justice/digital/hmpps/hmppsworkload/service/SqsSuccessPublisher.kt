@@ -33,7 +33,7 @@ private const val STRING = "String"
 private const val LOG_TEMPLATE = "Published event {} to topic for CRN {} and id {}"
 
 @Service
-@ConditionalOnProperty("hmpps.sqs.topics.hmmppsdomaintopic.arn")
+@ConditionalOnProperty("hmpps.sqs.topics.hmppsdomaintopic.arn")
 class SqsSuccessPublisher(
   val hmppsQueueService: HmppsQueueService,
   val objectMapper: ObjectMapper,
@@ -44,8 +44,8 @@ class SqsSuccessPublisher(
 ) : SuccessUpdater {
 
   private val domainTopic by lazy {
-    hmppsQueueService.findByTopicId("hmmppsdomaintopic")
-      ?: throw MissingTopicException("hmmppsdomaintopic not found")
+    hmppsQueueService.findByTopicId("hmppsdomaintopic")
+      ?: throw MissingTopicException("hmppsdomaintopic not found")
   }
 
   private val hmppsReductionsCompletedQueue by lazy {

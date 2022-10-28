@@ -14,7 +14,7 @@ hmpps.sqs:
     hmppsallocationcompletequeue:
       queueName: hmpps_allocation_complete_event_queue
       dlqName: hmpps_allocation_complete_event_dlq
-      subscribeTopicId: hmmppsdomaintopic
+      subscribeTopicId: hmppsdomaintopic
       subscribeFilter: '{"eventType":[ "person.community.manager.allocated", "event.manager.allocated","requirement.manager.allocated"] }'
       asyncQueueClient: true
       dlqMaxReceiveCount: 1
@@ -27,7 +27,7 @@ hmpps.sqs:
     tiercalcqueue:
       queueName: tier_calc_event_queue
       dlqName: tier_calc_event_dlq
-      subscribeTopicId: hmmppsdomaintopic
+      subscribeTopicId: hmppsdomaintopic
       subscribeFilter: '{"eventType":[ "TIER_CALCULATION_COMPLETE"] }'
     hmppsauditqueue:
       accessKeyId: foobar
@@ -37,7 +37,7 @@ hmpps.sqs:
     workloadcalculationqueue:
       queueName: workload_calculation_event_queue
       dlqName: workload_calculation_event_dlq
-      subscribeTopicId: hmmppsdomaintopic
+      subscribeTopicId: hmppsdomaintopic
       subscribeFilter: '{"eventType":[ "staff.available.hours.changed"] }'
       asyncQueueClient: true
       dlqMaxReceiveCount: 1
@@ -53,7 +53,7 @@ hmpps.sqs:
       secretAccessKey: foobar
       dlqMaxReceiveCount: 1
   topics:
-    hmmppsdomaintopic:
+    hmppsdomaintopic:
       arn: arn:aws:sns:eu-west-2:000000000000:${random.uuid}
     hmppsoffendertopic:
       arn: arn:aws:sns:eu-west-2:000000000000:${random.uuid}
