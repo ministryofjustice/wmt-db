@@ -1,1 +1,1 @@
-DROP VIEW app.cms_export_view;
+DROP MATERIALIZED VIEW app.cms_export_view;
