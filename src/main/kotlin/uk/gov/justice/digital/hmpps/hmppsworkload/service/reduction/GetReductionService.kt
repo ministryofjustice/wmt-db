@@ -15,8 +15,8 @@ class GetReductionService(private val reductionsRepository: ReductionsRepository
   )
 
   fun findNextReductionChange(staffCode: String, teamCode: String): ZonedDateTime? = workloadOwnerRepository.findFirstByOffenderManagerCodeAndTeamCodeOrderByIdDesc(staffCode, teamCode)?.let { workloadOwner ->
-    reductionsRepository.findByWorkloadOwnerAndEffectiveFromGreaterThanOrEffectiveToGreaterThanAndStatusNotIn(
-      workloadOwner, ZonedDateTime.now(), ZonedDateTime.now(), excludeStatuses
+    reductionsRepository.findUpcomingReductions(
+      workloadOwner, excludeStatuses, ZonedDateTime.now(), ZonedDateTime.now()
     )
       .flatMap { reduction ->
         listOf(
