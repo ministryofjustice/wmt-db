@@ -34,20 +34,20 @@ class DefaultSaveWorkloadService(
     loggedInUser: String,
     authToken: String
   ): CaseAllocated {
-    val staff = communityApiClient.getStaffByCode(staffCode).block()!!
+    val allocateTo = communityApiClient.getStaffByCode(staffCode).block()!!
     val summary = communityApiClient.getSummaryByCrn(allocateCase.crn).block()!!
     val activeRequirements = communityApiClient.getActiveRequirements(allocateCase.crn, allocateCase.eventId).block()!!.requirements
     val personManagerSaveResult = savePersonManagerService.savePersonManager(
       teamCode,
-      staff,
+      allocateTo,
       loggedInUser,
       summary,
       allocateCase.crn
-    ).also { afterPersonManagerSaved(it, staff) }
-    val eventManagerSaveResult = saveEventManagerService.saveEventManager(teamCode, staff, allocateCase, loggedInUser).also { afterEventManagerSaved(it) }
-    val requirementManagerSaveResults = saveRequirementManagerService.saveRequirementManagers(teamCode, staff, allocateCase, loggedInUser, activeRequirements).also { afterRequirementManagersSaved(it) }
+    ).also { afterPersonManagerSaved(it, allocateTo) }
+    val eventManagerSaveResult = saveEventManagerService.saveEventManager(teamCode, allocateTo, allocateCase, loggedInUser).also { afterEventManagerSaved(it) }
+    val requirementManagerSaveResults = saveRequirementManagerService.saveRequirementManagers(teamCode, allocateTo, allocateCase, loggedInUser, activeRequirements).also { afterRequirementManagersSaved(it) }
     if (personManagerSaveResult.hasChanged || eventManagerSaveResult.hasChanged || requirementManagerSaveResults.any { it.hasChanged }) {
-      notificationService.notifyAllocation(staff, summary, activeRequirements, allocateCase, loggedInUser, authToken)
+      notificationService.notifyAllocation(allocateTo, summary, activeRequirements, allocateCase, loggedInUser, authToken)
         .block()
       sqsSuccessPublisher.auditAllocation(allocateCase.crn, allocateCase.eventId, loggedInUser, activeRequirements.map { it.requirementId })
     }
