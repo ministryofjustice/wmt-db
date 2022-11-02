@@ -9,4 +9,6 @@ data class AllocateCase @JsonCreator constructor(
   val instructions: String = "",
   val emailTo: List<String>? = null,
   val emailCopy: String? = null
-)
+) {
+  fun sendEmailToAllocatingOfficer(): Boolean = emailCopy.isNullOrEmpty()
+}
