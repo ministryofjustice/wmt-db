@@ -5,6 +5,7 @@ import java.math.BigInteger
 fun allocateCase(crn: String, eventId: BigInteger) = """
   {
      "crn": "$crn",
-     "eventId": $eventId
+     "eventId": $eventId,
+     "emailTo" : ["additionalEmailReciever@test.justice.gov.uk"]
   }
 """.trimIndent()

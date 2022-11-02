@@ -427,4 +427,61 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     val auditData = AuditData(crn, eventId, listOf(requirementId))
     Assertions.assertEquals(objectMapper.writeValueAsString(auditData), getAuditMessages().details)
   }
+
+  @Test
+  fun `can send email when selecting checkbox`() {
+    staffCodeResponse(staffCode, teamCode)
+    offenderSummaryResponse(crn)
+    singleActiveRequirementResponse(crn, eventId)
+
+    webTestClient.post()
+      .uri("/team/$teamCode/offenderManager/$staffCode/case")
+      .bodyValue(allocateCase(crn, eventId))
+      .headers {
+        it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
+        it.contentType = MediaType.APPLICATION_JSON
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody()
+      .jsonPath("$.personManagerId")
+      .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
+      .jsonPath("$.eventManagerId")
+      .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
+      .jsonPath("$.requirementManagerIds[0]")
+      .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
+
+    expectWorkloadAllocationCompleteMessages(crn)
+
+    await untilCallTo {
+      workloadCalculationRepository.count()
+    } matches { it == 1L }
+    val actualWorkloadCalcEntity: WorkloadCalculationEntity =
+      workloadCalculationRepository.findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)!!
+
+    Assertions.assertAll(
+      { Assertions.assertEquals(staffCode, actualWorkloadCalcEntity.staffCode) },
+      { Assertions.assertEquals(teamCode, actualWorkloadCalcEntity.teamCode) },
+      { Assertions.assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity.calculatedDate.dayOfMonth) },
+      { Assertions.assertEquals(1, actualWorkloadCalcEntity.breakdownData.caseloadCount) }
+    )
+    // verify that the additional email got an email
+    verify(exactly = 1) { notificationClient.sendEmail(any(), "additionalEmailReciever@test.justice.gov.uk", any(), any()) }
+    // verify that the allocated to officer got an email
+    verify(exactly = 1) { notificationClient.sendEmail(any(), "sheila.hancock@test.justice.gov.uk", any(), any()) }
+    verify(exactly = 1) {
+      telemetryClient.trackEvent(
+        PERSON_MANAGER_ALLOCATED.eventName,
+        mapOf(
+          "crn" to crn,
+          "teamCode" to teamCode,
+          "providerCode" to "N01",
+          "staffId" to "123456",
+          "wmtPeriod" to getWmtPeriod(LocalDateTime.now())
+        ),
+        null
+      )
+    }
+  }
 }
