@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.reduction
 
-
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
@@ -11,7 +10,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
 import java.math.BigDecimal
 import java.time.ZonedDateTime
 
-class ReductionPerformanceIssue: IntegrationTestBase() {
+class ReductionPerformanceIssue : IntegrationTestBase() {
 
   @Test
   fun `query must only return reductions associated with the workload owner`() {
