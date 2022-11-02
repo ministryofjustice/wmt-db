@@ -22,7 +22,7 @@ class ReductionPerformanceIssue : IntegrationTestBase() {
     val reductionReason = reductionReasonRepository.save(ReductionReasonEntity(reductionCategoryEntity = reductionCategory))
     val expectedReduction = reductionsRepository.save(ReductionEntity(workloadOwner = wmtStaff.wmtWorkloadOwnerEntity, hours = BigDecimal.valueOf(5), effectiveFrom = ZonedDateTime.now().plusDays(3), effectiveTo = ZonedDateTime.now().plusDays(7), status = ReductionStatus.SCHEDULED, reductionReasonId = reductionReason.id!!))
 
-    val otherReduction = reductionsRepository.save(ReductionEntity(workloadOwner = otherWmtStaff.wmtWorkloadOwnerEntity, hours = BigDecimal.valueOf(5), effectiveFrom = ZonedDateTime.now().plusDays(5), effectiveTo = ZonedDateTime.now().plusDays(7), status = ReductionStatus.SCHEDULED, reductionReasonId = reductionReason.id!!))
+    reductionsRepository.save(ReductionEntity(workloadOwner = otherWmtStaff.wmtWorkloadOwnerEntity, hours = BigDecimal.valueOf(5), effectiveFrom = ZonedDateTime.now().plusDays(5), effectiveTo = ZonedDateTime.now().plusDays(7), status = ReductionStatus.SCHEDULED, reductionReasonId = reductionReason.id!!))
 
     val result = reductionsRepository.findUpcomingReductions(
       wmtStaff.wmtWorkloadOwnerEntity,
@@ -31,6 +31,6 @@ class ReductionPerformanceIssue : IntegrationTestBase() {
       ZonedDateTime.now()
     )
 
-    Assertions.assertThat(result).extracting("id").doesNotContain(otherReduction.id!!)
+    Assertions.assertThat(result).extracting("id").containsOnly(expectedReduction.id!!)
   }
 }
