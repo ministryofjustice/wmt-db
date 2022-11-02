@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration.offenderManager
 
 import com.microsoft.applicationinsights.TelemetryClient
 import com.ninjasquad.springmockk.MockkBean
+import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.verify
 import org.awaitility.kotlin.await
@@ -108,7 +109,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       { Assertions.assertEquals(1, actualWorkloadCalcEntity.breakdownData.caseloadCount) }
     )
 
-    verify(exactly = 1) { notificationClient.sendEmail(any(), any(), any(), any()) }
+    verify(exactly = 2) { notificationClient.sendEmail(any(), any(), any(), any()) }
     verify(exactly = 1) {
       telemetryClient.trackEvent(
         PERSON_MANAGER_ALLOCATED.eventName,
@@ -286,7 +287,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   }
 
   @Test
-  fun `must only call notify once when workload is the same`() {
+  fun `only send the email once when clicking allocate multiple times`() {
     staffCodeResponse(staffCode, teamCode)
     staffCodeResponse(staffCode, teamCode)
     offenderSummaryResponse(crn)
@@ -307,6 +308,11 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .expectStatus()
       .isOk
 
+    verify(exactly = 1) { notificationClient.sendEmail(any(), "sheila.hancock@test.justice.gov.uk", any(), any()) }
+    verify(exactly = 1) { notificationClient.sendEmail(any(), "additionalEmailReciever@test.justice.gov.uk", any(), any()) }
+
+    clearAllMocks()
+
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
       .bodyValue(allocateCase(crn, eventId))
@@ -318,7 +324,8 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .expectStatus()
       .isOk
 
-    verify(exactly = 1) { notificationClient.sendEmail(any(), any(), any(), any()) }
+    verify(exactly = 0) { notificationClient.sendEmail(any(), "sheila.hancock@test.justice.gov.uk", any(), any()) }
+    verify(exactly = 0) { notificationClient.sendEmail(any(), "additionalEmailReciever@test.justice.gov.uk", any(), any()) }
   }
 
   @Test
