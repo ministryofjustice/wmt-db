@@ -493,7 +493,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   }
 
   @Test
-  fun `can send email by default when checkbox unchecked`() {
+  fun `sends email by default to allocating officer`() {
     val allocateToEmail = "allocateTo-user@test.justice.gov.uk"
     staffCodeResponse(staffCode, teamCode, email = allocateToEmail)
     offenderSummaryResponse(crn)
@@ -531,7 +531,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     verify(exactly = 1) { notificationClient.sendEmail(any(), allocateToEmail, any(), any()) }
   }
   @Test
-  fun `do not send email when checkbox checked`() {
+  fun `do not send email to allocating officer`() {
     val allocateToEmail = "allocateTo-user@test.justice.gov.uk"
     staffCodeResponse(staffCode, teamCode, email = allocateToEmail)
     offenderSummaryResponse(crn)
