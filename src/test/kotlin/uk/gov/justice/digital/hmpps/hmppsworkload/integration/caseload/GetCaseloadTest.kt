@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType.LICENSE
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PersonManager
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier.A1
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
@@ -22,10 +23,7 @@ class GetCaseloadTest : IntegrationTestBase() {
   }
   @Test
   fun `must not return list of cases if no realtime data exist`() {
-    val staffCode = "OM1"
-    val teamCode = "T1"
-
-    Assertions.assertEquals(0, getCaseLoad.getCases(staffCode, teamCode).size)
+    Assertions.assertEquals(0, getCaseLoad.getCases(PersonManager("OM1", "T1")).size)
   }
 
   @Test
@@ -45,7 +43,7 @@ class GetCaseloadTest : IntegrationTestBase() {
 
     caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, realtimeCase.type, "Jane", "Doe"))
 
-    val actualCases = getCaseLoad.getCases(staffCode, teamCode)
+    val actualCases = getCaseLoad.getCases(PersonManager("OM1", "T1"))
 
     Assertions.assertEquals(realtimeCase.crn, actualCases[0].crn)
   }
