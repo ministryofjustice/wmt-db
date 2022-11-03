@@ -309,7 +309,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .isOk
 
     verify(exactly = 1) { notificationClient.sendEmail(any(), "sheila.hancock@test.justice.gov.uk", any(), any()) }
-    verify(exactly = 1) { notificationClient.sendEmail(any(), "additionalEmailReciever@test.justice.gov.uk", any(), any()) }
+    verify(exactly = 1) { notificationClient.sendEmail(any(), "additionalEmailReceiver@test.justice.gov.uk", any(), any()) }
 
     clearAllMocks()
 
@@ -325,7 +325,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .isOk
 
     verify(exactly = 0) { notificationClient.sendEmail(any(), "sheila.hancock@test.justice.gov.uk", any(), any()) }
-    verify(exactly = 0) { notificationClient.sendEmail(any(), "additionalEmailReciever@test.justice.gov.uk", any(), any()) }
+    verify(exactly = 0) { notificationClient.sendEmail(any(), "additionalEmailReceiver@test.justice.gov.uk", any(), any()) }
   }
 
   @Test
@@ -474,7 +474,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       { Assertions.assertEquals(1, actualWorkloadCalcEntity.breakdownData.caseloadCount) }
     )
     // verify that the additional email got an email
-    verify(exactly = 1) { notificationClient.sendEmail(any(), "additionalEmailReciever@test.justice.gov.uk", any(), any()) }
+    verify(exactly = 1) { notificationClient.sendEmail(any(), "additionalEmailReceiver@test.justice.gov.uk", any(), any()) }
     // verify that the allocated-to officer got an email
     verify(exactly = 1) { notificationClient.sendEmail(any(), "sheila.hancock@test.justice.gov.uk", any(), any()) }
     verify(exactly = 1) {
@@ -493,7 +493,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   }
 
   @Test
-  fun `can send email by default when checkbox unchecked`() {
+  fun `sends email by default to allocating officer`() {
     val allocateToEmail = "allocateTo-user@test.justice.gov.uk"
     staffCodeResponse(staffCode, teamCode, email = allocateToEmail)
     offenderSummaryResponse(crn)
@@ -524,14 +524,14 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     } matches { it == 1L }
 
     // verify that the additional email received an email
-    verify(exactly = 1) { notificationClient.sendEmail(any(), "additionalEmailReciever@test.justice.gov.uk", any(), any()) }
+    verify(exactly = 1) { notificationClient.sendEmail(any(), "additionalEmailReceiver@test.justice.gov.uk", any(), any()) }
     // verify that the allocating officer received an email
     verify(exactly = 1) { notificationClient.sendEmail(any(), "sheila.hancock@test.justice.gov.uk", any(), any()) }
     // verify that the allocate-to user received an email.
     verify(exactly = 1) { notificationClient.sendEmail(any(), allocateToEmail, any(), any()) }
   }
   @Test
-  fun `do not send email when checkbox checked`() {
+  fun `do not send email to allocating officer`() {
     val allocateToEmail = "allocateTo-user@test.justice.gov.uk"
     staffCodeResponse(staffCode, teamCode, email = allocateToEmail)
     offenderSummaryResponse(crn)
@@ -539,7 +539,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
-      .bodyValue(allocateCase(crn, eventId, true))
+      .bodyValue(allocateCase(crn, eventId, false))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
         it.contentType = MediaType.APPLICATION_JSON
@@ -562,7 +562,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     } matches { it == 1L }
 
     // verify that the additional email received an email
-    verify(exactly = 1) { notificationClient.sendEmail(any(), "additionalEmailReciever@test.justice.gov.uk", any(), any()) }
+    verify(exactly = 1) { notificationClient.sendEmail(any(), "additionalEmailReceiver@test.justice.gov.uk", any(), any()) }
     // verify that the allocate-to user received an email.
     verify(exactly = 1) { notificationClient.sendEmail(any(), allocateToEmail, any(), any()) }
     // verify that the allocating officer does not receive an email

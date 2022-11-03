@@ -54,7 +54,7 @@ class EmailNotificationService(
         .plus(getLoggedInUserParameters(notifyData.allocatingStaff))
       val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
       emailTo.add(allocatedOfficer.email)
-      if (allocateCase.sendEmailToAllocatingOfficer()) emailTo.add(notifyData.allocatingStaff.email)
+      if (allocateCase.sendEmailCopyToAllocatingOfficer) emailTo.add(notifyData.allocatingStaff.email)
       emailTo.map { email -> notificationClient.sendEmail(allocationTemplateId, email, parameters, null) }
     }
   }
