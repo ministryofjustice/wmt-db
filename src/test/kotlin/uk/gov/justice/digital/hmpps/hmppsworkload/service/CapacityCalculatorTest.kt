@@ -7,36 +7,40 @@ import java.math.BigInteger
 
 class CapacityCalculatorTest {
   private val capacityCalculator = CapacityCalculator()
+  private val availablePoints = 2176.0
+  private var currentHours = 37.0
+  private val reductionHours = 1.8
+  private val defaultContractedHoursForGrade = 37.0
 
   @Test
   fun `can calculate available points`() {
-    val availablePoints = BigDecimal.valueOf(2176)
-    val currentHours = BigDecimal.valueOf(37)
-    val reductionHours = BigDecimal.valueOf(1.8)
-    val defaultContractedHoursForGrade = BigDecimal.valueOf(37)
 
-    val calculatedAvailablePoints = capacityCalculator.calculateAvailablePoints(
-      availablePoints,
-      defaultContractedHoursForGrade,
-      currentHours - reductionHours
+    Assertions.assertEquals(
+      BigInteger.valueOf(2070),
+      calculateAvailableHours(availablePoints, defaultContractedHoursForGrade, currentHours, reductionHours)
     )
-
-    Assertions.assertEquals(BigInteger.valueOf(2070), calculatedAvailablePoints)
   }
 
   @Test
   fun `can calculate available points with different current hours`() {
-    val availablePoints = BigDecimal.valueOf(2176)
-    val currentHours = BigDecimal.valueOf(30)
-    val reductionHours = BigDecimal.valueOf(1.8)
-    val defaultContractedHoursForGrade = BigDecimal.valueOf(37)
+    currentHours = 30.0
 
-    val calculatedAvailablePoints = capacityCalculator.calculateAvailablePoints(
-      availablePoints,
-      defaultContractedHoursForGrade,
-      currentHours - reductionHours
+    Assertions.assertEquals(
+      BigInteger.valueOf(1658),
+      calculateAvailableHours(availablePoints, defaultContractedHoursForGrade, currentHours, reductionHours)
     )
+  }
 
-    Assertions.assertEquals(BigInteger.valueOf(1658), calculatedAvailablePoints)
+  private fun calculateAvailableHours(
+    availablePoints: Double,
+    defaultContractedHoursForGrade: Double,
+    currentHours: Double,
+    reductionHours: Double
+  ): BigInteger {
+    return capacityCalculator.calculateAvailablePoints(
+      BigDecimal.valueOf(availablePoints),
+      BigDecimal.valueOf(defaultContractedHoursForGrade),
+      BigDecimal.valueOf(currentHours) - BigDecimal.valueOf(reductionHours)
+    )
   }
 }
