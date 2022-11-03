@@ -309,7 +309,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .isOk
 
     verify(exactly = 1) { notificationClient.sendEmail(any(), "sheila.hancock@test.justice.gov.uk", any(), any()) }
-    verify(exactly = 1) { notificationClient.sendEmail(any(), "additionalEmailReciever@test.justice.gov.uk", any(), any()) }
+    verify(exactly = 1) { notificationClient.sendEmail(any(), "additionalEmailReceiver@test.justice.gov.uk", any(), any()) }
 
     clearAllMocks()
 
@@ -325,7 +325,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .isOk
 
     verify(exactly = 0) { notificationClient.sendEmail(any(), "sheila.hancock@test.justice.gov.uk", any(), any()) }
-    verify(exactly = 0) { notificationClient.sendEmail(any(), "additionalEmailReciever@test.justice.gov.uk", any(), any()) }
+    verify(exactly = 0) { notificationClient.sendEmail(any(), "additionalEmailReceiver@test.justice.gov.uk", any(), any()) }
   }
 
   @Test
@@ -436,7 +436,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   }
 
   @Test
-  fun `can send email when selecting checkbox`() {
+  fun `can send email when selecting a second person to receive email`() {
     staffCodeResponse(staffCode, teamCode)
     offenderSummaryResponse(crn)
     singleActiveRequirementResponse(crn, eventId)
@@ -474,8 +474,8 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       { Assertions.assertEquals(1, actualWorkloadCalcEntity.breakdownData.caseloadCount) }
     )
     // verify that the additional email got an email
-    verify(exactly = 1) { notificationClient.sendEmail(any(), "additionalEmailReciever@test.justice.gov.uk", any(), any()) }
-    // verify that the allocated to officer got an email
+    verify(exactly = 1) { notificationClient.sendEmail(any(), "additionalEmailReceiver@test.justice.gov.uk", any(), any()) }
+    // verify that the allocated-to officer got an email
     verify(exactly = 1) { notificationClient.sendEmail(any(), "sheila.hancock@test.justice.gov.uk", any(), any()) }
     verify(exactly = 1) {
       telemetryClient.trackEvent(
@@ -490,5 +490,82 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
         null
       )
     }
+  }
+
+  @Test
+  fun `sends email by default to allocating officer`() {
+    val allocateToEmail = "allocateTo-user@test.justice.gov.uk"
+    staffCodeResponse(staffCode, teamCode, email = allocateToEmail)
+    offenderSummaryResponse(crn)
+    singleActiveRequirementResponse(crn, eventId)
+
+    webTestClient.post()
+      .uri("/team/$teamCode/offenderManager/$staffCode/case")
+      .bodyValue(allocateCase(crn, eventId))
+      .headers {
+        it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
+        it.contentType = MediaType.APPLICATION_JSON
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody()
+      .jsonPath("$.personManagerId")
+      .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
+      .jsonPath("$.eventManagerId")
+      .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
+      .jsonPath("$.requirementManagerIds[0]")
+      .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
+
+    expectWorkloadAllocationCompleteMessages(crn)
+
+    await untilCallTo {
+      workloadCalculationRepository.count()
+    } matches { it == 1L }
+
+    // verify that the additional email received an email
+    verify(exactly = 1) { notificationClient.sendEmail(any(), "additionalEmailReceiver@test.justice.gov.uk", any(), any()) }
+    // verify that the allocating officer received an email
+    verify(exactly = 1) { notificationClient.sendEmail(any(), "sheila.hancock@test.justice.gov.uk", any(), any()) }
+    // verify that the allocate-to user received an email.
+    verify(exactly = 1) { notificationClient.sendEmail(any(), allocateToEmail, any(), any()) }
+  }
+  @Test
+  fun `do not send email to allocating officer`() {
+    val allocateToEmail = "allocateTo-user@test.justice.gov.uk"
+    staffCodeResponse(staffCode, teamCode, email = allocateToEmail)
+    offenderSummaryResponse(crn)
+    singleActiveRequirementResponse(crn, eventId)
+
+    webTestClient.post()
+      .uri("/team/$teamCode/offenderManager/$staffCode/case")
+      .bodyValue(allocateCase(crn, eventId, false))
+      .headers {
+        it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
+        it.contentType = MediaType.APPLICATION_JSON
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody()
+      .jsonPath("$.personManagerId")
+      .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
+      .jsonPath("$.eventManagerId")
+      .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
+      .jsonPath("$.requirementManagerIds[0]")
+      .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
+
+    expectWorkloadAllocationCompleteMessages(crn)
+
+    await untilCallTo {
+      workloadCalculationRepository.count()
+    } matches { it == 1L }
+
+    // verify that the additional email received an email
+    verify(exactly = 1) { notificationClient.sendEmail(any(), "additionalEmailReceiver@test.justice.gov.uk", any(), any()) }
+    // verify that the allocate-to user received an email.
+    verify(exactly = 1) { notificationClient.sendEmail(any(), allocateToEmail, any(), any()) }
+    // verify that the allocating officer does not receive an email
+    verify(exactly = 0) { notificationClient.sendEmail(any(), "sheila.hancock@test.justice.gov.uk", any(), any()) }
   }
 }
