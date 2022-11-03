@@ -28,7 +28,7 @@ class WorkloadCalculationService(
   private val getReductionService: GetReductionService,
   private val capacityCalculator: CapacityCalculator,
   private val workloadCalculationRepository: WorkloadCalculationRepository,
-  private val getCaseLoad: GetCaseload
+  private val getCaseLoad: GetCombinedCaseload
 ) {
 
   fun calculate(staffCode: String, teamCode: String, staffGrade: String): WorkloadCalculationEntity {

@@ -12,9 +12,9 @@ class GetCombinedCaseload(
   private val offenderManagerRepository: OffenderManagerRepository,
   private val personManagerRepository: PersonManagerRepository,
   private val caseDetailsRepository: CaseDetailsRepository
-) : GetCaseload {
+) {
 
-  override fun getCases(personManager: PersonManager): List<Case> {
+  fun getCases(personManager: PersonManager): List<Case> {
     val wmtCases =
       offenderManagerRepository.findCasesByTeamCodeAndStaffCode(personManager.staffCode, personManager.teamCode)
 

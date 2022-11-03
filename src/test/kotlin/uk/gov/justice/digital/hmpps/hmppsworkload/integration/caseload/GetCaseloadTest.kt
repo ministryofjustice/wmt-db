@@ -10,13 +10,12 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier.A1
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetCaseload
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetCombinedCaseload
 import java.math.BigInteger
 
 class GetCaseloadTest : IntegrationTestBase() {
 
-  private lateinit var getCaseLoad: GetCaseload
+  private lateinit var getCaseLoad: GetCombinedCaseload
   @BeforeAll
   fun setup() {
     getCaseLoad = GetCombinedCaseload(offenderManagerRepository, personManagerRepository, caseDetailsRepository)
