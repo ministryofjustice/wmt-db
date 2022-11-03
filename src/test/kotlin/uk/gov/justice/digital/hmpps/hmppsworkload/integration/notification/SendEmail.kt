@@ -26,7 +26,7 @@ class SendEmail : IntegrationTestBase() {
     val personSummary = PersonSummary("firstname", "surname")
     val requirements = emptyList<ConvictionRequirement>()
     val crn = "X123456"
-    val allocateCase = AllocateCase(crn, BigInteger.valueOf(123456789))
+    val allocateCase = AllocateCase(crn, BigInteger.valueOf(123456789), sendEmailCopyToAllocatingOfficer = false)
     val allocatingOfficerUsername = "AllocatingOfficer"
     val token = "token"
     singleActiveConvictionResponseForAllConvictions(crn)

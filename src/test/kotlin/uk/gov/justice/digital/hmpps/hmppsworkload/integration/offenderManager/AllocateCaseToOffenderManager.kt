@@ -539,7 +539,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
-      .bodyValue(allocateCase(crn, eventId, true))
+      .bodyValue(allocateCase(crn, eventId, false))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
         it.contentType = MediaType.APPLICATION_JSON
