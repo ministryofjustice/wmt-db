@@ -2,8 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.OffenderManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
@@ -16,10 +14,10 @@ class GetCombinedCaseload(
 ) : GetCaseload {
 
   override fun getCases(staffCode: String, teamCode: String): List<Case> {
-    val wmtCases: List<OffenderManagerCase> =
+    val wmtCases =
       offenderManagerRepository.findCasesByTeamCodeAndStaffCode(staffCode, teamCode)
 
-    val realtimeCases: List<PersonManagerEntity> =
+    val realtimeCases =
       personManagerRepository.findByStaffCodeAndTeamCodeAndIsActiveIsTrue(staffCode, teamCode)
 
     return caseDetailsRepository.findAllById(

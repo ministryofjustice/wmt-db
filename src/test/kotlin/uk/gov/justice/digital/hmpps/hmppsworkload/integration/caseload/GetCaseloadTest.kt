@@ -10,7 +10,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBas
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetCaseload
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetCurrentlyManagedCaseload
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetCombinedCaseload
 import java.math.BigInteger
 
 class GetCaseloadTest : IntegrationTestBase() {
@@ -18,7 +18,7 @@ class GetCaseloadTest : IntegrationTestBase() {
   private lateinit var getCaseLoad: GetCaseload
   @BeforeAll
   fun setup() {
-    getCaseLoad = GetCurrentlyManagedCaseload(personManagerRepository, caseDetailsRepository)
+    getCaseLoad = GetCombinedCaseload(offenderManagerRepository, personManagerRepository, caseDetailsRepository)
   }
   @Test
   fun `must not return list of cases if no realtime data exist`() {
