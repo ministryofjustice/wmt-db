@@ -6,7 +6,7 @@ fun allocateCase(crn: String, eventId: BigInteger, sendEmailCopyToAllocatingOffi
   {
      "crn": "$crn",
      "eventId": $eventId,
-     "emailTo" : ["additionalEmailReciever@test.justice.gov.uk"],
+     "emailTo" : ["additionalEmailReceiver@test.justice.gov.uk"],
      "sendEmailCopyToAllocatingOfficer": $sendEmailCopyToAllocatingOfficer
   }
 """.trimIndent()
