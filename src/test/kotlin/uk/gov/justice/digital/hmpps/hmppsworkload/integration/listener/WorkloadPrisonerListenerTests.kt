@@ -41,7 +41,6 @@ class WorkloadPrisonerListenerTests : IntegrationTestBase() {
       )
     )
 
-
     noMessagesOnWorkloadPrisonerQueue()
 
     val actualWorkloadCalcEntity: WorkloadCalculationEntity? =
@@ -66,11 +65,13 @@ class WorkloadPrisonerListenerTests : IntegrationTestBase() {
       )
     )
 
-
     noMessagesOnWorkloadPrisonerQueue()
   }
 
-  private fun prisonerEvent(nomsNumber: String) = HmppsMessage<ObjectNode>("prison-offender-events.prisoner.released", 1, "A prisoner has been released from prison", "", "2022-11-04T09:39:14Z", objectMapper.createObjectNode(), PersonReference(
-    listOf(PersonReferenceType("NOMS", nomsNumber))
-  ))
+  private fun prisonerEvent(nomsNumber: String) = HmppsMessage<ObjectNode>(
+    "prison-offender-events.prisoner.released", 1, "A prisoner has been released from prison", "", "2022-11-04T09:39:14Z", objectMapper.createObjectNode(),
+    PersonReference(
+      listOf(PersonReferenceType("NOMS", nomsNumber))
+    )
+  )
 }

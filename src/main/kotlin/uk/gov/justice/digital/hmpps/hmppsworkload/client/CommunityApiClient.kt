@@ -173,7 +173,6 @@ class CommunityApiClient(private val webClient: WebClient) {
           else -> Mono.error(ex)
         }
       }
-
   }
 }
 

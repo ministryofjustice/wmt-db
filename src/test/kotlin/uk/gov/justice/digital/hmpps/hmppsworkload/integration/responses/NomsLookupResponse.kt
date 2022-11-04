@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses
 
-class NomsLookupResponse {
-}
+class NomsLookupResponse
 
 fun nomsLookupResponse(crn: String, nomsNumber: String) = """
   {
