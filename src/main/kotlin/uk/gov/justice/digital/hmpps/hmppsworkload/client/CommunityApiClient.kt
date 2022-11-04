@@ -12,7 +12,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderAssessment
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.TeamStaff
 import java.math.BigInteger
 import java.time.LocalDate
@@ -52,15 +51,7 @@ class CommunityApiClient(private val webClient: WebClient) {
       .bodyToMono(Staff::class.java)
   }
 
-  fun getStaffSummaryByCode(staffCode: String): Mono<StaffSummary> {
-    return webClient
-      .get()
-      .uri("/staff/staffCode/$staffCode")
-      .retrieve()
-      .bodyToMono(StaffSummary::class.java)
-  }
-
-  fun getStaffByCode(staffCode: String): Mono<Staff> {
+  fun <T> getStaffByCode(staffCode: String, clazz: Class<T>): Mono<T> {
     return webClient
       .get()
       .uri("/staff/staffCode/$staffCode")
@@ -69,7 +60,7 @@ class CommunityApiClient(private val webClient: WebClient) {
         { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
         { Mono.error(MissingStaffError("staff member not found at $staffCode")) }
       )
-      .bodyToMono(Staff::class.java)
+      .bodyToMono(clazz)
   }
 
   fun getActiveConvictions(crn: String): Mono<List<Conviction>> {

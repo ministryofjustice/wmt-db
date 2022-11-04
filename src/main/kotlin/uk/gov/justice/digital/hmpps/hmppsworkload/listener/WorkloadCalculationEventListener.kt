@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.jms.annotation.JmsListener
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.WorkloadCalculationService
 import java.math.BigDecimal
@@ -22,7 +23,7 @@ class WorkloadCalculationEventListener(
     val availableHours = workloadCalculationEvent.additionalInformation.availableHours
     val staffCode = workloadCalculationEvent.personReference.identifiers.find { it.type == "staffCode" }!!.value
     val teamCode = workloadCalculationEvent.personReference.identifiers.find { it.type == "teamCode" }!!.value
-    val staffGrade = communityApiClient.getStaffSummaryByCode(staffCode).map { it.grade }.block()!!
+    val staffGrade = communityApiClient.getStaffByCode(staffCode, StaffSummary::class.java).map { it.grade }.block()!!
     workloadCalculationService.calculate(staffCode, teamCode, staffGrade, availableHours)
   }
 

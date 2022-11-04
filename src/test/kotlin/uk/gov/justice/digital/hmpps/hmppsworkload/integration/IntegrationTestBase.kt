@@ -454,20 +454,8 @@ abstract class IntegrationTestBase {
   }
 
   protected fun noMessagesOnWorkloadPrisonerQueue() {
-    await untilCallTo { countMessagesOnWorkloadPrisonerQueue() } matches { it == 0 }
+    numberOfMessagesCurrentlyOnQueue(workloadPrisonerSqsClient, workloadPrisonerQueue.queueUrl, 0)
   }
-
-  private fun countMessagesOnWorkloadPrisonerQueue(): Int =
-    workloadPrisonerSqsClient.getQueueAttributes(
-      workloadPrisonerQueue.queueUrl,
-      listOf("ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible")
-    )
-      .let {
-        (
-          it.attributes["ApproximateNumberOfMessages"]?.toInt()
-            ?: 0
-          ) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0)
-      }
 
   protected fun noMessagesOnWorkloadCalculationEventsDLQ() {
     numberOfMessagesCurrentlyOnQueue(workloadCalculationSqsDlqClient, workloadCalculationQueue.dlqUrl!!, 0)
