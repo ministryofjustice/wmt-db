@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PersonManagerIdentifier
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.OffenderManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
@@ -14,12 +14,12 @@ class GetCombinedCaseload(
   private val caseDetailsRepository: CaseDetailsRepository
 ) {
 
-  fun getCases(personManagerIdentifier: PersonManagerIdentifier): List<Case> {
+  fun getCases(staffIdentifier: StaffIdentifier): List<Case> {
     val wmtCases =
-      offenderManagerRepository.findCasesByTeamCodeAndStaffCode(personManagerIdentifier.staffCode, personManagerIdentifier.teamCode)
+      offenderManagerRepository.findCasesByTeamCodeAndStaffCode(staffIdentifier.staffCode, staffIdentifier.teamCode)
 
     val realtimeCases =
-      personManagerRepository.findByStaffCodeAndTeamCodeAndIsActiveIsTrue(personManagerIdentifier.staffCode, personManagerIdentifier.teamCode)
+      personManagerRepository.findByStaffCodeAndTeamCodeAndIsActiveIsTrue(staffIdentifier.staffCode, staffIdentifier.teamCode)
 
     return caseDetailsRepository.findAllById(
       wmtCases

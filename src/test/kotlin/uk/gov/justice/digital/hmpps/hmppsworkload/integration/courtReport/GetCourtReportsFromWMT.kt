@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CourtReportType
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PersonManagerIdentifier
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTCourtReportsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetCourtReports
@@ -21,7 +21,7 @@ class GetCourtReportsFromWMT : IntegrationTestBase() {
     val standardDeliveryReportCount = 10
     wmtCourtReportsRepository.save(WMTCourtReportsEntity(staffCode = staffCode, teamCode = teamCode, fastDeliveryReportCount = 0, standardDeliveryReportCount = standardDeliveryReportCount))
 
-    val results = wmtGetCourtReports.getCourtReports(PersonManagerIdentifier(staffCode, teamCode))
+    val results = wmtGetCourtReports.getCourtReports(StaffIdentifier(staffCode, teamCode))
 
     Assertions.assertEquals(standardDeliveryReportCount, results.size)
 
@@ -34,7 +34,7 @@ class GetCourtReportsFromWMT : IntegrationTestBase() {
   fun `return empty list if no court reports are found`() {
     val staffCode = "STAFF1"
     val teamCode = "TM1"
-    val results = wmtGetCourtReports.getCourtReports(PersonManagerIdentifier(staffCode, teamCode))
+    val results = wmtGetCourtReports.getCourtReports(StaffIdentifier(staffCode, teamCode))
     Assertions.assertTrue(results.isEmpty())
   }
 
@@ -43,7 +43,7 @@ class GetCourtReportsFromWMT : IntegrationTestBase() {
     val staffCode = "STAFF1"
     val teamCode = "TM1"
     wmtCourtReportsRepository.save(WMTCourtReportsEntity(staffCode = staffCode, teamCode = teamCode))
-    val results = wmtGetCourtReports.getCourtReports(PersonManagerIdentifier(staffCode, teamCode))
+    val results = wmtGetCourtReports.getCourtReports(StaffIdentifier(staffCode, teamCode))
     Assertions.assertTrue(results.isEmpty())
   }
 
@@ -54,7 +54,7 @@ class GetCourtReportsFromWMT : IntegrationTestBase() {
     val fastDeliveryReportCount = 10
     wmtCourtReportsRepository.save(WMTCourtReportsEntity(staffCode = staffCode, teamCode = teamCode, fastDeliveryReportCount = fastDeliveryReportCount, standardDeliveryReportCount = 0))
 
-    val results = wmtGetCourtReports.getCourtReports(PersonManagerIdentifier(staffCode, teamCode))
+    val results = wmtGetCourtReports.getCourtReports(StaffIdentifier(staffCode, teamCode))
 
     Assertions.assertEquals(fastDeliveryReportCount, results.size)
 

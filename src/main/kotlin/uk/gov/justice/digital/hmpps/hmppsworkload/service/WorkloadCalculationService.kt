@@ -6,7 +6,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Contact
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CourtReport
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CourtReportType
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PersonManagerIdentifier
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.BreakdownDataEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadCalculationEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadPointsEntity
@@ -39,9 +39,9 @@ class WorkloadCalculationService(
   }
 
   fun calculate(staffCode: String, teamCode: String, staffGrade: String, availableHours: BigDecimal): WorkloadCalculationEntity {
-    val personManagerIdentifier = PersonManagerIdentifier(staffCode, teamCode)
-    val cases = getCaseLoad.getCases(personManagerIdentifier)
-    val courtReports = getCourtReports.getCourtReports(personManagerIdentifier)
+    val staffIdentifier = StaffIdentifier(staffCode, teamCode)
+    val cases = getCaseLoad.getCases(staffIdentifier)
+    val courtReports = getCourtReports.getCourtReports(staffIdentifier)
     val paroleReports = getParoleReports.getParoleReports(staffCode, teamCode)
     val assessments = getAssessments.getAssessments(staffCode, teamCode)
     val contactsPerformedOutsideCaseload = getContacts.findContactsOutsideCaseload(staffCode, teamCode)
