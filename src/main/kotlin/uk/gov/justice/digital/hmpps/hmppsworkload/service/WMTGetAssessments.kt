@@ -7,8 +7,8 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTAssessmentRe
 import java.util.Locale
 
 @Service
-class WMTGetAssessments(private val wmtAssessmentRepository: WMTAssessmentRepository) : GetAssessments {
-  override fun getAssessments(staffCode: String, teamCode: String): List<Assessment> =
+class WMTGetAssessments(private val wmtAssessmentRepository: WMTAssessmentRepository) {
+  fun getAssessments(staffCode: String, teamCode: String): List<Assessment> =
     wmtAssessmentRepository.findByStaffCodeAndTeamCode(staffCode, teamCode).let { wmtAssessments ->
       wmtAssessments.map { Assessment(getCaseType(it.sentenceType)) }
     }

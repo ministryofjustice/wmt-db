@@ -20,7 +20,7 @@ class WorkloadCalculationService(
   private val workloadCalculator: WorkloadCalculator,
   private val getCourtReports: WMTGetCourtReports,
   private val getParoleReports: WMTGetParoleReports,
-  private val getAssessments: GetAssessments,
+  private val getAssessments: WMTGetAssessments,
   private val getContacts: GetContacts,
   private val getContactTypeWeightings: GetContactTypeWeightings,
   private val workloadPointsRepository: WorkloadPointsRepository,
