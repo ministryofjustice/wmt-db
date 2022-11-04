@@ -18,7 +18,7 @@ import java.math.BigDecimal
 @Service
 class WorkloadCalculationService(
   private val workloadCalculator: WorkloadCalculator,
-  private val getCourtReports: GetCourtReports,
+  private val getCourtReports: WMTGetCourtReports,
   private val getParoleReports: GetParoleReports,
   private val getAssessments: GetAssessments,
   private val getContacts: GetContacts,

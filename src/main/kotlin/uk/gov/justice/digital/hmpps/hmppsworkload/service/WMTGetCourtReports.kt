@@ -8,8 +8,8 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTCourtReports
 import java.util.stream.IntStream
 
 @Service
-class WMTGetCourtReports(private val wmtCourtReportsRepository: WMTCourtReportsRepository) : GetCourtReports {
-  override fun getCourtReports(staffIdentifier: StaffIdentifier): List<CourtReport> =
+class WMTGetCourtReports(private val wmtCourtReportsRepository: WMTCourtReportsRepository) {
+  fun getCourtReports(staffIdentifier: StaffIdentifier): List<CourtReport> =
     wmtCourtReportsRepository.findByStaffCodeAndTeamCode(staffIdentifier.staffCode, staffIdentifier.teamCode)?.let { wmtCourtReportsEntity ->
       return countToCourtReports(wmtCourtReportsEntity.standardDeliveryReportCount, CourtReportType.STANDARD) +
         countToCourtReports(wmtCourtReportsEntity.fastDeliveryReportCount, CourtReportType.FAST)

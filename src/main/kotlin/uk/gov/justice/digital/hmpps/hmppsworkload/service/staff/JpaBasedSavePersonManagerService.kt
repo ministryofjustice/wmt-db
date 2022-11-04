@@ -16,6 +16,9 @@ class JpaBasedSavePersonManagerService(
   private val getPersonManager: GetPersonManager,
 ) : SavePersonManagerService {
   @Transactional
+  /***
+   * Recalculate workload of existing and new case managers.
+   */
   override fun savePersonManager(
     teamCode: String,
     staff: Staff,
@@ -23,13 +26,13 @@ class JpaBasedSavePersonManagerService(
     personSummary: PersonSummary,
     crn: String
   ): SaveResult<PersonManagerEntity> =
-    personManagerRepository.findFirstByCrnOrderByCreatedDateDesc(crn)?.let { personManager ->
-      if (personManager.staffId == staff.staffIdentifier && personManager.teamCode == teamCode) {
-        SaveResult(personManager, false)
+    personManagerRepository.findFirstByCrnOrderByCreatedDateDesc(crn)?.let { existingPersonManager ->
+      if (existingPersonManager.staffId == staff.staffIdentifier && existingPersonManager.teamCode == teamCode) {
+        SaveResult(existingPersonManager, false)
       } else {
         val currentPersonManager = getPersonManager.findLatestByCrn(crn)
         createPersonManager(staff, teamCode, personSummary, loggedInUser, crn).also {
-          personManager.isActive = false
+          existingPersonManager.isActive = false
           workloadCalculationService.calculate(currentPersonManager!!.staffCode, currentPersonManager.teamCode, currentPersonManager.staffGrade)
         }
       }

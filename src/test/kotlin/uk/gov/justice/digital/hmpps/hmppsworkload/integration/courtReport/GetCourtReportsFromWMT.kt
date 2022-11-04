@@ -7,12 +7,12 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CourtReportType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTCourtReportsEntity
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetCourtReports
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.WMTGetCourtReports
 
 class GetCourtReportsFromWMT : IntegrationTestBase() {
 
   @Autowired
-  protected lateinit var wmtGetCourtReports: GetCourtReports
+  protected lateinit var wmtGetCourtReports: WMTGetCourtReports
 
   @Test
   fun `get standard delivery reports from completed in last 30 days`() {
