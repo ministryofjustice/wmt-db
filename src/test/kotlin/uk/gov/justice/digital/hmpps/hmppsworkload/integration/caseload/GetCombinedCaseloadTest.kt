@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
@@ -30,7 +31,7 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
     val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
     setupWmtManagedCase(wmtStaff, realtimeCase.tier, realtimeCase.crn, realtimeCase.type)
 
-    val actualCases = getCaseLoad.getCases(staffCode, teamCode)
+    val actualCases = getCaseLoad.getCases(StaffIdentifier("OM1", "T1"))
 
     Assertions.assertEquals(realtimeCase, actualCases[0])
   }
@@ -42,7 +43,7 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
     val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
     setupWmtManagedCase(wmtStaff, Tier.C2, "CRN12345", CaseType.COMMUNITY)
 
-    Assertions.assertEquals(0, getCaseLoad.getCases(staffCode, teamCode).size)
+    Assertions.assertEquals(0, getCaseLoad.getCases(StaffIdentifier("OM1", "T1")).size)
   }
 
   @Test
@@ -63,7 +64,7 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
     // realtime
     caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, CaseType.LICENSE, "Jane", "Doe"))
 
-    val actualCases = getCaseLoad.getCases(staffCode, teamCode)
+    val actualCases = getCaseLoad.getCases(StaffIdentifier("OM1", "T1"))
 
     Assertions.assertEquals(realtimeCase.crn, actualCases[0].crn)
   }
@@ -88,7 +89,7 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
     val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
     setupWmtManagedCase(wmtStaff, realtimeCase.tier, realtimeCase.crn, realtimeCase.type)
 
-    val actualCases = getCaseLoad.getCases(staffCode, teamCode)
+    val actualCases = getCaseLoad.getCases(StaffIdentifier("OM1", "T1"))
 
     Assertions.assertEquals(1, actualCases.size)
   }
@@ -118,7 +119,7 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
       )
     )
 
-    val actualCases = getCaseLoad.getCases(originalStaffCode, teamCode)
+    val actualCases = getCaseLoad.getCases(StaffIdentifier("STAFF1", "TEAM!"))
 
     Assertions.assertEquals(0, actualCases.size)
   }
