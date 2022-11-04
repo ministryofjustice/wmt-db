@@ -6,9 +6,6 @@ import com.amazonaws.services.sqs.model.PurgeQueueRequest
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.awaitility.kotlin.await
-import org.awaitility.kotlin.matches
-import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -445,39 +442,15 @@ abstract class IntegrationTestBase {
   }
 
   protected fun noMessagesOnOffenderEventsQueue() {
-    await untilCallTo { countMessagesOnOffenderEventQueue() } matches { it == 0 }
+    numberOfMessagesCurrentlyOnQueue(hmppsOffenderSqsClient, hmppsOffenderQueue.queueUrl, 0)
   }
 
   protected fun noMessagesOnExtractPlacedQueue() {
-    await untilCallTo { countMessagesOnExtractPlacedQueue() } matches { it == 0 }
+    numberOfMessagesCurrentlyOnQueue(hmppsExtractPlacedClient, hmppsExtractPlacedQueue.queueUrl, 0)
   }
 
-  private fun countMessagesOnOffenderEventQueue(): Int =
-    hmppsOffenderSqsClient.getQueueAttributes(
-      hmppsOffenderQueue.queueUrl,
-      listOf("ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible")
-    )
-      .let {
-        (
-          it.attributes["ApproximateNumberOfMessages"]?.toInt()
-            ?: 0
-          ) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0)
-      }
-
-  private fun countMessagesOnExtractPlacedQueue(): Int =
-    hmppsExtractPlacedClient.getQueueAttributes(
-      hmppsExtractPlacedQueue.queueUrl,
-      listOf("ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible")
-    )
-      .let {
-        (
-          it.attributes["ApproximateNumberOfMessages"]?.toInt()
-            ?: 0
-          ) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0)
-      }
-
   protected fun noMessagesOnWorkloadCalculationEventsQueue() {
-    await untilCallTo { countMessagesOnWorkloadCalculationEventQueue() } matches { it == 0 }
+    numberOfMessagesCurrentlyOnQueue(workloadCalculationSqsClient, workloadCalculationQueue.queueUrl, 0)
   }
 
   protected fun noMessagesOnWorkloadPrisonerQueue() {
@@ -497,55 +470,20 @@ abstract class IntegrationTestBase {
       }
 
   protected fun noMessagesOnWorkloadCalculationEventsDLQ() {
-    await untilCallTo { countMessagesOnWorkloadCalculationDeadLetterQueue() } matches { it == 0 }
+    numberOfMessagesCurrentlyOnQueue(workloadCalculationSqsDlqClient, workloadCalculationQueue.dlqUrl!!, 0)
   }
-
-  private fun countMessagesOnWorkloadCalculationEventQueue(): Int =
-    workloadCalculationSqsClient.getQueueAttributes(
-      workloadCalculationQueue.queueUrl,
-      listOf("ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible")
-    )
-      .let {
-        (
-          it.attributes["ApproximateNumberOfMessages"]?.toInt()
-            ?: 0
-          ) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0)
-      }
 
   protected fun oneMessageOnWorkloadCalculationDeadLetterQueue() {
-    await untilCallTo { countMessagesOnWorkloadCalculationDeadLetterQueue() } matches { it == 1 }
+    numberOfMessagesCurrentlyOnQueue(workloadCalculationSqsDlqClient, workloadCalculationQueue.dlqUrl!!, 1)
   }
 
-  private fun countMessagesOnWorkloadCalculationDeadLetterQueue(): Int =
-    workloadCalculationSqsDlqClient.getQueueAttributes(
-      workloadCalculationQueue.dlqUrl,
-      listOf("ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible")
-    )
-      .let {
-        (
-          it.attributes["ApproximateNumberOfMessages"]?.toInt()
-            ?: 0
-          ) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0)
-      }
-
   protected fun noMessagesOnOffenderEventsDLQ() {
-    await untilCallTo { countMessagesOnOffenderEventDeadLetterQueue() } matches { it == 0 }
+    numberOfMessagesCurrentlyOnQueue(hmppsOffenderSqsDlqClient, hmppsOffenderQueue.dlqUrl!!, 0)
   }
 
   protected fun noMessagesOnExtractPlacedDLQ() {
-    await untilCallTo { countMessagesOnExtractPlacedDeadLetterQueue() } matches { it == 0 }
+    numberOfMessagesCurrentlyOnQueue(hmppsExtractPlacedDlqClient, hmppsExtractPlacedQueue.dlqUrl!!, 0)
   }
-
-  private fun countMessagesOnOffenderEventDeadLetterQueue(): Int =
-    hmppsOffenderSqsDlqClient.getQueueAttributes(hmppsOffenderQueue.dlqUrl, listOf("ApproximateNumberOfMessages"))
-      .let { it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0 }
-
-  private fun countMessagesOnExtractPlacedDeadLetterQueue(): Int =
-    hmppsExtractPlacedDlqClient.getQueueAttributes(
-      hmppsExtractPlacedQueue.dlqUrl,
-      listOf("ApproximateNumberOfMessages")
-    )
-      .let { it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0 }
 
   protected fun offenderEvent(crn: String, sentenceId: BigInteger? = null) = HmppsOffenderEvent(crn, sentenceId)
 
@@ -780,8 +718,7 @@ abstract class IntegrationTestBase {
   }
 
   protected fun verifyAuditMessageOnQueue(): Boolean =
-    hmppsAuditQueueClient.getQueueAttributes(hmppsAuditQueue.queueUrl, listOf("ApproximateNumberOfMessages"))
-      .let { it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0 } == 1
+    getNumberOfMessagesCurrentlyOnQueue(hmppsAuditQueueClient, hmppsAuditQueue.queueUrl) == 1
 
   protected fun getAuditMessages(): AuditMessage {
     val message = hmppsAuditQueueClient.receiveMessage(hmppsAuditQueue.queueUrl)
@@ -792,11 +729,7 @@ abstract class IntegrationTestBase {
   }
 
   protected fun verifyReductionsCompletedOnQueue(): Boolean =
-    hmppsReductionsCompletedClient.getQueueAttributes(
-      hmppsReductionsCompletedQueue.queueUrl,
-      listOf("ApproximateNumberOfMessages")
-    )
-      .let { it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0 } == 1
+    getNumberOfMessagesCurrentlyOnQueue(hmppsReductionsCompletedClient, hmppsReductionsCompletedQueue.queueUrl) == 1
 
   protected fun getReductionsCompletedMessages(): HmppsMessage<JsonNode> {
     val message = hmppsReductionsCompletedClient.receiveMessage(hmppsReductionsCompletedQueue.queueUrl)
