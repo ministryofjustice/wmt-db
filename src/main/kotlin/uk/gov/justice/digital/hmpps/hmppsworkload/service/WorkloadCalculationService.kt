@@ -19,7 +19,7 @@ import java.math.BigDecimal
 class WorkloadCalculationService(
   private val workloadCalculator: WorkloadCalculator,
   private val getCourtReports: WMTGetCourtReports,
-  private val getParoleReports: GetParoleReports,
+  private val getParoleReports: WMTGetParoleReports,
   private val getAssessments: GetAssessments,
   private val getContacts: GetContacts,
   private val getContactTypeWeightings: GetContactTypeWeightings,
@@ -42,7 +42,7 @@ class WorkloadCalculationService(
     val staffIdentifier = StaffIdentifier(staffCode, teamCode)
     val cases = getCaseLoad.getCases(staffIdentifier)
     val courtReports = getCourtReports.getCourtReports(staffIdentifier)
-    val paroleReports = getParoleReports.getParoleReports(staffCode, teamCode)
+    val paroleReports = getParoleReports.getParoleReports(staffIdentifier)
     val assessments = getAssessments.getAssessments(staffCode, teamCode)
     val contactsPerformedOutsideCaseload = getContacts.findContactsOutsideCaseload(staffCode, teamCode)
     val contactsPerformedByOthers = getContacts.findContactsInCaseloadPerformedByOthers(staffCode, teamCode)
