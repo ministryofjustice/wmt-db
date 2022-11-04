@@ -39,9 +39,9 @@ class WorkloadCalculationService(
   }
 
   fun calculate(staffCode: String, teamCode: String, staffGrade: String, availableHours: BigDecimal): WorkloadCalculationEntity {
-    val personManager = PersonManagerIdentifier(staffCode, teamCode)
-    val cases = getCaseLoad.getCases(personManager)
-    val courtReports = getCourtReports.getCourtReports(staffCode, teamCode)
+    val personManagerIdentifier = PersonManagerIdentifier(staffCode, teamCode)
+    val cases = getCaseLoad.getCases(personManagerIdentifier)
+    val courtReports = getCourtReports.getCourtReports(personManagerIdentifier)
     val paroleReports = getParoleReports.getParoleReports(staffCode, teamCode)
     val assessments = getAssessments.getAssessments(staffCode, teamCode)
     val contactsPerformedOutsideCaseload = getContacts.findContactsOutsideCaseload(staffCode, teamCode)
