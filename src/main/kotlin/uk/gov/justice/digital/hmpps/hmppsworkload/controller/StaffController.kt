@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.MissingStaffError
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffSummary
 import javax.persistence.EntityNotFoundException
 
@@ -29,7 +30,7 @@ class StaffController(private val communityApiClient: CommunityApiClient) {
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/staff/code/{staffCode}")
   fun getStaffById(@PathVariable(required = true) staffCode: String): Mono<StaffSummary> =
-    communityApiClient.getStaffByCode(staffCode)
+    communityApiClient.getStaffByCode(staffCode, Staff::class.java)
       .onErrorMap { ex ->
         when (ex) {
           is MissingStaffError -> EntityNotFoundException("staff not found for $staffCode")

@@ -74,7 +74,7 @@ class GetOffenderManagerService(
   }
 
   fun getOverview(offenderManagerCode: String, teamCode: String): OffenderManagerOverview? =
-    communityApiClient.getStaffSummaryByCode(offenderManagerCode).map { staff ->
+    communityApiClient.getStaffByCode(offenderManagerCode, StaffSummary::class.java).map { staff ->
       val team = staff.teams!!.first { team -> team.code == teamCode }
       val overview = offenderManagerRepository.findByOverview(team.code, staff.staffCode)?.let {
         it.capacity = capacityCalculator.calculate(it.totalPoints, it.availablePoints)
@@ -100,7 +100,7 @@ class GetOffenderManagerService(
   fun getCases(teamCode: String, offenderManagerCode: String): OffenderManagerCases? =
     offenderManagerRepository.findCasesByTeamCodeAndStaffCode(offenderManagerCode, teamCode).let { cases ->
       val crnDetails = getCrnToCaseDetails(cases.map { it.crn })
-      communityApiClient.getStaffSummaryByCode(offenderManagerCode)
+      communityApiClient.getStaffByCode(offenderManagerCode, StaffSummary::class.java)
         .map { staffSummary ->
           val team = staffSummary.teams?.first { team -> team.code == teamCode }
           OffenderManagerCases.from(staffSummary, team!!, cases, crnDetails)
