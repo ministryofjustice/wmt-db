@@ -41,6 +41,12 @@ hmpps.sqs:
       subscribeFilter: '{"eventType":[ "staff.available.hours.changed"] }'
       asyncQueueClient: true
       dlqMaxReceiveCount: 1
+    workloadprisonerqueue:
+      queueName: workload_prisoner_queue
+      dlqName: workload_prisoner_dlq
+      subscribeTopicId: hmppsdomaintopic
+      subscribeFilter: '{"eventType":[ "prison-offender-events.prisoner.released", "prison-offender-events.prisoner.received"] }'
+      dlqMaxReceiveCount: 1
     hmppsreductionscompletedqueue:
       accessKeyId: foobar
       secretAccessKey: foobar

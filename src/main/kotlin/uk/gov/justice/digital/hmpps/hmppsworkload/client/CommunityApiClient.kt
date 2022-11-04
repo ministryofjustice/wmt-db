@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Contact
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Conviction
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ConvictionRequirements
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderAssessment
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffSummary
@@ -155,6 +156,25 @@ class CommunityApiClient(private val webClient: WebClient) {
         }
       }
   }
+
+  fun getCrn(nomsNumber: String): Mono<String> {
+    return webClient.get()
+      .uri("/secure/offenders/nomsNumber/$nomsNumber")
+      .retrieve()
+      .onStatus(
+        { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
+        { Mono.error(MissingOffenderError("No offender  found for $nomsNumber")) }
+      )
+      .bodyToMono(OffenderDetails::class.java)
+      .map { it.otherIds.crn }
+      .onErrorResume { ex ->
+        when (ex) {
+          is MissingOffenderError -> Mono.empty()
+          else -> Mono.error(ex)
+        }
+      }
+
+  }
 }
 
 class MissingTeamError(msg: String) : RuntimeException(msg)
@@ -162,3 +182,5 @@ class MissingStaffError(msg: String) : RuntimeException(msg)
 private class MissingOffenderAssessmentError(msg: String) : RuntimeException(msg)
 
 private class ForbiddenOffenderError(msg: String) : RuntimeException(msg)
+
+private class MissingOffenderError(msg: String) : RuntimeException(msg)

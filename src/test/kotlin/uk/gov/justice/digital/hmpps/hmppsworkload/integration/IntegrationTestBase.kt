@@ -55,6 +55,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.Wor
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WorkloadReportRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.communityApiAssessmentResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.convictionNoSentenceResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.nomsLookupResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.notFoundTierResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSummaryResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveConvictionResponse
@@ -205,6 +206,11 @@ abstract class IntegrationTestBase {
       ?: throw MissingQueueException("HmppsQueue hmppsextractplacedqueue not found")
   }
 
+  private val workloadPrisonerQueue by lazy {
+    hmppsQueueService.findByQueueId("workloadprisonerqueue")
+      ?: throw MissingQueueException("HmppsQueue  workloadprisonerqueue not found")
+  }
+
   private val hmppsOffenderSqsDlqClient by lazy { hmppsOffenderQueue.sqsDlqClient as AmazonSQS }
   protected val hmppsOffenderSqsClient by lazy { hmppsOffenderQueue.sqsClient }
 
@@ -226,6 +232,9 @@ abstract class IntegrationTestBase {
 
   protected val hmppsExtractPlacedClient by lazy { hmppsExtractPlacedQueue.sqsClient }
   private val hmppsExtractPlacedDlqClient by lazy { hmppsExtractPlacedQueue.sqsDlqClient as AmazonSQS }
+
+  private val workloadPrisonerSqsDlqClient by lazy { workloadPrisonerQueue.sqsDlqClient as AmazonSQS }
+  protected val workloadPrisonerSqsClient by lazy { workloadPrisonerQueue.sqsClient }
 
   @Autowired
   protected lateinit var hmppsQueueService: HmppsQueueService
@@ -295,6 +304,8 @@ abstract class IntegrationTestBase {
     hmppsReductionsCompletedClient.purgeQueue(PurgeQueueRequest(hmppsReductionsCompletedQueue.queueUrl))
     hmppsExtractPlacedClient.purgeQueue(PurgeQueueRequest(hmppsExtractPlacedQueue.queueUrl))
     hmppsExtractPlacedDlqClient.purgeQueue(PurgeQueueRequest(hmppsExtractPlacedQueue.dlqUrl))
+    workloadPrisonerSqsClient.purgeQueue(PurgeQueueRequest(workloadPrisonerQueue.queueUrl))
+    workloadPrisonerSqsDlqClient.purgeQueue(PurgeQueueRequest(workloadPrisonerQueue.dlqUrl))
     workloadCalculationRepository.deleteAll()
     clearWMT()
   }
@@ -468,6 +479,22 @@ abstract class IntegrationTestBase {
   protected fun noMessagesOnWorkloadCalculationEventsQueue() {
     await untilCallTo { countMessagesOnWorkloadCalculationEventQueue() } matches { it == 0 }
   }
+
+  protected fun noMessagesOnWorkloadPrisonerQueue() {
+    await untilCallTo { countMessagesOnWorkloadPrisonerQueue() } matches { it == 0 }
+  }
+
+  private fun countMessagesOnWorkloadPrisonerQueue(): Int =
+    workloadPrisonerSqsClient.getQueueAttributes(
+      workloadPrisonerQueue.queueUrl,
+      listOf("ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible")
+    )
+      .let {
+        (
+          it.attributes["ApproximateNumberOfMessages"]?.toInt()
+            ?: 0
+          ) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0)
+      }
 
   protected fun noMessagesOnWorkloadCalculationEventsDLQ() {
     await untilCallTo { countMessagesOnWorkloadCalculationDeadLetterQueue() } matches { it == 0 }
@@ -687,6 +714,13 @@ abstract class IntegrationTestBase {
     val request = request().withPath("/staff/staffCode/$staffCode")
     communityApi.`when`(request, Times.exactly(1)).respond(
       response().withContentType(APPLICATION_JSON).withBody(staffByCodeResponse(staffCode, teamCode, staffGrade, email))
+    )
+  }
+
+  protected fun nomsLookupRespond(crn: String, nomsNumber: String) {
+    val request = request().withPath("/secure/offenders/nomsNumber/$nomsNumber")
+    communityApi.`when`(request, Times.exactly(1)).respond(
+      response().withContentType(APPLICATION_JSON).withBody(nomsLookupResponse(crn, nomsNumber))
     )
   }
 
