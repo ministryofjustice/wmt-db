@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Contact
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Conviction
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ConvictionRequirement
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.CourtAppearance
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.DeliusStaff
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Offence
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderAssessment
@@ -24,7 +25,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskPredictor
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Sentence
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.SentenceType
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffName
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
@@ -72,8 +72,8 @@ class EmailNotificationServiceTests {
       )
     )
     every { communityApiClient.getInductionContacts(any(), any()) } returns Mono.just(emptyList())
-    val staff = Staff(BigInteger.ONE, "ALLOCATOR1", StaffName("Alli", "Cator"), null, null, null, "all1@cat0r.com")
-    every { communityApiClient.getStaffByUsername(any()) } returns Mono.just(staff)
+    val deliusStaff = DeliusStaff(BigInteger.ONE, "ALLOCATOR1", StaffName("Alli", "Cator"), null, null, null, "all1@cat0r.com")
+    every { communityApiClient.getStaffByUsername(any()) } returns Mono.just(deliusStaff)
     every { assessRisksNeedsApiClient.getRiskSummary(any(), any()) } returns Mono.just(Optional.empty())
     every { assessRisksNeedsApiClient.getRiskPredictors(any(), any()) } returns Mono.just(emptyList())
     every { communityApiClient.getAssessment(any()) } returns Mono.just(Optional.empty())
@@ -84,7 +84,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must add case name to email`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
     val allocatingOfficerUsername = "ALLOCATOR"
@@ -100,7 +100,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must add crn to email`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
     val allocatingOfficerUsername = "ALLOCATOR"
@@ -117,7 +117,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must add officer name`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
     val allocatingOfficerUsername = "ALLOCATOR"
@@ -134,7 +134,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must add court name`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
     val allocatingOfficerUsername = "ALLOCATOR"
@@ -164,7 +164,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must add court sentence date`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
     val allocatingOfficerUsername = "ALLOCATOR"
@@ -194,7 +194,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must add induction statement no induction appointment needed when case type is custody`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
     val allocatingOfficerUsername = "ALLOCATOR"
@@ -211,7 +211,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must add induction statement booked and due on when initial appointment is booked in the future`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
     val allocatingOfficerUsername = "ALLOCATOR"
@@ -245,7 +245,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must add induction statement is overdue and was due on when initial appointment is booked in the past`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
     val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, sendEmailCopyToAllocatingOfficer = false)
     val allocatingOfficerUsername = "ALLOCATOR"
@@ -279,7 +279,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must add induction statement has not been booked and is due on when initial appointment is not booked at all`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
     val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, sendEmailCopyToAllocatingOfficer = false)
     val allocatingOfficerUsername = "ALLOCATOR"
@@ -314,7 +314,7 @@ class EmailNotificationServiceTests {
   fun `must add offences`() {
 
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
     val allocatingOfficerUsername = "ALLOCATOR"
@@ -346,7 +346,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must add order`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
     val allocatingOfficerUsername = "ALLOCATOR"
@@ -374,7 +374,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must add requirements`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirement = ConvictionRequirement(
       RequirementCategory("MAIN", "Main Category"), RequirementCategory("SUB", "Sub Category"),
       BigInteger.TEN, BigInteger.ONE, "Year"
@@ -395,7 +395,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must add requirements without length`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirement = ConvictionRequirement(
       RequirementCategory("MAIN", "Main Category"), RequirementCategory("SUB", "Sub Category"),
       BigInteger.TEN, null, null
@@ -416,7 +416,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must add rosh capitalized when it exists`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
     val allocatingOfficerUsername = "ALLOCATOR"
@@ -436,7 +436,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must add RSR level capitalized when it exists`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
     val allocatingOfficerUsername = "ALLOCATOR"
@@ -457,7 +457,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must add RSR percentage when it exists`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
     val allocatingOfficerUsername = "ALLOCATOR"
@@ -478,7 +478,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must add ogrs percentage when it exists`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
     val allocatingOfficerUsername = "ALLOCATOR"
@@ -499,7 +499,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must add ogrs level low when its below 49`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
     val allocatingOfficerUsername = "ALLOCATOR"
@@ -520,7 +520,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must add ogrs level medium when its between 50 and 74`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
     val allocatingOfficerUsername = "ALLOCATOR"
@@ -541,7 +541,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must add ogrs level high when its between 75 and 89`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
     val allocatingOfficerUsername = "ALLOCATOR"
@@ -562,7 +562,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must add ogrs level very high when its 90 or more`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
     val allocatingOfficerUsername = "ALLOCATOR"
@@ -583,7 +583,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must add previous convictions when it exists`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
     val allocatingOfficerUsername = "ALLOCATOR"
@@ -628,7 +628,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must provide default previous convictions when only active convictions exist`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
     val allocatingOfficerUsername = "ALLOCATOR"
@@ -659,7 +659,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must add notes when they exist`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
     val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, "Some Notes", sendEmailCopyToAllocatingOfficer = false)
     val allocatingOfficerUsername = "ALLOCATOR"
@@ -676,14 +676,14 @@ class EmailNotificationServiceTests {
   @Test
   fun `must add allocating officer name`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
     val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, "Some Notes", sendEmailCopyToAllocatingOfficer = false)
     val allocatingOfficerUsername = "ALLOCATOR"
 
     val token = "token"
 
-    val allocatingOfficer = Staff(BigInteger.ONE, "ALLOCATOR1", StaffName("Alli", "Cator"), null, null, null, "all1@cat0r.com")
+    val allocatingOfficer = DeliusStaff(BigInteger.ONE, "ALLOCATOR1", StaffName("Alli", "Cator"), null, null, null, "all1@cat0r.com")
 
     every { communityApiClient.getStaffByUsername(any()) } returns Mono.just(allocatingOfficer)
 
@@ -697,7 +697,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must add allocating officer grade`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val mappedGrade = "ALLOCATING OFFICER GRADE"
     allocatedOfficer.grade = mappedGrade
     every { communityApiClient.getStaffByUsername(any()) } returns Mono.just(allocatedOfficer)
@@ -717,7 +717,7 @@ class EmailNotificationServiceTests {
   @Test
   fun `must email all addresses supplied`() {
     val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = Staff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
+    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
     val firstEmail = "first@email.com"
     val secondEmail = "second@email.com"

@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.DeliusStaff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseAllocated
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.SaveResult
@@ -54,11 +54,11 @@ class DefaultSaveWorkloadService(
     return CaseAllocated(personManagerSaveResult.entity.uuid, eventManagerSaveResult.entity.uuid, requirementManagerSaveResults.map { it.entity.uuid })
   }
 
-  private fun afterPersonManagerSaved(personManagerSaveResult: SaveResult<PersonManagerEntity>, staff: Staff) {
+  private fun afterPersonManagerSaved(personManagerSaveResult: SaveResult<PersonManagerEntity>, deliusStaff: DeliusStaff) {
     if (personManagerSaveResult.hasChanged) {
       telemetryService.trackPersonManagerAllocated(personManagerSaveResult.entity)
       val caseDetails = caseDetailsRepository.findByIdOrNull(personManagerSaveResult.entity.crn)
-      telemetryService.trackStaffGradeToTierAllocated(caseDetails, staff, personManagerSaveResult.entity.teamCode)
+      telemetryService.trackStaffGradeToTierAllocated(caseDetails, deliusStaff, personManagerSaveResult.entity.teamCode)
       sqsSuccessPublisher.updatePerson(
         personManagerSaveResult.entity.crn,
         personManagerSaveResult.entity.uuid,

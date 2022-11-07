@@ -8,10 +8,9 @@ import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Contact
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Conviction
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ConvictionRequirements
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.DeliusStaff
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderAssessment
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.TeamStaff
 import java.math.BigInteger
 import java.time.LocalDate
@@ -39,7 +38,7 @@ class CommunityApiClient(private val webClient: WebClient) {
       }
   }
 
-  fun getStaffByUsername(username: String): Mono<Staff> {
+  fun getStaffByUsername(username: String): Mono<DeliusStaff> {
     return webClient
       .get()
       .uri("/staff/username/{username}", username)
@@ -48,18 +47,10 @@ class CommunityApiClient(private val webClient: WebClient) {
         { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
         { Mono.error(MissingStaffError("User is not a staff member $username")) }
       )
-      .bodyToMono(Staff::class.java)
+      .bodyToMono(DeliusStaff::class.java)
   }
 
-  fun getStaffSummaryByCode(staffCode: String): Mono<StaffSummary> {
-    return webClient
-      .get()
-      .uri("/staff/staffCode/$staffCode")
-      .retrieve()
-      .bodyToMono(StaffSummary::class.java)
-  }
-
-  fun getStaffByCode(staffCode: String): Mono<Staff> {
+  fun getStaffByCode(staffCode: String): Mono<DeliusStaff> {
     return webClient
       .get()
       .uri("/staff/staffCode/$staffCode")
@@ -68,7 +59,7 @@ class CommunityApiClient(private val webClient: WebClient) {
         { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
         { Mono.error(MissingStaffError("staff member not found at $staffCode")) }
       )
-      .bodyToMono(Staff::class.java)
+      .bodyToMono(DeliusStaff::class.java)
   }
 
   fun getActiveConvictions(crn: String): Mono<List<Conviction>> {
