@@ -11,7 +11,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ConvictionRequireme
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderAssessment
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.TeamStaff
 import java.math.BigInteger
 import java.time.LocalDate
@@ -49,14 +48,6 @@ class CommunityApiClient(private val webClient: WebClient) {
         { Mono.error(MissingStaffError("User is not a staff member $username")) }
       )
       .bodyToMono(Staff::class.java)
-  }
-
-  fun getStaffSummaryByCode(staffCode: String): Mono<StaffSummary> {
-    return webClient
-      .get()
-      .uri("/staff/staffCode/$staffCode")
-      .retrieve()
-      .bodyToMono(StaffSummary::class.java)
   }
 
   fun getStaffByCode(staffCode: String): Mono<Staff> {

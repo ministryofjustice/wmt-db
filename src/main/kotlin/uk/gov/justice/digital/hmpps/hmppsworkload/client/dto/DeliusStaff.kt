@@ -11,7 +11,7 @@ data class Staff @JsonCreator constructor(
   val staffGrade: StaffGrade? = null,
   val teams: List<Team>? = null,
   val probationArea: StaffProbationArea? = null,
-  val email: String
+  val email: String?
 ) {
   var grade: String = deliusToStaffGrade(staffGrade?.code)
 }
