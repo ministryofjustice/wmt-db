@@ -34,7 +34,7 @@ class DefaultSaveWorkloadService(
     loggedInUser: String,
     authToken: String
   ): CaseAllocated {
-    val allocateTo = communityApiClient.getStaffByCode(staffCode, Staff::class.java).block()!!
+    val allocateTo = communityApiClient.getStaffByCode(staffCode).block()!!
     val summary = communityApiClient.getSummaryByCrn(allocateCase.crn).block()!!
     val activeRequirements = communityApiClient.getActiveRequirements(allocateCase.crn, allocateCase.eventId).block()!!.requirements
     val personManagerSaveResult = savePersonManagerService.savePersonManager(
