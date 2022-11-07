@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTAssessmentEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.WMTGetAssessments
@@ -19,7 +20,7 @@ class GetAssessmentsFromWMT : IntegrationTestBase() {
     val teamCode = "TM1"
     wmtAssessmentRepository.save(WMTAssessmentEntity(staffCode = staffCode, teamCode = teamCode, sentenceType = "Community"))
 
-    val results = wmtGetAssessments.getAssessments(staffCode, teamCode)
+    val results = wmtGetAssessments.getAssessments(StaffIdentifier(staffCode, teamCode))
 
     Assertions.assertEquals(1, results.size)
 
@@ -32,7 +33,7 @@ class GetAssessmentsFromWMT : IntegrationTestBase() {
     val teamCode = "TM1"
     wmtAssessmentRepository.save(WMTAssessmentEntity(staffCode = staffCode, teamCode = teamCode, sentenceType = "License"))
 
-    val results = wmtGetAssessments.getAssessments(staffCode, teamCode)
+    val results = wmtGetAssessments.getAssessments(StaffIdentifier(staffCode, teamCode))
 
     Assertions.assertEquals(1, results.size)
 
@@ -45,7 +46,7 @@ class GetAssessmentsFromWMT : IntegrationTestBase() {
     val teamCode = "TM1"
     wmtAssessmentRepository.save(WMTAssessmentEntity(staffCode = staffCode, teamCode = teamCode, sentenceType = "Licence"))
 
-    val results = wmtGetAssessments.getAssessments(staffCode, teamCode)
+    val results = wmtGetAssessments.getAssessments(StaffIdentifier(staffCode, teamCode))
 
     Assertions.assertEquals(1, results.size)
 
@@ -56,7 +57,7 @@ class GetAssessmentsFromWMT : IntegrationTestBase() {
   fun `must return empty list when no assessments are returned`() {
     val staffCode = "STAFF1"
     val teamCode = "TM1"
-    val results = wmtGetAssessments.getAssessments(staffCode, teamCode)
+    val results = wmtGetAssessments.getAssessments(StaffIdentifier(staffCode, teamCode))
     Assertions.assertTrue(results.isEmpty())
   }
 }

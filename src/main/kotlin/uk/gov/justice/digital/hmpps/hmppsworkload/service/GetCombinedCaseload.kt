@@ -13,18 +13,20 @@ class GetCombinedCaseload(
   private val personManagerRepository: PersonManagerRepository,
   private val caseDetailsRepository: CaseDetailsRepository
 ) {
-
+  /***
+   * Get combined Cases from WMT (offenderManagerRepository) and realtime cases (personManagerRepository).
+   */
   fun getCases(staffIdentifier: StaffIdentifier): List<Case> {
-    val wmtCases =
-      offenderManagerRepository.findCasesByTeamCodeAndStaffCode(staffIdentifier.staffCode, staffIdentifier.teamCode)
-
-    val realtimeCases =
-      personManagerRepository.findByStaffCodeAndTeamCodeAndIsActiveIsTrue(staffIdentifier.staffCode, staffIdentifier.teamCode)
 
     return caseDetailsRepository.findAllById(
-      wmtCases
+      offenderManagerRepository.findCasesByTeamCodeAndStaffCode(staffIdentifier.staffCode, staffIdentifier.teamCode)
         .map { c -> c.crn }
-        .union(realtimeCases.map { c -> c.crn })
+        .union(
+          personManagerRepository.findByStaffCodeAndTeamCodeAndIsActiveIsTrue(
+            staffIdentifier.staffCode,
+            staffIdentifier.teamCode
+          ).map { c -> c.crn }
+        )
     )
       .map { cde -> Case(cde.tier, cde.type, false, cde.crn) }
   }

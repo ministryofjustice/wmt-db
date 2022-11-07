@@ -18,9 +18,9 @@ import java.math.BigDecimal
 @Service
 class WorkloadCalculationService(
   private val workloadCalculator: WorkloadCalculator,
-  private val getCourtReports: GetCourtReports,
-  private val getParoleReports: GetParoleReports,
-  private val getAssessments: GetAssessments,
+  private val getCourtReports: WMTGetCourtReports,
+  private val getParoleReports: WMTGetParoleReports,
+  private val getAssessments: WMTGetAssessments,
   private val getContacts: GetContacts,
   private val getContactTypeWeightings: GetContactTypeWeightings,
   private val workloadPointsRepository: WorkloadPointsRepository,
@@ -42,8 +42,8 @@ class WorkloadCalculationService(
     val staffIdentifier = StaffIdentifier(staffCode, teamCode)
     val cases = getCaseLoad.getCases(staffIdentifier)
     val courtReports = getCourtReports.getCourtReports(staffIdentifier)
-    val paroleReports = getParoleReports.getParoleReports(staffCode, teamCode)
-    val assessments = getAssessments.getAssessments(staffCode, teamCode)
+    val paroleReports = getParoleReports.getParoleReports(staffIdentifier)
+    val assessments = getAssessments.getAssessments(staffIdentifier)
     val contactsPerformedOutsideCaseload = getContacts.findContactsOutsideCaseload(staffCode, teamCode)
     val contactsPerformedByOthers = getContacts.findContactsInCaseloadPerformedByOthers(staffCode, teamCode)
     val contactTypeWeightings = getContactTypeWeightings.findAll()
@@ -65,5 +65,5 @@ class WorkloadCalculationService(
     assessments.count { it.category == type }
 
   private fun getContactTypeCodeCounts(contacts: List<Contact>): Map<String, Int> =
-    contacts.groupingBy { c -> c.typeCode }.eachCount()
+    contacts.groupingBy { it.typeCode }.eachCount()
 }
