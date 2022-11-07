@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration.staff
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 
-class GetStaffByCode : IntegrationTestBase() {
+class GetDeliusStaffByCode : IntegrationTestBase() {
 
   @Test
   fun `get staff by Code`() {

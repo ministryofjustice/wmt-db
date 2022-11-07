@@ -8,10 +8,10 @@ import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Contact
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Conviction
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ConvictionRequirements
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.DeliusStaff
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderAssessment
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.TeamStaff
 import java.math.BigInteger
 import java.time.LocalDate
@@ -39,7 +39,7 @@ class CommunityApiClient(private val webClient: WebClient) {
       }
   }
 
-  fun getStaffByUsername(username: String): Mono<Staff> {
+  fun getStaffByUsername(username: String): Mono<DeliusStaff> {
     return webClient
       .get()
       .uri("/staff/username/{username}", username)
@@ -48,18 +48,10 @@ class CommunityApiClient(private val webClient: WebClient) {
         { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
         { Mono.error(MissingStaffError("User is not a staff member $username")) }
       )
-      .bodyToMono(Staff::class.java)
+      .bodyToMono(DeliusStaff::class.java)
   }
 
-  fun getStaffSummaryByCode(staffCode: String): Mono<StaffSummary> {
-    return webClient
-      .get()
-      .uri("/staff/staffCode/$staffCode")
-      .retrieve()
-      .bodyToMono(StaffSummary::class.java)
-  }
-
-  fun getStaffByCode(staffCode: String): Mono<Staff> {
+  fun getStaffByCode(staffCode: String): Mono<DeliusStaff> {
     return webClient
       .get()
       .uri("/staff/staffCode/$staffCode")
@@ -68,7 +60,7 @@ class CommunityApiClient(private val webClient: WebClient) {
         { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
         { Mono.error(MissingStaffError("staff member not found at $staffCode")) }
       )
-      .bodyToMono(Staff::class.java)
+      .bodyToMono(DeliusStaff::class.java)
   }
 
   fun getActiveConvictions(crn: String): Mono<List<Conviction>> {
@@ -155,6 +147,24 @@ class CommunityApiClient(private val webClient: WebClient) {
         }
       }
   }
+
+  fun getCrn(nomsNumber: String): Mono<String> {
+    return webClient.get()
+      .uri("/secure/offenders/nomsNumber/$nomsNumber")
+      .retrieve()
+      .onStatus(
+        { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
+        { Mono.error(MissingOffenderError("No offender  found for $nomsNumber")) }
+      )
+      .bodyToMono(OffenderDetails::class.java)
+      .map { it.otherIds.crn }
+      .onErrorResume { ex ->
+        when (ex) {
+          is MissingOffenderError -> Mono.empty()
+          else -> Mono.error(ex)
+        }
+      }
+  }
 }
 
 class MissingTeamError(msg: String) : RuntimeException(msg)
@@ -162,3 +172,5 @@ class MissingStaffError(msg: String) : RuntimeException(msg)
 private class MissingOffenderAssessmentError(msg: String) : RuntimeException(msg)
 
 private class ForbiddenOffenderError(msg: String) : RuntimeException(msg)
+
+private class MissingOffenderError(msg: String) : RuntimeException(msg)
