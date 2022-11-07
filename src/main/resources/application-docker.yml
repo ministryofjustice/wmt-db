@@ -28,6 +28,11 @@ hmpps.sqs:
       dlqName: workload_calculation_event_dlq
       subscribeTopicId: hmppsdomaintopic
       subscribeFilter: '{"eventType":[ "staff.available.hours.changed"] }'
+    workloadprisonerqueue:
+      queueName: workload_prisoner_queue
+      dlqName: workload_prisoner_dlq
+      subscribeTopicId: hmppsdomaintopic
+      subscribeFilter: '{"eventType":[ "prison-offender-events.prisoner.released", "prison-offender-events.prisoner.received"] }'
     hmppsreductionscompletedqueue:
       accessKeyId: foobar
       secretAccessKey: foobar
@@ -37,6 +42,7 @@ hmpps.sqs:
       accessKeyId: foobar
       secretAccessKey: foobar
       queueName: hmpps_extract_placed_queue
+
   topics:
     hmppsdomaintopic:
       arn: arn:aws:sns:eu-west-2:000000000000:${random.uuid}
