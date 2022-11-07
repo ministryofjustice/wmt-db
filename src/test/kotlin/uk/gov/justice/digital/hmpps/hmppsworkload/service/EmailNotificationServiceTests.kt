@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Contact
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Conviction
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ConvictionRequirement
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.CourtAppearance
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.DeliusStaff
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Offence
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderAssessment
@@ -24,7 +25,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskPredictor
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Sentence
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.SentenceType
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.DeliusStaff
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffName
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
