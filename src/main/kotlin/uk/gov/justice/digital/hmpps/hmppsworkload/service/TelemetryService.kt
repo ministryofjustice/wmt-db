@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 import com.microsoft.applicationinsights.TelemetryClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.DeliusStaff
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
@@ -63,13 +63,13 @@ class TelemetryService(@Autowired private val telemetryClient: TelemetryClient) 
     )
   }
 
-  fun trackStaffGradeToTierAllocated(caseDetailsEntity: CaseDetailsEntity?, staff: Staff, teamCode: String) {
+  fun trackStaffGradeToTierAllocated(caseDetailsEntity: CaseDetailsEntity?, deliusStaff: DeliusStaff, teamCode: String) {
     trackEvent(
       TelemetryEventType.STAFF_GRADE_TIER_ALLOCATED,
       mapOf(
         TEAM_CODE to teamCode,
-        PROVIDER_CODE to staff.probationArea!!.code,
-        "staffGrade" to staff.grade,
+        PROVIDER_CODE to deliusStaff.probationArea!!.code,
+        "staffGrade" to deliusStaff.grade,
         "tier" to caseDetailsEntity?.tier?.name
       )
     )

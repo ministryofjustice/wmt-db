@@ -22,7 +22,7 @@ class WorkloadCalculationEventListener(
     val availableHours = workloadCalculationEvent.additionalInformation.availableHours
     val staffCode = workloadCalculationEvent.personReference.identifiers.find { it.type == "staffCode" }!!.value
     val teamCode = workloadCalculationEvent.personReference.identifiers.find { it.type == "teamCode" }!!.value
-    val staffGrade = communityApiClient.getStaffSummaryByCode(staffCode).map { it.grade }.block()!!
+    val staffGrade = communityApiClient.getStaffByCode(staffCode).map { it.grade }.block()!!
     workloadCalculationService.calculate(staffCode, teamCode, staffGrade, availableHours)
   }
 

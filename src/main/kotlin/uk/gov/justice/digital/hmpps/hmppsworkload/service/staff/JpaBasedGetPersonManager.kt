@@ -21,7 +21,7 @@ class JpaBasedGetPersonManager(
   override fun findLatestByCrn(crn: String): PersonManager? {
     val personManager = personManagerRepository.findFirstByCrnOrderByCreatedDateDesc(crn)
     if (personManager != null) {
-      val staff = communityApiClient.getStaffSummaryByCode(personManager.staffCode).block()
+      val staff = communityApiClient.getStaffByCode(personManager.staffCode).block()
       return PersonManager(personManager.staffCode, personManager.teamCode, personManager.providerCode, staff!!.grade)
     }
     return null
