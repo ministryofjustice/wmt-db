@@ -65,5 +65,5 @@ class WorkloadCalculationService(
     assessments.count { it.category == type }
 
   private fun getContactTypeCodeCounts(contacts: List<Contact>): Map<String, Int> =
-    contacts.groupingBy { c -> c.typeCode }.eachCount()
+    contacts.groupingBy { it.typeCode }.eachCount()
 }
