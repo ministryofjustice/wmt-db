@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service.staff
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.DeliusStaff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.ImpactCase
@@ -60,14 +60,14 @@ class GetOffenderManagerService(
   } ?: BigInteger.ZERO
 
   private fun getDefaultOffenderManagerOverview(
-    staff: Staff,
+    deliusStaff: DeliusStaff,
     teamName: String
   ): OffenderManagerOverview {
     val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
-    val availablePoints = workloadPoints.getDefaultPointsAvailable(staff.grade)
-    val defaultContractedHours = workloadPoints.getDefaultContractedHours(staff.grade)
+    val availablePoints = workloadPoints.getDefaultPointsAvailable(deliusStaff.grade)
+    val defaultContractedHours = workloadPoints.getDefaultContractedHours(deliusStaff.grade)
 
-    val overview = OffenderManagerOverview(staff.staff.forenames, staff.staff.surname, 0, 0, availablePoints.toBigInteger(), BigInteger.ZERO, staff.staffCode, teamName, LocalDateTime.now(), -1, BigInteger.ZERO)
+    val overview = OffenderManagerOverview(deliusStaff.staff.forenames, deliusStaff.staff.surname, 0, 0, availablePoints.toBigInteger(), BigInteger.ZERO, deliusStaff.staffCode, teamName, LocalDateTime.now(), -1, BigInteger.ZERO)
     overview.capacity = capacityCalculator.calculate(overview.totalPoints, overview.availablePoints)
     overview.contractedHours = defaultContractedHours
     return overview

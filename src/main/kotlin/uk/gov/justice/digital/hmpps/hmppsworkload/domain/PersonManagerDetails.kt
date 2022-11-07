@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.domain
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import io.swagger.v3.oas.annotations.media.Schema
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.DeliusStaff
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import java.math.BigInteger
 import java.time.ZonedDateTime
@@ -37,7 +37,7 @@ data class PersonManagerDetails @JsonCreator constructor(
   val staffSurname: String
 ) {
   companion object {
-    fun from(personManagerEntity: PersonManagerEntity, staff: Staff): PersonManagerDetails {
+    fun from(personManagerEntity: PersonManagerEntity, deliusStaff: DeliusStaff): PersonManagerDetails {
       return PersonManagerDetails(
         personManagerEntity.uuid,
         personManagerEntity.staffId,
@@ -48,10 +48,10 @@ data class PersonManagerDetails @JsonCreator constructor(
         personManagerEntity.createdDate!!,
         personManagerEntity.crn,
         personManagerEntity.offenderName,
-        staff.grade,
-        staff.email!!,
-        staff.staff.forenames,
-        staff.staff.surname
+        deliusStaff.grade,
+        deliusStaff.email!!,
+        deliusStaff.staff.forenames,
+        deliusStaff.staff.surname
       )
     }
   }

@@ -15,7 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderAssessment
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskPredictor
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskSummary
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.DeliusStaff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
@@ -41,7 +41,7 @@ class EmailNotificationService(
   private val caseDetailsRepository: CaseDetailsRepository
 ) : NotificationService {
 
-  override fun notifyAllocation(allocatedOfficer: Staff, personSummary: PersonSummary, requirements: List<ConvictionRequirement>, allocateCase: AllocateCase, allocatingOfficerUsername: String, token: String): Mono<List<SendEmailResponse>> {
+  override fun notifyAllocation(allocatedOfficer: DeliusStaff, personSummary: PersonSummary, requirements: List<ConvictionRequirement>, allocateCase: AllocateCase, allocatingOfficerUsername: String, token: String): Mono<List<SendEmailResponse>> {
     return getNotifyData(allocateCase.crn, allocatingOfficerUsername, token, allocateCase.eventId).map { notifyData ->
       val caseDetails = caseDetailsRepository.findByIdOrNull(allocateCase.crn)!!
       val parameters = mapOf(
@@ -51,15 +51,15 @@ class EmailNotificationService(
       ).plus(getRiskParameters(notifyData.riskSummary, notifyData.riskPredictors, notifyData.assessment))
         .plus(getConvictionParameters(notifyData.conviction, notifyData.previousConvictions))
         .plus(getPersonOnProbationParameters(personSummary, allocateCase))
-        .plus(getLoggedInUserParameters(notifyData.allocatingStaff))
+        .plus(getLoggedInUserParameters(notifyData.allocatingDeliusStaff))
       val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
       emailTo.add(allocatedOfficer.email!!)
-      if (allocateCase.sendEmailCopyToAllocatingOfficer) emailTo.add(notifyData.allocatingStaff.email)
+      if (allocateCase.sendEmailCopyToAllocatingOfficer) emailTo.add(notifyData.allocatingDeliusStaff.email)
       emailTo.map { email -> notificationClient.sendEmail(allocationTemplateId, email, parameters, null) }
     }
   }
 
-  private fun getLoggedInUserParameters(loggedInUser: Staff): Map<String, Any> = mapOf(
+  private fun getLoggedInUserParameters(loggedInUser: DeliusStaff): Map<String, Any> = mapOf(
     "allocatingOfficerName" to "${loggedInUser.staff.forenames} ${loggedInUser.staff.surname}",
     "allocatingOfficerGrade" to loggedInUser.grade
   )
@@ -147,7 +147,7 @@ data class NotifyData(
   val conviction: Conviction,
   val previousConvictions: List<Conviction>,
   val initialAppointments: List<Contact>,
-  val allocatingStaff: Staff,
+  val allocatingDeliusStaff: DeliusStaff,
   val riskSummary: RiskSummary?,
   val riskPredictors: List<RiskPredictor>,
   val assessment: OffenderAssessment?

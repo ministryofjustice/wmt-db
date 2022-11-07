@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ConvictionRequirement
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.DeliusStaff
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffName
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType.COMMUNITY
@@ -22,7 +22,7 @@ class SendEmail : IntegrationTestBase() {
   lateinit var emailNotificationService: EmailNotificationService
   @Test
   fun `sends an email when ROSH cannot be retrieved`() {
-    val allocatedOfficer = Staff(staffIdentifier = BigInteger.ONE, staffCode = "STAFF1", staff = StaffName("Staff", "Member"), email = "simulate-delivered@notifications.service.gov.uk")
+    val allocatedOfficer = DeliusStaff(staffIdentifier = BigInteger.ONE, staffCode = "STAFF1", staff = StaffName("Staff", "Member"), email = "simulate-delivered@notifications.service.gov.uk")
     val personSummary = PersonSummary("firstname", "surname")
     val requirements = emptyList<ConvictionRequirement>()
     val crn = "X123456"

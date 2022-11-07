@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.domain
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import io.swagger.v3.oas.annotations.media.Schema
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.DeliusStaff
 import java.math.BigInteger
 
 data class StaffSummary @JsonCreator constructor(
@@ -16,12 +16,12 @@ data class StaffSummary @JsonCreator constructor(
   val id: BigInteger
 ) {
   companion object {
-    fun from(staff: Staff): StaffSummary {
+    fun from(deliusStaff: DeliusStaff): StaffSummary {
       return StaffSummary(
-        staff.staff.forenames,
-        staff.staff.surname,
-        staff.email,
-        staff.staffIdentifier
+        deliusStaff.staff.forenames,
+        deliusStaff.staff.surname,
+        deliusStaff.email,
+        deliusStaff.staffIdentifier
       )
     }
   }

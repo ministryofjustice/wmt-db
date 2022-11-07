@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service.staff
 
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Staff
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.DeliusStaff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.SaveResult
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
@@ -16,31 +16,31 @@ class JpaBasedSaveEventManagerService(
   @Transactional
   override fun saveEventManager(
     teamCode: String,
-    staff: Staff,
+    deliusStaff: DeliusStaff,
     allocateCase: AllocateCase,
     loggedInUser: String
   ): SaveResult<EventManagerEntity> = eventManagerRepository.findFirstByCrnAndEventIdOrderByCreatedDateDesc(allocateCase.crn, allocateCase.eventId)?.let { eventManager ->
-    if (eventManager.staffId == staff.staffIdentifier && eventManager.teamCode == teamCode) {
+    if (eventManager.staffId == deliusStaff.staffIdentifier && eventManager.teamCode == teamCode) {
       return SaveResult(eventManager, false)
     }
     eventManager.isActive = false
-    saveEventManagerEntity(allocateCase, staff, teamCode, loggedInUser)
-  } ?: saveEventManagerEntity(allocateCase, staff, teamCode, loggedInUser)
+    saveEventManagerEntity(allocateCase, deliusStaff, teamCode, loggedInUser)
+  } ?: saveEventManagerEntity(allocateCase, deliusStaff, teamCode, loggedInUser)
 
   private fun saveEventManagerEntity(
     allocateCase: AllocateCase,
-    staff: Staff,
+    deliusStaff: DeliusStaff,
     teamCode: String,
     loggedInUser: String
   ): SaveResult<EventManagerEntity> {
     val eventManagerEntity = EventManagerEntity(
       crn = allocateCase.crn,
-      staffId = staff.staffIdentifier,
-      staffCode = staff.staffCode,
+      staffId = deliusStaff.staffIdentifier,
+      staffCode = deliusStaff.staffCode,
       teamCode = teamCode,
       eventId = allocateCase.eventId,
       createdBy = loggedInUser,
-      providerCode = staff.probationArea!!.code,
+      providerCode = deliusStaff.probationArea!!.code,
       isActive = true
     )
     eventManagerRepository.save(eventManagerEntity)
