@@ -2,18 +2,17 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration.listener
 
 import com.amazonaws.services.sns.model.MessageAttributeValue
 import com.amazonaws.services.sns.model.PublishRequest
-import com.fasterxml.jackson.databind.node.ObjectNode
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReferenceType
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadCalculationEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.listener.WorkloadPrisonerEvent
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.LocalDateTime
@@ -83,8 +82,7 @@ class WorkloadPrisonerListenerTests : IntegrationTestBase() {
     noMessagesOnWorkloadPrisonerDLQ()
   }
 
-  private fun prisonerEvent(nomsNumber: String) = HmppsMessage<ObjectNode>(
-    "prison-offender-events.prisoner.released", 1, "A prisoner has been released from prison", null, "2022-11-04T09:39:14Z", objectMapper.createObjectNode(),
+  private fun prisonerEvent(nomsNumber: String) = WorkloadPrisonerEvent(
     PersonReference(
       listOf(PersonReferenceType("NOMS", nomsNumber))
     )

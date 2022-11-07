@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.jms.annotation.JmsListener
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.WorkloadCalculationService
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.GetPersonManager
 
@@ -29,7 +29,11 @@ class WorkloadPrisonerEventListener(
 
   private fun getNomsNumber(rawMessage: String): String {
     val (message) = objectMapper.readValue(rawMessage, SQSMessage::class.java)
-    val event = objectMapper.readValue(message, HmppsMessage::class.java)
+    val event = objectMapper.readValue(message, WorkloadPrisonerEvent::class.java)
     return event.personReference.identifiers.find { it.type == "NOMS" }!!.value
   }
 }
+
+data class WorkloadPrisonerEvent(
+  val personReference: PersonReference
+)
