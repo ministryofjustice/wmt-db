@@ -1,15 +1,11 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration
 
-import com.amazonaws.services.sqs.AmazonSQSAsync
+import com.amazonaws.services.sqs.AmazonSQS
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
 
-fun oneMessageCurrentlyOnQueue(client: AmazonSQSAsync, queueUrl: String) {
-  numberOfMessagesCurrentlyOnQueue(client, queueUrl, 1)
-}
-
-fun numberOfMessagesCurrentlyOnQueue(client: AmazonSQSAsync, queueUrl: String, count: Int) {
+fun numberOfMessagesCurrentlyOnQueue(client: AmazonSQS, queueUrl: String, count: Int) {
   await untilCallTo {
     getNumberOfMessagesCurrentlyOnQueue(
       client,
@@ -18,7 +14,10 @@ fun numberOfMessagesCurrentlyOnQueue(client: AmazonSQSAsync, queueUrl: String, c
   } matches { it == count }
 }
 
-fun getNumberOfMessagesCurrentlyOnQueue(client: AmazonSQSAsync, queueUrl: String): Int? {
-  val queueAttributes = client.getQueueAttributes(queueUrl, listOf("ApproximateNumberOfMessages"))
-  return queueAttributes.attributes["ApproximateNumberOfMessages"]?.toInt()
-}
+fun getNumberOfMessagesCurrentlyOnQueue(client: AmazonSQS, queueUrl: String): Int = client.getQueueAttributes(queueUrl, listOf("ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible"))
+  .let {
+    (
+      it.attributes["ApproximateNumberOfMessages"]?.toInt()
+        ?: 0
+      ) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0)
+  }
