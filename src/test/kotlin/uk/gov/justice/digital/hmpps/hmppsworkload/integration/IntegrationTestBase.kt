@@ -6,6 +6,9 @@ import com.amazonaws.services.sqs.model.PurgeQueueRequest
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.awaitility.kotlin.await
+import org.awaitility.kotlin.matches
+import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -454,20 +457,8 @@ abstract class IntegrationTestBase {
   }
 
   protected fun noMessagesOnWorkloadPrisonerQueue() {
-    await untilCallTo { countMessagesOnWorkloadPrisonerQueue() } matches { it == 0 }
+    numberOfMessagesCurrentlyOnQueue(workloadPrisonerSqsClient, workloadPrisonerQueue.queueUrl, 0)
   }
-
-  private fun countMessagesOnWorkloadPrisonerQueue(): Int =
-    workloadPrisonerSqsClient.getQueueAttributes(
-      workloadPrisonerQueue.queueUrl,
-      listOf("ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible")
-    )
-      .let {
-        (
-          it.attributes["ApproximateNumberOfMessages"]?.toInt()
-            ?: 0
-          ) + (it.attributes["ApproximateNumberOfMessagesNotVisible"]?.toInt() ?: 0)
-      }
 
   protected fun noMessagesOnWorkloadCalculationEventsDLQ() {
     numberOfMessagesCurrentlyOnQueue(workloadCalculationSqsDlqClient, workloadCalculationQueue.dlqUrl!!, 0)
