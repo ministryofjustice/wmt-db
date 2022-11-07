@@ -43,7 +43,7 @@ class WorkloadCalculationService(
     val cases = getCaseLoad.getCases(staffIdentifier)
     val courtReports = getCourtReports.getCourtReports(staffIdentifier)
     val paroleReports = getParoleReports.getParoleReports(staffIdentifier)
-    val assessments = getAssessments.getAssessments(staffCode, teamCode)
+    val assessments = getAssessments.getAssessments(staffIdentifier)
     val contactsPerformedOutsideCaseload = getContacts.findContactsOutsideCaseload(staffCode, teamCode)
     val contactsPerformedByOthers = getContacts.findContactsInCaseloadPerformedByOthers(staffCode, teamCode)
     val contactTypeWeightings = getContactTypeWeightings.findAll()
