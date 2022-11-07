@@ -49,7 +49,7 @@ data class PersonManagerDetails @JsonCreator constructor(
         personManagerEntity.crn,
         personManagerEntity.offenderName,
         staff.grade,
-        staff.email,
+        staff.email!!,
         staff.staff.forenames,
         staff.staff.surname
       )
