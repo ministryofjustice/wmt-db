@@ -457,6 +457,10 @@ abstract class IntegrationTestBase {
     numberOfMessagesCurrentlyOnQueue(workloadPrisonerSqsClient, workloadPrisonerQueue.queueUrl, 0)
   }
 
+  protected fun noMessagesOnWorkloadPrisonerDLQ() {
+    numberOfMessagesCurrentlyOnQueue(workloadPrisonerSqsDlqClient, workloadPrisonerQueue.dlqUrl!!, 0)
+  }
+
   protected fun noMessagesOnWorkloadCalculationEventsDLQ() {
     numberOfMessagesCurrentlyOnQueue(workloadCalculationSqsDlqClient, workloadCalculationQueue.dlqUrl!!, 0)
   }
@@ -647,6 +651,13 @@ abstract class IntegrationTestBase {
     val request = request().withPath("/secure/offenders/nomsNumber/$nomsNumber")
     communityApi.`when`(request, Times.exactly(1)).respond(
       response().withContentType(APPLICATION_JSON).withBody(nomsLookupResponse(crn, nomsNumber))
+    )
+  }
+
+  protected fun nomsLookupNotFoundRespond(nomsNumber: String) {
+    val request = request().withPath("/secure/offenders/nomsNumber/$nomsNumber")
+    communityApi.`when`(request, Times.exactly(1)).respond(
+      response().withContentType(APPLICATION_JSON).withStatusCode(404)
     )
   }
 

@@ -66,6 +66,21 @@ class WorkloadPrisonerListenerTests : IntegrationTestBase() {
     )
 
     noMessagesOnWorkloadPrisonerQueue()
+    noMessagesOnWorkloadPrisonerDLQ()
+  }
+
+  @Test
+  fun `process prisoner not in Delius yet`() {
+    val nomsNumber = "X1111XX"
+    nomsLookupNotFoundRespond(nomsNumber)
+    hmppsDomainSnsClient.publish(
+      PublishRequest(hmppsDomainTopicArn, jsonString(prisonerEvent(nomsNumber))).withMessageAttributes(
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("prison-offender-events.prisoner.released"))
+      )
+    )
+
+    noMessagesOnWorkloadPrisonerQueue()
+    noMessagesOnWorkloadPrisonerDLQ()
   }
 
   private fun prisonerEvent(nomsNumber: String) = HmppsMessage<ObjectNode>(
