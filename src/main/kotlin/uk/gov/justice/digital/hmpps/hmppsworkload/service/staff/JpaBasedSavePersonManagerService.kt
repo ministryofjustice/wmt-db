@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.DeliusStaff
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.SaveResult
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.WorkloadCalculationService
@@ -30,7 +31,10 @@ class JpaBasedSavePersonManagerService(
         val currentPersonManager = getPersonManager.findLatestByCrn(crn)
         createPersonManager(deliusStaff, teamCode, personSummary, loggedInUser, crn).also {
           personManager.isActive = false
-          workloadCalculationService.saveWorkloadCalculation(currentPersonManager!!.staffCode, currentPersonManager.teamCode, currentPersonManager.staffGrade)
+          workloadCalculationService.saveWorkloadCalculation(
+            StaffIdentifier(currentPersonManager!!.staffCode, currentPersonManager.teamCode),
+            currentPersonManager.staffGrade
+          )
         }
       }
     } ?: createPersonManager(deliusStaff, teamCode, personSummary, loggedInUser, crn)
@@ -53,7 +57,7 @@ class JpaBasedSavePersonManagerService(
       isActive = true
     )
     personManagerRepository.save(personManagerEntity)
-    workloadCalculationService.saveWorkloadCalculation(deliusStaff.staffCode, teamCode, deliusStaff.grade)
+    workloadCalculationService.saveWorkloadCalculation(StaffIdentifier(deliusStaff.staffCode, teamCode), deliusStaff.grade)
     return SaveResult(personManagerEntity, true)
   }
 }

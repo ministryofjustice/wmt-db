@@ -32,26 +32,22 @@ class WorkloadCalculationService(
 ) {
 
   fun saveWorkloadCalculation(
-    staffCode: String,
-    teamCode: String,
+    staffIdentifier: StaffIdentifier,
     staffGrade: String,
     availableHours: BigDecimal = getAvailableHours(
-      staffCode,
-      teamCode,
+      staffIdentifier,
       staffGrade
     )
   ): WorkloadCalculationEntity {
-    return workloadCalculationRepository.save(calculate(staffCode, teamCode, staffGrade, availableHours))
+    return workloadCalculationRepository.save(calculate(staffIdentifier.staffCode, staffIdentifier.teamCode, staffGrade, availableHours))
   }
 
   private fun getAvailableHours(
-    staffCode: String,
-    teamCode: String,
+    staffIdentifier: StaffIdentifier,
     staffGrade: String
   ): BigDecimal {
-    return this.weeklyHours.findWeeklyHours(staffCode, teamCode, staffGrade) - getReductionService.findReductionHours(
-      staffCode,
-      teamCode
+    return this.weeklyHours.findWeeklyHours(staffIdentifier, staffGrade) - getReductionService.findReductionHours(
+      staffIdentifier
     )
   }
 
@@ -72,7 +68,24 @@ class WorkloadCalculationService(
       availableHours
     )
     val workloadPoints = workloadCalculator.getWorkloadPoints(cases, courtReports, paroleReports, assessments, contactsPerformedOutsideCaseload, contactsPerformedByOthers, contactTypeWeightings, t2aWorkloadPoints, workloadPointsWeighting)
-    return workloadCalculationRepository.save(WorkloadCalculationEntity(availablePoints = availablePoints, workloadPoints = workloadPoints, staffCode = staffCode, teamCode = teamCode, breakdownData = BreakdownDataEntity(getCourtReportCounts(courtReports, CourtReportType.STANDARD), getCourtReportCounts(courtReports, CourtReportType.FAST), paroleReports, getAssessmentCounts(assessments, CaseType.COMMUNITY), getAssessmentCounts(assessments, CaseType.LICENSE), getContactTypeCodeCounts(contactsPerformedOutsideCaseload), getContactTypeCodeCounts(contactsPerformedByOthers), contactTypeWeightings, cases.size, availableHours)))
+    return WorkloadCalculationEntity(
+      availablePoints = availablePoints,
+      workloadPoints = workloadPoints,
+      staffCode = staffCode,
+      teamCode = teamCode,
+      breakdownData = BreakdownDataEntity(
+        getCourtReportCounts(courtReports, CourtReportType.STANDARD),
+        getCourtReportCounts(courtReports, CourtReportType.FAST),
+        paroleReports,
+        getAssessmentCounts(assessments, CaseType.COMMUNITY),
+        getAssessmentCounts(assessments, CaseType.LICENSE),
+        getContactTypeCodeCounts(contactsPerformedOutsideCaseload),
+        getContactTypeCodeCounts(contactsPerformedByOthers),
+        contactTypeWeightings,
+        cases.size,
+        availableHours
+      )
+    )
   }
 
   private fun getCourtReportCounts(courtReports: List<CourtReport>, type: CourtReportType): Int =

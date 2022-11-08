@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.HmppsTierApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PersonManager
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
@@ -35,7 +36,7 @@ class SaveCaseDetailsService(
         caseDetailsRepository.save(it)
         val staff: PersonManager? = getPersonManager.findLatestByCrn(crn)
         if (staff != null) {
-          workloadCalculationService.saveWorkloadCalculation(staff.staffCode, staff.teamCode, staff.staffGrade)
+          workloadCalculationService.saveWorkloadCalculation(StaffIdentifier(staff.staffCode, staff.teamCode), staff.staffGrade)
         }
       }
     } ?: caseDetailsRepository.findByIdOrNull(crn)?.let {

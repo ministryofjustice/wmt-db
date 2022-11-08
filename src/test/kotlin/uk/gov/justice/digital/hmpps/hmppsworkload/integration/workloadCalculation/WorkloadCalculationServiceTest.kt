@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.AdjustmentReasonEntity
@@ -32,7 +33,7 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
     val teamCode = "TM1"
     val staffGrade = "PO"
 
-    workloadCalculation.saveWorkloadCalculation(staffCode, teamCode, staffGrade)
+    workloadCalculation.saveWorkloadCalculation(StaffIdentifier(staffCode, teamCode), staffGrade)
 
     await untilCallTo {
       workloadCalculationRepository.count()
@@ -51,7 +52,7 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
 
     wmtCourtReportsRepository
       .save(WMTCourtReportsEntity(staffCode = staffCode, teamCode = teamCode, fastDeliveryReportCount = fastDeliveryReportCount, standardDeliveryReportCount = standardDeliveryReportCount))
-    workloadCalculation.saveWorkloadCalculation(staffCode, teamCode, staffGrade)
+    workloadCalculation.saveWorkloadCalculation(StaffIdentifier(staffCode, teamCode), staffGrade)
 
     await untilCallTo {
       workloadCalculationRepository.count()
@@ -75,7 +76,7 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
 
     wmtInstitutionalReportRepository.save(WMTInstitutionalReportEntity(staffCode = staffCode, teamCode = teamCode, paroleReports = paroleReportsCount))
 
-    workloadCalculation.saveWorkloadCalculation(staffCode, teamCode, staffGrade)
+    workloadCalculation.saveWorkloadCalculation(StaffIdentifier(staffCode, teamCode), staffGrade)
     await untilCallTo {
       workloadCalculationRepository.count()
     } matches { it == 1L }
@@ -96,7 +97,7 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
 
     wmtAssessmentRepository.save(WMTAssessmentEntity(staffCode = staffCode, teamCode = teamCode, sentenceType = "Community"))
     wmtAssessmentRepository.save(WMTAssessmentEntity(staffCode = staffCode, teamCode = teamCode, sentenceType = "License"))
-    workloadCalculation.saveWorkloadCalculation(staffCode, teamCode, staffGrade)
+    workloadCalculation.saveWorkloadCalculation(StaffIdentifier(staffCode, teamCode), staffGrade)
 
     await untilCallTo {
       workloadCalculationRepository.count()
@@ -124,7 +125,7 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
     wmtcmsRepository
       .save(WMTCMSEntity(staffCode = "StaffCode", staffTeamCode = "TM2", personManagerStaffCode = staffCode, personManagerTeamCode = teamCode, contactTypeCode = contactTypeCode))
 
-    workloadCalculation.saveWorkloadCalculation(staffCode, teamCode, staffGrade)
+    workloadCalculation.saveWorkloadCalculation(StaffIdentifier(staffCode, teamCode), staffGrade)
 
     await untilCallTo {
       workloadCalculationRepository.count()
@@ -147,7 +148,7 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
     val adjustmentReason = AdjustmentReasonEntity(typeCode = "ADJUSTMENT_REASON1", points = 10)
     adjustmentReasonRepository.save(adjustmentReason)
 
-    workloadCalculation.saveWorkloadCalculation(staffCode, teamCode, staffGrade)
+    workloadCalculation.saveWorkloadCalculation(StaffIdentifier(staffCode, teamCode), staffGrade)
 
     await untilCallTo {
       workloadCalculationRepository.count()
@@ -170,7 +171,7 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
 
     caseDetailsRepository.save(CaseDetailsEntity("CRN1", Tier.B2, CaseType.COMMUNITY, "Jane", "Doe"))
 
-    workloadCalculation.saveWorkloadCalculation(staffCode, teamCode, staffGrade)
+    workloadCalculation.saveWorkloadCalculation(StaffIdentifier(staffCode, teamCode), staffGrade)
 
     await untilCallTo {
       workloadCalculationRepository.count()

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.jms.annotation.JmsListener
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.WorkloadCalculationService
 import java.math.BigDecimal
@@ -20,10 +21,12 @@ class WorkloadCalculationEventListener(
   fun processMessage(rawMessage: String) {
     val workloadCalculationEvent = getWorkloadCalculationEvent(rawMessage)
     val availableHours = workloadCalculationEvent.additionalInformation.availableHours
-    val staffCode = workloadCalculationEvent.personReference.identifiers.find { it.type == "staffCode" }!!.value
-    val teamCode = workloadCalculationEvent.personReference.identifiers.find { it.type == "teamCode" }!!.value
-    val staffGrade = communityApiClient.getStaffByCode(staffCode).map { it.grade }.block()!!
-    workloadCalculationService.saveWorkloadCalculation(staffCode, teamCode, staffGrade, availableHours)
+    val staffIdentifier = StaffIdentifier(
+      workloadCalculationEvent.personReference.identifiers.find { it.type == "staffCode" }!!.value,
+      workloadCalculationEvent.personReference.identifiers.find { it.type == "teamCode" }!!.value
+    )
+    val staffGrade = communityApiClient.getStaffByCode(staffIdentifier.staffCode).map { it.grade }.block()!!
+    workloadCalculationService.saveWorkloadCalculation(staffIdentifier, staffGrade, availableHours)
   }
 
   private fun getWorkloadCalculationEvent(rawMessage: String): WorkloadCalculationEvent {
