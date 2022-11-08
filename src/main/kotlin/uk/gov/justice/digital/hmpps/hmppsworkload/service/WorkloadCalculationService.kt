@@ -62,17 +62,10 @@ class WorkloadCalculationService(
     val contactTypeWeightings = getContactTypeWeightings.findAll()
     val t2aWorkloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(true)
     val workloadPointsWeighting: WorkloadPointsEntity = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
-    val availablePoints = capacityCalculator.calculateAvailablePoints(
-      workloadPointsWeighting.getDefaultPointsAvailable(staffGrade),
-      workloadPointsWeighting.getDefaultContractedHours(staffGrade),
-      availableHours
-    )
+    val availablePoints = capacityCalculator.calculateAvailablePoints(workloadPointsWeighting.getDefaultPointsAvailable(staffGrade), workloadPointsWeighting.getDefaultContractedHours(staffGrade), availableHours)
     val workloadPoints = workloadCalculator.getWorkloadPoints(cases, courtReports, paroleReports, assessments, contactsPerformedOutsideCaseload, contactsPerformedByOthers, contactTypeWeightings, t2aWorkloadPoints, workloadPointsWeighting)
     return WorkloadCalculationEntity(
-      availablePoints = availablePoints,
-      workloadPoints = workloadPoints,
-      staffCode = staffCode,
-      teamCode = teamCode,
+      availablePoints = availablePoints, workloadPoints = workloadPoints, staffCode = staffCode, teamCode = teamCode,
       breakdownData = BreakdownDataEntity(
         getCourtReportCounts(courtReports, CourtReportType.STANDARD),
         getCourtReportCounts(courtReports, CourtReportType.FAST),
