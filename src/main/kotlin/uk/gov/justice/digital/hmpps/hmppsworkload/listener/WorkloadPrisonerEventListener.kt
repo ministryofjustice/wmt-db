@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.jms.annotation.JmsListener
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.WorkloadCalculationService
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.GetPersonManager
@@ -22,7 +23,7 @@ class WorkloadPrisonerEventListener(
     val nomsNumber = getNomsNumber(rawMessage)
     communityApiClient.getCrn(nomsNumber).block()?.let { crn ->
       getPersonManager.findLatestByCrn(crn)?.let { personManager ->
-        workloadCalculationService.calculate(personManager.staffCode, personManager.teamCode, personManager.staffGrade)
+        workloadCalculationService.saveWorkloadCalculation(StaffIdentifier(personManager.staffCode, personManager.teamCode), personManager.staffGrade)
       }
     }
   }

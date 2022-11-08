@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service.reduction
 
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.ReductionsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTWorkloadOwnerRepository
@@ -27,8 +28,8 @@ class GetReductionService(private val reductionsRepository: ReductionsRepository
       .minByOrNull { it }
   }
 
-  fun findReductionHours(staffCode: String, teamCode: String): BigDecimal = (
-    workloadOwnerRepository.findFirstByOffenderManagerCodeAndTeamCodeOrderByIdDesc(staffCode, teamCode)?.let { workloadOwner ->
+  fun findReductionHours(staffIdentifier: StaffIdentifier): BigDecimal = (
+    workloadOwnerRepository.findFirstByOffenderManagerCodeAndTeamCodeOrderByIdDesc(staffIdentifier.staffCode, staffIdentifier.teamCode)?.let { workloadOwner ->
       reductionsRepository.findByWorkloadOwnerAndEffectiveFromLessThanAndEffectiveToGreaterThanAndStatusNotIn(
         workloadOwner, ZonedDateTime.now(), ZonedDateTime.now(), excludeStatuses
       )
