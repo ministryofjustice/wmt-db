@@ -32,7 +32,7 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
     val teamCode = "TM1"
     val staffGrade = "PO"
 
-    workloadCalculation.calculate(staffCode, teamCode, staffGrade)
+    workloadCalculation.saveWorkloadCalculation(staffCode, teamCode, staffGrade)
 
     await untilCallTo {
       workloadCalculationRepository.count()
@@ -51,7 +51,7 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
 
     wmtCourtReportsRepository
       .save(WMTCourtReportsEntity(staffCode = staffCode, teamCode = teamCode, fastDeliveryReportCount = fastDeliveryReportCount, standardDeliveryReportCount = standardDeliveryReportCount))
-    workloadCalculation.calculate(staffCode, teamCode, staffGrade)
+    workloadCalculation.saveWorkloadCalculation(staffCode, teamCode, staffGrade)
 
     await untilCallTo {
       workloadCalculationRepository.count()
@@ -75,7 +75,7 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
 
     wmtInstitutionalReportRepository.save(WMTInstitutionalReportEntity(staffCode = staffCode, teamCode = teamCode, paroleReports = paroleReportsCount))
 
-    workloadCalculation.calculate(staffCode, teamCode, staffGrade)
+    workloadCalculation.saveWorkloadCalculation(staffCode, teamCode, staffGrade)
     await untilCallTo {
       workloadCalculationRepository.count()
     } matches { it == 1L }
@@ -96,7 +96,7 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
 
     wmtAssessmentRepository.save(WMTAssessmentEntity(staffCode = staffCode, teamCode = teamCode, sentenceType = "Community"))
     wmtAssessmentRepository.save(WMTAssessmentEntity(staffCode = staffCode, teamCode = teamCode, sentenceType = "License"))
-    workloadCalculation.calculate(staffCode, teamCode, staffGrade)
+    workloadCalculation.saveWorkloadCalculation(staffCode, teamCode, staffGrade)
 
     await untilCallTo {
       workloadCalculationRepository.count()
@@ -124,7 +124,7 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
     wmtcmsRepository
       .save(WMTCMSEntity(staffCode = "StaffCode", staffTeamCode = "TM2", personManagerStaffCode = staffCode, personManagerTeamCode = teamCode, contactTypeCode = contactTypeCode))
 
-    workloadCalculation.calculate(staffCode, teamCode, staffGrade)
+    workloadCalculation.saveWorkloadCalculation(staffCode, teamCode, staffGrade)
 
     await untilCallTo {
       workloadCalculationRepository.count()
@@ -147,7 +147,7 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
     val adjustmentReason = AdjustmentReasonEntity(typeCode = "ADJUSTMENT_REASON1", points = 10)
     adjustmentReasonRepository.save(adjustmentReason)
 
-    workloadCalculation.calculate(staffCode, teamCode, staffGrade)
+    workloadCalculation.saveWorkloadCalculation(staffCode, teamCode, staffGrade)
 
     await untilCallTo {
       workloadCalculationRepository.count()
@@ -170,7 +170,7 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
 
     caseDetailsRepository.save(CaseDetailsEntity("CRN1", Tier.B2, CaseType.COMMUNITY, "Jane", "Doe"))
 
-    workloadCalculation.calculate(staffCode, teamCode, staffGrade)
+    workloadCalculation.saveWorkloadCalculation(staffCode, teamCode, staffGrade)
 
     await untilCallTo {
       workloadCalculationRepository.count()

@@ -35,7 +35,7 @@ class SaveCaseDetailsService(
         caseDetailsRepository.save(it)
         val staff: PersonManager? = getPersonManager.findLatestByCrn(crn)
         if (staff != null) {
-          workloadCalculationService.calculate(staff.staffCode, staff.teamCode, staff.staffGrade)
+          workloadCalculationService.saveWorkloadCalculation(staff.staffCode, staff.teamCode, staff.staffGrade)
         }
       }
     } ?: caseDetailsRepository.findByIdOrNull(crn)?.let {

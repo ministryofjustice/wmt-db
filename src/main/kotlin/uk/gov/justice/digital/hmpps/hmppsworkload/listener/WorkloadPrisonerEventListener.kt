@@ -22,7 +22,7 @@ class WorkloadPrisonerEventListener(
     val nomsNumber = getNomsNumber(rawMessage)
     communityApiClient.getCrn(nomsNumber).block()?.let { crn ->
       getPersonManager.findLatestByCrn(crn)?.let { personManager ->
-        workloadCalculationService.calculate(personManager.staffCode, personManager.teamCode, personManager.staffGrade)
+        workloadCalculationService.saveWorkloadCalculation(personManager.staffCode, personManager.teamCode, personManager.staffGrade)
       }
     }
   }

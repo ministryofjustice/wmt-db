@@ -31,14 +31,31 @@ class WorkloadCalculationService(
   private val getCaseLoad: GetCombinedCaseload
 ) {
 
-  fun calculate(staffCode: String, teamCode: String, staffGrade: String): WorkloadCalculationEntity {
-    val weeklyHours = weeklyHours.findWeeklyHours(staffCode, teamCode, staffGrade)
-    val reductions = getReductionService.findReductionHours(staffCode, teamCode)
-    val availableHours = weeklyHours - reductions
-    return calculate(staffCode, teamCode, staffGrade, availableHours)
+  fun saveWorkloadCalculation(
+    staffCode: String,
+    teamCode: String,
+    staffGrade: String,
+    availableHours: BigDecimal = getAvailableHours(
+      staffCode,
+      teamCode,
+      staffGrade
+    )
+  ): WorkloadCalculationEntity {
+    return workloadCalculationRepository.save(calculate(staffCode, teamCode, staffGrade, availableHours))
   }
 
-  fun calculate(staffCode: String, teamCode: String, staffGrade: String, availableHours: BigDecimal): WorkloadCalculationEntity {
+  private fun getAvailableHours(
+    staffCode: String,
+    teamCode: String,
+    staffGrade: String
+  ): BigDecimal {
+    return this.weeklyHours.findWeeklyHours(staffCode, teamCode, staffGrade) - getReductionService.findReductionHours(
+      staffCode,
+      teamCode
+    )
+  }
+
+  private fun calculate(staffCode: String, teamCode: String, staffGrade: String, availableHours: BigDecimal): WorkloadCalculationEntity {
     val staffIdentifier = StaffIdentifier(staffCode, teamCode)
     val cases = getCaseLoad.getCases(staffIdentifier)
     val courtReports = getCourtReports.getCourtReports(staffIdentifier)

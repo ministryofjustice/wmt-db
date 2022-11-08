@@ -30,7 +30,7 @@ class JpaBasedSavePersonManagerService(
         val currentPersonManager = getPersonManager.findLatestByCrn(crn)
         createPersonManager(deliusStaff, teamCode, personSummary, loggedInUser, crn).also {
           personManager.isActive = false
-          workloadCalculationService.calculate(currentPersonManager!!.staffCode, currentPersonManager.teamCode, currentPersonManager.staffGrade)
+          workloadCalculationService.saveWorkloadCalculation(currentPersonManager!!.staffCode, currentPersonManager.teamCode, currentPersonManager.staffGrade)
         }
       }
     } ?: createPersonManager(deliusStaff, teamCode, personSummary, loggedInUser, crn)
@@ -53,7 +53,7 @@ class JpaBasedSavePersonManagerService(
       isActive = true
     )
     personManagerRepository.save(personManagerEntity)
-    workloadCalculationService.calculate(deliusStaff.staffCode, teamCode, deliusStaff.grade)
+    workloadCalculationService.saveWorkloadCalculation(deliusStaff.staffCode, teamCode, deliusStaff.grade)
     return SaveResult(personManagerEntity, true)
   }
 }
