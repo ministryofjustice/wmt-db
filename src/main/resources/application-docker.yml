@@ -22,7 +22,6 @@ hmpps.sqs:
       accessKeyId: foobar
       secretAccessKey: foobar
       queueName: hmpps_workload_audit_queue
-      asyncQueueClient: true
     workloadcalculationqueue:
       queueName: workload_calculation_event_queue
       dlqName: workload_calculation_event_dlq
