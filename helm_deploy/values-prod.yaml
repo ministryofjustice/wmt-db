@@ -22,3 +22,18 @@ generic-service:
 generic-prometheus-alerts:
   rdsAlertsDatabases:
     cloud-platform-78407cd5fbd86ed5: "Workload live"
+  sqsOldestAlertQueueNames:
+    - "Digital-Prison-Services-prod-hmpps_workload_offender_events_queue"
+    - "Digital-Prison-Services-prod-workload_calculation_hmpps_queue"
+    - "Digital-Prison-Services-prod-workload_prisoner_hmpps_queue"
+    - "manage-a-workforce-production-hmpps_extract_placed_queue"
+    - "manage-a-workforce-production-hmpps_reductions_completed_event_queue"
+  sqsNumberAlertQueueNames:
+    - "Digital-Prison-Services-prod-hmpps_workload_offender_events_queue_dl"
+    - "Digital-Prison-Services-prod-workload_calculation_hmpps_dlq"
+    - "Digital-Prison-Services-prod-workload_prisoner_hmpps_dlq"
+    - "manage-a-workforce-production-hmpps_extract_placed_dlq"
+    - "manage-a-workforce-production-hmpps_reductions_completed_event_dlq"
+  sqsAlertsOldestThreshold: 2
+  sqsAlertsTotalMessagesThreshold: 1
+  runbookUrl: https://dsdmoj.atlassian.net/wiki/spaces/MaS/pages/3533964702/WMT+Run+book
