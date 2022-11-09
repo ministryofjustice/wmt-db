@@ -26,7 +26,3 @@ generic-service:
     delius-test-2: "35.178.162.73/32"
     delius-test-3: "52.56.195.113/32"
 
-generic-prometheus-alerts:
-  rdsAlertsDatabases:
-    cloud-platform-a16a7b8ef5605999: "Workload live"
-
