@@ -21,7 +21,7 @@ class WorkloadCalculationService(
   private val getCourtReports: WMTGetCourtReports,
   private val getParoleReports: WMTGetParoleReports,
   private val getAssessments: WMTGetAssessments,
-  private val getContacts: GetContacts,
+  private val getContacts: WMTGetContacts,
   private val getContactTypeWeightings: GetContactTypeWeightings,
   private val workloadPointsRepository: WorkloadPointsRepository,
   private val weeklyHours: GetWeeklyHours,
@@ -57,15 +57,15 @@ class WorkloadCalculationService(
     val courtReports = getCourtReports.getCourtReports(staffIdentifier)
     val paroleReports = getParoleReports.getParoleReports(staffIdentifier)
     val assessments = getAssessments.getAssessments(staffIdentifier)
-    val contactsPerformedOutsideCaseload = getContacts.findContactsOutsideCaseload(staffCode, teamCode)
-    val contactsPerformedByOthers = getContacts.findContactsInCaseloadPerformedByOthers(staffCode, teamCode)
+    val contactsPerformedOutsideCaseload = getContacts.findContactsOutsideCaseload(staffIdentifier)
+    val contactsPerformedByOthers = getContacts.findContactsInCaseloadPerformedByOthers(staffIdentifier)
     val contactTypeWeightings = getContactTypeWeightings.findAll()
     val t2aWorkloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(true)
     val workloadPointsWeighting: WorkloadPointsEntity = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
     val availablePoints = capacityCalculator.calculateAvailablePoints(workloadPointsWeighting.getDefaultPointsAvailable(staffGrade), workloadPointsWeighting.getDefaultContractedHours(staffGrade), availableHours)
     val workloadPoints = workloadCalculator.getWorkloadPoints(cases, courtReports, paroleReports, assessments, contactsPerformedOutsideCaseload, contactsPerformedByOthers, contactTypeWeightings, t2aWorkloadPoints, workloadPointsWeighting)
     return WorkloadCalculationEntity(
-      availablePoints = availablePoints, workloadPoints = workloadPoints, staffCode = staffCode, teamCode = teamCode,
+      availablePoints = availablePoints, workloadPoints = workloadPoints, staffCode = staffIdentifier.staffCode, teamCode = staffIdentifier.teamCode,
       breakdownData = BreakdownDataEntity(
         getCourtReportCounts(courtReports, CourtReportType.STANDARD),
         getCourtReportCounts(courtReports, CourtReportType.FAST),
