@@ -7,7 +7,7 @@ fun teamStaffJsonResponse(staffCode: String) = """
           "staffCode": "$staffCode",
           "staffIdentifier": 123456789,
           "staff": {
-              "forenames": "Ben",
+              "forenames": "Jane",
               "surname": "Doe"
           },
           "staffGrade": {
@@ -32,8 +32,8 @@ fun teamStaffJsonResponse(staffCode: String) = """
           "staffCode": "NOWORKLOAD1",
           "staffIdentifier": 987654321,
           "staff": {
-              "forenames": "Jane",
-              "surname": "Doe"
+              "forenames": "No",
+              "surname": "Workload"
           }
       },
       {
