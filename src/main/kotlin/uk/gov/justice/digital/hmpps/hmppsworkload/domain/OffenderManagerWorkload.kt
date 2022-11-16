@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.domain
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import io.swagger.v3.oas.annotations.media.Schema
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.TeamOverview
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -27,22 +26,4 @@ data class OffenderManagerWorkload @JsonCreator constructor(
   val staffId: BigInteger,
   @Schema(description = "Probation Practitioner Total cases allocated in the last week", example = "3")
   val totalCasesInLastWeek: BigInteger
-) {
-  companion object {
-    fun from(teamOverview: TeamOverview): OffenderManagerWorkload {
-
-      return OffenderManagerWorkload(
-        teamOverview.forename,
-        teamOverview.surname,
-        teamOverview.email,
-        teamOverview.grade,
-        teamOverview.totalCommunityCases,
-        teamOverview.totalCustodyCases,
-        teamOverview.capacity,
-        teamOverview.code,
-        teamOverview.staffId,
-        teamOverview.casesInLastWeek
-      )
-    }
-  }
-}
+)

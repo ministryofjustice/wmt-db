@@ -11,10 +11,4 @@ data class TeamOverview(
   val availablePoints: BigInteger,
   val totalPoints: BigInteger,
   val code: String,
-) {
-  var capacity: BigDecimal = BigDecimal.ZERO
-  var staffId: BigInteger = BigInteger.valueOf(-1)
-  var casesInLastWeek: BigInteger = BigInteger.ZERO
-  var grade = ""
-  var email: String? = null
-}
+)
