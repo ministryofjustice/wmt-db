@@ -47,7 +47,7 @@ class JpaBasedTeamService(
     teamStaff: TeamStaff
   ): TeamOverview {
     return TeamOverview(
-      teamStaff.staff.forenames, teamStaff.staff.surname, BigDecimal.ZERO, BigDecimal.ZERO,
+      BigDecimal.ZERO, BigDecimal.ZERO,
       defaultAvailablePointsForGrade(teamStaff), BigInteger.ZERO, teamStaff.staffCode
     )
   }
