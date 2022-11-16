@@ -88,6 +88,8 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
       .isEqualTo(50)
       .jsonPath("$.code")
       .isEqualTo("OM1")
+      .jsonPath("$.email")
+      .isEqualTo("sheila.hancock@test.justice.gov.uk")
       .jsonPath("$.teamName")
       .isEqualTo(wmtStaff.team.description)
       .jsonPath("$.totalCases")
@@ -205,6 +207,28 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
       .isEqualTo(0)
       .jsonPath("$.caseTotals.untiered")
       .isEqualTo(0)
+  }
+
+  @Test
+  fun `can get overview for an offender manager without email`() {
+    val teamCode = "T1"
+    val offenderManagerCode = "NOWORKLOAD1"
+    staffCodeResponse(offenderManagerCode, teamCode, "EX", null)
+    webTestClient.get()
+      .uri("/team/$teamCode/offenderManagers/$offenderManagerCode")
+      .headers {
+        it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody()
+      .jsonPath("$.forename")
+      .isEqualTo("Sheila")
+      .jsonPath("$.surname")
+      .isEqualTo("Hancock")
+      .jsonPath("$.email")
+      .doesNotExist()
   }
 
   @Test

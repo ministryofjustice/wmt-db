@@ -1,8 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses
 
-fun staffByCodeResponse(staffCode: String, teamCode: String, staffGrade: String, email: String) = """
+fun staffByCodeResponse(staffCode: String, teamCode: String, staffGrade: String, email: String?): String {
+  val emailEntry = email?.let { "\"email\": \"$email\"," } ?: ""
+  return """
   {
-    "email": "$email",
+    $emailEntry
     "probationArea": {
       "code": "N01",
       "description": "NPS North West",
@@ -96,3 +98,4 @@ fun staffByCodeResponse(staffCode: String, teamCode: String, staffGrade: String,
     "username": "SheilaHancockNPS"
   }
 """.trimIndent()
+}
