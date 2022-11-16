@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses
 fun teamStaffJsonResponse(staffCode: String) = """
   [
       {
+          "email": "some.email@justice.gov.uk",
           "staffCode": "$staffCode",
           "staffIdentifier": 123456789,
           "staff": {
@@ -27,6 +28,7 @@ fun teamStaffJsonResponse(staffCode: String) = """
           }
       },
       {
+          "email": "no.workload.email@justice.gov.uk",
           "staffCode": "NOWORKLOAD1",
           "staffIdentifier": 987654321,
           "staff": {
