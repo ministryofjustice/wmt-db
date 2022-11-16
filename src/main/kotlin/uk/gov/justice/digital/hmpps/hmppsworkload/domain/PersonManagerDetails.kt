@@ -30,7 +30,7 @@ data class PersonManagerDetails @JsonCreator constructor(
   @Schema(description = "Staff Grade")
   val staffGrade: String,
   @Schema(description = "Staff Email")
-  val staffEmail: String,
+  val staffEmail: String?,
   @Schema(description = "Staff Forename")
   val staffForename: String,
   @Schema(description = "Staff Surname")
@@ -49,7 +49,7 @@ data class PersonManagerDetails @JsonCreator constructor(
         personManagerEntity.crn,
         personManagerEntity.offenderName,
         deliusStaff.grade,
-        deliusStaff.email!!,
+        deliusStaff.email,
         deliusStaff.staff.forenames,
         deliusStaff.staff.surname
       )

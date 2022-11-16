@@ -51,6 +51,21 @@ class GetPersonManagerById : IntegrationTestBase() {
   }
 
   @Test
+  fun `must still return person manager if staff has no email`() {
+    val storedPersonManager = PersonManagerEntity(crn = "CRN1", staffId = BigInteger.valueOf(123456789L), staffCode = "OM1", teamCode = "T1", offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1", isActive = true)
+    personManagerRepository.save(storedPersonManager)
+    staffCodeResponse(staffCode = storedPersonManager.staffCode, teamCode = storedPersonManager.teamCode, email = null)
+    webTestClient.get()
+      .uri("/allocation/person/${storedPersonManager.uuid}")
+      .headers {
+        it.authToken(roles = listOf("ROLE_WORKLOAD_READ"))
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+  }
+
+  @Test
   fun `not found returned when getting person manager from uuid which does not exist`() {
     webTestClient.get()
       .uri("/allocation/person/${UUID.randomUUID()}")
