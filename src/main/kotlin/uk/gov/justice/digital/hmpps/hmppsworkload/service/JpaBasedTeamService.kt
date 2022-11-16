@@ -37,6 +37,7 @@ class JpaBasedTeamService(
         overview.casesInLastWeek = caseCounts.getOrDefault(overview.code, 0).toBigInteger()
         overview.grade = it.grade
         overview.capacity = capacityCalculator.calculate(overview.totalPoints, overview.availablePoints)
+        overview.email = it.email
         overview
       }.filter {
         grades == null || grades.contains(it.grade)

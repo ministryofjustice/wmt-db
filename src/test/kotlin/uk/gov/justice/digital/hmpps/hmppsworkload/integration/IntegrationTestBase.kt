@@ -640,7 +640,7 @@ abstract class IntegrationTestBase {
     return messages
   }
 
-  protected fun staffCodeResponse(staffCode: String, teamCode: String, staffGrade: String = "PSM", email: String = "sheila.hancock@test.justice.gov.uk") {
+  protected fun staffCodeResponse(staffCode: String, teamCode: String, staffGrade: String = "PSM", email: String? = "sheila.hancock@test.justice.gov.uk") {
     val request = request().withPath("/staff/staffCode/$staffCode")
     communityApi.`when`(request, Times.exactly(1)).respond(
       response().withContentType(APPLICATION_JSON).withBody(staffByCodeResponse(staffCode, teamCode, staffGrade, email))

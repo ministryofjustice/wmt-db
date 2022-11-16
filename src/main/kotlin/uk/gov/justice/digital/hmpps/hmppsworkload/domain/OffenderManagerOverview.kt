@@ -19,6 +19,8 @@ data class OffenderManagerOverview @JsonCreator constructor(
   val capacity: BigDecimal,
   @Schema(description = "Offender Manager Code", example = "OM1")
   val code: String,
+  @Schema(description = "Offender Manager e-mail address", example = "example.user@test.justice.gov.uk")
+  val email: String?,
   @Schema(description = "Team Name", example = "Team Name")
   val teamName: String,
   @Schema(description = "Probation Practitioner total cases", example = "25")
@@ -54,6 +56,7 @@ data class OffenderManagerOverview @JsonCreator constructor(
         offenderManagerOverview.grade,
         offenderManagerOverview.capacity,
         offenderManagerOverview.code,
+        offenderManagerOverview.email,
         offenderManagerOverview.teamName,
         offenderManagerOverview.totalCommunityCases.plus(offenderManagerOverview.totalCustodyCases),
         offenderManagerOverview.contractedHours,

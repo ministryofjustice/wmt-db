@@ -30,4 +30,5 @@ data class OffenderManagerOverview(
   var releasesDue = BigInteger.ZERO
   var grade = ""
   var lastAllocatedEvent: EventDetails? = null
+  var email: String? = null
 }

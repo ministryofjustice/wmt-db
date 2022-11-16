@@ -94,6 +94,7 @@ class GetOffenderManagerService(
         it
       } ?: getDefaultOffenderManagerOverview(staff, team.description)
       overview.grade = staff.grade
+      overview.email = staff.email
       overview.lastAllocatedEvent = getEventManager.findLatestByStaffAndTeam(offenderManagerCode, teamCode)
       overview
     }.block()

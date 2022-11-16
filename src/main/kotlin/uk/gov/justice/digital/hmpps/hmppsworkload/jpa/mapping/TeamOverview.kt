@@ -16,4 +16,5 @@ data class TeamOverview(
   var staffId: BigInteger = BigInteger.valueOf(-1)
   var casesInLastWeek: BigInteger = BigInteger.ZERO
   var grade = ""
+  var email: String? = null
 }

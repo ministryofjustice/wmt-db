@@ -11,6 +11,8 @@ data class OffenderManagerWorkload @JsonCreator constructor(
   val forename: String,
   @Schema(description = "Probation Practitioner surname", example = "Smith")
   val surname: String,
+  @Schema(description = "Probation Practitioner email", example = "some.email@justice.gov.uk")
+  val email: String?,
   @Schema(description = "Probation Practitioner Grade", example = "PO")
   val grade: String,
   @Schema(description = "Probation Practitioner Total current Community and Licence case count", example = "10")
@@ -32,6 +34,7 @@ data class OffenderManagerWorkload @JsonCreator constructor(
       return OffenderManagerWorkload(
         teamOverview.forename,
         teamOverview.surname,
+        teamOverview.email,
         teamOverview.grade,
         teamOverview.totalCommunityCases,
         teamOverview.totalCustodyCases,
