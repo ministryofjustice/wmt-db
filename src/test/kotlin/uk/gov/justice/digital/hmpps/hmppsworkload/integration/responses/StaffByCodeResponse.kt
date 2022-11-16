@@ -97,5 +97,5 @@ fun staffByCodeResponse(staffCode: String, teamCode: String, staffGrade: String,
     "telephoneNumber": "020 1111 2222",
     "username": "SheilaHancockNPS"
   }
-""".trimIndent()
+  """.trimIndent()
 }
