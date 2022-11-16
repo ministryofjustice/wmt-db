@@ -18,11 +18,13 @@ data class OffenderManagerCases @JsonCreator constructor(
   val code: String,
   @Schema(description = "Team Name", example = "Team Name")
   val teamName: String,
-  val activeCases: List<OffenderManagerActiveCase>
+  val activeCases: List<OffenderManagerActiveCase>,
+  @Schema(description = "Email", example = "offender.manager@justice.gov.uk")
+  val email: String?,
 ) {
   companion object {
     fun from(deliusStaff: DeliusStaff, team: Team, cases: List<OffenderManagerCase>, offenderDetails: Map<String, CaseDetailsEntity>): OffenderManagerCases {
-      return OffenderManagerCases(deliusStaff.staff.forenames, deliusStaff.staff.surname, deliusStaff.grade, deliusStaff.staffCode, team.description, cases.map { OffenderManagerActiveCase.from(it, offenderDetails[it.crn]) })
+      return OffenderManagerCases(deliusStaff.staff.forenames, deliusStaff.staff.surname, deliusStaff.grade, deliusStaff.staffCode, team.description, cases.map { OffenderManagerActiveCase.from(it, offenderDetails[it.crn]) }, deliusStaff.email)
     }
   }
 }

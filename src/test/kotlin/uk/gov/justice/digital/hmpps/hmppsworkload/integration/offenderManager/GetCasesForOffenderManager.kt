@@ -37,6 +37,8 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
       .isEqualTo("PO")
       .jsonPath("$.code")
       .isEqualTo(staffCode)
+      .jsonPath("$.email")
+      .isEqualTo("sheila.hancock@test.justice.gov.uk")
       .jsonPath("$.teamName")
       .isEqualTo("Test Team")
       .jsonPath("$.activeCases[?(@.crn == 'CRN2222')].tier")
@@ -63,6 +65,28 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
       .isEqualTo("John")
       .jsonPath("$.activeCases[?(@.crn == 'CRN1111')].surname")
       .isEqualTo("Doe")
+  }
+
+  @Test
+  fun `Get staff member without any email`() {
+    val staffCode = "NOWORKLOAD1"
+    val teamCode = "T1"
+    staffCodeResponse(staffCode, teamCode, email = null)
+    webTestClient.get()
+      .uri("/team/$teamCode/offenderManagers/$staffCode/cases")
+      .headers {
+        it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody()
+      .jsonPath("$.forename")
+      .isEqualTo("Sheila")
+      .jsonPath("$.surname")
+      .isEqualTo("Hancock")
+      .jsonPath("$.email")
+      .doesNotExist()
   }
 
   @Test
