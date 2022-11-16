@@ -21,8 +21,6 @@ import javax.persistence.Table
     ConstructorResult(
       targetClass = TeamOverview::class,
       columns = [
-        ColumnResult(name = "forename"),
-        ColumnResult(name = "surname"),
         ColumnResult(name = "total_community_cases"),
         ColumnResult(name = "total_filtered_custody_cases"),
         ColumnResult(name = "available_points"),
@@ -36,7 +34,7 @@ import javax.persistence.Table
   name = "TeamEntity.findByOverview",
   resultSetMapping = "TeamOverviewResult",
   query = """SELECT
-    om.forename,om.surname, (w.total_filtered_community_cases + w.total_filtered_license_cases) as total_community_cases, w.total_filtered_custody_cases , wpc.available_points AS available_points, wpc.total_points AS total_points, om."key"
+    (w.total_filtered_community_cases + w.total_filtered_license_cases) as total_community_cases, w.total_filtered_custody_cases , wpc.available_points AS available_points, wpc.total_points AS total_points, om."key"
     FROM app.workload_owner AS wo
     JOIN app.team AS t
         ON wo.team_id = t.id

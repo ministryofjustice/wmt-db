@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.TeamStaff
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerWorkload
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.WorkloadCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.TeamOverview
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
@@ -23,7 +24,7 @@ class JpaBasedTeamService(
   private val personManagerRepository: PersonManagerRepository
 ) {
 
-  fun getTeamOverview(teamCode: String, grades: List<String>?): List<TeamOverview>? = communityApiClient
+  fun getTeamOverview(teamCode: String, grades: List<String>?): List<OffenderManagerWorkload>? = communityApiClient
     .getTeamStaff(teamCode)
     .map { staff ->
       val workloads = teamRepository.findByOverview(teamCode).associateBy { it.code }
@@ -33,12 +34,10 @@ class JpaBasedTeamService(
         .mapValues { countEntry -> countEntry.value.size }
       staff.map {
         val overview = workloads[it.staffCode] ?: getTeamOverviewForOffenderManagerWithoutWorkload(it)
-        overview.staffId = it.staffIdentifier
-        overview.casesInLastWeek = caseCounts.getOrDefault(overview.code, 0).toBigInteger()
-        overview.grade = it.grade
-        overview.capacity = capacityCalculator.calculate(overview.totalPoints, overview.availablePoints)
-        overview.email = it.email
-        overview
+        OffenderManagerWorkload(
+          it.staff.forenames, it.staff.surname, it.email, it.grade, overview.totalCommunityCases,
+          overview.totalCustodyCases, capacityCalculator.calculate(overview.totalPoints, overview.availablePoints), it.staffCode, it.staffIdentifier, caseCounts.getOrDefault(overview.code, 0).toBigInteger()
+        )
       }.filter {
         grades == null || grades.contains(it.grade)
       }
@@ -48,7 +47,7 @@ class JpaBasedTeamService(
     teamStaff: TeamStaff
   ): TeamOverview {
     return TeamOverview(
-      teamStaff.staff.forenames, teamStaff.staff.surname, BigDecimal.ZERO, BigDecimal.ZERO,
+      BigDecimal.ZERO, BigDecimal.ZERO,
       defaultAvailablePointsForGrade(teamStaff), BigInteger.ZERO, teamStaff.staffCode
     )
   }
