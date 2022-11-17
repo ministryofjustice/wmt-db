@@ -35,7 +35,7 @@ class TeamController(
   fun getTeamSummary(@PathVariable(required = true) teamCode: String, @RequestParam grades: List<String>?): ResponseEntity<TeamSummary> {
     val overviews = teamService.getTeamOverview(teamCode, grades)
     if (overviews != null) {
-      return ResponseEntity.ok(TeamSummary.from(overviews))
+      return ResponseEntity.ok(TeamSummary(overviews))
     }
     throw EntityNotFoundException("Team not found for $teamCode")
   }
