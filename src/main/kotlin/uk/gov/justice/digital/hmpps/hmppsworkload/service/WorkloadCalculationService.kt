@@ -26,7 +26,6 @@ class WorkloadCalculationService(
   private val workloadPointsRepository: WorkloadPointsRepository,
   private val weeklyHours: GetWeeklyHours,
   private val getReductionService: GetReductionService,
-  private val capacityCalculator: CapacityCalculator,
   private val workloadCalculationRepository: WorkloadCalculationRepository,
   private val getCaseLoad: GetCombinedCaseload
 ) {
@@ -62,7 +61,7 @@ class WorkloadCalculationService(
     val contactTypeWeightings = getContactTypeWeightings.findAll()
     val t2aWorkloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(true)
     val workloadPointsWeighting: WorkloadPointsEntity = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
-    val availablePoints = capacityCalculator.calculateAvailablePoints(workloadPointsWeighting.getDefaultPointsAvailable(staffGrade), workloadPointsWeighting.getDefaultContractedHours(staffGrade), availableHours)
+    val availablePoints = calculateAvailablePoints(workloadPointsWeighting.getDefaultPointsAvailable(staffGrade), workloadPointsWeighting.getDefaultContractedHours(staffGrade), availableHours)
     val workloadPoints = workloadCalculator.getWorkloadPoints(cases, courtReports, paroleReports, assessments, contactsPerformedOutsideCaseload, contactsPerformedByOthers, contactTypeWeightings, t2aWorkloadPoints, workloadPointsWeighting)
     return WorkloadCalculationEntity(
       availablePoints = availablePoints, workloadPoints = workloadPoints, staffCode = staffIdentifier.staffCode, teamCode = staffIdentifier.teamCode,

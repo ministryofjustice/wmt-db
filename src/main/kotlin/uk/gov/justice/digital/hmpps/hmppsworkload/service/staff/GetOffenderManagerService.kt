@@ -16,10 +16,10 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOve
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.OffenderManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadPointsRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.CapacityCalculator
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.CaseCalculator
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetSentenceService
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetWeeklyHours
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.calculateCapacity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.reduction.GetReductionService
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -28,7 +28,6 @@ import java.time.LocalDateTime
 @Service
 class GetOffenderManagerService(
   private val offenderManagerRepository: OffenderManagerRepository,
-  private val capacityCalculator: CapacityCalculator,
   private val caseCalculator: CaseCalculator,
   private val getReductionService: GetReductionService,
   private val communityApiClient: CommunityApiClient,
@@ -42,7 +41,7 @@ class GetOffenderManagerService(
   fun getPotentialWorkload(staffCode: String, teamCode: String, impactCase: ImpactCase): OffenderManagerOverview? {
     return getOverview(staffCode, teamCode)?.let { overview ->
       val currentCaseImpact = getCurrentCasePoints(teamCode, overview.code, impactCase.crn)
-      overview.potentialCapacity = capacityCalculator.calculateCapacity(
+      overview.potentialCapacity = calculateCapacity(
         overview.totalPoints.minus(currentCaseImpact)
           .plus(caseCalculator.getPointsForCase(getPotentialCase(crn = impactCase.crn))),
         overview.availablePoints
@@ -69,7 +68,7 @@ class GetOffenderManagerService(
     val defaultContractedHours = workloadPoints.getDefaultContractedHours(deliusStaff.grade)
 
     val overview = OffenderManagerOverview(deliusStaff.staff.forenames, deliusStaff.staff.surname, 0, 0, availablePoints.toBigInteger(), BigInteger.ZERO, deliusStaff.staffCode, teamName, LocalDateTime.now(), -1, BigInteger.ZERO)
-    overview.capacity = capacityCalculator.calculateCapacity(overview.totalPoints, overview.availablePoints)
+    overview.capacity = calculateCapacity(overview.totalPoints, overview.availablePoints)
     overview.contractedHours = defaultContractedHours
     return overview
   }
@@ -78,7 +77,7 @@ class GetOffenderManagerService(
     communityApiClient.getStaffByCode(offenderManagerCode).map { staff ->
       val team = staff.teams!!.first { team -> team.code == teamCode }
       val overview = offenderManagerRepository.findByOverview(team.code, staff.staffCode)?.let {
-        it.capacity = capacityCalculator.calculateCapacity(it.totalPoints, it.availablePoints)
+        it.capacity = calculateCapacity(it.totalPoints, it.availablePoints)
         it.nextReductionChange = getReductionService.findNextReductionChange(offenderManagerCode, teamCode)
         it.reductionHours = getReductionService.findReductionHours(StaffIdentifier(offenderManagerCode, teamCode))
         it.contractedHours = getWeeklyHours.findWeeklyHours(StaffIdentifier(offenderManagerCode, teamCode), staff.grade)
