@@ -42,7 +42,7 @@ class GetOffenderManagerService(
   fun getPotentialWorkload(staffCode: String, teamCode: String, impactCase: ImpactCase): OffenderManagerOverview? {
     return getOverview(staffCode, teamCode)?.let { overview ->
       val currentCaseImpact = getCurrentCasePoints(teamCode, overview.code, impactCase.crn)
-      overview.potentialCapacity = capacityCalculator.calculate(
+      overview.potentialCapacity = capacityCalculator.calculateCapacity(
         overview.totalPoints.minus(currentCaseImpact)
           .plus(caseCalculator.getPointsForCase(getPotentialCase(crn = impactCase.crn))),
         overview.availablePoints
@@ -69,7 +69,7 @@ class GetOffenderManagerService(
     val defaultContractedHours = workloadPoints.getDefaultContractedHours(deliusStaff.grade)
 
     val overview = OffenderManagerOverview(deliusStaff.staff.forenames, deliusStaff.staff.surname, 0, 0, availablePoints.toBigInteger(), BigInteger.ZERO, deliusStaff.staffCode, teamName, LocalDateTime.now(), -1, BigInteger.ZERO)
-    overview.capacity = capacityCalculator.calculate(overview.totalPoints, overview.availablePoints)
+    overview.capacity = capacityCalculator.calculateCapacity(overview.totalPoints, overview.availablePoints)
     overview.contractedHours = defaultContractedHours
     return overview
   }
@@ -78,7 +78,7 @@ class GetOffenderManagerService(
     communityApiClient.getStaffByCode(offenderManagerCode).map { staff ->
       val team = staff.teams!!.first { team -> team.code == teamCode }
       val overview = offenderManagerRepository.findByOverview(team.code, staff.staffCode)?.let {
-        it.capacity = capacityCalculator.calculate(it.totalPoints, it.availablePoints)
+        it.capacity = capacityCalculator.calculateCapacity(it.totalPoints, it.availablePoints)
         it.nextReductionChange = getReductionService.findNextReductionChange(offenderManagerCode, teamCode)
         it.reductionHours = getReductionService.findReductionHours(StaffIdentifier(offenderManagerCode, teamCode))
         it.contractedHours = getWeeklyHours.findWeeklyHours(StaffIdentifier(offenderManagerCode, teamCode), staff.grade)

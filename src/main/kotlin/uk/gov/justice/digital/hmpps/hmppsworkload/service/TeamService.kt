@@ -16,7 +16,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 
 @Service
-class JpaBasedTeamService(
+class TeamService(
   private val teamRepository: TeamRepository,
   private val capacityCalculator: CapacityCalculator,
   private val communityApiClient: CommunityApiClient,
@@ -36,7 +36,7 @@ class JpaBasedTeamService(
         val overview = workloads[it.staffCode] ?: getTeamOverviewForOffenderManagerWithoutWorkload(it)
         OffenderManagerWorkload(
           it.staff.forenames, it.staff.surname, it.email, it.grade, overview.totalCommunityCases,
-          overview.totalCustodyCases, capacityCalculator.calculate(overview.totalPoints, overview.availablePoints), it.staffCode, it.staffIdentifier, caseCounts.getOrDefault(overview.code, 0).toBigInteger()
+          overview.totalCustodyCases, capacityCalculator.calculateCapacity(overview.totalPoints, overview.availablePoints), it.staffCode, it.staffIdentifier, caseCounts.getOrDefault(overview.code, 0).toBigInteger()
         )
       }.filter {
         grades == null || grades.contains(it.grade)
@@ -59,6 +59,6 @@ class JpaBasedTeamService(
 
   fun getWorkloadCases(teams: List<String>): Flux<WorkloadCase> {
     return Flux.fromIterable(teamRepository.findWorkloadCountCaseByCode(teams))
-      .map { WorkloadCase(it.teamCode, it.totalCases, capacityCalculator.calculate(it.totalPoints.toBigInteger(), it.availablePoints.toBigInteger()).toDouble()) }
+      .map { WorkloadCase(it.teamCode, it.totalCases, capacityCalculator.calculateCapacity(it.totalPoints.toBigInteger(), it.availablePoints.toBigInteger()).toDouble()) }
   }
 }

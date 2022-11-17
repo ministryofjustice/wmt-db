@@ -8,7 +8,7 @@ import java.math.RoundingMode.HALF_UP
 
 @Service
 class CapacityCalculator {
-  fun calculate(totalPoints: BigInteger, availablePoints: BigInteger): BigDecimal {
+  fun calculateCapacity(totalPoints: BigInteger, availablePoints: BigInteger): BigDecimal {
     if (totalPoints != BigInteger.ZERO && availablePoints != BigInteger.ZERO) {
       return BigDecimal(totalPoints)
         .divide(BigDecimal(availablePoints), 3, HALF_UP).multiply(BigDecimal.valueOf(100))
