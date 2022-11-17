@@ -6,7 +6,6 @@ import java.math.BigDecimal
 import java.math.BigInteger
 
 class CapacityCalculatorTest {
-  private val capacityCalculator = CapacityCalculator()
   private val availablePoints = 2176.0
   private var currentHours = 37.0
   private val reductionHours = 1.8
@@ -37,7 +36,7 @@ class CapacityCalculatorTest {
     currentHours: Double,
     reductionHours: Double
   ): BigInteger {
-    return capacityCalculator.calculateAvailablePoints(
+    return calculateAvailablePoints(
       BigDecimal.valueOf(availablePoints),
       BigDecimal.valueOf(defaultContractedHoursForGrade),
       BigDecimal.valueOf(currentHours) - BigDecimal.valueOf(reductionHours)

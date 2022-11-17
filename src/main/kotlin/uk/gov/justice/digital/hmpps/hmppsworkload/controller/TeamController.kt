@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Flux
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.TeamSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.WorkloadCase
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.JpaBasedTeamService
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.TeamService
 import javax.persistence.EntityNotFoundException
 
 @RestController
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 class TeamController(
-  private val teamService: JpaBasedTeamService
+  private val teamService: TeamService
 ) {
 
   @Operation(summary = "Retrieve Team summary by Team Code")
@@ -35,7 +35,7 @@ class TeamController(
   fun getTeamSummary(@PathVariable(required = true) teamCode: String, @RequestParam grades: List<String>?): ResponseEntity<TeamSummary> {
     val overviews = teamService.getTeamOverview(teamCode, grades)
     if (overviews != null) {
-      return ResponseEntity.ok(TeamSummary.from(overviews))
+      return ResponseEntity.ok(TeamSummary(overviews))
     }
     throw EntityNotFoundException("Team not found for $teamCode")
   }
