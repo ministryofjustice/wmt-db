@@ -631,6 +631,7 @@ abstract class IntegrationTestBase {
       val message = allocationCompleteClient.receiveMessage(allocationCompleteUrl)
       messages.addAll(
         message.messages.map {
+          allocationCompleteClient.deleteMessage(allocationCompleteUrl, it.receiptHandle)
           val sqsMessage = objectMapper.readValue(it.body, SQSMessage::class.java)
           val personAllocationMessageType = object : TypeReference<HmppsMessage<HmppsAllocationMessage>>() {}
           objectMapper.readValue(sqsMessage.Message, personAllocationMessageType)
@@ -722,6 +723,7 @@ abstract class IntegrationTestBase {
   protected fun getAuditMessages(): AuditMessage {
     val message = hmppsAuditQueueClient.receiveMessage(hmppsAuditQueue.queueUrl)
     return message.messages.map {
+      hmppsAuditQueueClient.deleteMessage(hmppsAuditQueue.queueUrl, it.receiptHandle)
       val auditDataType = object : TypeReference<AuditMessage>() {}
       objectMapper.readValue(it.body, auditDataType)
     }.first()
@@ -733,8 +735,8 @@ abstract class IntegrationTestBase {
   protected fun getReductionsCompletedMessages(): HmppsMessage<JsonNode> {
     val message = hmppsReductionsCompletedClient.receiveMessage(hmppsReductionsCompletedQueue.queueUrl)
     return message.messages.map {
+      hmppsReductionsCompletedClient.deleteMessage(hmppsReductionsCompletedQueue.queueUrl, it.receiptHandle)
       val reductionsCompletedMessageDataType = object : TypeReference<HmppsMessage<JsonNode>>() {}
-
       objectMapper.readValue(it.body, reductionsCompletedMessageDataType)
     }.first()
   }
