@@ -3,8 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.client
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
-import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
@@ -21,17 +19,10 @@ class AssessRisksNeedsApiClient(@Qualifier("assessRiskNeedsApiWebClient") privat
       .uri("/risks/crn/$crn/summary")
       .header(HttpHeaders.AUTHORIZATION, token)
       .retrieve()
-      .onStatus(
-        { httpStatus -> httpStatus == NOT_FOUND || httpStatus == INTERNAL_SERVER_ERROR },
-        { Mono.error(MissingRiskError("No risk summary found for $crn")) }
-      )
       .bodyToMono(RiskSummary::class.java)
       .map { Optional.of(it) }
-      .onErrorResume { ex ->
-        when (ex) {
-          is MissingRiskError -> Mono.just(Optional.empty())
-          else -> Mono.error(ex)
-        }
+      .onErrorResume {
+        Mono.just(Optional.empty())
       }
   }
 
@@ -42,18 +33,9 @@ class AssessRisksNeedsApiClient(@Qualifier("assessRiskNeedsApiWebClient") privat
       .uri("/risks/crn/$crn/predictors/rsr/history")
       .header(HttpHeaders.AUTHORIZATION, token)
       .retrieve()
-      .onStatus(
-        { httpStatus -> NOT_FOUND == httpStatus },
-        { Mono.error(MissingRiskError("No risk predictors found for $crn")) }
-      )
       .bodyToMono(responseType)
-      .onErrorResume { ex ->
-        when (ex) {
-          is MissingRiskError -> Mono.just(emptyList())
-          else -> Mono.error(ex)
-        }
+      .onErrorResume {
+        Mono.just(emptyList())
       }
   }
 }
-
-private class MissingRiskError(msg: String) : RuntimeException(msg)
