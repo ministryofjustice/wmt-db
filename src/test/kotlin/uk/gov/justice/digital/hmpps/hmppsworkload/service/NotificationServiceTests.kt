@@ -42,13 +42,13 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Optional
 
-class EmailNotificationServiceTests {
+class NotificationServiceTests {
   private val notificationClient = mockk<NotificationClientApi>()
   private val communityApiClient = mockk<CommunityApiClient>()
   private val hmppsCaseDetailsRepo = mockk<CaseDetailsRepository>()
   private val assessRisksNeedsApiClient = mockk<AssessRisksNeedsApiClient>()
   private val templateId = "templateId"
-  private val notificationService = EmailNotificationService(
+  private val notificationService = NotificationService(
     notificationClient, templateId, communityApiClient,
     assessRisksNeedsApiClient, hmppsCaseDetailsRepo
   )
