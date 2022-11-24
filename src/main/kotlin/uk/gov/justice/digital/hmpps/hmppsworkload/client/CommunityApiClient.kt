@@ -72,17 +72,7 @@ class CommunityApiClient(private val webClient: WebClient) {
       .bodyToMono(responseType)
   }
 
-  fun getAllConvictions(crn: String): Mono<List<Conviction>> {
-    val responseType = object : ParameterizedTypeReference<List<Conviction>>() {}
-
-    return webClient
-      .get()
-      .uri("/offenders/crn/$crn/convictions")
-      .retrieve()
-      .bodyToMono(responseType)
-  }
-
-  fun getAllConvictionsFlux(crn: String): Flux<Conviction> = webClient
+  fun getAllConvictions(crn: String): Flux<Conviction> = webClient
     .get()
     .uri("/offenders/crn/$crn/convictions")
     .retrieve()

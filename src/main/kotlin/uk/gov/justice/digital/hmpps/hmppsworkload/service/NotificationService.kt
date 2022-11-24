@@ -118,17 +118,19 @@ class NotificationService(
   private fun mapRequirements(requirements: List<ConvictionRequirement>): List<String> = requirements
     .map { requirement -> "${requirement.requirementTypeMainCategory.description}: ${requirement.requirementTypeSubCategory.description} ${requirement.length ?: ""} ${requirement.lengthUnit ?: ""}".trimEnd() }
 
-  private fun getNotifyData(crn: String, allocatingOfficerUsername: String, token: String, eventId: BigInteger): Mono<NotifyData> = Mono.zip(
-    communityApiClient.getAllConvictions(crn), communityApiClient.getStaffByUsername(allocatingOfficerUsername), assessRisksNeedsApiClient.getRiskSummary(crn, token),
-    assessRisksNeedsApiClient.getRiskPredictors(crn, token),
-    communityApiClient.getAssessment(crn),
-  )
-    .flatMap { results ->
-      val conviction = results.t1.first { it.convictionId == eventId }
-      communityApiClient.getInductionContacts(crn, conviction.sentence!!.startDate).map { initialAppointments ->
-        NotifyData(conviction, initialAppointments, results.t2, results.t3.orElse(null), results.t4, results.t5.orElse(null))
+  private fun getNotifyData(crn: String, allocatingOfficerUsername: String, token: String, eventId: BigInteger): Mono<NotifyData> {
+    val conviction = communityApiClient.getAllConvictions(crn).filter { it.convictionId == eventId }.blockFirst()
+    return Mono.zip(
+      communityApiClient.getStaffByUsername(allocatingOfficerUsername), assessRisksNeedsApiClient.getRiskSummary(crn, token),
+      assessRisksNeedsApiClient.getRiskPredictors(crn, token),
+      communityApiClient.getAssessment(crn),
+    )
+      .flatMap { results ->
+        communityApiClient.getInductionContacts(crn, conviction.sentence!!.startDate).map { initialAppointments ->
+          NotifyData(conviction, initialAppointments, results.t1, results.t2.orElse(null), results.t3, results.t4.orElse(null))
+        }
       }
-    }
+  }
 }
 
 data class NotifyData(

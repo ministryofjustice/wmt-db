@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.data.repository.findByIdOrNull
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.AssessRisksNeedsApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
@@ -56,21 +57,20 @@ class NotificationServiceTests {
 
   @BeforeEach
   fun setup() {
-    every { communityApiClient.getAllConvictions(any()) } returns Mono.just(
-      listOf(
-        Conviction(
-          Sentence(
-            SentenceType("", ""),
-            BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
-          ),
-          null, true, BigInteger.TEN,
-          CourtAppearance(
-            LocalDateTime.now(), "Court 1"
-          ),
-          emptyList()
-        )
+    every { communityApiClient.getAllConvictions(any()) } returns Flux.just(
+      Conviction(
+        Sentence(
+          SentenceType("", ""),
+          BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
+        ),
+        null, true, BigInteger.TEN,
+        CourtAppearance(
+          LocalDateTime.now(), "Court 1"
+        ),
+        emptyList()
       )
     )
+
     every { communityApiClient.getInductionContacts(any(), any()) } returns Mono.just(emptyList())
     val deliusStaff = DeliusStaff(BigInteger.ONE, "ALLOCATOR1", StaffName("Alli", "Cator"), null, null, null, "all1@cat0r.com")
     every { communityApiClient.getStaffByUsername(any()) } returns Mono.just(deliusStaff)
@@ -152,7 +152,7 @@ class NotificationServiceTests {
       ),
       emptyList()
     )
-    every { communityApiClient.getAllConvictions(any()) } returns Mono.just(listOf(activeConviction))
+    every { communityApiClient.getAllConvictions(any()) } returns Flux.just(activeConviction)
 
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
@@ -182,7 +182,7 @@ class NotificationServiceTests {
       ),
       emptyList()
     )
-    every { communityApiClient.getAllConvictions(any()) } returns Mono.just(listOf(activeConviction))
+    every { communityApiClient.getAllConvictions(any()) } returns Flux.just(activeConviction)
 
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
@@ -233,7 +233,7 @@ class NotificationServiceTests {
       ),
       emptyList()
     )
-    every { communityApiClient.getAllConvictions(any()) } returns Mono.just(listOf(activeConviction))
+    every { communityApiClient.getAllConvictions(any()) } returns Flux.just(activeConviction)
 
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
@@ -267,7 +267,7 @@ class NotificationServiceTests {
       ),
       emptyList()
     )
-    every { communityApiClient.getAllConvictions(any()) } returns Mono.just(listOf(activeConviction))
+    every { communityApiClient.getAllConvictions(any()) } returns Flux.just(activeConviction)
 
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
@@ -301,7 +301,7 @@ class NotificationServiceTests {
       ),
       emptyList()
     )
-    every { communityApiClient.getAllConvictions(any()) } returns Mono.just(listOf(activeConviction))
+    every { communityApiClient.getAllConvictions(any()) } returns Flux.just(activeConviction)
 
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
@@ -334,7 +334,7 @@ class NotificationServiceTests {
       ),
       listOf(offence)
     )
-    every { communityApiClient.getAllConvictions(any()) } returns Mono.just(listOf(activeConviction))
+    every { communityApiClient.getAllConvictions(any()) } returns Flux.just(activeConviction)
 
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
@@ -362,7 +362,7 @@ class NotificationServiceTests {
       ),
       emptyList()
     )
-    every { communityApiClient.getAllConvictions(any()) } returns Mono.just(listOf(activeConviction))
+    every { communityApiClient.getAllConvictions(any()) } returns Flux.just(activeConviction)
 
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
