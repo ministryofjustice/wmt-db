@@ -49,7 +49,7 @@ class NotificationService(
         "induction_statement" to mapInductionAppointment(notifyData.initialAppointments, caseDetails.type, notifyData.conviction.sentence!!.startDate),
         "requirements" to mapRequirements(requirements),
       ).plus(getRiskParameters(notifyData.riskSummary, notifyData.riskPredictors, notifyData.assessment))
-        .plus(getConvictionParameters(notifyData.conviction, notifyData.previousConvictions))
+        .plus(getConvictionParameters(notifyData.conviction))
         .plus(getPersonOnProbationParameters(personSummary, allocateCase))
         .plus(getLoggedInUserParameters(notifyData.allocatingDeliusStaff))
       val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
@@ -70,12 +70,11 @@ class NotificationService(
     "notes" to allocateCase.instructions,
   )
 
-  private fun getConvictionParameters(conviction: Conviction, previousConvictions: List<Conviction>): Map<String, Any> = mapOf(
+  private fun getConvictionParameters(conviction: Conviction): Map<String, Any> = mapOf(
     "court_name" to conviction.courtAppearance!!.courtName,
     "sentence_date" to conviction.courtAppearance.appearanceDate.format(DateUtils.notifyDateFormat),
     "offences" to mapOffences(conviction.offences!!),
-    "order" to conviction.sentence!!.mapOrder(),
-    "previousConvictions" to mapConvictionsToOffenceDescription(previousConvictions)
+    "order" to conviction.sentence!!.mapOrder()
   )
 
   private fun getRiskParameters(riskSummary: RiskSummary?, riskPredictors: List<RiskPredictor>, assessment: OffenderAssessment?): Map<String, Any> {
@@ -94,17 +93,6 @@ class NotificationService(
       "ogrsLevel" to ogrsLevel,
       "ogrsPercentage" to ogrsPercentage,
     )
-  }
-
-  private fun mapConvictionsToOffenceDescription(convictions: List<Conviction>): List<String> {
-    val mappedConvictions = convictions
-      .filter { it.offences != null }
-      .flatMap { it.offences!! }
-      .map { offence -> offence.detail.description }
-    if (mappedConvictions.isEmpty()) {
-      return listOf(NOT_APPLICABLE)
-    }
-    return mappedConvictions
   }
 
   private fun mapInductionAppointment(appointments: List<Contact>, caseType: CaseType, sentenceStartDate: LocalDate): String {
@@ -138,14 +126,13 @@ class NotificationService(
     .flatMap { results ->
       val conviction = results.t1.first { it.convictionId == eventId }
       communityApiClient.getInductionContacts(crn, conviction.sentence!!.startDate).map { initialAppointments ->
-        NotifyData(conviction, results.t1.filter { !it.active }, initialAppointments, results.t2, results.t3.orElse(null), results.t4, results.t5.orElse(null))
+        NotifyData(conviction, initialAppointments, results.t2, results.t3.orElse(null), results.t4, results.t5.orElse(null))
       }
     }
 }
 
 data class NotifyData(
   val conviction: Conviction,
-  val previousConvictions: List<Conviction>,
   val initialAppointments: List<Contact>,
   val allocatingDeliusStaff: DeliusStaff,
   val riskSummary: RiskSummary?,
