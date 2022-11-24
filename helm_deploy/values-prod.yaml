@@ -37,3 +37,4 @@ generic-prometheus-alerts:
   sqsAlertsOldestThreshold: 2
   sqsAlertsTotalMessagesThreshold: 1
   runbookUrl: https://dsdmoj.atlassian.net/wiki/spaces/MaS/pages/3533964702/WMT+Run+book
+  ingress5xxErrorWindowMinutes: 4
