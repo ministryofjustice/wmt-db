@@ -23,11 +23,13 @@ data class EventManagerDetails @JsonCreator constructor(
   @Schema(description = "Created date")
   val createdDate: ZonedDateTime,
   @Schema(description = "event ID")
-  val eventId: BigInteger
+  val eventId: BigInteger,
+  @Schema(description = "event Number")
+  val eventNumber: Int?
 ) {
   companion object {
     fun from(eventManagerEntity: EventManagerEntity): EventManagerDetails {
-      return EventManagerDetails(eventManagerEntity.uuid, eventManagerEntity.staffId, eventManagerEntity.staffCode, eventManagerEntity.teamCode, eventManagerEntity.providerCode, eventManagerEntity.createdBy, eventManagerEntity.createdDate!!, eventManagerEntity.eventId)
+      return EventManagerDetails(eventManagerEntity.uuid, eventManagerEntity.staffId, eventManagerEntity.staffCode, eventManagerEntity.teamCode, eventManagerEntity.providerCode, eventManagerEntity.createdBy, eventManagerEntity.createdDate!!, eventManagerEntity.eventId, eventManagerEntity.eventNumber)
     }
   }
 }

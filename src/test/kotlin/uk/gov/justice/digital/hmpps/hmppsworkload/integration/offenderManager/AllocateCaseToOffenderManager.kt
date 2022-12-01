@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.MediaType
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseAllocated
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
@@ -217,7 +218,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     singleActiveRequirementResponse(crn, eventId, requirementId)
     val storedPersonManager = PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1", isActive = true)
     personManagerRepository.save(storedPersonManager)
-    val storedEventManager = EventManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, eventId = eventId, createdBy = "USER1", providerCode = "PV1", isActive = true)
+    val storedEventManager = EventManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, eventId = eventId, createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = null)
     eventManagerRepository.save(storedEventManager)
     val storedRequirementManager = RequirementManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, eventId = eventId, requirementId = requirementId, createdBy = "USER1", providerCode = "PV1", isActive = true)
     requirementManagerRepository.save(storedRequirementManager)
@@ -249,7 +250,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     val otherPersonManager = PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1", isActive = true)
     staffCodeResponse(otherPersonManager.staffCode, otherPersonManager.teamCode)
     val storedPersonManager = personManagerRepository.save(otherPersonManager)
-    val storedEventManager = eventManagerRepository.save(EventManagerEntity(crn = crn, eventId = eventId, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", createdBy = "USER1", providerCode = "PV1", isActive = true))
+    val storedEventManager = eventManagerRepository.save(EventManagerEntity(crn = crn, eventId = eventId, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = null))
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
@@ -568,5 +569,57 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     verify(exactly = 1) { notificationClient.sendEmail(any(), allocateToEmail, any(), any()) }
     // verify that the allocating officer does not receive an email
     verify(exactly = 0) { notificationClient.sendEmail(any(), "sheila.hancock@test.justice.gov.uk", any(), any()) }
+  }
+
+  @Test
+  fun `must return event number for event manager allocated`() {
+    staffCodeResponse(staffCode, teamCode)
+    offenderSummaryResponse(crn)
+    singleActiveRequirementResponse(crn, eventId)
+
+    val response = webTestClient.post()
+      .uri("/team/$teamCode/offenderManager/$staffCode/case")
+      .bodyValue(allocateCase(crn, eventId, eventNumber))
+      .headers {
+        it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
+        it.contentType = MediaType.APPLICATION_JSON
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody(CaseAllocated::class.java)
+      .returnResult()
+      .responseBody
+
+    val storedEventManager = eventManagerRepository.findByUuid(response.eventManagerId)!!
+    val eventManagerAllocatedEvent = expectWorkloadAllocationCompleteMessages(crn)["event.manager.allocated"]!!
+
+    webTestClient.get()
+      .uri(eventManagerAllocatedEvent.detailUrl.replace("https://localhost:8080", ""))
+      .headers {
+        it.authToken(roles = listOf("ROLE_WORKLOAD_READ"))
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody()
+      .jsonPath("$.id")
+      .isEqualTo(storedEventManager.uuid.toString())
+      .jsonPath("$.staffId")
+      .isEqualTo(storedEventManager.staffId)
+      .jsonPath("$.staffCode")
+      .isEqualTo(staffCode)
+      .jsonPath("$.teamCode")
+      .isEqualTo(teamCode)
+      .jsonPath("$.providerCode")
+      .isEqualTo(storedEventManager.providerCode)
+      .jsonPath("$.createdBy")
+      .isEqualTo(storedEventManager.createdBy)
+      .jsonPath("$.createdDate")
+      .exists()
+      .jsonPath("$.eventId")
+      .isEqualTo(eventId)
+      .jsonPath("$.eventNumber")
+      .isEqualTo(eventNumber)
   }
 }

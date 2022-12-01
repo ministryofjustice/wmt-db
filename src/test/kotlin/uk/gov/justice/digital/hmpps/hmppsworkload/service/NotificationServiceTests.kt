@@ -53,7 +53,7 @@ class NotificationServiceTests {
     notificationClient, templateId, communityApiClient,
     assessRisksNeedsApiClient, hmppsCaseDetailsRepo
   )
-  private val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, sendEmailCopyToAllocatingOfficer = false)
+  private val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
 
   @BeforeEach
   fun setup() {
@@ -247,7 +247,7 @@ class NotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, sendEmailCopyToAllocatingOfficer = false)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
     val allocatingOfficerUsername = "ALLOCATOR"
 
     val token = "token"
@@ -281,7 +281,7 @@ class NotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, sendEmailCopyToAllocatingOfficer = false)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
     val allocatingOfficerUsername = "ALLOCATOR"
 
     val token = "token"
@@ -585,7 +585,7 @@ class NotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, "Some Notes", sendEmailCopyToAllocatingOfficer = false)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, "Some Notes", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
     val allocatingOfficerUsername = "ALLOCATOR"
 
     val token = "token"
@@ -602,7 +602,7 @@ class NotificationServiceTests {
     val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, "Some Notes", sendEmailCopyToAllocatingOfficer = false)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, "Some Notes", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
     val allocatingOfficerUsername = "ALLOCATOR"
 
     val token = "token"
@@ -626,7 +626,7 @@ class NotificationServiceTests {
     allocatedOfficer.grade = mappedGrade
     every { communityApiClient.getStaffByUsername(any()) } returns Mono.just(allocatedOfficer)
     val requirements = emptyList<ConvictionRequirement>()
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, "Some Notes", sendEmailCopyToAllocatingOfficer = false)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, "Some Notes", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
     val allocatingOfficerUsername = "ALLOCATOR"
 
     val token = "token"
@@ -645,7 +645,7 @@ class NotificationServiceTests {
     val requirements = emptyList<ConvictionRequirement>()
     val firstEmail = "first@email.com"
     val secondEmail = "second@email.com"
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, "instructions", listOf(firstEmail, secondEmail), false)
+    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, "instructions", listOf(firstEmail, secondEmail), false, 1)
     val allocatingOfficerUsername = "ALLOCATOR"
 
     val token = "token"

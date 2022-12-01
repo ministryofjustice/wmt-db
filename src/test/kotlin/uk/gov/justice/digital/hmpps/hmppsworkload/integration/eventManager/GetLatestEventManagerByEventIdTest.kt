@@ -12,7 +12,7 @@ class GetLatestEventManagerByEventIdTest : IntegrationTestBase() {
 
   @Test
   fun `can get event manager by Id`() {
-    val storedEventManager = EventManagerEntity(crn = "CRN1", staffId = BigInteger.valueOf(123456789L), staffCode = "OM1", teamCode = "T1", createdBy = "USER1", providerCode = "PV1", eventId = BigInteger.valueOf(567891234L), isActive = true)
+    val storedEventManager = EventManagerEntity(crn = "CRN1", staffId = BigInteger.valueOf(123456789L), staffCode = "OM1", teamCode = "T1", createdBy = "USER1", providerCode = "PV1", eventId = BigInteger.valueOf(567891234L), isActive = true, eventNumber = null)
     eventManagerRepository.save(storedEventManager)
 
     val caseDetailsEntity = CaseDetailsEntity(crn = storedEventManager.crn, Tier.C2, CaseType.CUSTODY, "Jane", "Doe")

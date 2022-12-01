@@ -41,7 +41,8 @@ class JpaBasedSaveEventManagerService(
       eventId = allocateCase.eventId,
       createdBy = loggedInUser,
       providerCode = deliusStaff.probationArea!!.code,
-      isActive = true
+      isActive = true,
+      eventNumber = allocateCase.eventNumber
     )
     eventManagerRepository.save(eventManagerEntity)
     return SaveResult(eventManagerEntity, true)
