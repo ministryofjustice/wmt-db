@@ -12,14 +12,14 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType.COMMUNITY
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier.B3
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.EmailNotificationService
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.NotificationService
 import java.math.BigInteger
 import java.util.UUID
 
 class SendEmail : IntegrationTestBase() {
 
   @Autowired
-  lateinit var emailNotificationService: EmailNotificationService
+  lateinit var notificationService: NotificationService
   @Test
   fun `sends an email when ROSH cannot be retrieved`() {
     val allocatedOfficer = DeliusStaff(staffIdentifier = BigInteger.ONE, staffCode = "STAFF1", staff = StaffName("Staff", "Member"), email = "simulate-delivered@notifications.service.gov.uk")
@@ -36,7 +36,7 @@ class SendEmail : IntegrationTestBase() {
     riskPredictorResponse(crn)
     assessmentCommunityApiResponse(crn)
     caseDetailsRepository.save(CaseDetailsEntity(crn, B3, COMMUNITY, "Jane", "Doe"))
-    val emailSendResponse = emailNotificationService.notifyAllocation(
+    val emailSendResponse = notificationService.notifyAllocation(
       allocatedOfficer,
       personSummary,
       requirements,

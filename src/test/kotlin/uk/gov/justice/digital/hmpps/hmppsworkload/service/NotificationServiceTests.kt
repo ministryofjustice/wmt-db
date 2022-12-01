@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.data.repository.findByIdOrNull
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.AssessRisksNeedsApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
@@ -42,13 +43,13 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Optional
 
-class EmailNotificationServiceTests {
+class NotificationServiceTests {
   private val notificationClient = mockk<NotificationClientApi>()
   private val communityApiClient = mockk<CommunityApiClient>()
   private val hmppsCaseDetailsRepo = mockk<CaseDetailsRepository>()
   private val assessRisksNeedsApiClient = mockk<AssessRisksNeedsApiClient>()
   private val templateId = "templateId"
-  private val notificationService = EmailNotificationService(
+  private val notificationService = NotificationService(
     notificationClient, templateId, communityApiClient,
     assessRisksNeedsApiClient, hmppsCaseDetailsRepo
   )
@@ -56,21 +57,20 @@ class EmailNotificationServiceTests {
 
   @BeforeEach
   fun setup() {
-    every { communityApiClient.getAllConvictions(any()) } returns Mono.just(
-      listOf(
-        Conviction(
-          Sentence(
-            SentenceType("", ""),
-            BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
-          ),
-          null, true, BigInteger.TEN,
-          CourtAppearance(
-            LocalDateTime.now(), "Court 1"
-          ),
-          emptyList()
-        )
+    every { communityApiClient.getAllConvictions(any()) } returns Flux.just(
+      Conviction(
+        Sentence(
+          SentenceType("", ""),
+          BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
+        ),
+        null, true, BigInteger.TEN,
+        CourtAppearance(
+          LocalDateTime.now(), "Court 1"
+        ),
+        emptyList()
       )
     )
+
     every { communityApiClient.getInductionContacts(any(), any()) } returns Mono.just(emptyList())
     val deliusStaff = DeliusStaff(BigInteger.ONE, "ALLOCATOR1", StaffName("Alli", "Cator"), null, null, null, "all1@cat0r.com")
     every { communityApiClient.getStaffByUsername(any()) } returns Mono.just(deliusStaff)
@@ -152,7 +152,7 @@ class EmailNotificationServiceTests {
       ),
       emptyList()
     )
-    every { communityApiClient.getAllConvictions(any()) } returns Mono.just(listOf(activeConviction))
+    every { communityApiClient.getAllConvictions(any()) } returns Flux.just(activeConviction)
 
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
@@ -182,7 +182,7 @@ class EmailNotificationServiceTests {
       ),
       emptyList()
     )
-    every { communityApiClient.getAllConvictions(any()) } returns Mono.just(listOf(activeConviction))
+    every { communityApiClient.getAllConvictions(any()) } returns Flux.just(activeConviction)
 
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
@@ -233,7 +233,7 @@ class EmailNotificationServiceTests {
       ),
       emptyList()
     )
-    every { communityApiClient.getAllConvictions(any()) } returns Mono.just(listOf(activeConviction))
+    every { communityApiClient.getAllConvictions(any()) } returns Flux.just(activeConviction)
 
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
@@ -267,7 +267,7 @@ class EmailNotificationServiceTests {
       ),
       emptyList()
     )
-    every { communityApiClient.getAllConvictions(any()) } returns Mono.just(listOf(activeConviction))
+    every { communityApiClient.getAllConvictions(any()) } returns Flux.just(activeConviction)
 
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
@@ -301,7 +301,7 @@ class EmailNotificationServiceTests {
       ),
       emptyList()
     )
-    every { communityApiClient.getAllConvictions(any()) } returns Mono.just(listOf(activeConviction))
+    every { communityApiClient.getAllConvictions(any()) } returns Flux.just(activeConviction)
 
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
@@ -334,7 +334,7 @@ class EmailNotificationServiceTests {
       ),
       listOf(offence)
     )
-    every { communityApiClient.getAllConvictions(any()) } returns Mono.just(listOf(activeConviction))
+    every { communityApiClient.getAllConvictions(any()) } returns Flux.just(activeConviction)
 
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
@@ -362,7 +362,7 @@ class EmailNotificationServiceTests {
       ),
       emptyList()
     )
-    every { communityApiClient.getAllConvictions(any()) } returns Mono.just(listOf(activeConviction))
+    every { communityApiClient.getAllConvictions(any()) } returns Flux.just(activeConviction)
 
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
@@ -578,82 +578,6 @@ class EmailNotificationServiceTests {
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals("Very High", parameters.captured["ogrsLevel"])
-  }
-
-  @Test
-  fun `must add previous convictions when it exists`() {
-    val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
-    val requirements = emptyList<ConvictionRequirement>()
-
-    val allocatingOfficerUsername = "ALLOCATOR"
-
-    val token = "token"
-
-    val activeConviction = Conviction(
-      Sentence(
-        SentenceType("", ""),
-        BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
-      ),
-      null, true, BigInteger.TEN,
-      CourtAppearance(
-        LocalDateTime.now(), "Court 1"
-      ),
-      emptyList()
-    )
-
-    val previousOffence = Offence(true, OffenceDetail("Previous main", "Previous sub", "Previous Description"))
-
-    val previousConvictions = Conviction(
-      Sentence(
-        SentenceType("", ""),
-        BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
-      ),
-      null, false, BigInteger.TWO,
-      CourtAppearance(
-        LocalDateTime.now(), "Court 1"
-      ),
-      listOf(previousOffence)
-    )
-
-    every { communityApiClient.getAllConvictions(any()) } returns Mono.just(listOf(activeConviction, previousConvictions))
-
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
-      .block()
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
-    Assertions.assertEquals(listOf(previousOffence.detail.description), parameters.captured["previousConvictions"])
-  }
-
-  @Test
-  fun `must provide default previous convictions when only active convictions exist`() {
-    val personSummary = PersonSummary("John", "Doe")
-    val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
-    val requirements = emptyList<ConvictionRequirement>()
-
-    val allocatingOfficerUsername = "ALLOCATOR"
-
-    val token = "token"
-
-    val activeConviction = Conviction(
-      Sentence(
-        SentenceType("", ""),
-        BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
-      ),
-      null, true, BigInteger.TEN,
-      CourtAppearance(
-        LocalDateTime.now(), "Court 1"
-      ),
-      emptyList()
-    )
-
-    every { communityApiClient.getAllConvictions(any()) } returns Mono.just(listOf(activeConviction))
-
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
-      .block()
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
-    Assertions.assertEquals(listOf("N/A"), parameters.captured["previousConvictions"])
   }
 
   @Test

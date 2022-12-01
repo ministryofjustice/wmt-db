@@ -16,7 +16,7 @@ class JpaBasedSaveSentenceService(
 ) : SaveSentenceService {
 
   override fun saveSentence(crn: String, sentenceId: BigInteger) {
-    communityApiClient.getAllConvictionsFlux(crn)
+    communityApiClient.getAllConvictions(crn)
       .filter { isCurrentSentence(it, sentenceId) }
       .map { conviction ->
         convictionToSentenceEntity(conviction!!, crn)
