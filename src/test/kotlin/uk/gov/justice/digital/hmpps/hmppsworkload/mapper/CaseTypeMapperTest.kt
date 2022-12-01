@@ -28,10 +28,10 @@ class CaseTypeMapperTest {
       expectedSentenceEndDate = LocalDate.now().plusDays(15)
     )
 
-    val convictionCommunity = Conviction(sentenceCommunity, active = true, convictionId = BigInteger.ONE)
+    val convictionCommunity = Conviction(sentenceCommunity, active = true, convictionId = BigInteger.ONE, eventNumber = 1)
     val convictionLicense = Conviction(
       sentenceLicense, custody = Custody(CustodyStatus("LicenseCode"), null),
-      active = true, convictionId = BigInteger.TEN
+      active = true, convictionId = BigInteger.TEN, eventNumber = 2
     )
 
     val caseTypeActual = CaseTypeMapper(listOf(CustodyCaseTypeRule(), CommunityCaseTypeRule(), LicenseCaseTypeRule()))
@@ -49,10 +49,10 @@ class CaseTypeMapperTest {
       expectedSentenceEndDate = LocalDate.now().plusDays(20)
     )
 
-    val convictionCommunity = Conviction(sentenceCommunity, active = true, convictionId = BigInteger.ONE)
+    val convictionCommunity = Conviction(sentenceCommunity, active = true, convictionId = BigInteger.ONE, eventNumber = 1)
     val convictionNoSentence = Conviction(
       null, custody = Custody(CustodyStatus("LicenseCode"), null),
-      active = true, convictionId = BigInteger.TEN
+      active = true, convictionId = BigInteger.TEN, eventNumber = 2
     )
 
     val caseTypeActual = CaseTypeMapper(listOf(CustodyCaseTypeRule(), CommunityCaseTypeRule(), LicenseCaseTypeRule()))

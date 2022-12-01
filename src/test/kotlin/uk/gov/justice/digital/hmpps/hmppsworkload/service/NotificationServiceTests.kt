@@ -63,7 +63,7 @@ class NotificationServiceTests {
           SentenceType("", ""),
           BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
         ),
-        null, true, BigInteger.TEN,
+        null, true, BigInteger.TEN, 1,
         CourtAppearance(
           LocalDateTime.now(), "Court 1"
         ),
@@ -146,13 +146,26 @@ class NotificationServiceTests {
         SentenceType("", ""),
         BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
       ),
-      null, true, BigInteger.TEN,
+      null, true, BigInteger.TEN, 1,
       CourtAppearance(
         LocalDateTime.now(), "Court 1"
       ),
       emptyList()
     )
-    every { communityApiClient.getAllConvictions(any()) } returns Flux.just(activeConviction)
+
+    val anotherConviction = Conviction(
+      Sentence(
+        SentenceType("", ""),
+        BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
+      ),
+      null, true, BigInteger.TEN, 2,
+      CourtAppearance(
+        LocalDateTime.now(), "Court 2"
+      ),
+      emptyList()
+    )
+
+    every { communityApiClient.getAllConvictions(any()) } returns Flux.just(activeConviction, anotherConviction)
 
     notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
@@ -176,7 +189,7 @@ class NotificationServiceTests {
         SentenceType("", ""),
         BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
       ),
-      null, true, BigInteger.TEN,
+      null, true, BigInteger.TEN, 1,
       CourtAppearance(
         LocalDateTime.now(), "Court 1"
       ),
@@ -227,7 +240,7 @@ class NotificationServiceTests {
         SentenceType("", ""),
         BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
       ),
-      null, true, BigInteger.TEN,
+      null, true, BigInteger.TEN, 1,
       CourtAppearance(
         LocalDateTime.now(), "Court 1"
       ),
@@ -261,7 +274,7 @@ class NotificationServiceTests {
         SentenceType("", ""),
         BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
       ),
-      null, true, BigInteger.TEN,
+      null, true, BigInteger.TEN, 1,
       CourtAppearance(
         LocalDateTime.now(), "Court 1"
       ),
@@ -295,7 +308,7 @@ class NotificationServiceTests {
         SentenceType("", ""),
         BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
       ),
-      null, true, BigInteger.TEN,
+      null, true, BigInteger.TEN, 1,
       CourtAppearance(
         LocalDateTime.now(), "Court 1"
       ),
@@ -328,7 +341,7 @@ class NotificationServiceTests {
         SentenceType("", ""),
         BigInteger.ONE, "Minutes", "Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null
       ),
-      null, true, BigInteger.TEN,
+      null, true, BigInteger.TEN, 1,
       CourtAppearance(
         LocalDateTime.now(), "Court 1"
       ),
@@ -356,7 +369,7 @@ class NotificationServiceTests {
     val sentence = Sentence(SentenceType("", ""), BigInteger.ONE, "Minutes", "Sentence Description", LocalDate.now(), BigInteger.ONE, LocalDate.now(), null)
 
     val activeConviction = Conviction(
-      sentence, null, true, BigInteger.TEN,
+      sentence, null, true, BigInteger.TEN, 1,
       CourtAppearance(
         LocalDateTime.now(), "Court 1"
       ),

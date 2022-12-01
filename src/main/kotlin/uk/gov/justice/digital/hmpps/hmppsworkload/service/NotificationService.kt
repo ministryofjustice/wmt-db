@@ -23,7 +23,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.utils.DateUtils
 import uk.gov.justice.digital.hmpps.hmppsworkload.utils.capitalize
 import uk.gov.service.notify.NotificationClientApi
 import uk.gov.service.notify.SendEmailResponse
-import java.math.BigInteger
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -42,7 +41,7 @@ class NotificationService(
 ) {
 
   fun notifyAllocation(allocatedOfficer: DeliusStaff, personSummary: PersonSummary, requirements: List<ConvictionRequirement>, allocateCase: AllocateCase, allocatingOfficerUsername: String, token: String): Mono<List<SendEmailResponse>> {
-    return getNotifyData(allocateCase.crn, allocatingOfficerUsername, token, allocateCase.eventId).map { notifyData ->
+    return getNotifyData(allocateCase.crn, allocatingOfficerUsername, token, allocateCase.eventNumber).map { notifyData ->
       val caseDetails = caseDetailsRepository.findByIdOrNull(allocateCase.crn)!!
       val parameters = mapOf(
         "officer_name" to "${allocatedOfficer.staff.forenames} ${allocatedOfficer.staff.surname}",
@@ -118,8 +117,8 @@ class NotificationService(
   private fun mapRequirements(requirements: List<ConvictionRequirement>): List<String> = requirements
     .map { requirement -> "${requirement.requirementTypeMainCategory.description}: ${requirement.requirementTypeSubCategory.description} ${requirement.length ?: ""} ${requirement.lengthUnit ?: ""}".trimEnd() }
 
-  private fun getNotifyData(crn: String, allocatingOfficerUsername: String, token: String, eventId: BigInteger): Mono<NotifyData> {
-    val conviction = communityApiClient.getAllConvictions(crn).filter { it.convictionId == eventId }.blockFirst()
+  private fun getNotifyData(crn: String, allocatingOfficerUsername: String, token: String, eventNumber: Int): Mono<NotifyData> {
+    val conviction = communityApiClient.getAllConvictions(crn).filter { it.eventNumber == eventNumber }.blockFirst()
     return Mono.zip(
       communityApiClient.getStaffByUsername(allocatingOfficerUsername), assessRisksNeedsApiClient.getRiskSummary(crn, token),
       assessRisksNeedsApiClient.getRiskPredictors(crn, token),

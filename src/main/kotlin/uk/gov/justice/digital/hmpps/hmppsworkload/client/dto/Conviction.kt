@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.client.dto
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonProperty
 import java.math.BigInteger
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -10,6 +11,8 @@ data class Conviction @JsonCreator constructor(
   val custody: Custody? = null,
   val active: Boolean,
   val convictionId: BigInteger,
+  @JsonProperty("index")
+  val eventNumber: Int,
   val courtAppearance: CourtAppearance? = null,
   val offences: List<Offence>? = null
 )
