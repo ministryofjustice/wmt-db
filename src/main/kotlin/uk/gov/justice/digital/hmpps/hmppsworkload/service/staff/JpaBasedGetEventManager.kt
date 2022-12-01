@@ -25,4 +25,10 @@ class JpaBasedGetEventManager(private val eventManagerRepository: EventManagerRe
       CaseDetails.from(caseDetailsEntity)
     }
   }
+
+  fun findDetailsByCrnAndEventNumber(crn: String, eventNumber: Int): CaseDetails? = eventManagerRepository.findFirstByCrnAndEventNumberOrderByCreatedDateDesc(crn, eventNumber)?.let { eventManagerEntity ->
+    caseDetailsRepository.findByIdOrNull(eventManagerEntity.crn)?.let { caseDetailsEntity ->
+      CaseDetails.from(caseDetailsEntity)
+    }
+  }
 }

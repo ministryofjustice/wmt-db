@@ -18,4 +18,6 @@ interface EventManagerRepository : CrudRepository<EventManagerEntity, Long> {
   fun setInactiveTrueFor(crn: String): Int
 
   fun findFirstByEventIdOrderByCreatedDateDesc(eventId: BigInteger): EventManagerEntity?
+
+  fun findFirstByCrnAndEventNumberOrderByCreatedDateDesc(crn: String, eventNumber: Int): EventManagerEntity?
 }

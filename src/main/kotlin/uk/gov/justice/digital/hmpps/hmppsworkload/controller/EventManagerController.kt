@@ -44,4 +44,19 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
   @GetMapping("/allocation/event/eventId/{eventId}/details")
   fun getCaseDetails(@PathVariable(required = true) eventId: BigInteger): CaseDetails =
     getEventManager.findDetailsByEventId(eventId) ?: throw EntityNotFoundException("Event Manager details not found for eventId $eventId")
+
+  @Operation(summary = "Get case details of Event Manager by crn and event number")
+  @ApiResponses(
+    value = [
+      ApiResponse(responseCode = "200", description = "OK"),
+      ApiResponse(responseCode = "404", description = "Result Not Found")
+    ]
+  )
+  @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
+  @GetMapping("/allocation/person/{crn}/event/{eventNumber}/details")
+  fun getCaseDetailsForEventManager(
+    @PathVariable(required = true) crn: String,
+    @PathVariable(required = true) eventNumber: Int
+  ): CaseDetails =
+    getEventManager.findDetailsByCrnAndEventNumber(crn, eventNumber) ?: throw EntityNotFoundException("Case details of event manager not found for crn $crn eventId $eventNumber")
 }
