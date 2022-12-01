@@ -88,7 +88,9 @@ workflows:
             - hmpps-common-vars
             - hmpps-workload-preprod
           requires:
-            - deploy_dev
+            - validate
+            - build_docker
+            - helm_lint
           helm_timeout: 5m
       - request-prod-approval:
           type: approval
