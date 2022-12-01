@@ -609,7 +609,7 @@ abstract class IntegrationTestBase {
     )
   }
 
-  protected fun expectWorkloadAllocationCompleteMessages(crn: String) {
+  protected fun expectWorkloadAllocationCompleteMessages(crn: String): List<HmppsMessage<HmppsAllocationMessage>> {
     numberOfMessagesCurrentlyOnQueue(allocationCompleteClient, allocationCompleteUrl, 3)
     val changeEvents = getAllAllocationMessages()
     changeEvents.forEach { changeEvent ->
@@ -623,6 +623,8 @@ abstract class IntegrationTestBase {
 
     val numberOfRequirementAllocationMessages = changeEvents.count { it.eventType == "requirement.manager.allocated" }
     Assertions.assertEquals(1, numberOfRequirementAllocationMessages)
+
+    return changeEvents
   }
 
   private fun getAllAllocationMessages(): List<HmppsMessage<HmppsAllocationMessage>> {
