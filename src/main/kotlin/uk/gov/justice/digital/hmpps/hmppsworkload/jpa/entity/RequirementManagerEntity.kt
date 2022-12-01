@@ -57,5 +57,8 @@ data class RequirementManagerEntity(
   var providerCode: String,
 
   @Column
-  var isActive: Boolean
+  var isActive: Boolean,
+
+  @Column
+  var eventNumber: Int?
 )

@@ -220,7 +220,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     personManagerRepository.save(storedPersonManager)
     val storedEventManager = EventManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, eventId = eventId, createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = null)
     eventManagerRepository.save(storedEventManager)
-    val storedRequirementManager = RequirementManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, eventId = eventId, requirementId = requirementId, createdBy = "USER1", providerCode = "PV1", isActive = true)
+    val storedRequirementManager = RequirementManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, eventId = eventId, requirementId = requirementId, createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = null)
     requirementManagerRepository.save(storedRequirementManager)
 
     webTestClient.post()
@@ -619,6 +619,59 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .exists()
       .jsonPath("$.eventId")
       .isEqualTo(eventId)
+      .jsonPath("$.eventNumber")
+      .isEqualTo(eventNumber)
+  }
+
+  @Test
+  fun `must return event number for requirement manager allocated`() {
+    staffCodeResponse(staffCode, teamCode)
+    offenderSummaryResponse(crn)
+    singleActiveRequirementResponse(crn, eventId)
+
+    val response = webTestClient.post()
+      .uri("/team/$teamCode/offenderManager/$staffCode/case")
+      .bodyValue(allocateCase(crn, eventId, eventNumber))
+      .headers {
+        it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
+        it.contentType = MediaType.APPLICATION_JSON
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody(CaseAllocated::class.java)
+      .returnResult()
+      .responseBody
+
+    val storedRequirementManager = requirementManagerRepository.findByUuid(response.requirementManagerIds[0])!!
+    val requirementManagerAllocatedEvent = expectWorkloadAllocationCompleteMessages(crn)["requirement.manager.allocated"]!!
+    webTestClient.get()
+      .uri(requirementManagerAllocatedEvent.detailUrl.replace("https://localhost:8080", ""))
+      .headers {
+        it.authToken(roles = listOf("ROLE_WORKLOAD_READ"))
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody()
+      .jsonPath("$.id")
+      .isEqualTo(storedRequirementManager.uuid.toString())
+      .jsonPath("$.staffId")
+      .isEqualTo(storedRequirementManager.staffId)
+      .jsonPath("$.staffCode")
+      .isEqualTo(staffCode)
+      .jsonPath("$.teamCode")
+      .isEqualTo(teamCode)
+      .jsonPath("$.providerCode")
+      .isEqualTo(storedRequirementManager.providerCode)
+      .jsonPath("$.createdBy")
+      .isEqualTo(storedRequirementManager.createdBy)
+      .jsonPath("$.createdDate")
+      .exists()
+      .jsonPath("$.eventId")
+      .isEqualTo(eventId)
+      .jsonPath("$.requirementId")
+      .isEqualTo(storedRequirementManager.requirementId)
       .jsonPath("$.eventNumber")
       .isEqualTo(eventNumber)
   }

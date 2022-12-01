@@ -169,7 +169,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
 
     val personManagerEntity = personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "STFFCDE", teamCode = "TM1", offenderName = "Name", createdBy = "USER1", providerCode = "PV1", isActive = true))
     val eventManagerEntity = eventManagerRepository.save(EventManagerEntity(crn = crn, eventId = BigInteger.TEN, staffId = BigInteger.ONE, staffCode = "STFFCDE", teamCode = "TM1", createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = null))
-    val requirementManagerEntity = requirementManagerRepository.save(RequirementManagerEntity(crn = crn, eventId = BigInteger.TEN, requirementId = BigInteger.TWO, staffId = BigInteger.ONE, staffCode = "STFFCDE", teamCode = "TM1", createdBy = "USER1", providerCode = "PV1", isActive = true))
+    val requirementManagerEntity = requirementManagerRepository.save(RequirementManagerEntity(crn = crn, eventId = BigInteger.TEN, requirementId = BigInteger.TWO, staffId = BigInteger.ONE, staffCode = "STFFCDE", teamCode = "TM1", createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = null))
 
     val sentenceId = BigInteger.valueOf(2500278160L)
     singleInactiveConvictionsResponse(crn)

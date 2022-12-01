@@ -25,11 +25,13 @@ data class RequirementManagerDetails @JsonCreator constructor(
   @Schema(description = "event ID")
   val eventId: BigInteger,
   @Schema(description = "requirement ID")
-  val requirementId: BigInteger
+  val requirementId: BigInteger,
+  @Schema(description = "event number")
+  val eventNumber: Int?
 ) {
   companion object {
     fun from(requirementManagerEntity: RequirementManagerEntity): RequirementManagerDetails {
-      return RequirementManagerDetails(requirementManagerEntity.uuid, requirementManagerEntity.staffId, requirementManagerEntity.staffCode, requirementManagerEntity.teamCode, requirementManagerEntity.providerCode, requirementManagerEntity.createdBy, requirementManagerEntity.createdDate!!, requirementManagerEntity.eventId, requirementManagerEntity.requirementId)
+      return RequirementManagerDetails(requirementManagerEntity.uuid, requirementManagerEntity.staffId, requirementManagerEntity.staffCode, requirementManagerEntity.teamCode, requirementManagerEntity.providerCode, requirementManagerEntity.createdBy, requirementManagerEntity.createdDate!!, requirementManagerEntity.eventId, requirementManagerEntity.requirementId, requirementManagerEntity.eventNumber)
     }
   }
 }

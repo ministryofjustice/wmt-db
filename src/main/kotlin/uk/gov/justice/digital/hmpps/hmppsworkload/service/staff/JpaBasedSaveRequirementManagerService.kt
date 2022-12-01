@@ -52,7 +52,8 @@ class JpaBasedSaveRequirementManagerService(
       requirementId = requirement.requirementId,
       createdBy = loggedInUser,
       providerCode = deliusStaff.probationArea!!.code,
-      isActive = true
+      isActive = true,
+      eventNumber = allocateCase.eventNumber
     )
     requirementManagerRepository.save(requirementManagerEntity)
     return SaveResult(requirementManagerEntity, true)
