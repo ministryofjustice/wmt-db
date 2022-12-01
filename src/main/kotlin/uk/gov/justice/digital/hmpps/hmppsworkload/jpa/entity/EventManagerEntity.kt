@@ -54,5 +54,8 @@ data class EventManagerEntity(
   var providerCode: String,
 
   @Column
-  var isActive: Boolean
+  var isActive: Boolean,
+
+  @Column
+  var eventNumber: Int? = null
 )
