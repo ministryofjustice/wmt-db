@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.EnrichedEventManagerDetails
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.EventManagerDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.JpaBasedGetEventManager
 import java.math.BigInteger
@@ -42,6 +42,6 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/allocation/event/eventId/{eventId}/details")
-  fun getEventManagerDetailsByEventId(@PathVariable(required = true) eventId: BigInteger): EnrichedEventManagerDetails =
+  fun getCaseDetails(@PathVariable(required = true) eventId: BigInteger): CaseDetails =
     getEventManager.findDetailsByEventId(eventId) ?: throw EntityNotFoundException("Event Manager details not found for eventId $eventId")
 }

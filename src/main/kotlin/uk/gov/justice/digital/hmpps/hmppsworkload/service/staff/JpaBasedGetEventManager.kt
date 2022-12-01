@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service.staff
 
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.EnrichedEventManagerDetails
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.EventDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
@@ -20,9 +20,9 @@ class JpaBasedGetEventManager(private val eventManagerRepository: EventManagerRe
       }
     }
 
-  fun findDetailsByEventId(eventId: BigInteger): EnrichedEventManagerDetails? = eventManagerRepository.findFirstByEventIdOrderByCreatedDateDesc(eventId)?.let { eventManagerEntity ->
+  fun findDetailsByEventId(eventId: BigInteger): CaseDetails? = eventManagerRepository.findFirstByEventIdOrderByCreatedDateDesc(eventId)?.let { eventManagerEntity ->
     caseDetailsRepository.findByIdOrNull(eventManagerEntity.crn)?.let { caseDetailsEntity ->
-      EnrichedEventManagerDetails.from(eventManagerEntity, caseDetailsEntity)
+      CaseDetails.from(caseDetailsEntity)
     }
   }
 }
