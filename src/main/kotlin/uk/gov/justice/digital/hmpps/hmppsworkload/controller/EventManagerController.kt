@@ -58,5 +58,5 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
     @PathVariable(required = true) crn: String,
     @PathVariable(required = true) eventNumber: Int
   ): CaseDetails =
-    getEventManager.findDetailsByCrnAndEventNumber(crn, eventNumber) ?: throw EntityNotFoundException("Case details of event manager not found for crn $crn eventId $eventNumber")
+    getEventManager.findDetailsByCrnAndEventNumber(crn, eventNumber) ?: throw EntityNotFoundException("Case details of event manager not found for crn $crn eventNumber $eventNumber")
 }

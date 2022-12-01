@@ -11,7 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 class GetImpactForOffenderManager : IntegrationTestBase() {
 
   @Test
-  fun `can get impact for an offender manager with workload`() {
+  fun `can post impact for an offender manager with workload`() {
     val crn = "CRN1"
     val staffCode = "OM1"
     val teamCode = "T1"
@@ -22,6 +22,39 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/impact")
       .bodyValue(impactCase(crn))
+      .headers {
+        it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
+        it.contentType = MediaType.APPLICATION_JSON
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody()
+      .jsonPath("$.forename")
+      .isEqualTo("Jane")
+      .jsonPath("$.surname")
+      .isEqualTo("Doe")
+      .jsonPath("$.grade")
+      .isEqualTo("PO")
+      .jsonPath("$.capacity")
+      .isEqualTo(50)
+      .jsonPath("$.code")
+      .isEqualTo(staffCode)
+      .jsonPath("$.potentialCapacity")
+      .isEqualTo(55)
+  }
+
+  @Test
+  fun `can get impact for an offender manager with workload`() {
+    val crn = "CRN1"
+    val staffCode = "OM1"
+    val teamCode = "T1"
+    staffCodeResponse(staffCode, teamCode)
+    setupCurrentWmtStaff(staffCode, teamCode)
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Jane", "Doe"))
+
+    webTestClient.get()
+      .uri("/team/$teamCode/offenderManager/$staffCode/impact/person/$crn")
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
         it.contentType = MediaType.APPLICATION_JSON

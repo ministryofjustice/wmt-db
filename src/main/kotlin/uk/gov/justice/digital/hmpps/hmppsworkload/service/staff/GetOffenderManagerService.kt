@@ -6,7 +6,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.DeliusStaff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.ImpactCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerCases
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
@@ -38,12 +37,12 @@ class GetOffenderManagerService(
   private val getEventManager: JpaBasedGetEventManager
 ) {
 
-  fun getPotentialWorkload(staffCode: String, teamCode: String, impactCase: ImpactCase): OffenderManagerOverview? {
+  fun getPotentialWorkload(staffCode: String, teamCode: String, crn: String): OffenderManagerOverview? {
     return getOverview(staffCode, teamCode)?.let { overview ->
-      val currentCaseImpact = getCurrentCasePoints(teamCode, overview.code, impactCase.crn)
+      val currentCaseImpact = getCurrentCasePoints(teamCode, overview.code, crn)
       overview.potentialCapacity = calculateCapacity(
         overview.totalPoints.minus(currentCaseImpact)
-          .plus(caseCalculator.getPointsForCase(getPotentialCase(crn = impactCase.crn))),
+          .plus(caseCalculator.getPointsForCase(getPotentialCase(crn = crn))),
         overview.availablePoints
       )
       overview

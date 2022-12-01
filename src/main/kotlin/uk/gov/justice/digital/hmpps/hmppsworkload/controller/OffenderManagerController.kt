@@ -40,8 +40,26 @@ class OffenderManagerController(
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @PostMapping("/team/{teamCode}/offenderManager/{staffCode}/impact")
-  fun getImpactOfAllocation(@PathVariable(required = true) teamCode: String, @PathVariable(required = true) staffCode: String, @RequestBody impactCase: ImpactCase): OffenderManagerPotentialWorkload {
-    val potentialWorkload = getOffenderManagerService.getPotentialWorkload(staffCode, teamCode, impactCase)
+  @Deprecated("use the get mapping below")
+  fun postImpactOfAllocation(@PathVariable(required = true) teamCode: String, @PathVariable(required = true) staffCode: String, @RequestBody impactCase: ImpactCase): OffenderManagerPotentialWorkload {
+    val potentialWorkload = getOffenderManagerService.getPotentialWorkload(staffCode, teamCode, impactCase.crn)
+    if (potentialWorkload != null) {
+      return OffenderManagerPotentialWorkload.from(potentialWorkload)
+    }
+    throw EntityNotFoundException("Team $teamCode and staff Code $staffCode combination not found")
+  }
+
+  @Operation(summary = "Retrieves capacity and potential capacity if case were to be allocated")
+  @ApiResponses(
+    value = [
+      ApiResponse(responseCode = "200", description = "OK"),
+      ApiResponse(responseCode = "404", description = "Result Not Found")
+    ]
+  )
+  @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
+  @GetMapping("/team/{teamCode}/offenderManager/{staffCode}/impact/person/{crn}")
+  fun getImpactOfAllocation(@PathVariable(required = true) teamCode: String, @PathVariable(required = true) staffCode: String, @PathVariable crn: String): OffenderManagerPotentialWorkload {
+    val potentialWorkload = getOffenderManagerService.getPotentialWorkload(staffCode, teamCode, crn)
     if (potentialWorkload != null) {
       return OffenderManagerPotentialWorkload.from(potentialWorkload)
     }
