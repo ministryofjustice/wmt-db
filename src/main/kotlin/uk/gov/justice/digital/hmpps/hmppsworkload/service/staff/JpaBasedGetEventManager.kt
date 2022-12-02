@@ -7,7 +7,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.EventDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.EventManagerRepository
-import java.math.BigInteger
 import java.util.UUID
 
 @Service
@@ -19,12 +18,6 @@ class JpaBasedGetEventManager(private val eventManagerRepository: EventManagerRe
         EventDetails(caseDetails.tier, caseDetails.type, caseDetails.crn, eventManagerEntity.createdDate!!)
       }
     }
-
-  fun findDetailsByEventId(eventId: BigInteger): CaseDetails? = eventManagerRepository.findFirstByEventIdOrderByCreatedDateDesc(eventId)?.let { eventManagerEntity ->
-    caseDetailsRepository.findByIdOrNull(eventManagerEntity.crn)?.let { caseDetailsEntity ->
-      CaseDetails.from(caseDetailsEntity)
-    }
-  }
 
   fun findDetailsByCrnAndEventNumber(crn: String, eventNumber: Int): CaseDetails? = eventManagerRepository.findFirstByCrnAndEventNumberOrderByCreatedDateDesc(crn, eventNumber)?.let { eventManagerEntity ->
     caseDetailsRepository.findByIdOrNull(eventManagerEntity.crn)?.let { caseDetailsEntity ->

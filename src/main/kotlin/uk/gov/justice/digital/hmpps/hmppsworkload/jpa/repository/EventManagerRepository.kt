@@ -17,7 +17,5 @@ interface EventManagerRepository : CrudRepository<EventManagerEntity, Long> {
   @Query("update EventManagerEntity e set e.isActive= false where e.crn = ?1")
   fun setInactiveTrueFor(crn: String): Int
 
-  fun findFirstByEventIdOrderByCreatedDateDesc(eventId: BigInteger): EventManagerEntity?
-
   fun findFirstByCrnAndEventNumberOrderByCreatedDateDesc(crn: String, eventNumber: Int): EventManagerEntity?
 }
