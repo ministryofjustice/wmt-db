@@ -14,6 +14,10 @@ class JpaBasedSaveEventManagerService(
 ) : SaveEventManagerService {
 
   @Transactional
+  /***
+   * if the case has an event manager check if the new event manager is the same otherwise make the older event manager
+   * inactive and save the new event manager.
+   */
   override fun saveEventManager(
     teamCode: String,
     deliusStaff: DeliusStaff,

@@ -155,7 +155,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     Assertions.assertEquals(staffCode, eventManager.staffCode)
     Assertions.assertEquals(teamCode, eventManager.teamCode)
 
-    val requirementManager = requirementManagerRepository.findFirstByCrnAndEventIdAndRequirementIdOrderByCreatedDateDesc(crn, eventId, requirementId)!!
+    val requirementManager = requirementManagerRepository.findFirstByCrnAndEventNumberAndRequirementIdOrderByCreatedDateDesc(crn, eventNumber, requirementId)!!
     Assertions.assertEquals(staffCode, requirementManager.staffCode)
     Assertions.assertEquals(teamCode, requirementManager.teamCode)
   }
