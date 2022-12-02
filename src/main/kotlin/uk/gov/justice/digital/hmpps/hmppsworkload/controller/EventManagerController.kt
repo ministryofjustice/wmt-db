@@ -42,6 +42,7 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/allocation/event/eventId/{eventId}/details")
+  @Deprecated("Use getCaseDetailsForEventManager instead using the eventNumber")
   fun getCaseDetails(@PathVariable(required = true) eventId: BigInteger): CaseDetails =
     getEventManager.findDetailsByEventId(eventId) ?: throw EntityNotFoundException("Event Manager details not found for eventId $eventId")
 
