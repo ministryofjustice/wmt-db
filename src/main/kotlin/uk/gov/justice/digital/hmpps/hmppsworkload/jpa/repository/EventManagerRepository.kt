@@ -8,7 +8,6 @@ import java.math.BigInteger
 import java.util.UUID
 
 interface EventManagerRepository : CrudRepository<EventManagerEntity, Long> {
-  fun findFirstByCrnAndEventIdOrderByCreatedDateDesc(crn: String, eventId: BigInteger): EventManagerEntity?
   fun findByUuid(id: UUID): EventManagerEntity?
 
   fun findFirstByStaffCodeAndTeamCodeAndIsActiveTrueOrderByCreatedDateDesc(staffCode: String, teamCode: String): EventManagerEntity?
