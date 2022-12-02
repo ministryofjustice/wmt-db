@@ -8,7 +8,7 @@ import java.math.BigInteger
 import java.util.UUID
 
 interface RequirementManagerRepository : CrudRepository<RequirementManagerEntity, Long> {
-  fun findFirstByCrnAndEventIdAndRequirementIdOrderByCreatedDateDesc(crn: String, eventId: BigInteger, requirementId: BigInteger): RequirementManagerEntity?
+  fun findFirstByCrnAndEventNumberAndRequirementIdOrderByCreatedDateDesc(crn: String, eventNumber: Int, requirementId: BigInteger): RequirementManagerEntity?
   fun findByUuid(id: UUID): RequirementManagerEntity?
 
   @Modifying

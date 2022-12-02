@@ -14,12 +14,16 @@ class JpaBasedSaveEventManagerService(
 ) : SaveEventManagerService {
 
   @Transactional
+  /***
+   * if the case has an event manager check if the new event manager is the same otherwise make the older event manager
+   * inactive and save the new event manager.
+   */
   override fun saveEventManager(
     teamCode: String,
     deliusStaff: DeliusStaff,
     allocateCase: AllocateCase,
     loggedInUser: String
-  ): SaveResult<EventManagerEntity> = eventManagerRepository.findFirstByCrnAndEventIdOrderByCreatedDateDesc(allocateCase.crn, allocateCase.eventId)?.let { eventManager ->
+  ): SaveResult<EventManagerEntity> = eventManagerRepository.findFirstByCrnAndEventNumberOrderByCreatedDateDesc(allocateCase.crn, allocateCase.eventNumber)?.let { eventManager ->
     if (eventManager.staffId == deliusStaff.staffIdentifier && eventManager.teamCode == teamCode) {
       return SaveResult(eventManager, false)
     }

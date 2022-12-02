@@ -49,7 +49,7 @@ class DefaultSaveWorkloadService(
     if (personManagerSaveResult.hasChanged || eventManagerSaveResult.hasChanged || requirementManagerSaveResults.any { it.hasChanged }) {
       notificationService.notifyAllocation(allocateTo, summary, activeRequirements, allocateCase, loggedInUser, authToken)
         .block()
-      sqsSuccessPublisher.auditAllocation(allocateCase.crn, allocateCase.eventId, loggedInUser, activeRequirements.map { it.requirementId })
+      sqsSuccessPublisher.auditAllocation(allocateCase.crn, allocateCase.eventNumber, loggedInUser, activeRequirements.map { it.requirementId })
     }
     return CaseAllocated(personManagerSaveResult.entity.uuid, eventManagerSaveResult.entity.uuid, requirementManagerSaveResults.map { it.entity.uuid })
   }

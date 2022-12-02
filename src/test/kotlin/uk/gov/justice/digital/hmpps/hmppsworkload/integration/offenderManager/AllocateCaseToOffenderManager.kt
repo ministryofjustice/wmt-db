@@ -151,11 +151,11 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     Assertions.assertEquals(staffCode, personManager.staffCode)
     Assertions.assertEquals(teamCode, personManager.teamCode)
 
-    val eventManager = eventManagerRepository.findFirstByCrnAndEventIdOrderByCreatedDateDesc(crn, eventId)!!
+    val eventManager = eventManagerRepository.findFirstByCrnAndEventNumberOrderByCreatedDateDesc(crn, eventNumber)!!
     Assertions.assertEquals(staffCode, eventManager.staffCode)
     Assertions.assertEquals(teamCode, eventManager.teamCode)
 
-    val requirementManager = requirementManagerRepository.findFirstByCrnAndEventIdAndRequirementIdOrderByCreatedDateDesc(crn, eventId, requirementId)!!
+    val requirementManager = requirementManagerRepository.findFirstByCrnAndEventNumberAndRequirementIdOrderByCreatedDateDesc(crn, eventNumber, requirementId)!!
     Assertions.assertEquals(staffCode, requirementManager.staffCode)
     Assertions.assertEquals(teamCode, requirementManager.teamCode)
   }
@@ -218,9 +218,9 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     singleActiveRequirementResponse(crn, eventId, requirementId)
     val storedPersonManager = PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1", isActive = true)
     personManagerRepository.save(storedPersonManager)
-    val storedEventManager = EventManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, eventId = eventId, createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = null)
+    val storedEventManager = EventManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, eventId = eventId, createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = eventNumber)
     eventManagerRepository.save(storedEventManager)
-    val storedRequirementManager = RequirementManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, eventId = eventId, requirementId = requirementId, createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = null)
+    val storedRequirementManager = RequirementManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, eventId = eventId, requirementId = requirementId, createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = eventNumber)
     requirementManagerRepository.save(storedRequirementManager)
 
     webTestClient.post()
@@ -250,7 +250,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     val otherPersonManager = PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", offenderName = "John Doe", createdBy = "USER1", providerCode = "PV1", isActive = true)
     staffCodeResponse(otherPersonManager.staffCode, otherPersonManager.teamCode)
     val storedPersonManager = personManagerRepository.save(otherPersonManager)
-    val storedEventManager = eventManagerRepository.save(EventManagerEntity(crn = crn, eventId = eventId, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = null))
+    val storedEventManager = eventManagerRepository.save(EventManagerEntity(crn = crn, eventId = eventId, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = eventNumber))
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
@@ -433,7 +433,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .isOk
 
     await untilCallTo { verifyAuditMessageOnQueue() } matches { it == true }
-    val auditData = AuditData(crn, eventId, listOf(requirementId))
+    val auditData = AuditData(crn, eventNumber, listOf(requirementId))
     Assertions.assertEquals(objectMapper.writeValueAsString(auditData), getAuditMessages().details)
   }
 

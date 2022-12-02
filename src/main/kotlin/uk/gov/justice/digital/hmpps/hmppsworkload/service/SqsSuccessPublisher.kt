@@ -124,13 +124,13 @@ class SqsSuccessPublisher(
 
   fun auditAllocation(
     crn: String,
-    eventId: BigInteger,
+    eventNumber: Int,
     loggedInUser: String,
     requirementIds: List<BigInteger>
   ) {
     val auditData = AuditData(
       crn,
-      eventId,
+      eventNumber,
       requirementIds
     )
 
@@ -194,7 +194,7 @@ data class AuditMessage(val operationId: String, val what: String = "CASE_ALLOCA
 
 data class AuditData(
   val crn: String,
-  val eventId: BigInteger,
+  val eventNumber: Int,
   val requirementIds: List<BigInteger>
 )
 
