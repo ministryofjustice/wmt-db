@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseAllocated
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.ImpactCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerCases
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerOverview
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerPotentialWorkload
@@ -30,24 +29,6 @@ class OffenderManagerController(
   private val getOffenderManagerService: GetOffenderManagerService,
   private val saveWorkloadService: SaveWorkloadService
 ) {
-
-  @Operation(summary = "Retrieves capacity and potential capacity if case were to be allocated")
-  @ApiResponses(
-    value = [
-      ApiResponse(responseCode = "200", description = "OK"),
-      ApiResponse(responseCode = "404", description = "Result Not Found")
-    ]
-  )
-  @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
-  @PostMapping("/team/{teamCode}/offenderManager/{staffCode}/impact")
-  @Deprecated("use the get mapping below")
-  fun postImpactOfAllocation(@PathVariable(required = true) teamCode: String, @PathVariable(required = true) staffCode: String, @RequestBody impactCase: ImpactCase): OffenderManagerPotentialWorkload {
-    val potentialWorkload = getOffenderManagerService.getPotentialWorkload(staffCode, teamCode, impactCase.crn)
-    if (potentialWorkload != null) {
-      return OffenderManagerPotentialWorkload.from(potentialWorkload)
-    }
-    throw EntityNotFoundException("Team $teamCode and staff Code $staffCode combination not found")
-  }
 
   @Operation(summary = "Retrieves capacity and potential capacity if case were to be allocated")
   @ApiResponses(
