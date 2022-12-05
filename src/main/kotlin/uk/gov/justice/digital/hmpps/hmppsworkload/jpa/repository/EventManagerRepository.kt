@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
-import java.math.BigInteger
 import java.util.UUID
 
 interface EventManagerRepository : CrudRepository<EventManagerEntity, Long> {
@@ -15,8 +14,6 @@ interface EventManagerRepository : CrudRepository<EventManagerEntity, Long> {
   @Modifying
   @Query("update EventManagerEntity e set e.isActive= false where e.crn = ?1")
   fun setInactiveTrueFor(crn: String): Int
-
-  fun findFirstByEventIdOrderByCreatedDateDesc(eventId: BigInteger): EventManagerEntity?
 
   fun findFirstByCrnAndEventNumberOrderByCreatedDateDesc(crn: String, eventNumber: Int): EventManagerEntity?
 }
