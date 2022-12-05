@@ -15,7 +15,7 @@ class GetReductionService(private val reductionsRepository: ReductionsRepository
     ReductionStatus.ARCHIVED, ReductionStatus.DELETED
   )
 
-  fun findNextReductionChange(staffCode: String, teamCode: String): ZonedDateTime? = workloadOwnerRepository.findFirstByOffenderManagerCodeAndTeamCodeOrderByIdDesc(staffCode, teamCode)?.let { workloadOwner ->
+  fun findNextReductionChange(staffIdentifier: StaffIdentifier): ZonedDateTime? = workloadOwnerRepository.findFirstByOffenderManagerCodeAndTeamCodeOrderByIdDesc(staffIdentifier.staffCode, staffIdentifier.teamCode)?.let { workloadOwner ->
     reductionsRepository.findUpcomingReductions(
       workloadOwner, excludeStatuses, ZonedDateTime.now(), ZonedDateTime.now()
     )

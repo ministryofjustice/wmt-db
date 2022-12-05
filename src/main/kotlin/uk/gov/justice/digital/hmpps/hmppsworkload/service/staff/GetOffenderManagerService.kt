@@ -77,7 +77,7 @@ class GetOffenderManagerService(
       val team = staff.teams!!.first { team -> team.code == staffIdentifier.teamCode }
       val overview = offenderManagerRepository.findByOverview(team.code, staff.staffCode)?.let {
         it.capacity = calculateCapacity(it.totalPoints, it.availablePoints)
-        it.nextReductionChange = getReductionService.findNextReductionChange(staffIdentifier.staffCode, staffIdentifier.teamCode)
+        it.nextReductionChange = getReductionService.findNextReductionChange(staffIdentifier)
         it.reductionHours = getReductionService.findReductionHours(staffIdentifier)
         it.contractedHours = getWeeklyHours.findWeeklyHours(staffIdentifier, staff.grade)
         offenderManagerRepository.findByCaseloadTotals(it.workloadOwnerId).let { totals ->
@@ -93,7 +93,7 @@ class GetOffenderManagerService(
       } ?: getDefaultOffenderManagerOverview(staff, team.description)
       overview.grade = staff.grade
       overview.email = staff.email
-      overview.lastAllocatedEvent = getEventManager.findLatestByStaffAndTeam(staffIdentifier.staffCode, staffIdentifier.teamCode)
+      overview.lastAllocatedEvent = getEventManager.findLatestByStaffAndTeam(staffIdentifier)
       overview
     }.block()
 

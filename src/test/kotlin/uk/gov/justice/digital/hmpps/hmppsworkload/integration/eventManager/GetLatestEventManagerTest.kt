@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.EventDetails
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
@@ -34,7 +35,7 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
     val realtimeCase = EventDetails(Tier.A1, CaseType.LICENSE, eventManagerEntity.crn, eventManagerEntity.createdDate!!)
     // realtime
     caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, realtimeCase.type, "Jane", "Doe"))
-    val result = getEventManager.findLatestByStaffAndTeam(staffCode, teamCode)
+    val result = getEventManager.findLatestByStaffAndTeam(StaffIdentifier(staffCode, teamCode))
 
     Assertions.assertEquals(realtimeCase, result)
   }
@@ -51,7 +52,7 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
       )
     )
 
-    Assertions.assertNull(getEventManager.findLatestByStaffAndTeam(staffCode, teamCode))
+    Assertions.assertNull(getEventManager.findLatestByStaffAndTeam(StaffIdentifier(staffCode, teamCode)))
   }
 
   @Test
@@ -81,7 +82,7 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
     // realtime
     caseDetailsRepository.save(CaseDetailsEntity(latestEventManagerEntity.crn, realtimeCase.tier, realtimeCase.type, "Jane", "Doe"))
 
-    val result = getEventManager.findLatestByStaffAndTeam(staffCode, teamCode)
+    val result = getEventManager.findLatestByStaffAndTeam(StaffIdentifier(staffCode, teamCode))
 
     Assertions.assertEquals(realtimeCase, result)
   }
@@ -110,6 +111,6 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
       )
     )
 
-    Assertions.assertNull(getEventManager.findLatestByStaffAndTeam(staffCode, teamCode))
+    Assertions.assertNull(getEventManager.findLatestByStaffAndTeam(StaffIdentifier(staffCode, teamCode)))
   }
 }
