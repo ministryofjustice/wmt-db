@@ -41,7 +41,7 @@ class OffenderManagerController(
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/team/{teamCode}/offenderManager/{staffCode}/impact/person/{crn}")
   fun getImpactOfAllocation(@PathVariable(required = true) teamCode: String, @PathVariable(required = true) staffCode: String, @PathVariable crn: String): OffenderManagerPotentialWorkload {
-    val potentialWorkload = getOffenderManagerService.getPotentialWorkload(staffCode, teamCode, crn)
+    val potentialWorkload = getOffenderManagerService.getPotentialWorkload(StaffIdentifier(staffCode, teamCode), crn)
     if (potentialWorkload != null) {
       return OffenderManagerPotentialWorkload.from(potentialWorkload)
     }
@@ -58,7 +58,7 @@ class OffenderManagerController(
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/team/{teamCode}/offenderManagers/{offenderManagerCode}")
   fun getOverview(@PathVariable(required = true) teamCode: String, @PathVariable(required = true) offenderManagerCode: String): OffenderManagerOverview {
-    return getOffenderManagerService.getOverview(offenderManagerCode, teamCode)?.let {
+    return getOffenderManagerService.getOverview(StaffIdentifier(offenderManagerCode, teamCode))?.let {
       OffenderManagerOverview.from(it)
     } ?: run {
       throw EntityNotFoundException("Team $teamCode and offender manager $offenderManagerCode combination not found")
@@ -96,7 +96,7 @@ class OffenderManagerController(
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/team/{teamCode}/offenderManagers/{offenderManagerCode}/cases")
   fun getCases(@PathVariable(required = true) teamCode: String, @PathVariable(required = true) offenderManagerCode: String): OffenderManagerCases {
-    return getOffenderManagerService.getCases(teamCode, offenderManagerCode)
+    return getOffenderManagerService.getCases(StaffIdentifier(offenderManagerCode, teamCode))
       ?: run {
         throw EntityNotFoundException("Team $teamCode and offender manager $offenderManagerCode combination not found")
       }

@@ -37,9 +37,9 @@ class GetOffenderManagerService(
   private val getEventManager: JpaBasedGetEventManager
 ) {
 
-  fun getPotentialWorkload(staffCode: String, teamCode: String, crn: String): OffenderManagerOverview? {
-    return getOverview(staffCode, teamCode)?.let { overview ->
-      val currentCaseImpact = getCurrentCasePoints(teamCode, overview.code, crn)
+  fun getPotentialWorkload(staffIdentifier: StaffIdentifier, crn: String): OffenderManagerOverview? {
+    return getOverview(staffIdentifier)?.let { overview ->
+      val currentCaseImpact = getCurrentCasePoints(staffIdentifier, crn)
       overview.potentialCapacity = calculateCapacity(
         overview.totalPoints.minus(currentCaseImpact)
           .plus(caseCalculator.getPointsForCase(getPotentialCase(crn = crn))),
@@ -54,7 +54,7 @@ class GetOffenderManagerService(
       .let { Case(tier = it.tier, type = it.type, crn = crn) }
   }
 
-  private fun getCurrentCasePoints(teamCode: String, staffCode: String, crn: String): BigInteger = offenderManagerRepository.findCaseByTeamCodeAndStaffCodeAndCrn(teamCode, staffCode, crn)?.let { currentCase ->
+  private fun getCurrentCasePoints(staffIdentifier: StaffIdentifier, crn: String): BigInteger = offenderManagerRepository.findCaseByTeamCodeAndStaffCodeAndCrn(staffIdentifier.teamCode, staffIdentifier.staffCode, crn)?.let { currentCase ->
     return caseCalculator.getPointsForCase(Case(Tier.valueOf(currentCase.tier), CaseType.valueOf(currentCase.caseCategory), false, crn))
   } ?: BigInteger.ZERO
 
@@ -72,19 +72,19 @@ class GetOffenderManagerService(
     return overview
   }
 
-  fun getOverview(offenderManagerCode: String, teamCode: String): OffenderManagerOverview? =
-    communityApiClient.getStaffByCode(offenderManagerCode).map { staff ->
-      val team = staff.teams!!.first { team -> team.code == teamCode }
+  fun getOverview(staffIdentifier: StaffIdentifier): OffenderManagerOverview? =
+    communityApiClient.getStaffByCode(staffIdentifier.staffCode).map { staff ->
+      val team = staff.teams!!.first { team -> team.code == staffIdentifier.teamCode }
       val overview = offenderManagerRepository.findByOverview(team.code, staff.staffCode)?.let {
         it.capacity = calculateCapacity(it.totalPoints, it.availablePoints)
-        it.nextReductionChange = getReductionService.findNextReductionChange(offenderManagerCode, teamCode)
-        it.reductionHours = getReductionService.findReductionHours(StaffIdentifier(offenderManagerCode, teamCode))
-        it.contractedHours = getWeeklyHours.findWeeklyHours(StaffIdentifier(offenderManagerCode, teamCode), staff.grade)
+        it.nextReductionChange = getReductionService.findNextReductionChange(staffIdentifier.staffCode, staffIdentifier.teamCode)
+        it.reductionHours = getReductionService.findReductionHours(staffIdentifier)
+        it.contractedHours = getWeeklyHours.findWeeklyHours(staffIdentifier, staff.grade)
         offenderManagerRepository.findByCaseloadTotals(it.workloadOwnerId).let { totals ->
           it.tierCaseTotals = totals.map { total -> TierCaseTotals(total.getATotal(), total.getBTotal(), total.getCTotal(), total.getDTotal(), total.untiered) }
             .fold(TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)) { first, second -> TierCaseTotals(first.A.add(second.A), first.B.add(second.B), first.C.add(second.C), first.D.add(second.D), first.untiered.add(second.untiered)) }
         }
-        offenderManagerRepository.findCasesByTeamCodeAndStaffCode(offenderManagerCode, teamCode).let { cases ->
+        offenderManagerRepository.findCasesByTeamCodeAndStaffCode(staffIdentifier.staffCode, staffIdentifier.teamCode).let { cases ->
           val crns = cases.map { case -> case.crn }
           it.caseEndDue = getSentenceService.getCasesDueToEndCount(crns)
           it.releasesDue = getSentenceService.getCasesDueToBeReleases(crns)
@@ -93,16 +93,16 @@ class GetOffenderManagerService(
       } ?: getDefaultOffenderManagerOverview(staff, team.description)
       overview.grade = staff.grade
       overview.email = staff.email
-      overview.lastAllocatedEvent = getEventManager.findLatestByStaffAndTeam(offenderManagerCode, teamCode)
+      overview.lastAllocatedEvent = getEventManager.findLatestByStaffAndTeam(staffIdentifier.staffCode, staffIdentifier.teamCode)
       overview
     }.block()
 
-  fun getCases(teamCode: String, offenderManagerCode: String): OffenderManagerCases? =
-    offenderManagerRepository.findCasesByTeamCodeAndStaffCode(offenderManagerCode, teamCode).let { cases ->
+  fun getCases(staffIdentifier: StaffIdentifier): OffenderManagerCases? =
+    offenderManagerRepository.findCasesByTeamCodeAndStaffCode(staffIdentifier.staffCode, staffIdentifier.teamCode).let { cases ->
       val crnDetails = getCrnToCaseDetails(cases.map { it.crn })
-      communityApiClient.getStaffByCode(offenderManagerCode)
+      communityApiClient.getStaffByCode(staffIdentifier.staffCode)
         .map { staffSummary ->
-          val team = staffSummary.teams?.first { team -> team.code == teamCode }
+          val team = staffSummary.teams?.first { team -> team.code == staffIdentifier.teamCode }
           OffenderManagerCases.from(staffSummary, team!!, cases, crnDetails)
         }.block()
     }
