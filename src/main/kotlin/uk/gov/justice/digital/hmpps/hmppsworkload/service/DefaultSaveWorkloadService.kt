@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.DeliusStaff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseAllocated
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.SaveResult
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RequirementManagerEntity
@@ -25,27 +26,26 @@ class DefaultSaveWorkloadService(
   private val telemetryService: TelemetryService,
   private val sqsSuccessPublisher: SqsSuccessPublisher,
   private val caseDetailsRepository: CaseDetailsRepository
-) : SaveWorkloadService {
+) {
 
-  override fun saveWorkload(
-    staffCode: String,
-    teamCode: String,
+  fun saveWorkload(
+    allocatedStaffId: StaffIdentifier,
     allocateCase: AllocateCase,
     loggedInUser: String,
     authToken: String
   ): CaseAllocated {
-    val allocateTo = communityApiClient.getStaffByCode(staffCode).block()!!
+    val allocateTo = communityApiClient.getStaffByCode(allocatedStaffId.staffCode).block()!!
     val summary = communityApiClient.getSummaryByCrn(allocateCase.crn).block()!!
     val activeRequirements = communityApiClient.getActiveRequirements(allocateCase.crn, allocateCase.eventId).block()!!.requirements
     val personManagerSaveResult = savePersonManagerService.savePersonManager(
-      teamCode,
+      allocatedStaffId.teamCode,
       allocateTo,
       loggedInUser,
       summary,
       allocateCase.crn
     ).also { afterPersonManagerSaved(it, allocateTo) }
-    val eventManagerSaveResult = saveEventManagerService.saveEventManager(teamCode, allocateTo, allocateCase, loggedInUser).also { afterEventManagerSaved(it) }
-    val requirementManagerSaveResults = saveRequirementManagerService.saveRequirementManagers(teamCode, allocateTo, allocateCase, loggedInUser, activeRequirements).also { afterRequirementManagersSaved(it) }
+    val eventManagerSaveResult = saveEventManagerService.saveEventManager(allocatedStaffId.teamCode, allocateTo, allocateCase, loggedInUser).also { afterEventManagerSaved(it) }
+    val requirementManagerSaveResults = saveRequirementManagerService.saveRequirementManagers(allocatedStaffId.teamCode, allocateTo, allocateCase, loggedInUser, activeRequirements).also { afterRequirementManagersSaved(it) }
     if (personManagerSaveResult.hasChanged || eventManagerSaveResult.hasChanged || requirementManagerSaveResults.any { it.hasChanged }) {
       notificationService.notifyAllocation(allocateTo, summary, activeRequirements, allocateCase, loggedInUser, authToken)
         .block()
