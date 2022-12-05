@@ -25,8 +25,6 @@ data class PersonManagerDetails @JsonCreator constructor(
   val createdDate: ZonedDateTime,
   @Schema(description = "crn")
   val crn: String,
-  @Schema(description = "personName")
-  val personName: String,
   @Schema(description = "Staff Grade")
   val staffGrade: String,
   @Schema(description = "Staff Email")
@@ -47,7 +45,6 @@ data class PersonManagerDetails @JsonCreator constructor(
         personManagerEntity.createdBy,
         personManagerEntity.createdDate!!,
         personManagerEntity.crn,
-        personManagerEntity.offenderName,
         deliusStaff.grade,
         deliusStaff.email!!,
         deliusStaff.staff.forenames,

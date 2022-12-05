@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service.staff
 
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.DeliusStaff
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.SaveResult
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
@@ -21,7 +20,6 @@ class JpaBasedSavePersonManagerService(
     teamCode: String,
     deliusStaff: DeliusStaff,
     loggedInUser: String,
-    personSummary: PersonSummary,
     crn: String
   ): SaveResult<PersonManagerEntity> =
     personManagerRepository.findFirstByCrnOrderByCreatedDateDesc(crn)?.let { personManager ->
@@ -29,7 +27,7 @@ class JpaBasedSavePersonManagerService(
         SaveResult(personManager, false)
       } else {
         val currentPersonManager = getPersonManager.findLatestByCrn(crn)
-        createPersonManager(deliusStaff, teamCode, personSummary, loggedInUser, crn).also {
+        createPersonManager(deliusStaff, teamCode, loggedInUser, crn).also {
           personManager.isActive = false
           workloadCalculationService.saveWorkloadCalculation(
             StaffIdentifier(currentPersonManager!!.staffCode, currentPersonManager.teamCode),
@@ -37,12 +35,11 @@ class JpaBasedSavePersonManagerService(
           )
         }
       }
-    } ?: createPersonManager(deliusStaff, teamCode, personSummary, loggedInUser, crn)
+    } ?: createPersonManager(deliusStaff, teamCode, loggedInUser, crn)
 
   private fun createPersonManager(
     deliusStaff: DeliusStaff,
     teamCode: String,
-    personSummary: PersonSummary,
     loggedInUser: String,
     crn: String
   ): SaveResult<PersonManagerEntity> {
@@ -51,7 +48,6 @@ class JpaBasedSavePersonManagerService(
       staffId = deliusStaff.staffIdentifier,
       staffCode = deliusStaff.staffCode,
       teamCode = teamCode,
-      offenderName = "${personSummary.firstName} ${personSummary.surname}",
       createdBy = loggedInUser,
       providerCode = deliusStaff.probationArea!!.code,
       isActive = true

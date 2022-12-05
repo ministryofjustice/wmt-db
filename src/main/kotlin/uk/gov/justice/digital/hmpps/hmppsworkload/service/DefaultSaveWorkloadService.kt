@@ -35,19 +35,17 @@ class DefaultSaveWorkloadService(
     authToken: String
   ): CaseAllocated {
     val allocateTo = communityApiClient.getStaffByCode(allocatedStaffId.staffCode).block()!!
-    val summary = communityApiClient.getSummaryByCrn(allocateCase.crn).block()!!
     val activeRequirements = communityApiClient.getActiveRequirements(allocateCase.crn, allocateCase.eventId).block()!!.requirements
     val personManagerSaveResult = savePersonManagerService.savePersonManager(
       allocatedStaffId.teamCode,
       allocateTo,
       loggedInUser,
-      summary,
       allocateCase.crn
     ).also { afterPersonManagerSaved(it, allocateTo) }
     val eventManagerSaveResult = saveEventManagerService.saveEventManager(allocatedStaffId.teamCode, allocateTo, allocateCase, loggedInUser).also { afterEventManagerSaved(it) }
     val requirementManagerSaveResults = saveRequirementManagerService.saveRequirementManagers(allocatedStaffId.teamCode, allocateTo, allocateCase, loggedInUser, activeRequirements).also { afterRequirementManagersSaved(it) }
     if (personManagerSaveResult.hasChanged || eventManagerSaveResult.hasChanged || requirementManagerSaveResults.any { it.hasChanged }) {
-      notificationService.notifyAllocation(allocateTo, summary, activeRequirements, allocateCase, loggedInUser, authToken)
+      notificationService.notifyAllocation(allocateTo, activeRequirements, allocateCase, loggedInUser, authToken)
         .block()
       sqsSuccessPublisher.auditAllocation(allocateCase.crn, allocateCase.eventNumber, loggedInUser, activeRequirements.map { it.requirementId })
     }

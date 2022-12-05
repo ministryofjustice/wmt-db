@@ -40,7 +40,7 @@ class NotificationService(
   private val caseDetailsRepository: CaseDetailsRepository
 ) {
 
-  fun notifyAllocation(allocatedOfficer: DeliusStaff, personSummary: PersonSummary, requirements: List<ConvictionRequirement>, allocateCase: AllocateCase, allocatingOfficerUsername: String, token: String): Mono<List<SendEmailResponse>> {
+  fun notifyAllocation(allocatedOfficer: DeliusStaff, requirements: List<ConvictionRequirement>, allocateCase: AllocateCase, allocatingOfficerUsername: String, token: String): Mono<List<SendEmailResponse>> {
     return getNotifyData(allocateCase.crn, allocatingOfficerUsername, token, allocateCase.eventNumber).map { notifyData ->
       val caseDetails = caseDetailsRepository.findByIdOrNull(allocateCase.crn)!!
       val parameters = mapOf(
@@ -49,7 +49,7 @@ class NotificationService(
         "requirements" to mapRequirements(requirements),
       ).plus(getRiskParameters(notifyData.riskSummary, notifyData.riskPredictors, notifyData.assessment))
         .plus(getConvictionParameters(notifyData.conviction))
-        .plus(getPersonOnProbationParameters(personSummary, allocateCase))
+        .plus(getPersonOnProbationParameters(notifyData.personSummary, allocateCase))
         .plus(getLoggedInUserParameters(notifyData.allocatingDeliusStaff))
       val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
       emailTo.add(allocatedOfficer.email!!)
@@ -123,10 +123,11 @@ class NotificationService(
       communityApiClient.getStaffByUsername(allocatingOfficerUsername), assessRisksNeedsApiClient.getRiskSummary(crn, token),
       assessRisksNeedsApiClient.getRiskPredictors(crn, token),
       communityApiClient.getAssessment(crn),
+      communityApiClient.getSummaryByCrn(crn)
     )
       .flatMap { results ->
         communityApiClient.getInductionContacts(crn, conviction.sentence!!.startDate).map { initialAppointments ->
-          NotifyData(conviction, initialAppointments, results.t1, results.t2.orElse(null), results.t3, results.t4.orElse(null))
+          NotifyData(conviction, initialAppointments, results.t1, results.t2.orElse(null), results.t3, results.t4.orElse(null), results.t5)
         }
       }
   }
@@ -138,5 +139,6 @@ data class NotifyData(
   val allocatingDeliusStaff: DeliusStaff,
   val riskSummary: RiskSummary?,
   val riskPredictors: List<RiskPredictor>,
-  val assessment: OffenderAssessment?
+  val assessment: OffenderAssessment?,
+  val personSummary: PersonSummary
 )

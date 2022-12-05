@@ -31,7 +31,7 @@ class WorkloadCalculationListenerTests : IntegrationTestBase() {
     caseDetailsRepository.save(caseDetailsEntity)
 
     staffCodeResponse(staffCode, teamCode)
-    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = staffCode, teamCode = teamCode, offenderName = "offender", createdBy = "createdby", providerCode = "providerCode", isActive = true))
+    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", providerCode = "providerCode", isActive = true))
 
     hmppsDomainSnsClient.publish(
       PublishRequest(hmppsDomainTopicArn, jsonString(staffAvailableHoursChangedEvent(staffCode, teamCode, availableHours))).withMessageAttributes(
@@ -63,7 +63,7 @@ class WorkloadCalculationListenerTests : IntegrationTestBase() {
     caseDetailsRepository.save(caseDetailsEntity)
 
     staffCodeErrorResponse(staffCode, teamCode)
-    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = staffCode, teamCode = teamCode, offenderName = "offender", createdBy = "createdby", providerCode = "providerCode", isActive = true))
+    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", providerCode = "providerCode", isActive = true))
 
     hmppsDomainSnsClient.publish(
       PublishRequest(hmppsDomainTopicArn, jsonString(staffAvailableHoursChangedEvent(staffCode, teamCode, availableHours))).withMessageAttributes(

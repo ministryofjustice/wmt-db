@@ -54,6 +54,7 @@ class NotificationServiceTests {
     assessRisksNeedsApiClient, hmppsCaseDetailsRepo
   )
   private val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
+  private val personSummary = PersonSummary("John", "Doe")
 
   @BeforeEach
   fun setup() {
@@ -79,11 +80,12 @@ class NotificationServiceTests {
     every { communityApiClient.getAssessment(any()) } returns Mono.just(Optional.empty())
     every { notificationClient.sendEmail(any(), any(), any(), any()) } returns SendEmailResponse(emailResponse())
     every { hmppsCaseDetailsRepo.findByIdOrNull(any()) } returns CaseDetailsEntity("", Tier.B3, CaseType.CUSTODY, "Jane", "Doe")
+    every { communityApiClient.getSummaryByCrn(any()) } returns Mono.just(personSummary)
   }
 
   @Test
   fun `must add case name to email`() {
-    val personSummary = PersonSummary("John", "Doe")
+
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
@@ -91,7 +93,7 @@ class NotificationServiceTests {
 
     val token = "token"
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token).block()
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token).block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
     Assertions.assertEquals("${personSummary.firstName} ${personSummary.surname}", parameters.captured["case_name"])
@@ -99,7 +101,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must add crn to email`() {
-    val personSummary = PersonSummary("John", "Doe")
+
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
@@ -107,7 +109,7 @@ class NotificationServiceTests {
 
     val token = "token"
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
@@ -116,7 +118,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must add officer name`() {
-    val personSummary = PersonSummary("John", "Doe")
+
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
@@ -124,7 +126,7 @@ class NotificationServiceTests {
 
     val token = "token"
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
@@ -133,7 +135,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must add court name`() {
-    val personSummary = PersonSummary("John", "Doe")
+
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
@@ -167,7 +169,7 @@ class NotificationServiceTests {
 
     every { communityApiClient.getAllConvictions(any()) } returns Flux.just(activeConviction, anotherConviction)
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
@@ -176,7 +178,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must add court sentence date`() {
-    val personSummary = PersonSummary("John", "Doe")
+
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
@@ -197,7 +199,7 @@ class NotificationServiceTests {
     )
     every { communityApiClient.getAllConvictions(any()) } returns Flux.just(activeConviction)
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
@@ -206,7 +208,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must add induction statement no induction appointment needed when case type is custody`() {
-    val personSummary = PersonSummary("John", "Doe")
+
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
@@ -214,7 +216,7 @@ class NotificationServiceTests {
 
     val token = "token"
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
@@ -223,7 +225,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must add induction statement booked and due on when initial appointment is booked in the future`() {
-    val personSummary = PersonSummary("John", "Doe")
+
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
@@ -248,7 +250,7 @@ class NotificationServiceTests {
     )
     every { communityApiClient.getAllConvictions(any()) } returns Flux.just(activeConviction)
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
@@ -257,7 +259,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must add induction statement is overdue and was due on when initial appointment is booked in the past`() {
-    val personSummary = PersonSummary("John", "Doe")
+
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
     val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
@@ -282,7 +284,7 @@ class NotificationServiceTests {
     )
     every { communityApiClient.getAllConvictions(any()) } returns Flux.just(activeConviction)
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
@@ -291,7 +293,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must add induction statement has not been booked and is due on when initial appointment is not booked at all`() {
-    val personSummary = PersonSummary("John", "Doe")
+
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
     val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
@@ -316,7 +318,7 @@ class NotificationServiceTests {
     )
     every { communityApiClient.getAllConvictions(any()) } returns Flux.just(activeConviction)
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
@@ -326,7 +328,6 @@ class NotificationServiceTests {
   @Test
   fun `must add offences`() {
 
-    val personSummary = PersonSummary("John", "Doe")
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
@@ -349,7 +350,7 @@ class NotificationServiceTests {
     )
     every { communityApiClient.getAllConvictions(any()) } returns Flux.just(activeConviction)
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
@@ -358,7 +359,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must add order`() {
-    val personSummary = PersonSummary("John", "Doe")
+
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
@@ -377,7 +378,7 @@ class NotificationServiceTests {
     )
     every { communityApiClient.getAllConvictions(any()) } returns Flux.just(activeConviction)
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
@@ -386,7 +387,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must add requirements`() {
-    val personSummary = PersonSummary("John", "Doe")
+
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirement = ConvictionRequirement(
       RequirementCategory("MAIN", "Main Category"), RequirementCategory("SUB", "Sub Category"),
@@ -398,7 +399,7 @@ class NotificationServiceTests {
 
     val token = "token"
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
@@ -407,7 +408,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must add requirements without length`() {
-    val personSummary = PersonSummary("John", "Doe")
+
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirement = ConvictionRequirement(
       RequirementCategory("MAIN", "Main Category"), RequirementCategory("SUB", "Sub Category"),
@@ -419,7 +420,7 @@ class NotificationServiceTests {
 
     val token = "token"
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
@@ -428,7 +429,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must add rosh capitalized when it exists`() {
-    val personSummary = PersonSummary("John", "Doe")
+
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
@@ -439,7 +440,7 @@ class NotificationServiceTests {
     val riskSummary = RiskSummary("HIGH")
     every { assessRisksNeedsApiClient.getRiskSummary(allocateCase.crn, token) } returns Mono.just(Optional.of(riskSummary))
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
@@ -448,7 +449,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must add RSR level capitalized when it exists`() {
-    val personSummary = PersonSummary("John", "Doe")
+
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
@@ -460,7 +461,7 @@ class NotificationServiceTests {
 
     every { assessRisksNeedsApiClient.getRiskPredictors(allocateCase.crn, token) } returns Mono.just(listOf(riskPredictor))
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
@@ -469,7 +470,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must add RSR percentage when it exists`() {
-    val personSummary = PersonSummary("John", "Doe")
+
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
@@ -481,7 +482,7 @@ class NotificationServiceTests {
 
     every { assessRisksNeedsApiClient.getRiskPredictors(allocateCase.crn, token) } returns Mono.just(listOf(riskPredictor))
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
@@ -490,7 +491,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must add ogrs percentage when it exists`() {
-    val personSummary = PersonSummary("John", "Doe")
+
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
@@ -502,7 +503,7 @@ class NotificationServiceTests {
 
     every { communityApiClient.getAssessment(any()) } returns Mono.just(Optional.of(offenderAssessment))
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
@@ -511,7 +512,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must add ogrs level low when its below 49`() {
-    val personSummary = PersonSummary("John", "Doe")
+
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
@@ -523,7 +524,7 @@ class NotificationServiceTests {
 
     every { communityApiClient.getAssessment(any()) } returns Mono.just(Optional.of(offenderAssessment))
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
@@ -532,7 +533,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must add ogrs level medium when its between 50 and 74`() {
-    val personSummary = PersonSummary("John", "Doe")
+
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
@@ -544,7 +545,7 @@ class NotificationServiceTests {
 
     every { communityApiClient.getAssessment(any()) } returns Mono.just(Optional.of(offenderAssessment))
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
@@ -553,7 +554,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must add ogrs level high when its between 75 and 89`() {
-    val personSummary = PersonSummary("John", "Doe")
+
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
@@ -565,7 +566,7 @@ class NotificationServiceTests {
 
     every { communityApiClient.getAssessment(any()) } returns Mono.just(Optional.of(offenderAssessment))
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
@@ -574,7 +575,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must add ogrs level very high when its 90 or more`() {
-    val personSummary = PersonSummary("John", "Doe")
+
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
 
@@ -586,7 +587,7 @@ class NotificationServiceTests {
 
     every { communityApiClient.getAssessment(any()) } returns Mono.just(Optional.of(offenderAssessment))
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
@@ -595,7 +596,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must add notes when they exist`() {
-    val personSummary = PersonSummary("John", "Doe")
+
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
     val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, "Some Notes", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
@@ -603,7 +604,7 @@ class NotificationServiceTests {
 
     val token = "token"
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
@@ -612,7 +613,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must add allocating officer name`() {
-    val personSummary = PersonSummary("John", "Doe")
+
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
     val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, "Some Notes", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
@@ -624,7 +625,7 @@ class NotificationServiceTests {
 
     every { communityApiClient.getStaffByUsername(any()) } returns Mono.just(allocatingOfficer)
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
@@ -633,7 +634,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must add allocating officer grade`() {
-    val personSummary = PersonSummary("John", "Doe")
+
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val mappedGrade = "ALLOCATING OFFICER GRADE"
     allocatedOfficer.grade = mappedGrade
@@ -644,7 +645,7 @@ class NotificationServiceTests {
 
     val token = "token"
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token)
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token)
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, capture(parameters), isNull()) }
@@ -653,7 +654,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must email all addresses supplied`() {
-    val personSummary = PersonSummary("John", "Doe")
+
     val allocatedOfficer = DeliusStaff(BigInteger.ONE, "STFFCDE1", StaffName("Sally", "Socks"), null, null, null, "email1@email.com")
     val requirements = emptyList<ConvictionRequirement>()
     val firstEmail = "first@email.com"
@@ -663,7 +664,7 @@ class NotificationServiceTests {
 
     val token = "token"
 
-    notificationService.notifyAllocation(allocatedOfficer, personSummary, requirements, allocateCase, allocatingOfficerUsername, token).block()
+    notificationService.notifyAllocation(allocatedOfficer, requirements, allocateCase, allocatingOfficerUsername, token).block()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocatedOfficer.email, any(), isNull()) }
     verify(exactly = 1) { notificationClient.sendEmail(templateId, firstEmail, any(), isNull()) }
     verify(exactly = 1) { notificationClient.sendEmail(templateId, secondEmail, any(), isNull()) }

@@ -56,7 +56,7 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
     personManagerRepository.save(
       PersonManagerEntity(
         crn = realtimeCase.crn, staffCode = staffCode,
-        teamCode = teamCode, staffId = BigInteger.TEN, offenderName = "offenderName", createdBy = "createdBy",
+        teamCode = teamCode, staffId = BigInteger.TEN, createdBy = "createdBy",
         providerCode = "providerCode", isActive = true
       )
     )
@@ -81,7 +81,7 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
     personManagerRepository.save(
       PersonManagerEntity(
         crn = realtimeCase.crn, staffCode = staffCode,
-        teamCode = teamCode, staffId = BigInteger.TEN, offenderName = "offenderName", createdBy = "createdBy",
+        teamCode = teamCode, staffId = BigInteger.TEN, createdBy = "createdBy",
         providerCode = "providerCode", isActive = true
       )
     )
@@ -106,7 +106,7 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
     personManagerRepository.save(
       PersonManagerEntity(
         crn = realtimeCase.crn, staffCode = originalStaffCode,
-        teamCode = teamCode, staffId = BigInteger.TEN, offenderName = "offenderName", createdBy = "createdBy",
+        teamCode = teamCode, staffId = BigInteger.TEN, createdBy = "createdBy",
         providerCode = "providerCode", isActive = false
       )
     )
@@ -114,7 +114,7 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
     personManagerRepository.save(
       PersonManagerEntity(
         crn = realtimeCase.crn, staffCode = newStaffCode,
-        teamCode = teamCode, staffId = BigInteger.ONE, offenderName = "offenderName", createdBy = "createdBy",
+        teamCode = teamCode, staffId = BigInteger.ONE, createdBy = "createdBy",
         providerCode = "providerCode", isActive = true
       )
     )
