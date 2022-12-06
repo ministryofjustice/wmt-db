@@ -41,9 +41,6 @@ data class PersonManagerEntity(
   val teamCode: String,
 
   @Column
-  val offenderName: String,
-
-  @Column
   var createdBy: String,
 
   @Column

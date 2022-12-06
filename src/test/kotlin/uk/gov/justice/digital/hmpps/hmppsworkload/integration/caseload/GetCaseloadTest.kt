@@ -35,7 +35,7 @@ class GetCaseloadTest : IntegrationTestBase() {
     personManagerRepository.save(
       PersonManagerEntity(
         crn = realtimeCase.crn, staffCode = staffCode,
-        teamCode = teamCode, staffId = BigInteger.TEN, offenderName = "offenderName", createdBy = "createdBy",
+        teamCode = teamCode, staffId = BigInteger.TEN, createdBy = "createdBy",
         providerCode = "providerCode", isActive = true
       )
     )

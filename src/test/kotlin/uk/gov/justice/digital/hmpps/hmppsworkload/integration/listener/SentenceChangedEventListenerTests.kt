@@ -81,7 +81,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     tierCalculationResponse(crn)
     offenderSummaryResponse(crn)
     staffCodeResponse(staffCode, teamCode)
-    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "offender", createdBy = "createdby", providerCode = "providerCode", isActive = true))
+    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", providerCode = "providerCode", isActive = true))
 
     hmppsOffenderSnsClient.publish(
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn, sentenceId))).withMessageAttributes(
@@ -119,7 +119,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     offenderSummaryResponse(crn)
     tierCalculationResponse(crn, Tier.C3.name)
 
-    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "offender", createdBy = "createdby", providerCode = "providerCode", isActive = true))
+    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", providerCode = "providerCode", isActive = true))
 
     staffCodeResponse(staffCode, teamCode)
     staffCodeResponse(staffCode, teamCode)
@@ -167,7 +167,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     val crn = "J678910"
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.C1, CaseType.COMMUNITY, "Jane", "Doe"))
 
-    val personManagerEntity = personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "STFFCDE", teamCode = "TM1", offenderName = "Name", createdBy = "USER1", providerCode = "PV1", isActive = true))
+    val personManagerEntity = personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "STFFCDE", teamCode = "TM1", createdBy = "USER1", providerCode = "PV1", isActive = true))
     val eventManagerEntity = eventManagerRepository.save(EventManagerEntity(crn = crn, eventId = BigInteger.TEN, staffId = BigInteger.ONE, staffCode = "STFFCDE", teamCode = "TM1", createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = null))
     val requirementManagerEntity = requirementManagerRepository.save(RequirementManagerEntity(crn = crn, eventId = BigInteger.TEN, requirementId = BigInteger.TWO, staffId = BigInteger.ONE, staffCode = "STFFCDE", teamCode = "TM1", createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = null))
 
@@ -304,7 +304,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
 
     val caseDetailsEntity = CaseDetailsEntity(crn, Tier.C3, CaseType.COMMUNITY, "Jane", "Doe")
     staffCodeResponse(staffCode, teamCode)
-    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "offender", createdBy = "createdby", providerCode = "providerCode", isActive = true))
+    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", providerCode = "providerCode", isActive = true))
     caseDetailsRepository.save(caseDetailsEntity)
 
     hmppsOffenderSnsClient.publish(
@@ -337,7 +337,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     caseDetailsRepository.save(caseDetailsEntity)
 
     staffCodeResponse(staffCode, teamCode)
-    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, offenderName = "offender", createdBy = "createdby", providerCode = "providerCode", isActive = true))
+    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", providerCode = "providerCode", isActive = true))
 
     hmppsOffenderSnsClient.publish(
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn, sentenceId))).withMessageAttributes(
