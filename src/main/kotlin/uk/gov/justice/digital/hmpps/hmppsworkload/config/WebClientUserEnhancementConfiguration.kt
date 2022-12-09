@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
+import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.InMemoryOAuth2AuthorizedClientService
@@ -17,8 +18,10 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction
 import org.springframework.web.context.annotation.RequestScope
 import org.springframework.web.reactive.function.client.WebClient
+import reactor.netty.http.client.HttpClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.HmppsTierApiClient
+import java.time.Duration
 
 @Configuration
 class WebClientUserEnhancementConfiguration(
@@ -95,5 +98,12 @@ class WebClientUserEnhancementConfiguration(
   }
 
   @Bean
-  fun assessRiskNeedsApiWebClient(builder: WebClient.Builder): WebClient = builder.baseUrl(assessRisksNeedsApiRootUri).build()
+  fun assessRiskNeedsApiWebClient(builder: WebClient.Builder): WebClient {
+    val httpClient: HttpClient = HttpClient.create()
+      .responseTimeout(Duration.ofSeconds(2))
+    return builder
+      .baseUrl(assessRisksNeedsApiRootUri)
+      .clientConnector(ReactorClientHttpConnector(httpClient))
+      .build()
+  }
 }

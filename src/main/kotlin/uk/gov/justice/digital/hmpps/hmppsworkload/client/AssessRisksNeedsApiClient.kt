@@ -20,6 +20,7 @@ class AssessRisksNeedsApiClient(@Qualifier("assessRiskNeedsApiWebClient") privat
       .header(HttpHeaders.AUTHORIZATION, token)
       .retrieve()
       .bodyToMono(RiskSummary::class.java)
+      .retry(1)
       .map { Optional.of(it) }
       .onErrorResume {
         Mono.just(Optional.empty())
@@ -34,6 +35,7 @@ class AssessRisksNeedsApiClient(@Qualifier("assessRiskNeedsApiWebClient") privat
       .header(HttpHeaders.AUTHORIZATION, token)
       .retrieve()
       .bodyToMono(responseType)
+      .retry(1)
       .onErrorResume {
         Mono.just(emptyList())
       }

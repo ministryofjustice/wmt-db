@@ -19,6 +19,7 @@ class SendEmail : IntegrationTestBase() {
 
   @Autowired
   lateinit var notificationService: NotificationService
+
   @Test
   fun `sends an email when ROSH cannot be retrieved`() {
     val allocatedOfficer = DeliusStaff(staffIdentifier = BigInteger.ONE, staffCode = "STAFF1", staff = StaffName("Staff", "Member"), email = "simulate-delivered@notifications.service.gov.uk")
@@ -42,6 +43,36 @@ class SendEmail : IntegrationTestBase() {
       allocatingOfficerUsername,
       token
     ).block()
+    verifyRiskSummaryCalled(crn, 2)
+    verifyRiskPredictorCalled(crn, 1)
+    assertEquals(UUID.fromString("d2708c23-d5d2-4455-b26c-7d5d1d5c5733"), emailSendResponse?.first()?.templateId)
+  }
+
+  @Test
+  fun `sends an email when risk predictor cannot be retrieved`() {
+    val allocatedOfficer = DeliusStaff(staffIdentifier = BigInteger.ONE, staffCode = "STAFF1", staff = StaffName("Staff", "Member"), email = "simulate-delivered@notifications.service.gov.uk")
+    val requirements = emptyList<ConvictionRequirement>()
+    val crn = "X123456"
+    val allocateCase = AllocateCase(crn, BigInteger.valueOf(123456789), sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
+    val allocatingOfficerUsername = "AllocatingOfficer"
+    val token = "token"
+    singleActiveConvictionResponseForAllConvictions(crn)
+    singleActiveInductionResponse(crn)
+    staffUserNameResponse(allocatingOfficerUsername)
+    riskSummaryResponse(crn)
+    riskPredictorErrorResponse(crn)
+    assessmentCommunityApiResponse(crn)
+    offenderSummaryResponse(crn)
+    caseDetailsRepository.save(CaseDetailsEntity(crn, B3, COMMUNITY, "Jane", "Doe"))
+    val emailSendResponse = notificationService.notifyAllocation(
+      allocatedOfficer,
+      requirements,
+      allocateCase,
+      allocatingOfficerUsername,
+      token
+    ).block()
+    verifyRiskSummaryCalled(crn, 1)
+    verifyRiskPredictorCalled(crn, 2)
     assertEquals(UUID.fromString("d2708c23-d5d2-4455-b26c-7d5d1d5c5733"), emailSendResponse?.first()?.templateId)
   }
 }

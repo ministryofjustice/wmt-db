@@ -20,6 +20,7 @@ import org.mockserver.model.HttpResponse.response
 import org.mockserver.model.HttpStatusCode.INTERNAL_SERVER_ERROR_500
 import org.mockserver.model.MediaType.APPLICATION_JSON
 import org.mockserver.model.Parameter
+import org.mockserver.verify.VerificationTimes
 import org.slf4j.event.Level
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -64,6 +65,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleIn
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByCodeResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByUserNameResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.successfulRiskPredictorResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.successfulRiskSummaryResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.teamStaffJsonResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.OffenderManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PduEntity
@@ -504,13 +506,6 @@ abstract class IntegrationTestBase {
     )
   }
 
-  protected fun riskPredictorResponse(crn: String) {
-    val request = request().withPath("/risks/crn/$crn/predictors/rsr/history")
-    assessRisksNeedsApi.`when`(request, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(successfulRiskPredictorResponse())
-    )
-  }
-
   protected fun assessmentCommunityApiResponse(crn: String) {
     val ogrsRequest =
       request().withPath("/offenders/crn/$crn/assessments")
@@ -520,12 +515,51 @@ abstract class IntegrationTestBase {
     )
   }
 
-  protected fun riskSummaryErrorResponse(crn: String) {
-    val request = request().withPath("/risks/crn/$crn/summary")
+  protected fun riskPredictorResponse(crn: String) {
+    val request = request().withPath("/risks/crn/$crn/predictors/rsr/history")
+    assessRisksNeedsApi.`when`(request, Times.exactly(1)).respond(
+      response().withContentType(APPLICATION_JSON).withBody(successfulRiskPredictorResponse())
+    )
+  }
+
+  protected fun riskPredictorErrorResponse(crn: String) {
+    val request = request().withPath("/risks/crn/$crn/predictors/rsr/history")
     assessRisksNeedsApi.`when`(request, Times.exactly(1)).respond(
       response().withStatusCode(INTERNAL_SERVER_ERROR_500.code()).withContentType(
         APPLICATION_JSON
       ).withBody("{}")
+    )
+  }
+
+  protected fun verifyRiskPredictorCalled(crn: String, times: Int) {
+    assessRisksNeedsApi.verify(
+      request()
+        .withPath("/risks/crn/$crn/predictors/rsr/history"),
+      VerificationTimes.exactly(times)
+    )
+  }
+
+  protected fun riskSummaryResponse(crn: String) {
+    val request = request().withPath("/risks/crn/$crn/summary")
+    assessRisksNeedsApi.`when`(request, Times.exactly(2)).respond(
+      response().withContentType(APPLICATION_JSON).withBody(successfulRiskSummaryResponse())
+    )
+  }
+
+  protected fun riskSummaryErrorResponse(crn: String) {
+    val request = request().withPath("/risks/crn/$crn/summary")
+    assessRisksNeedsApi.`when`(request, Times.exactly(2)).respond(
+      response().withStatusCode(INTERNAL_SERVER_ERROR_500.code()).withContentType(
+        APPLICATION_JSON
+      ).withBody("{}")
+    )
+  }
+
+  protected fun verifyRiskSummaryCalled(crn: String, times: Int) {
+    assessRisksNeedsApi.verify(
+      request()
+        .withPath("/risks/crn/$crn/summary"),
+      VerificationTimes.exactly(times)
     )
   }
 

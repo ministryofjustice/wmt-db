@@ -120,7 +120,8 @@ class NotificationService(
   private fun getNotifyData(crn: String, allocatingOfficerUsername: String, token: String, eventNumber: Int): Mono<NotifyData> {
     val conviction = communityApiClient.getAllConvictions(crn).filter { it.eventNumber == eventNumber }.blockFirst()
     return Mono.zip(
-      communityApiClient.getStaffByUsername(allocatingOfficerUsername), assessRisksNeedsApiClient.getRiskSummary(crn, token),
+      communityApiClient.getStaffByUsername(allocatingOfficerUsername),
+      assessRisksNeedsApiClient.getRiskSummary(crn, token),
       assessRisksNeedsApiClient.getRiskPredictors(crn, token),
       communityApiClient.getAssessment(crn),
       communityApiClient.getSummaryByCrn(crn)
