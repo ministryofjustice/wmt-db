@@ -42,7 +42,7 @@ class TeamService(
         )
         OffenderManagerWorkload(
           it.staff.forenames, it.staff.surname, it.email, it.grade, overview.totalCommunityCases,
-          overview.totalCustodyCases, calculateCapacity(overview.totalPoints, overview.availablePoints), it.staffCode, it.staffIdentifier, caseCounts.getOrDefault(overview.code, 0).toBigInteger()
+          overview.totalCustodyCases, calculateCapacity(overview.totalPoints, overview.availablePoints), it.staffCode, caseCounts.getOrDefault(overview.code, 0).toBigInteger()
         )
       }.filter {
         grades == null || grades.contains(it.grade)
