@@ -26,7 +26,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("uk.gov.service.notify:notifications-java-client:3.19.0-RELEASE")
-  implementation("com.vladmihalcea:hibernate-types-52:2.20.0")
+  implementation("com.vladmihalcea:hibernate-types-52:2.21.1")
 
   runtimeOnly("com.zaxxer:HikariCP")
   runtimeOnly("org.flywaydb:flyway-core")
