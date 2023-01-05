@@ -14,10 +14,8 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBas
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.AdjustmentReasonEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTAssessmentEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTCMSEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTCourtReportsEntity
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTInstitutionalReportEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.WorkloadCalculationService
 import java.math.BigInteger
 
@@ -64,51 +62,6 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
     Assertions.assertAll(
       { assertEquals(standardDeliveryReportCount, workloadCalculationResult?.breakdownData?.standardDeliveryReportCount) },
       { assertEquals(fastDeliveryReportCount, workloadCalculationResult?.breakdownData?.fastDeliveryReportCount) }
-    )
-  }
-
-  @Test
-  fun `breakdown data should include parole report count`() {
-    val staffCode = "STAFF1"
-    val teamCode = "TM1"
-    val staffGrade = "PO"
-    val paroleReportsCount = 4
-
-    wmtInstitutionalReportRepository.save(WMTInstitutionalReportEntity(staffCode = staffCode, teamCode = teamCode, paroleReports = paroleReportsCount))
-
-    workloadCalculation.saveWorkloadCalculation(StaffIdentifier(staffCode, teamCode), staffGrade)
-    await untilCallTo {
-      workloadCalculationRepository.count()
-    } matches { it == 1L }
-
-    val workloadCalculationResult = workloadCalculationRepository
-      .findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)
-
-    assertEquals(paroleReportsCount, workloadCalculationResult?.breakdownData?.paroleReportsCount)
-  }
-
-  @Test
-  fun `breakdown data should include case assessment count`() {
-    val staffCode = "STAFF1"
-    val teamCode = "TM1"
-    val staffGrade = "PO"
-    val communityAssessmentCount = 1
-    val licenseAssessmentCount = 1
-
-    wmtAssessmentRepository.save(WMTAssessmentEntity(staffCode = staffCode, teamCode = teamCode, sentenceType = "Community"))
-    wmtAssessmentRepository.save(WMTAssessmentEntity(staffCode = staffCode, teamCode = teamCode, sentenceType = "License"))
-    workloadCalculation.saveWorkloadCalculation(StaffIdentifier(staffCode, teamCode), staffGrade)
-
-    await untilCallTo {
-      workloadCalculationRepository.count()
-    } matches { it == 1L }
-
-    val workloadCalculationResult = workloadCalculationRepository
-      .findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)
-
-    Assertions.assertAll(
-      { assertEquals(communityAssessmentCount, workloadCalculationResult?.breakdownData?.communityCaseAssessmentCount) },
-      { assertEquals(licenseAssessmentCount, workloadCalculationResult?.breakdownData?.licenseCaseAssessmentCount) }
     )
   }
 

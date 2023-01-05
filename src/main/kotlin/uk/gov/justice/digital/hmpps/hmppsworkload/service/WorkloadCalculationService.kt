@@ -1,8 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Assessment
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Contact
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CourtReport
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CourtReportType
@@ -19,8 +17,6 @@ import java.math.BigDecimal
 class WorkloadCalculationService(
   private val workloadCalculator: WorkloadCalculator,
   private val getCourtReports: WMTGetCourtReports,
-  private val getParoleReports: WMTGetParoleReports,
-  private val getAssessments: WMTGetAssessments,
   private val getContacts: WMTGetContacts,
   private val getContactTypeWeightings: GetContactTypeWeightings,
   private val workloadPointsRepository: WorkloadPointsRepository,
@@ -54,23 +50,26 @@ class WorkloadCalculationService(
     val staffIdentifier = StaffIdentifier(staffCode, teamCode)
     val cases = getCaseLoad.getCases(staffIdentifier)
     val courtReports = getCourtReports.getCourtReports(staffIdentifier)
-    val paroleReports = getParoleReports.getParoleReports(staffIdentifier)
-    val assessments = getAssessments.getAssessments(staffIdentifier)
     val contactsPerformedOutsideCaseload = getContacts.findContactsOutsideCaseload(staffIdentifier)
     val contactsPerformedByOthers = getContacts.findContactsInCaseloadPerformedByOthers(staffIdentifier)
     val contactTypeWeightings = getContactTypeWeightings.findAll()
     val t2aWorkloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(true)
     val workloadPointsWeighting: WorkloadPointsEntity = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
     val availablePoints = calculateAvailablePoints(workloadPointsWeighting.getDefaultPointsAvailable(staffGrade), workloadPointsWeighting.getDefaultContractedHours(staffGrade), availableHours)
-    val workloadPoints = workloadCalculator.getWorkloadPoints(cases, courtReports, paroleReports, assessments, contactsPerformedOutsideCaseload, contactsPerformedByOthers, contactTypeWeightings, t2aWorkloadPoints, workloadPointsWeighting)
+    val workloadPoints = workloadCalculator.getWorkloadPoints(
+      cases,
+      courtReports,
+      contactsPerformedOutsideCaseload,
+      contactsPerformedByOthers,
+      contactTypeWeightings,
+      t2aWorkloadPoints,
+      workloadPointsWeighting
+    )
     return WorkloadCalculationEntity(
       availablePoints = availablePoints, workloadPoints = workloadPoints, staffCode = staffIdentifier.staffCode, teamCode = staffIdentifier.teamCode,
       breakdownData = BreakdownDataEntity(
         getCourtReportCounts(courtReports, CourtReportType.STANDARD),
         getCourtReportCounts(courtReports, CourtReportType.FAST),
-        paroleReports,
-        getAssessmentCounts(assessments, CaseType.COMMUNITY),
-        getAssessmentCounts(assessments, CaseType.LICENSE),
         getContactTypeCodeCounts(contactsPerformedOutsideCaseload),
         getContactTypeCodeCounts(contactsPerformedByOthers),
         contactTypeWeightings,
@@ -82,9 +81,6 @@ class WorkloadCalculationService(
 
   private fun getCourtReportCounts(courtReports: List<CourtReport>, type: CourtReportType): Int =
     courtReports.count { it.type == type }
-
-  private fun getAssessmentCounts(assessments: List<Assessment>, type: CaseType): Int =
-    assessments.count { it.category == type }
 
   private fun getContactTypeCodeCounts(contacts: List<Contact>): Map<String, Int> =
     contacts.groupingBy { it.typeCode }.eachCount()
