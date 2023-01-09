@@ -10,6 +10,7 @@ import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
 import org.hamcrest.core.IsNot
 import org.hamcrest.text.MatchesPattern
+import org.hamcrest.text.StringContainsInOrder
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -158,6 +159,30 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     val requirementManager = requirementManagerRepository.findFirstByCrnAndEventNumberAndRequirementIdOrderByCreatedDateDesc(crn, eventNumber, requirementId)!!
     Assertions.assertEquals(staffCode, requirementManager.staffCode)
     Assertions.assertEquals(teamCode, requirementManager.teamCode)
+  }
+
+  @Test
+  fun `Notify error due to an invalid recipient returns error containing the offending email address`() {
+    staffCodeResponse(staffCode, teamCode)
+    offenderSummaryResponse(crn)
+    val requirementId = BigInteger.valueOf(75315091L)
+    singleActiveRequirementResponse(crn, eventId, requirementId)
+    every { notificationClient.sendEmail(any(), any(), any(), any()) } throws NotificationClientException("An exception")
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY, "Jane", "Doe"))
+
+    webTestClient.post()
+      .uri("/team/$teamCode/offenderManager/$staffCode/case")
+      .bodyValue(allocateCase(crn, eventId, eventNumber))
+      .headers {
+        it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
+        it.contentType = MediaType.APPLICATION_JSON
+      }
+      .exchange()
+      .expectStatus()
+      .is5xxServerError
+      .expectBody()
+      .jsonPath("$.userMessage")
+      .value(StringContainsInOrder(listOf("additionalEmailReceiver@test.justice.gov.uk")))
   }
 
   @Test
