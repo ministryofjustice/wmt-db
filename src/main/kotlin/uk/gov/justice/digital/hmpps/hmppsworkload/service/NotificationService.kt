@@ -59,7 +59,7 @@ class NotificationService(
     }
   }
 
-  class NotificationInvalidSenderException(emailRecipient: String): Exception("Unable to deliver to recipient $emailRecipient")
+  class NotificationInvalidSenderException(emailRecipient: String) : Exception("Unable to deliver to recipient $emailRecipient")
 
   private fun addRecipientTo400Response(emailRecipient: String, wrappedApiCall: () -> SendEmailResponse): SendEmailResponse {
     try {
