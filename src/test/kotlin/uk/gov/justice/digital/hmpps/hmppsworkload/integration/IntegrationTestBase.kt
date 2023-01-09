@@ -81,10 +81,8 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.ReductionsRepos
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.RequirementManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.SentenceRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.TeamRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTAssessmentRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTCMSRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTCourtReportsRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTInstitutionalReportRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTWorkloadOwnerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadCalculationRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadPointsRepository
@@ -134,12 +132,6 @@ abstract class IntegrationTestBase {
 
   @Autowired
   protected lateinit var wmtCourtReportsRepository: WMTCourtReportsRepository
-
-  @Autowired
-  protected lateinit var wmtAssessmentRepository: WMTAssessmentRepository
-
-  @Autowired
-  protected lateinit var wmtInstitutionalReportRepository: WMTInstitutionalReportRepository
 
   @Autowired
   protected lateinit var wmtcmsRepository: WMTCMSRepository
@@ -287,8 +279,6 @@ abstract class IntegrationTestBase {
     sentenceRepository.deleteAll()
     caseDetailsRepository.deleteAll()
     wmtCourtReportsRepository.deleteAll()
-    wmtAssessmentRepository.deleteAll()
-    wmtInstitutionalReportRepository.deleteAll()
     wmtcmsRepository.deleteAll()
     reductionsRepository.deleteAll()
     adjustmentReasonRepository.deleteAll()
@@ -320,7 +310,6 @@ abstract class IntegrationTestBase {
     requirementManagerRepository.deleteAll()
     sentenceRepository.deleteAll()
     wmtCourtReportsRepository.deleteAll()
-    wmtAssessmentRepository.deleteAll()
     wmtcmsRepository.deleteAll()
     reductionsRepository.deleteAll()
     adjustmentReasonRepository.deleteAll()
