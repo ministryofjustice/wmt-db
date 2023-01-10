@@ -22,6 +22,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepo
 import uk.gov.justice.digital.hmpps.hmppsworkload.utils.DateUtils
 import uk.gov.justice.digital.hmpps.hmppsworkload.utils.capitalize
 import uk.gov.service.notify.NotificationClientApi
+import uk.gov.service.notify.NotificationClientException
 import uk.gov.service.notify.SendEmailResponse
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -54,7 +55,20 @@ class NotificationService(
       val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
       emailTo.add(allocatedOfficer.email!!)
       if (allocateCase.sendEmailCopyToAllocatingOfficer) emailTo.add(notifyData.allocatingDeliusStaff.email)
-      emailTo.map { email -> notificationClient.sendEmail(allocationTemplateId, email, parameters, null) }
+      emailTo.map { email -> addRecipientTo400Response(email) { notificationClient.sendEmail(allocationTemplateId, email, parameters, null) } }
+    }
+  }
+
+  class NotificationInvalidSenderException(emailRecipient: String) : Exception("Unable to deliver to recipient $emailRecipient")
+
+  private fun addRecipientTo400Response(emailRecipient: String, wrappedApiCall: () -> SendEmailResponse): SendEmailResponse {
+    try {
+      return wrappedApiCall.invoke()
+    } catch (notificationException: NotificationClientException) {
+      if (notificationException.httpResult == 400) {
+        throw NotificationInvalidSenderException(emailRecipient)
+      }
+      throw notificationException
     }
   }
 
