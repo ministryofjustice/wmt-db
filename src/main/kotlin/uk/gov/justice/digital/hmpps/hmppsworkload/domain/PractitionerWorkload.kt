@@ -46,14 +46,14 @@ data class Practitioner constructor(
   val grade: String,
   val workload: BigDecimal,
   val casesPastWeek: Int,
-  val communityCases: Int,
-  val custodyCases: Int
+  val communityCases: BigDecimal,
+  val custodyCases: BigDecimal
 ) {
   companion object {
     fun from(practitionerTeam: PractitionerTeam, practitionerWorkload: TeamOverview, caseCount: Int): Practitioner {
       return Practitioner(
         practitionerTeam.code, practitionerTeam.name,
-        practitionerTeam.email.takeUnless { email -> email.isNullOrBlank() },
+        practitionerTeam.email.takeUnless { email -> email.isEmpty() },
         practitionerTeam.grade ?: "DMY",
         calculateCapacity(practitionerWorkload.totalPoints, practitionerWorkload.availablePoints),
         caseCount,

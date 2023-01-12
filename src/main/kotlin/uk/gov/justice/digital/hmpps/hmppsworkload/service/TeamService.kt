@@ -31,43 +31,24 @@ class TeamService(
   fun getPractitioners(teamCodes: List<String>, crn: String, grades: List<String>?): PractitionerWorkload? {
     return workforceAllocationsToDeliusApiClient.choosePractitioners(crn, teamCodes)
       .map { choosePractitionerResponse ->
-
-        val practitionerWorkloads =
-          teamRepository.findAllByTeamCodes(teamCodes).associateBy { team -> team.code }
+        val practitionerWorkloads = teamRepository.findAllByTeamCodes(teamCodes).associateBy { team -> team.code }
         val caseCountAfter = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).minusDays(7L)
-
         val practitionerCaseCounts = personManagerRepository.findByTeamCodeInAndCreatedDateGreaterThanEqualAndIsActiveIsTrue(teamCodes, caseCountAfter)
           .groupBy { it.staffCode }
           .mapValues { countEntry -> countEntry.value.size }
 
-        PractitionerWorkload(
-          choosePractitionerResponse.crn,
-          choosePractitionerResponse.name,
+        val enrichedTeams = choosePractitionerResponse.teams.mapValues { team ->
+          team.value
+            .filter { grades == null || grades.contains(it.grade) }
+            .map {
+              val practitionerWorkload = practitionerWorkloads[it.code] ?: getTeamOverviewForOffenderManagerWithoutWorkload(it.code, it.grade ?: "DMY")
+              Practitioner.from(it, practitionerWorkload, practitionerCaseCounts.getOrDefault(it.code, 0))
+            }
+        }
+        PractitionerWorkload.from(
+          choosePractitionerResponse,
           caseDetailsRepository.findByIdOrNull(crn)!!.tier,
-          choosePractitionerResponse.probationStatus,
-          choosePractitionerResponse.communityPersonManager,
-          choosePractitionerResponse.teams.mapValues { team ->
-            team.value
-              .filter {
-                grades == null || grades.contains(it.grade)
-              }
-              .map {
-                val practitionerWorkload = practitionerWorkloads[it.code] ?: getTeamOverviewForOffenderManagerWithoutWorkload(
-                  it.code,
-                  it.grade ?: "DMY"
-                )
-                Practitioner(
-                  it.code,
-                  it.name,
-                  it.email.takeUnless { email -> email.isEmpty() },
-                  it.grade ?: "DMY",
-                  calculateCapacity(practitionerWorkload.totalPoints, practitionerWorkload.availablePoints),
-                  practitionerCaseCounts.getOrDefault(it.code, 0),
-                  practitionerWorkload.totalCommunityCases,
-                  practitionerWorkload.totalCustodyCases
-                )
-              }
-          }
+          enrichedTeams
         )
       }.block()
   }
