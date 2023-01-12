@@ -121,32 +121,36 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
   @Test
   fun `can filter officers by grade`() {
     val teamCode = "T1"
-    teamStaffResponse(teamCode)
+    val teamCode2 = "T2"
+    val crn = "CRN1"
+    choosePractitionerByTeamCodesResponse(listOf(teamCode, teamCode2), crn)
     val firstWmtStaff = setupCurrentWmtStaff("OM1", teamCode)
-    setupCurrentWmtStaff("OM2", teamCode)
+    setupCurrentWmtStaff("OM2", teamCode2)
+
+    val firstOm = firstWmtStaff.offenderManager.code
+    val noWorkloadStaffCode = "NOWORKLOAD1"
+
     webTestClient.get()
-      .uri("/team/$teamCode/offenderManagers?grades=PO,PQiP")
+      .uri("/team/choose-practitioner?crn=$crn&teamCode=$teamCode,$teamCode2&grades=PO,PQiP")
       .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT")) }
       .exchange()
       .expectStatus()
       .isOk
       .expectBody()
-      .jsonPath("$.offenderManagers[?(@.code == '${firstWmtStaff.offenderManager.code}')].forename")
+      .jsonPath("$.teams.$teamCode[?(@.code == '$firstOm')].name.forename")
       .isEqualTo("Jane")
-      .jsonPath("$.offenderManagers[?(@.code == '${firstWmtStaff.offenderManager.code}')].surname")
+      .jsonPath("$.teams.$teamCode[?(@.code == '$firstOm')].name.surname")
       .isEqualTo("Doe")
-      .jsonPath("$.offenderManagers[?(@.code == '${firstWmtStaff.offenderManager.code}')].grade")
+      .jsonPath("$.teams.$teamCode[?(@.code == '$firstOm')].email")
+      .isEqualTo("j.doe@email.co.uk")
+      .jsonPath("$.teams.$teamCode[?(@.code == '$firstOm')].grade")
       .isEqualTo("PO")
-      .jsonPath("$.offenderManagers[?(@.code == '${firstWmtStaff.offenderManager.code}')].totalCommunityCases")
-      .isEqualTo(15)
-      .jsonPath("$.offenderManagers[?(@.code == '${firstWmtStaff.offenderManager.code}')].totalCustodyCases")
-      .isEqualTo(20)
-      .jsonPath("$.offenderManagers[?(@.code == '${firstWmtStaff.offenderManager.code}')].capacity")
-      .isEqualTo(50.toDouble())
-      .jsonPath("$.offenderManagers[?(@.code == '${firstWmtStaff.offenderManager.code}')].code")
-      .isEqualTo("OM1")
-      .jsonPath("$.offenderManagers[?(@.code == 'NOWORKLOAD1')]")
+      .jsonPath("$.teams.$teamCode[?(@.code == '$noWorkloadStaffCode')]")
       .doesNotExist()
+      .jsonPath("$.teams.all[?(@.code == '$noWorkloadStaffCode')]")
+      .doesNotExist()
+      .jsonPath("$.teams.all[?(@.code == '$firstOm')].name.forename")
+      .isEqualTo("Jane")
   }
 
   @Test

@@ -25,7 +25,7 @@ class TeamService(
   private val personManagerRepository: PersonManagerRepository,
   private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient
 ) {
-  fun getPractitioner(teamCodes: List<String>, crn: String): PractitionerWorkload {
+  fun getPractitioner(teamCodes: List<String>, crn: String, grades: List<String>?): PractitionerWorkload {
     return workforceAllocationsToDeliusApiClient.getPractitioner(crn, teamCodes)
       .map { choosePractitionerResponse ->
 
@@ -43,22 +43,26 @@ class TeamService(
           choosePractitionerResponse.probationStatus,
           choosePractitionerResponse.communityPersonManager,
           choosePractitionerResponse.teams.mapValues {
-            it.value.map {
-              val overview = workloads[it.code] ?: getTeamOverviewForOffenderManagerWithoutWorkload(
-                it.code,
-                it.grade ?: "DMY"
-              )
-              Practitioner(
-                it.code,
-                it.name,
-                it.email.takeUnless { it.isEmpty() },
-                it.grade ?: "DMY",
-                calculateCapacity(overview.totalPoints, overview.availablePoints),
-                caseCounts[it.code]!!,
-                overview.totalCommunityCases,
-                overview.totalCustodyCases
-              )
-            }
+            it.value
+              .filter {
+                grades == null || grades.contains(it.grade)
+              }
+              .map {
+                val overview = workloads[it.code] ?: getTeamOverviewForOffenderManagerWithoutWorkload(
+                  it.code,
+                  it.grade ?: "DMY"
+                )
+                Practitioner(
+                  it.code,
+                  it.name,
+                  it.email.takeUnless { it.isEmpty() },
+                  it.grade ?: "DMY",
+                  calculateCapacity(overview.totalPoints, overview.availablePoints),
+                  caseCounts.getOrDefault(it.code, 0),
+                  overview.totalCommunityCases,
+                  overview.totalCustodyCases
+                )
+              }
           }
         )
       }.block()

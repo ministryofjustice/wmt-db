@@ -50,8 +50,8 @@ class TeamController(
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/team/choose-practitioner")
-  fun getPractitionersSummary(@RequestParam teamCode: List<String>, @RequestParam crn: String): ResponseEntity<PractitionerWorkload> {
-    val practitionerWorkload = teamService.getPractitioner(teamCode, crn)
+  fun getPractitionersSummary(@RequestParam teamCode: List<String>, @RequestParam crn: String, @RequestParam grades: List<String>?): ResponseEntity<PractitionerWorkload> {
+    val practitionerWorkload = teamService.getPractitioner(teamCode, crn, grades)
     if (practitionerWorkload != null) {
       return ResponseEntity.ok(practitionerWorkload)
     }
