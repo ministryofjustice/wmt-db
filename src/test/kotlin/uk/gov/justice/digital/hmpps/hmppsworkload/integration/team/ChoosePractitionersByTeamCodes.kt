@@ -165,8 +165,11 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
 
   @Test
   fun `must return forbidden when auth token does not contain correct role`() {
+    val teamCode = "T1"
+    val teamCode2 = "T2"
+    val crn = "CRN1"
     webTestClient.get()
-      .uri("/team/T1/offenderManagers")
+      .uri("/team/choose-practitioner?crn=$crn&teamCode=$teamCode,$teamCode2&grades=PO,PQiP")
       .headers { it.authToken(roles = listOf("ROLE_RANDOM_ROLE")) }
       .exchange()
       .expectStatus()
@@ -175,23 +178,26 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
 
   @Test
   fun `can get team overview of offender manager by team code when assigned to another staff member`() {
-    val teamCode = "TEAM1"
-    teamStaffResponse(teamCode, "STAFF1")
 
-    val movedPersonManager = PersonManagerEntity(crn = "CRN3", staffId = BigInteger.valueOf(123456789L), staffCode = "STAFF1", teamCode = teamCode, createdBy = "USER1", providerCode = "R1", isActive = false)
+    val teamCode = "T1"
+    val staffCode = "OM1"
+    val crn = "CRN1"
+    choosePractitionerByTeamCodesResponse(listOf(teamCode), crn)
+
+    val movedPersonManager = PersonManagerEntity(crn = "CRN3", staffId = BigInteger.valueOf(123456789L), staffCode = staffCode, teamCode = teamCode, createdBy = "USER1", providerCode = "R1", isActive = false)
     personManagerRepository.save(movedPersonManager)
 
     val newPersonManager = PersonManagerEntity(crn = "CRN3", staffId = BigInteger.valueOf(56789321L), staffCode = "STAFF2", teamCode = "TEAM2", createdBy = "USER2", providerCode = "R1", isActive = true)
     personManagerRepository.save(newPersonManager)
 
     webTestClient.get()
-      .uri("/team/$teamCode/offenderManagers")
+      .uri("/team/choose-practitioner?crn=$crn&teamCode=$teamCode")
       .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT")) }
       .exchange()
       .expectStatus()
       .isOk
       .expectBody()
-      .jsonPath("$.offenderManagers[?(@.code == 'STAFF1')].totalCasesInLastWeek")
+      .jsonPath("$.teams.$teamCode[?(@.code == '$staffCode')].casesPastWeek")
       .isEqualTo(0)
   }
 }
