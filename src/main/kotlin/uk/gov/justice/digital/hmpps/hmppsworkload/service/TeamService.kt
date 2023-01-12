@@ -3,7 +3,10 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToDeliusApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerWorkload
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Practitioner
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PractitionerWorkload
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.WorkloadCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.TeamOverview
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
@@ -19,8 +22,47 @@ class TeamService(
   private val teamRepository: TeamRepository,
   private val communityApiClient: CommunityApiClient,
   private val workloadPointsRepository: WorkloadPointsRepository,
-  private val personManagerRepository: PersonManagerRepository
+  private val personManagerRepository: PersonManagerRepository,
+  private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient
 ) {
+  fun getPractitioner(teamCodes: List<String>, crn: String): PractitionerWorkload {
+    return workforceAllocationsToDeliusApiClient.getPractitioner(crn, teamCodes)
+      .map { choosePractitionerResponse ->
+
+        val workloads =
+          teamRepository.findAllByTeamCodes(teamCodes).associateBy { team -> team.code }
+        val caseCountAfter = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).minusDays(7L)
+
+        val caseCounts = personManagerRepository.findByTeamCodeInAndCreatedDateGreaterThanEqualAndIsActiveIsTrue(teamCodes, caseCountAfter)
+          .groupBy { it.staffCode }
+          .mapValues { countEntry -> countEntry.value.size }
+
+        PractitionerWorkload(
+          choosePractitionerResponse.crn,
+          choosePractitionerResponse.name,
+          choosePractitionerResponse.probationStatus,
+          choosePractitionerResponse.communityPersonManager,
+          choosePractitionerResponse.teams.mapValues {
+            it.value.map {
+              val overview = workloads[it.code] ?: getTeamOverviewForOffenderManagerWithoutWorkload(
+                it.code,
+                it.grade ?: "DMY"
+              )
+              Practitioner(
+                it.code,
+                it.name,
+                it.email.takeUnless { it.isEmpty() },
+                it.grade ?: "DMY",
+                calculateCapacity(overview.totalPoints, overview.availablePoints),
+                caseCounts[it.code]!!,
+                overview.totalCommunityCases,
+                overview.totalCustodyCases
+              )
+            }
+          }
+        )
+      }.block()
+  }
 
   fun getWorkloadCases(teams: List<String>): Flux<WorkloadCase> {
     return Flux.fromIterable(teamRepository.findWorkloadCountCaseByCode(teams))

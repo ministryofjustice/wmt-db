@@ -21,6 +21,7 @@ import org.springframework.web.reactive.function.client.WebClient
 import reactor.netty.http.client.HttpClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.HmppsTierApiClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToDeliusApiClient
 import java.time.Duration
 
 @Configuration
@@ -28,6 +29,7 @@ class WebClientUserEnhancementConfiguration(
   @Value("\${community.endpoint.url}") private val communityApiRootUri: String,
   @Value("\${hmpps-tier.endpoint.url}") private val hmppsTierApiRootUri: String,
   @Value("\${assess-risks-needs.endpoint.url}") private val assessRisksNeedsApiRootUri: String,
+  @Value("\${workforce-allocations-to-delius.endpoint.url}") private val workforceAllocationsToDeliusApiRootUri: String,
 ) {
 
   @Bean
@@ -105,5 +107,19 @@ class WebClientUserEnhancementConfiguration(
       .baseUrl(assessRisksNeedsApiRootUri)
       .clientConnector(ReactorClientHttpConnector(httpClient))
       .build()
+  }
+
+  @Bean
+  @RequestScope
+  fun workforceAllocationsToDeliusApiWebClientUserEnhancedAppScope(
+    clientRegistrationRepository: ClientRegistrationRepository,
+    builder: WebClient.Builder
+  ): WebClient {
+    return getOAuthWebClient(authorizedClientManagerUserEnhanced(clientRegistrationRepository), builder, workforceAllocationsToDeliusApiRootUri, "workforce-allocations-to-delius-api")
+  }
+
+  @Bean
+  fun workforceAllocationsToDeliusApiClientUserEnhanced(@Qualifier("workforceAllocationsToDeliusApiWebClientUserEnhancedAppScope") webClient: WebClient): WorkforceAllocationsToDeliusApiClient {
+    return WorkforceAllocationsToDeliusApiClient(webClient)
   }
 }

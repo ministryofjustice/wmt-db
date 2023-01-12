@@ -8,20 +8,22 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 
 class GetCasesForOffenderManager : IntegrationTestBase() {
 
+  val teamCode = "T1"
+  val staffCodeOM = "OM1"
+  val staffCodeNO = "NOWORKLOAD1"
+
   @Test
   fun `get all cases allocated to offender manager`() {
-    val staffCode = "OM1"
-    val teamCode = "T1"
-    staffCodeResponse(staffCode, teamCode)
+    staffCodeResponse(staffCodeOM, teamCode)
     val realTimeCaseDetails = caseDetailsRepository.saveAll(listOf(CaseDetailsEntity("CRN2222", Tier.B3, CaseType.CUSTODY, "Sally", "Smith"), CaseDetailsEntity("CRN3333", Tier.C1, CaseType.COMMUNITY, "John", "Williams"), CaseDetailsEntity("CRN1111", Tier.C1, CaseType.LICENSE, "John", "Doe")))
-    val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
+    val wmtStaff = setupCurrentWmtStaff(staffCodeOM, teamCode)
 
     realTimeCaseDetails.forEach { caseDetails ->
       setupWmtManagedCase(wmtStaff, caseDetails.tier, caseDetails.crn, caseDetails.type)
     }
 
     webTestClient.get()
-      .uri("/team/$teamCode/offenderManagers/$staffCode/cases")
+      .uri("/team/$teamCode/offenderManagers/$staffCodeOM/cases")
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
       }
@@ -36,7 +38,7 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
       .jsonPath("$.grade")
       .isEqualTo("PO")
       .jsonPath("$.code")
-      .isEqualTo(staffCode)
+      .isEqualTo(staffCodeOM)
       .jsonPath("$.email")
       .isEqualTo("sheila.hancock@test.justice.gov.uk")
       .jsonPath("$.teamName")
@@ -69,11 +71,9 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `Get staff member without any email`() {
-    val staffCode = "NOWORKLOAD1"
-    val teamCode = "T1"
-    staffCodeResponse(staffCode, teamCode, email = null)
+    staffCodeResponse(staffCodeNO, teamCode, email = null)
     webTestClient.get()
-      .uri("/team/$teamCode/offenderManagers/$staffCode/cases")
+      .uri("/team/$teamCode/offenderManagers/$staffCodeNO/cases")
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
       }
@@ -91,11 +91,9 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `Get staff member without any WMT active cases`() {
-    val staffCode = "NOWORKLOAD1"
-    val teamCode = "T1"
-    staffCodeResponse(staffCode, teamCode)
+    staffCodeResponse(staffCodeNO, teamCode)
     webTestClient.get()
-      .uri("/team/$teamCode/offenderManagers/$staffCode/cases")
+      .uri("/team/$teamCode/offenderManagers/$staffCodeNO/cases")
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
       }
@@ -110,7 +108,7 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
       .jsonPath("$.grade")
       .isEqualTo("PO")
       .jsonPath("$.code")
-      .isEqualTo(staffCode)
+      .isEqualTo(staffCodeNO)
       .jsonPath("$.teamName")
       .isEqualTo("Test Team")
       .jsonPath("$.activeCases")
@@ -119,17 +117,15 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `still return response if not all offender details are returned`() {
-    val staffCode = "OM1"
-    val teamCode = "T1"
-    staffCodeResponse(staffCode, teamCode)
+    staffCodeResponse(staffCodeOM, teamCode)
     val caseDetails = caseDetailsRepository.save(CaseDetailsEntity("CRN1111", Tier.C1, CaseType.LICENSE, "John", "Doe"))
-    val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
+    val wmtStaff = setupCurrentWmtStaff(staffCodeOM, teamCode)
     setupWmtManagedCase(wmtStaff, caseDetails.tier, caseDetails.crn, caseDetails.type)
     setupWmtManagedCase(wmtStaff, Tier.B3, "CRN2222", CaseType.CUSTODY)
     setupWmtManagedCase(wmtStaff, Tier.C1, "CRN3333", CaseType.COMMUNITY)
 
     webTestClient.get()
-      .uri("/team/$teamCode/offenderManagers/$staffCode/cases")
+      .uri("/team/$teamCode/offenderManagers/$staffCodeOM/cases")
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
       }
@@ -144,7 +140,7 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
       .jsonPath("$.grade")
       .isEqualTo("PO")
       .jsonPath("$.code")
-      .isEqualTo(staffCode)
+      .isEqualTo(staffCodeOM)
       .jsonPath("$.teamName")
       .isEqualTo("Test Team")
       .jsonPath("$.activeCases[?(@.crn == 'CRN2222')].tier")

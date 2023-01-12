@@ -51,6 +51,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WMT
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WMTWorkloadRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WorkloadPointsCalculationRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WorkloadReportRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.choosePractitionerByTeamResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.communityApiAssessmentResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.convictionNoSentenceResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.nomsLookupResponse
@@ -104,6 +105,8 @@ abstract class IntegrationTestBase {
   var hmppsTier: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8082)
   var assessRisksNeedsApi: ClientAndServer =
     startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8085)
+  var workforceAllocationsToDeliusApi: ClientAndServer =
+    startClientAndServer(Configuration.configuration().logLevel(Level.DEBUG), 8084)
 
   @Autowired
   protected lateinit var objectMapper: ObjectMapper
@@ -272,6 +275,7 @@ abstract class IntegrationTestBase {
     communityApi.reset()
     hmppsTier.reset()
     assessRisksNeedsApi.reset()
+    workforceAllocationsToDeliusApi.reset()
     setupOauth()
     personManagerRepository.deleteAll()
     eventManagerRepository.deleteAll()
@@ -305,6 +309,7 @@ abstract class IntegrationTestBase {
     oauthMock.stop()
     hmppsTier.stop()
     assessRisksNeedsApi.stop()
+    workforceAllocationsToDeliusApi.stop()
     personManagerRepository.deleteAll()
     eventManagerRepository.deleteAll()
     requirementManagerRepository.deleteAll()
@@ -485,6 +490,16 @@ abstract class IntegrationTestBase {
 
     communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
       response().withContentType(APPLICATION_JSON).withBody(teamStaffJsonResponse(staffCode))
+    )
+  }
+
+  protected fun choosePractitionerByTeamCodesResponse(teamCodes: List<String>, crn: String) {
+    val choosePractitionerRequest =
+      request()
+        .withPath("/allocation-demand/choose-practitioner").withQueryStringParameter("crn", crn).withQueryStringParameter("teamCode", teamCodes.joinToString(separator = ","))
+
+    workforceAllocationsToDeliusApi.`when`(choosePractitionerRequest, Times.exactly(1)).respond(
+      response().withContentType(APPLICATION_JSON).withBody(choosePractitionerByTeamResponse())
     )
   }
 
