@@ -55,7 +55,7 @@ class TeamController(
     if (practitionerWorkload != null) {
       return ResponseEntity.ok(practitionerWorkload)
     }
-    throw EntityNotFoundException("Team not found for $teamCode")
+    throw EntityNotFoundException("Choose practitioner not found for $teamCode")
   }
 
   @Operation(summary = "Retrieve Team workload and case count by Team Codes")

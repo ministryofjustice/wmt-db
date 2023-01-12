@@ -25,7 +25,7 @@ class TeamService(
   private val personManagerRepository: PersonManagerRepository,
   private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient
 ) {
-  fun getPractitioner(teamCodes: List<String>, crn: String, grades: List<String>?): PractitionerWorkload {
+  fun getPractitioner(teamCodes: List<String>, crn: String, grades: List<String>?): PractitionerWorkload? {
     return workforceAllocationsToDeliusApiClient.getPractitioner(crn, teamCodes)
       .map { choosePractitionerResponse ->
 

@@ -156,7 +156,7 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
   @Test
   fun `must return not found when team code is not matched`() {
     webTestClient.get()
-      .uri("/team/RANDOMCODE/offenderManagers")
+      .uri("/team/choose-practitioner?crn=CRNRANDOM123456&teamCode=T1")
       .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT")) }
       .exchange()
       .expectStatus()
