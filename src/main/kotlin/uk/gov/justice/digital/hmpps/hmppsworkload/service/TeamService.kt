@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
@@ -9,6 +10,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Practitioner
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PractitionerWorkload
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.WorkloadCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.TeamOverview
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.TeamRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadPointsRepository
@@ -23,44 +25,46 @@ class TeamService(
   private val communityApiClient: CommunityApiClient,
   private val workloadPointsRepository: WorkloadPointsRepository,
   private val personManagerRepository: PersonManagerRepository,
+  private val caseDetailsRepository: CaseDetailsRepository,
   private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient
 ) {
-  fun getPractitioner(teamCodes: List<String>, crn: String, grades: List<String>?): PractitionerWorkload? {
-    return workforceAllocationsToDeliusApiClient.getPractitioner(crn, teamCodes)
+  fun getPractitioners(teamCodes: List<String>, crn: String, grades: List<String>?): PractitionerWorkload? {
+    return workforceAllocationsToDeliusApiClient.choosePractitioners(crn, teamCodes)
       .map { choosePractitionerResponse ->
 
-        val workloads =
+        val practitionerWorkloads =
           teamRepository.findAllByTeamCodes(teamCodes).associateBy { team -> team.code }
         val caseCountAfter = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).minusDays(7L)
 
-        val caseCounts = personManagerRepository.findByTeamCodeInAndCreatedDateGreaterThanEqualAndIsActiveIsTrue(teamCodes, caseCountAfter)
+        val practitionerCaseCounts = personManagerRepository.findByTeamCodeInAndCreatedDateGreaterThanEqualAndIsActiveIsTrue(teamCodes, caseCountAfter)
           .groupBy { it.staffCode }
           .mapValues { countEntry -> countEntry.value.size }
 
         PractitionerWorkload(
           choosePractitionerResponse.crn,
           choosePractitionerResponse.name,
+          caseDetailsRepository.findByIdOrNull(crn)!!.tier,
           choosePractitionerResponse.probationStatus,
           choosePractitionerResponse.communityPersonManager,
-          choosePractitionerResponse.teams.mapValues {
-            it.value
+          choosePractitionerResponse.teams.mapValues { team ->
+            team.value
               .filter {
                 grades == null || grades.contains(it.grade)
               }
               .map {
-                val overview = workloads[it.code] ?: getTeamOverviewForOffenderManagerWithoutWorkload(
+                val practitionerWorkload = practitionerWorkloads[it.code] ?: getTeamOverviewForOffenderManagerWithoutWorkload(
                   it.code,
                   it.grade ?: "DMY"
                 )
                 Practitioner(
                   it.code,
                   it.name,
-                  it.email.takeUnless { it.isEmpty() },
+                  it.email.takeUnless { email -> email.isEmpty() },
                   it.grade ?: "DMY",
-                  calculateCapacity(overview.totalPoints, overview.availablePoints),
-                  caseCounts.getOrDefault(it.code, 0),
-                  overview.totalCommunityCases,
-                  overview.totalCustodyCases
+                  calculateCapacity(practitionerWorkload.totalPoints, practitionerWorkload.availablePoints),
+                  practitionerCaseCounts.getOrDefault(it.code, 0),
+                  practitionerWorkload.totalCommunityCases,
+                  practitionerWorkload.totalCustodyCases
                 )
               }
           }

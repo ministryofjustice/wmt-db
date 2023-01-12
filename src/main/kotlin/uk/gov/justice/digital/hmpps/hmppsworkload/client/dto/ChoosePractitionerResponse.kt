@@ -7,7 +7,6 @@ data class ChoosePractitionerResponse @JsonCreator constructor(
   val name: Name,
   val probationStatus: ProbationStatus,
   val communityPersonManager: CommunityPersonManager,
-  // staff list + enrich with workload data
   val teams: Map<String, List<PractitionerTeam>>
 )
 
