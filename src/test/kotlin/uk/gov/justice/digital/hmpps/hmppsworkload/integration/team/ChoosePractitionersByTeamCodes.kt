@@ -1,10 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.team
 
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import java.math.BigInteger
 import java.time.ZonedDateTime
@@ -16,8 +13,6 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
     val teamCode = "T1"
     val teamCode2 = "T2"
     val crn = "CRN1"
-    val caseDetails = caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Don", "Cole"))
-
     choosePractitionerByTeamCodesResponse(listOf(teamCode, teamCode2), crn)
     val firstWmtStaff = setupCurrentWmtStaff("OM1", teamCode)
     val secondWmtStaff = setupCurrentWmtStaff("OM2", teamCode2)
@@ -39,7 +34,7 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
     personManagerRepository.save(personManagerWithNoWorkload)
 
     webTestClient.get()
-      .uri("/team/choose-practitioner?crn=$crn&teamCodes=$teamCode,$teamCode2")
+      .uri("/team/choose-practitioner?crn=$crn&teamCode=$teamCode,$teamCode2")
       .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT")) }
       .exchange()
       .expectStatus()
@@ -53,8 +48,6 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
       .isEqualTo("")
       .jsonPath("$.name.surname")
       .isEqualTo("Cole")
-      .jsonPath("$.tier")
-      .isEqualTo(caseDetails.tier.name)
       .jsonPath("$.probationStatus.status")
       .isEqualTo("PREVIOUSLY_MANAGED")
       .jsonPath("$.probationStatus.description")
@@ -107,6 +100,22 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
       .doesNotExist()
       .jsonPath("$.teams.$teamCode2[?(@.code == '$secondOm')].grade")
       .isEqualTo("PQiP")
+      .jsonPath("$.teams.all[?(@.code == '$firstOm')].name.forename")
+      .isEqualTo("Jane")
+      .jsonPath("$.teams.all[?(@.code == '$firstOm')].name.surname")
+      .isEqualTo("Doe")
+      .jsonPath("$.teams.all[?(@.code == '$firstOm')].email")
+      .isEqualTo("j.doe@email.co.uk")
+      .jsonPath("$.teams.all[?(@.code == '$firstOm')].grade")
+      .isEqualTo("PO")
+      .jsonPath("$.teams.all[?(@.code == '$firstOm')].workload")
+      .isEqualTo(50.toDouble())
+      .jsonPath("$.teams.all[?(@.code == '$firstOm')].casesPastWeek")
+      .isEqualTo(1)
+      .jsonPath("$.teams.all[?(@.code == '$firstOm')].communityCases")
+      .isEqualTo(15)
+      .jsonPath("$.teams.all[?(@.code == '$firstOm')].custodyCases")
+      .isEqualTo(20)
   }
 
   @Test
@@ -114,7 +123,6 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
     val teamCode = "T1"
     val teamCode2 = "T2"
     val crn = "CRN1"
-    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Don", "Cole"))
     choosePractitionerByTeamCodesResponse(listOf(teamCode, teamCode2), crn)
     val firstWmtStaff = setupCurrentWmtStaff("OM1", teamCode)
     setupCurrentWmtStaff("OM2", teamCode2)
@@ -123,7 +131,7 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
     val noWorkloadStaffCode = "NOWORKLOAD1"
 
     webTestClient.get()
-      .uri("/team/choose-practitioner?crn=$crn&teamCodes=$teamCode,$teamCode2&grades=PO,PQiP")
+      .uri("/team/choose-practitioner?crn=$crn&teamCode=$teamCode,$teamCode2&grades=PO,PQiP")
       .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT")) }
       .exchange()
       .expectStatus()
@@ -139,12 +147,16 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
       .isEqualTo("PO")
       .jsonPath("$.teams.$teamCode[?(@.code == '$noWorkloadStaffCode')]")
       .doesNotExist()
+      .jsonPath("$.teams.all[?(@.code == '$noWorkloadStaffCode')]")
+      .doesNotExist()
+      .jsonPath("$.teams.all[?(@.code == '$firstOm')].name.forename")
+      .isEqualTo("Jane")
   }
 
   @Test
   fun `must return not found when team code is not matched`() {
     webTestClient.get()
-      .uri("/team/choose-practitioner?crn=CRNRANDOM123456&teamCodes=T1")
+      .uri("/team/choose-practitioner?crn=CRNRANDOM123456&teamCode=T1")
       .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT")) }
       .exchange()
       .expectStatus()
@@ -153,11 +165,8 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
 
   @Test
   fun `must return forbidden when auth token does not contain correct role`() {
-    val teamCode = "T1"
-    val teamCode2 = "T2"
-    val crn = "CRN1"
     webTestClient.get()
-      .uri("/team/choose-practitioner?crn=$crn&teamCodes=$teamCode,$teamCode2&grades=PO,PQiP")
+      .uri("/team/T1/offenderManagers")
       .headers { it.authToken(roles = listOf("ROLE_RANDOM_ROLE")) }
       .exchange()
       .expectStatus()
@@ -166,81 +175,23 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
 
   @Test
   fun `can get team overview of offender manager by team code when assigned to another staff member`() {
+    val teamCode = "TEAM1"
+    teamStaffResponse(teamCode, "STAFF1")
 
-    val teamCode = "T1"
-    val staffCode = "OM1"
-    val crn = "CRN1"
-    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Don", "Cole"))
-    choosePractitionerByTeamCodesResponse(listOf(teamCode), crn)
-
-    val movedPersonManager = PersonManagerEntity(crn = "CRN3", staffId = BigInteger.valueOf(123456789L), staffCode = staffCode, teamCode = teamCode, createdBy = "USER1", providerCode = "R1", isActive = false)
+    val movedPersonManager = PersonManagerEntity(crn = "CRN3", staffId = BigInteger.valueOf(123456789L), staffCode = "STAFF1", teamCode = teamCode, createdBy = "USER1", providerCode = "R1", isActive = false)
     personManagerRepository.save(movedPersonManager)
 
     val newPersonManager = PersonManagerEntity(crn = "CRN3", staffId = BigInteger.valueOf(56789321L), staffCode = "STAFF2", teamCode = "TEAM2", createdBy = "USER2", providerCode = "R1", isActive = true)
     personManagerRepository.save(newPersonManager)
 
     webTestClient.get()
-      .uri("/team/choose-practitioner?crn=$crn&teamCodes=$teamCode")
+      .uri("/team/$teamCode/offenderManagers")
       .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT")) }
       .exchange()
       .expectStatus()
       .isOk
       .expectBody()
-      .jsonPath("$.teams.$teamCode[?(@.code == '$staffCode')].casesPastWeek")
+      .jsonPath("$.offenderManagers[?(@.code == 'STAFF1')].totalCasesInLastWeek")
       .isEqualTo(0)
-  }
-
-  @Test
-  fun `must get correct workloads when the same offender manager is working in multiple teams`() {
-    val teamCode = "T1"
-    val teamCode2 = "T2"
-    val crn = "CRN1"
-    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Don", "Cole"))
-    val staffCode = "OM1"
-
-    choosePractitionerStaffInMultipleTeamsResponse(listOf(teamCode, teamCode2), crn, staffCode)
-    val firstTeamWorkload = setupCurrentWmtStaff(staffCode, teamCode, 20)
-    val secondTeamWorkload = setupCurrentWmtStaff(staffCode, teamCode2, 50)
-
-    webTestClient.get()
-      .uri("/team/choose-practitioner?crn=$crn&teamCodes=$teamCode,$teamCode2")
-      .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT")) }
-      .exchange()
-      .expectStatus()
-      .isOk
-      .expectBody()
-      .jsonPath("$.teams.$teamCode[?(@.code == '$staffCode')].custodyCases")
-      .isEqualTo(firstTeamWorkload.workload.totalFilteredCustodyCases)
-      .jsonPath("$.teams.$teamCode2[?(@.code == '$staffCode')].custodyCases")
-      .isEqualTo(secondTeamWorkload.workload.totalFilteredCustodyCases)
-  }
-
-  @Test
-  fun `can get choose practitioner response when practitioner does not have an email field`() {
-    val teamCode = "T2"
-    val crn = "CRN1"
-    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Don", "Cole"))
-
-    choosePractitionerByTeamCodesResponse(listOf(teamCode), crn)
-    val firstWmtStaff = setupCurrentWmtStaff("OM3", teamCode)
-
-    val firstOm = firstWmtStaff.offenderManager.code
-
-    val storedPersonManager = PersonManagerEntity(crn = "CRN1", staffId = BigInteger.valueOf(123456789L), staffCode = firstOm, teamCode = teamCode, createdBy = "USER1", providerCode = "R1", isActive = true)
-    personManagerRepository.save(storedPersonManager)
-
-    webTestClient.get()
-      .uri("/team/choose-practitioner?crn=$crn&teamCodes=$teamCode")
-      .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT")) }
-      .exchange()
-      .expectStatus()
-      .isOk
-      .expectBody()
-      .jsonPath("$.teams.$teamCode[?(@.code == '$firstOm')].name.forename")
-      .isEqualTo("Mark")
-      .jsonPath("$.teams.$teamCode[?(@.code == '$firstOm')].name.surname")
-      .isEqualTo("NoEmail")
-      .jsonPath("$.teams.$teamCode[?(@.code == '$firstOm')].email")
-      .doesNotExist()
   }
 }

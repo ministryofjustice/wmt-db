@@ -7,14 +7,14 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ChoosePractitionerR
 
 class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
 
-  fun choosePractitioners(crn: String, teamCodes: List<String>): Mono<ChoosePractitionerResponse> {
+  fun getPractitioner(crn: String, teamCode: List<String>): Mono<ChoosePractitionerResponse> {
     return webClient
       .get()
-      .uri("/allocation-demand/choose-practitioner?crn=$crn&teamCode=${teamCodes.joinToString(separator = ",")}")
+      .uri("/allocation-demand/choose-practitioner?crn=$crn&teamCode=${teamCode.joinToString(separator = ",")}")
       .retrieve()
       .onStatus(
         { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
-        { Mono.error(MissingChoosePractitioner("No choose practitioner found for $crn $teamCodes")) }
+        { Mono.error(MissingChoosePractitioner("No choose practitioner found for $crn $teamCode")) }
       )
       .bodyToMono(ChoosePractitionerResponse::class.java)
       .onErrorResume { ex ->
