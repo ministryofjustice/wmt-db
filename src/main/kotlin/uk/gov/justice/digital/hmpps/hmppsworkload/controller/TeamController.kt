@@ -50,12 +50,12 @@ class TeamController(
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/team/choose-practitioner")
-  fun getPractitionersSummary(@RequestParam teamCode: List<String>, @RequestParam crn: String, @RequestParam grades: List<String>?): ResponseEntity<PractitionerWorkload> {
-    val practitionerWorkload = teamService.getPractitioner(teamCode, crn, grades)
-    if (practitionerWorkload != null) {
-      return ResponseEntity.ok(practitionerWorkload)
+  fun getPractitioners(@RequestParam teamCodes: List<String>, @RequestParam crn: String, @RequestParam grades: List<String>?): ResponseEntity<PractitionerWorkload> {
+    val practitionerWorkloads = teamService.getPractitioners(teamCodes, crn, grades)
+    if (practitionerWorkloads != null) {
+      return ResponseEntity.ok(practitionerWorkloads)
     }
-    throw EntityNotFoundException("Choose practitioner not found for $teamCode")
+    throw EntityNotFoundException("Choose practitioner not found for $teamCodes")
   }
 
   @Operation(summary = "Retrieve Team workload and case count by Team Codes")
