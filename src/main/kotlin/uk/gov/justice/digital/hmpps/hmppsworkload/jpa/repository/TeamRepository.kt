@@ -12,6 +12,9 @@ interface TeamRepository : CrudRepository<TeamEntity, Long> {
   @Query(nativeQuery = true)
   fun findByOverview(teamCode: String): List<TeamOverview>
 
+  @Query(nativeQuery = true)
+  fun findAllByTeamCodes(teamCodes: List<String>): List<TeamOverview>
+
   fun findByCode(code: String): TeamEntity?
 
   @Query(nativeQuery = true)

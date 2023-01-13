@@ -72,6 +72,9 @@ hmpps-tier:
 assess-risks-needs:
   endpoint:
     url: http://localhost:8085
+workforce-allocations-to-delius:
+  endpoint:
+    url: http://localhost:8084
 
 application:
   notify:
