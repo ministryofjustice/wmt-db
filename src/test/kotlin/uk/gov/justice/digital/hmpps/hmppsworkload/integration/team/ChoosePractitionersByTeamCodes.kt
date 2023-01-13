@@ -107,22 +107,6 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
       .doesNotExist()
       .jsonPath("$.teams.$teamCode2[?(@.code == '$secondOm')].grade")
       .isEqualTo("PQiP")
-      .jsonPath("$.teams.all[?(@.code == '$firstOm')].name.forename")
-      .isEqualTo("Jane")
-      .jsonPath("$.teams.all[?(@.code == '$firstOm')].name.surname")
-      .isEqualTo("Doe")
-      .jsonPath("$.teams.all[?(@.code == '$firstOm')].email")
-      .isEqualTo("j.doe@email.co.uk")
-      .jsonPath("$.teams.all[?(@.code == '$firstOm')].grade")
-      .isEqualTo("PO")
-      .jsonPath("$.teams.all[?(@.code == '$firstOm')].workload")
-      .isEqualTo(50.toDouble())
-      .jsonPath("$.teams.all[?(@.code == '$firstOm')].casesPastWeek")
-      .isEqualTo(1)
-      .jsonPath("$.teams.all[?(@.code == '$firstOm')].communityCases")
-      .isEqualTo(15)
-      .jsonPath("$.teams.all[?(@.code == '$firstOm')].custodyCases")
-      .isEqualTo(20)
   }
 
   @Test
@@ -155,10 +139,6 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
       .isEqualTo("PO")
       .jsonPath("$.teams.$teamCode[?(@.code == '$noWorkloadStaffCode')]")
       .doesNotExist()
-      .jsonPath("$.teams.all[?(@.code == '$noWorkloadStaffCode')]")
-      .doesNotExist()
-      .jsonPath("$.teams.all[?(@.code == '$firstOm')].name.forename")
-      .isEqualTo("Jane")
   }
 
   @Test

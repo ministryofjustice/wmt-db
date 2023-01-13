@@ -51,34 +51,6 @@ fun choosePractitionerByTeamResponse() = """
         "email": "",
         "grade": "PQiP"
       }
-    ],
-    "all": [
-      {
-        "code": "OM1",
-        "name": {
-          "forename": "Jane",
-          "surname": "Doe"
-        },
-        "email": "j.doe@email.co.uk",
-        "grade": "PO"
-      },
-      {
-        "code": "NOWORKLOAD1",
-        "name": {
-          "forename": "No",
-          "surname": "Workload"
-        },
-        "email": "no.workload.email@co.uk"
-      },
-      {
-        "code": "OM2",
-        "name": {
-          "forename": "Mark",
-          "surname": "Reese"
-        },
-        "email": "",
-        "grade": "PQiP"
-      }
     ]
   }
 }
