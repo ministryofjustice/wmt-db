@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.8.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.8.1"
   kotlin("plugin.spring") version "1.8.0"
   kotlin("plugin.jpa") version "1.8.0"
   id("io.gitlab.arturbosch.detekt").version("1.22.0")
@@ -33,7 +33,7 @@ dependencies {
   runtimeOnly("org.postgresql:postgresql:42.5.1")
 
   testImplementation("io.jsonwebtoken:jjwt:0.9.1")
-  testImplementation("org.mock-server:mockserver-netty:5.14.0")
+  testImplementation("org.mock-server:mockserver-netty:5.15.0")
   testImplementation("org.awaitility:awaitility-kotlin:4.2.0")
   testImplementation("io.mockk:mockk:1.13.3")
   testImplementation("com.ninja-squad:springmockk:4.0.0")
