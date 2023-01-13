@@ -2,6 +2,9 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.client.dto
 
 import com.fasterxml.jackson.annotation.JsonCreator
 
+/***
+ * workforce-allocations-to-delius api response
+ */
 data class ChoosePractitionerResponse @JsonCreator constructor(
   val crn: String,
   val name: Name,
