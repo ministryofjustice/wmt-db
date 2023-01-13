@@ -53,7 +53,7 @@ data class Practitioner constructor(
     fun from(practitionerTeam: PractitionerTeam, practitionerWorkload: TeamOverview, caseCount: Int): Practitioner {
       return Practitioner(
         practitionerTeam.code, practitionerTeam.name,
-        practitionerTeam.email.takeUnless { email -> email.isEmpty() },
+        practitionerTeam.email.takeUnless { email -> email.isNullOrBlank() },
         practitionerTeam.grade ?: "DMY",
         calculateCapacity(practitionerWorkload.totalPoints, practitionerWorkload.availablePoints),
         caseCount,
