@@ -50,14 +50,6 @@ fun choosePractitionerByTeamResponse() = """
         },
         "email": "",
         "grade": "PQiP"
-      },
-      {
-        "code": "OM3",
-        "name": {
-          "forename": "Mark",
-          "surname": "NoEmail"
-        },
-        "grade": "PQiP"
       }
     ]
   }
