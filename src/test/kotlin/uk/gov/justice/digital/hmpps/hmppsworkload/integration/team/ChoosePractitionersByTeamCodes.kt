@@ -209,4 +209,29 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
       .jsonPath("$.teams.$teamCode[?(@.code == '$staffCode')].casesPastWeek")
       .isEqualTo(0)
   }
+
+  @Test
+  fun `must get correct workloads when the same offender manager is working in multiple teams`() {
+    val teamCode = "T1"
+    val teamCode2 = "T2"
+    val crn = "CRN1"
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Don", "Cole"))
+    val staffCode = "OM1"
+
+    choosePractitionerStaffInMultipleTeamsResponse(listOf(teamCode, teamCode2), crn, staffCode)
+    val firstTeamWorkload = setupCurrentWmtStaff(staffCode, teamCode, 20)
+    val secondTeamWorkload = setupCurrentWmtStaff(staffCode, teamCode2, 50)
+
+    webTestClient.get()
+      .uri("/team/choose-practitioner?crn=$crn&teamCodes=$teamCode,$teamCode2")
+      .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT")) }
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody()
+      .jsonPath("$.teams.$teamCode[?(@.code == '$staffCode')].custodyCases")
+      .isEqualTo(firstTeamWorkload.workload.totalFilteredCustodyCases)
+      .jsonPath("$.teams.$teamCode2[?(@.code == '$staffCode')].custodyCases")
+      .isEqualTo(secondTeamWorkload.workload.totalFilteredCustodyCases)
+  }
 }

@@ -46,8 +46,8 @@ data class Practitioner constructor(
   val grade: String,
   val workload: BigDecimal,
   val casesPastWeek: Int,
-  val communityCases: BigDecimal,
-  val custodyCases: BigDecimal
+  val communityCases: Int,
+  val custodyCases: Int
 ) {
   companion object {
     fun from(practitionerTeam: PractitionerTeam, practitionerWorkload: TeamOverview, caseCount: Int): Practitioner {

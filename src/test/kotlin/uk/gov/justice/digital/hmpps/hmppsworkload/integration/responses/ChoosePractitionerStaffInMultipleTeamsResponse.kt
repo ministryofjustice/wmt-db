@@ -43,6 +43,26 @@ fun choosePractitionerStaffInMultipleTeamsResponse() = """
           "email": "j.doe@email.co.uk",
           "grade": "PO"
         }
+      ],
+      "all": [
+        {
+          "code": "OM1",
+          "name": {
+            "forename": "Jane",
+            "surname": "Doe"
+          },
+          "email": "j.doe@email.co.uk",
+          "grade": "PO"
+        },
+        {
+          "code": "OM1",
+          "name": {
+            "forename": "Jane",
+            "surname": "Doe"
+          },
+          "email": "j.doe@email.co.uk",
+          "grade": "PO"
+        }
       ]
     }
   }
