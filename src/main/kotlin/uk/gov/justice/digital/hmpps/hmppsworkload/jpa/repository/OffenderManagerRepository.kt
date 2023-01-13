@@ -19,5 +19,5 @@ interface OffenderManagerRepository : CrudRepository<OffenderManagerEntity, Long
   @Query(nativeQuery = true)
   fun findCaseByTeamCodeAndStaffCodeAndCrn(teamCode: String, offenderManagerCode: String, crn: String): OffenderManagerCase?
 
-  fun findByCode(staffCode: String): OffenderManagerEntity
+  fun findByCode(staffCode: String): OffenderManagerEntity?
 }

@@ -15,9 +15,9 @@ data class OffenderManagerWorkload @JsonCreator constructor(
   @Schema(description = "Probation Practitioner Grade", example = "PO")
   val grade: String,
   @Schema(description = "Probation Practitioner Total current Community and Licence case count", example = "10")
-  val totalCommunityCases: BigDecimal,
+  val totalCommunityCases: Int,
   @Schema(description = "Probation Practitioner Total custody case count", example = "5")
-  val totalCustodyCases: BigDecimal,
+  val totalCustodyCases: Int,
   @Schema(description = "Probation Practitioner capacity as a decimal", example = "0.5")
   val capacity: BigDecimal,
   @Schema(description = "Offender Manager Code", example = "OM1")

@@ -21,11 +21,12 @@ import javax.persistence.Table
     ConstructorResult(
       targetClass = TeamOverview::class,
       columns = [
-        ColumnResult(name = "total_community_cases"),
-        ColumnResult(name = "total_filtered_custody_cases"),
+        ColumnResult(name = "total_community_cases", type = Int::class),
+        ColumnResult(name = "total_filtered_custody_cases", type = Int::class),
         ColumnResult(name = "available_points"),
         ColumnResult(name = "total_points"),
-        ColumnResult(name = "key")
+        ColumnResult(name = "key"),
+        ColumnResult(name = "team_code")
       ]
     )
   ]
@@ -34,7 +35,7 @@ import javax.persistence.Table
   name = "TeamEntity.findByOverview",
   resultSetMapping = "TeamOverviewResult",
   query = """SELECT
-    (w.total_filtered_community_cases + w.total_filtered_license_cases) as total_community_cases, w.total_filtered_custody_cases , wpc.available_points AS available_points, wpc.total_points AS total_points, om."key"
+    (w.total_filtered_community_cases + w.total_filtered_license_cases) as total_community_cases, w.total_filtered_custody_cases , wpc.available_points AS available_points, wpc.total_points AS total_points, om."key", t.code as team_code
     FROM app.workload_owner AS wo
     JOIN app.team AS t
         ON wo.team_id = t.id
@@ -52,7 +53,7 @@ import javax.persistence.Table
   name = "TeamEntity.findAllByTeamCodes",
   resultSetMapping = "TeamOverviewResult",
   query = """SELECT
-    (w.total_filtered_community_cases + w.total_filtered_license_cases) as total_community_cases, w.total_filtered_custody_cases , wpc.available_points AS available_points, wpc.total_points AS total_points, om."key"
+    (w.total_filtered_community_cases + w.total_filtered_license_cases) as total_community_cases, w.total_filtered_custody_cases , wpc.available_points AS available_points, wpc.total_points AS total_points, om."key", t.code as team_code
     FROM app.workload_owner AS wo
     JOIN app.team AS t
         ON wo.team_id = t.id
