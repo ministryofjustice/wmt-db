@@ -214,4 +214,33 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
       .jsonPath("$.teams.$teamCode2[?(@.code == '$staffCode')].custodyCases")
       .isEqualTo(secondTeamWorkload.workload.totalFilteredCustodyCases)
   }
+
+  @Test
+  fun `can get choose practitioner response when practitioner does not have an email field`() {
+    val teamCode = "T2"
+    val crn = "CRN1"
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Don", "Cole"))
+
+    choosePractitionerByTeamCodesResponse(listOf(teamCode), crn)
+    val firstWmtStaff = setupCurrentWmtStaff("OM3", teamCode)
+
+    val firstOm = firstWmtStaff.offenderManager.code
+
+    val storedPersonManager = PersonManagerEntity(crn = "CRN1", staffId = BigInteger.valueOf(123456789L), staffCode = firstOm, teamCode = teamCode, createdBy = "USER1", providerCode = "R1", isActive = true)
+    personManagerRepository.save(storedPersonManager)
+
+    webTestClient.get()
+      .uri("/team/choose-practitioner?crn=$crn&teamCodes=$teamCode")
+      .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT")) }
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody()
+      .jsonPath("$.teams.$teamCode[?(@.code == '$firstOm')].name.forename")
+      .isEqualTo("Mark")
+      .jsonPath("$.teams.$teamCode[?(@.code == '$firstOm')].name.surname")
+      .isEqualTo("NoEmail")
+      .jsonPath("$.teams.$teamCode[?(@.code == '$firstOm')].email")
+      .doesNotExist()
+  }
 }
