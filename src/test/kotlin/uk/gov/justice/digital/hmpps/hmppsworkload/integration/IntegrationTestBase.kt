@@ -51,6 +51,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WMT
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WMTWorkloadRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WorkloadPointsCalculationRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WorkloadReportRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.choosePractitionerByTeamCodesNoCommunityPersonManagerResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.choosePractitionerByTeamResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.choosePractitionerStaffInMultipleTeamsResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.communityApiAssessmentResponse
@@ -501,6 +502,16 @@ abstract class IntegrationTestBase {
 
     workforceAllocationsToDeliusApi.`when`(choosePractitionerRequest, Times.exactly(1)).respond(
       response().withContentType(APPLICATION_JSON).withBody(choosePractitionerByTeamResponse())
+    )
+  }
+
+  protected fun choosePractitionerByTeamCodesResponseNoCommunityPersonManager(teamCodes: List<String>, crn: String) {
+    val choosePractitionerRequest =
+      request()
+        .withPath("/allocation-demand/choose-practitioner").withQueryStringParameter("crn", crn).withQueryStringParameter("teamCode", teamCodes.joinToString(separator = ","))
+
+    workforceAllocationsToDeliusApi.`when`(choosePractitionerRequest, Times.exactly(1)).respond(
+      response().withContentType(APPLICATION_JSON).withBody(choosePractitionerByTeamCodesNoCommunityPersonManagerResponse())
     )
   }
 

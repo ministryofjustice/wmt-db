@@ -9,7 +9,7 @@ data class ChoosePractitionerResponse @JsonCreator constructor(
   val crn: String,
   val name: Name,
   val probationStatus: ProbationStatus,
-  val communityPersonManager: CommunityPersonManager,
+  val communityPersonManager: CommunityPersonManager?,
   val teams: Map<String, List<PractitionerTeam>>
 )
 
