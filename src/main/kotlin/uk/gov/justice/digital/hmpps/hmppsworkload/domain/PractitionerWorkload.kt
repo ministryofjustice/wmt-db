@@ -18,7 +18,7 @@ data class PractitionerWorkload @JsonCreator constructor(
   val name: Name,
   val tier: Tier,
   val probationStatus: ProbationStatus,
-  val communityPersonManager: CommunityPersonManager,
+  val communityPersonManager: CommunityPersonManager?,
   val teams: Map<String, List<Practitioner>>
 ) {
   companion object {
