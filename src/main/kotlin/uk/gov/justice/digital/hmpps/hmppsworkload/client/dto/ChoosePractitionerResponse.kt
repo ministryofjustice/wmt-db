@@ -29,7 +29,9 @@ data class CommunityPersonManager constructor(
   val name: Name,
   val grade: String?,
   val teamCode: String
-)
+) {
+  val isUnallocated: Boolean = code.endsWith("U")
+}
 
 data class PractitionerTeam constructor(
   val code: String,
