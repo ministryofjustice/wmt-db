@@ -32,11 +32,7 @@ data class PractitionerWorkload @JsonCreator constructor(
         choosePractitionerResponse.name,
         tier,
         choosePractitionerResponse.probationStatus,
-        if (choosePractitionerResponse.communityPersonManager?.isUnallocated == true) {
-          null
-        } else {
-          choosePractitionerResponse.communityPersonManager
-        },
+        choosePractitionerResponse.communityPersonManager.takeUnless { it?.isUnallocated ?: true },
         teams
       )
     }
