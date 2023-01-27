@@ -26,7 +26,7 @@ class SaveCaseDetailsService(
 ) {
 
   fun save(crn: String) {
-    val convictions = communityApiClient.getActiveConvictions(crn).block()!!
+    val convictions = communityApiClient.getActiveConvictions(crn).collectList().block()!!
     val personSummary = communityApiClient.getSummaryByCrn(crn).block()!!
     caseTypeMapper.getCaseType(convictions).takeUnless { it == CaseType.UNKNOWN }?.let { caseType ->
       hmppsTierApiClient.getTierByCrn(crn).map {
