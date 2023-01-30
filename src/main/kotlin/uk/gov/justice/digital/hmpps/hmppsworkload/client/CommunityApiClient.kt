@@ -63,13 +63,12 @@ class CommunityApiClient(private val webClient: WebClient) {
       .bodyToMono(DeliusStaff::class.java)
   }
 
-  fun getActiveConvictions(crn: String): Mono<List<Conviction>> {
-    val responseType = object : ParameterizedTypeReference<List<Conviction>>() {}
+  fun getActiveConvictions(crn: String): Flux<Conviction> {
     return webClient
       .get()
       .uri("/offenders/crn/$crn/convictions?activeOnly=true")
       .retrieve()
-      .bodyToMono(responseType)
+      .bodyToFlux(Conviction::class.java)
   }
 
   fun getAllConvictions(crn: String): Flux<Conviction> = webClient
