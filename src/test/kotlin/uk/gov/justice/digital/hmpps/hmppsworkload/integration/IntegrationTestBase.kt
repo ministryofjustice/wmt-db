@@ -70,7 +70,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByC
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByUserNameResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.successfulRiskPredictorResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.successfulRiskSummaryResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.teamStaffJsonResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.OffenderManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PduEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RegionEntity
@@ -484,16 +483,6 @@ abstract class IntegrationTestBase {
     val response = response().withContentType(APPLICATION_JSON)
       .withBody(objectMapper.writeValueAsString(mapOf("access_token" to "ABCDE", "token_type" to "bearer")))
     oauthMock.`when`(request().withPath("/auth/oauth/token")).respond(response)
-  }
-
-  protected fun teamStaffResponse(teamCode: String, staffCode: String = "OM1") {
-    val convictionsRequest =
-      request()
-        .withPath("/teams/$teamCode/staff")
-
-    communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(teamStaffJsonResponse(staffCode))
-    )
   }
 
   protected fun choosePractitionerByTeamCodesResponse(teamCodes: List<String>, crn: String) {

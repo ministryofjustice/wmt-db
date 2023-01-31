@@ -12,32 +12,12 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.DeliusStaff
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderAssessment
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.TeamStaff
 import java.math.BigInteger
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Optional
 
 class CommunityApiClient(private val webClient: WebClient) {
-
-  fun getTeamStaff(teamCode: String): Mono<List<TeamStaff>> {
-    val responseType = object : ParameterizedTypeReference<List<TeamStaff>>() {}
-    return webClient
-      .get()
-      .uri("/teams/$teamCode/staff")
-      .retrieve()
-      .onStatus(
-        { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
-        { Mono.error(MissingTeamError("No team found for $teamCode")) }
-      )
-      .bodyToMono(responseType)
-      .onErrorResume { ex ->
-        when (ex) {
-          is MissingTeamError -> Mono.empty()
-          else -> Mono.error(ex)
-        }
-      }
-  }
 
   fun getStaffByUsername(username: String): Mono<DeliusStaff> {
     return webClient
@@ -156,7 +136,6 @@ class CommunityApiClient(private val webClient: WebClient) {
   }
 }
 
-class MissingTeamError(msg: String) : RuntimeException(msg)
 class MissingStaffError(msg: String) : RuntimeException(msg)
 private class MissingOffenderAssessmentError(msg: String) : RuntimeException(msg)
 

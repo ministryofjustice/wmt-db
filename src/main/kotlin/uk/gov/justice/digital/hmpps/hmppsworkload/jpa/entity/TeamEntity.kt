@@ -32,24 +32,6 @@ import javax.persistence.Table
   ]
 )
 @NamedNativeQuery(
-  name = "TeamEntity.findByOverview",
-  resultSetMapping = "TeamOverviewResult",
-  query = """SELECT
-    (w.total_filtered_community_cases + w.total_filtered_license_cases) as total_community_cases, w.total_filtered_custody_cases , wpc.available_points AS available_points, wpc.total_points AS total_points, om."key", t.code as team_code
-    FROM app.workload_owner AS wo
-    JOIN app.team AS t
-        ON wo.team_id = t.id
-    JOIN app.workload AS w
-        ON wo.id = w.workload_owner_id
-    JOIN app.workload_points_calculations AS wpc
-        ON wpc.workload_id = w.id
-    JOIN app.workload_report AS wr
-        ON wr.id = wpc.workload_report_id
-    JOIN app.offender_manager AS om
-        ON om.id = wo.offender_manager_id
-    WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS NULL AND t.code = ?1"""
-)
-@NamedNativeQuery(
   name = "TeamEntity.findAllByTeamCodes",
   resultSetMapping = "TeamOverviewResult",
   query = """SELECT

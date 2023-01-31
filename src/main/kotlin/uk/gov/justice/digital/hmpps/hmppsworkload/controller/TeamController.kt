@@ -7,13 +7,11 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Flux
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PractitionerWorkload
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.TeamSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.WorkloadCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.TeamService
 import javax.persistence.EntityNotFoundException
@@ -23,23 +21,6 @@ import javax.persistence.EntityNotFoundException
 class TeamController(
   private val teamService: TeamService
 ) {
-
-  @Operation(summary = "Retrieve Team summary by Team Code")
-  @ApiResponses(
-    value = [
-      ApiResponse(responseCode = "200", description = "OK"),
-      ApiResponse(responseCode = "404", description = "Result Not Found")
-    ]
-  )
-  @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
-  @GetMapping("/team/{teamCode}/offenderManagers")
-  fun getTeamSummary(@PathVariable(required = true) teamCode: String, @RequestParam grades: List<String>?): ResponseEntity<TeamSummary> {
-    val overviews = teamService.getTeamOverview(teamCode, grades)
-    if (overviews != null) {
-      return ResponseEntity.ok(TeamSummary(overviews))
-    }
-    throw EntityNotFoundException("Team not found for $teamCode")
-  }
 
   @Operation(summary = "Retrieve Team summary by Team Code")
   @ApiResponses(
