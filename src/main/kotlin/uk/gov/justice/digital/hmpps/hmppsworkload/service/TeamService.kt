@@ -3,9 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToDeliusApiClient
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerWorkload
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Practitioner
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PractitionerWorkload
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.WorkloadCase
@@ -21,7 +19,6 @@ import java.time.ZoneId
 @Service
 class TeamService(
   private val teamRepository: TeamRepository,
-  private val communityApiClient: CommunityApiClient,
   private val workloadPointsRepository: WorkloadPointsRepository,
   private val personManagerRepository: PersonManagerRepository,
   private val caseDetailsRepository: CaseDetailsRepository,
@@ -59,29 +56,6 @@ class TeamService(
     return Flux.fromIterable(teamRepository.findWorkloadCountCaseByCode(teams))
       .map { WorkloadCase(it.teamCode, it.totalCases, calculateCapacity(it.totalPoints.toBigInteger(), it.availablePoints.toBigInteger()).toDouble()) }
   }
-
-  fun getTeamOverview(teamCode: String, grades: List<String>?): List<OffenderManagerWorkload>? = communityApiClient
-    .getTeamStaff(teamCode)
-    .map { staff ->
-      val workloads = teamRepository.findByOverview(teamCode).associateBy { it.staffCode }
-      val caseCountAfter = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).minusDays(7L)
-      val caseCounts = personManagerRepository.findByTeamCodeAndCreatedDateGreaterThanEqualAndIsActiveIsTrue(teamCode, caseCountAfter)
-        .groupBy { it.staffCode }
-        .mapValues { countEntry -> countEntry.value.size }
-      staff.map {
-        val overview = workloads[it.staffCode] ?: getTeamOverviewForOffenderManagerWithoutWorkload(
-          it.staffCode,
-          it.grade,
-          teamCode
-        )
-        OffenderManagerWorkload(
-          it.staff.forenames, it.staff.surname, it.email, it.grade, overview.totalCommunityCases,
-          overview.totalCustodyCases, calculateCapacity(overview.totalPoints, overview.availablePoints), it.staffCode, caseCounts.getOrDefault(overview.staffCode, 0).toBigInteger()
-        )
-      }.filter {
-        grades == null || grades.contains(it.grade)
-      }
-    }.block()
 
   private fun getTeamOverviewForOffenderManagerWithoutWorkload(
     staffCode: String,
