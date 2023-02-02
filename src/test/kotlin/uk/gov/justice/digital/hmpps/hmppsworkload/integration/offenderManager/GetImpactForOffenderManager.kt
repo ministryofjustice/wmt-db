@@ -30,9 +30,9 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
       .isOk
       .expectBody()
       .jsonPath("$.forename")
-      .isEqualTo("Jane")
+      .isEqualTo("Sheila")
       .jsonPath("$.surname")
-      .isEqualTo("Doe")
+      .isEqualTo("Hancock")
       .jsonPath("$.grade")
       .isEqualTo("PO")
       .jsonPath("$.capacity")
@@ -65,9 +65,9 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
       .isOk
       .expectBody()
       .jsonPath("$.forename")
-      .isEqualTo("Jane")
+      .isEqualTo("Sheila")
       .jsonPath("$.surname")
-      .isEqualTo("Doe")
+      .isEqualTo("Hancock")
       .jsonPath("$.grade")
       .isEqualTo("PO")
       .jsonPath("$.capacity")

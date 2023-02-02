@@ -8,14 +8,11 @@ import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 data class OffenderManagerOverview(
-  val forename: String,
-  val surname: String,
   val totalCommunityCases: Int,
   val totalCustodyCases: Int,
   val availablePoints: BigInteger,
   val totalPoints: BigInteger,
   val code: String,
-  val teamName: String,
   val lastUpdatedOn: LocalDateTime?,
   val workloadOwnerId: Long,
   val paroleReportsDue: BigInteger
@@ -31,4 +28,7 @@ data class OffenderManagerOverview(
   var grade = ""
   var lastAllocatedEvent: EventDetails? = null
   var email: String? = null
+  var forename: String = ""
+  var surname: String = ""
+  var hasWorkload = false
 }

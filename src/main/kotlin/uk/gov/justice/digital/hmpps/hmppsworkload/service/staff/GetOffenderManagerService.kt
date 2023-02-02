@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service.staff
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.DeliusStaff
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerCases
@@ -38,7 +37,10 @@ class GetOffenderManagerService(
 ) {
 
   fun getPotentialWorkload(staffIdentifier: StaffIdentifier, crn: String): OffenderManagerOverview? {
-    return getOverview(staffIdentifier)?.let { overview ->
+    return communityApiClient.getStaffByCode(staffIdentifier.staffCode).map { staff ->
+      val overview = findOffenderManagerOverview(staffIdentifier, staff.grade)
+      overview.forename = staff.staff.forenames
+      overview.surname = staff.staff.surname
       val currentCaseImpact = getCurrentCasePoints(staffIdentifier, crn)
       overview.potentialCapacity = calculateCapacity(
         overview.totalPoints.minus(currentCaseImpact)
@@ -46,7 +48,7 @@ class GetOffenderManagerService(
         overview.availablePoints
       )
       overview
-    }
+    }.block()
   }
 
   private fun getPotentialCase(crn: String): Case {
@@ -58,44 +60,49 @@ class GetOffenderManagerService(
     return caseCalculator.getPointsForCase(Case(Tier.valueOf(currentCase.tier), CaseType.valueOf(currentCase.caseCategory), false, crn))
   } ?: BigInteger.ZERO
 
-  private fun getDefaultOffenderManagerOverview(
-    deliusStaff: DeliusStaff,
-    teamName: String
-  ): OffenderManagerOverview {
+  private fun getDefaultOffenderManagerOverview(staffCode: String, grade: String): OffenderManagerOverview {
     val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
-    val availablePoints = workloadPoints.getDefaultPointsAvailable(deliusStaff.grade)
-    val defaultContractedHours = workloadPoints.getDefaultContractedHours(deliusStaff.grade)
+    val availablePoints = workloadPoints.getDefaultPointsAvailable(grade)
+    val defaultContractedHours = workloadPoints.getDefaultContractedHours(grade)
 
-    val overview = OffenderManagerOverview(deliusStaff.staff.forenames, deliusStaff.staff.surname, 0, 0, availablePoints.toBigInteger(), BigInteger.ZERO, deliusStaff.staffCode, teamName, LocalDateTime.now(), -1, BigInteger.ZERO)
+    val overview = OffenderManagerOverview(0, 0, availablePoints.toBigInteger(), BigInteger.ZERO, staffCode, LocalDateTime.now(), -1, BigInteger.ZERO)
     overview.capacity = calculateCapacity(overview.totalPoints, overview.availablePoints)
     overview.contractedHours = defaultContractedHours
+    overview.grade = grade
     return overview
   }
 
   fun getOverview(staffIdentifier: StaffIdentifier): OffenderManagerOverview? =
     communityApiClient.getStaffByCode(staffIdentifier.staffCode).map { staff ->
-      val team = staff.teams!!.first { team -> team.code == staffIdentifier.teamCode }
-      val overview = offenderManagerRepository.findByOverview(team.code, staff.staffCode)?.let {
-        it.capacity = calculateCapacity(it.totalPoints, it.availablePoints)
-        it.nextReductionChange = getReductionService.findNextReductionChange(staffIdentifier)
-        it.reductionHours = getReductionService.findReductionHours(staffIdentifier)
-        it.contractedHours = getWeeklyHours.findWeeklyHours(staffIdentifier, staff.grade)
-        offenderManagerRepository.findByCaseloadTotals(it.workloadOwnerId).let { totals ->
-          it.tierCaseTotals = totals.map { total -> TierCaseTotals(total.getATotal(), total.getBTotal(), total.getCTotal(), total.getDTotal(), total.untiered) }
+      val overview = findOffenderManagerOverview(staffIdentifier, staff.grade)
+      if (overview.hasWorkload) {
+        overview.nextReductionChange = getReductionService.findNextReductionChange(staffIdentifier)
+        overview.reductionHours = getReductionService.findReductionHours(staffIdentifier)
+        overview.contractedHours = getWeeklyHours.findWeeklyHours(staffIdentifier, staff.grade)
+        offenderManagerRepository.findByCaseloadTotals(overview.workloadOwnerId).let { totals ->
+          overview.tierCaseTotals = totals.map { total -> TierCaseTotals(total.getATotal(), total.getBTotal(), total.getCTotal(), total.getDTotal(), total.untiered) }
             .fold(TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)) { first, second -> TierCaseTotals(first.A.add(second.A), first.B.add(second.B), first.C.add(second.C), first.D.add(second.D), first.untiered.add(second.untiered)) }
         }
         offenderManagerRepository.findCasesByTeamCodeAndStaffCode(staffIdentifier.staffCode, staffIdentifier.teamCode).let { cases ->
           val crns = cases.map { case -> case.crn }
-          it.caseEndDue = getSentenceService.getCasesDueToEndCount(crns)
-          it.releasesDue = getSentenceService.getCasesDueToBeReleases(crns)
+          overview.caseEndDue = getSentenceService.getCasesDueToEndCount(crns)
+          overview.releasesDue = getSentenceService.getCasesDueToBeReleases(crns)
         }
-        it
-      } ?: getDefaultOffenderManagerOverview(staff, team.description)
+      }
+      overview.forename = staff.staff.forenames
+      overview.surname = staff.staff.surname
       overview.grade = staff.grade
       overview.email = staff.email
       overview.lastAllocatedEvent = getEventManager.findLatestByStaffAndTeam(staffIdentifier)
       overview
     }.block()
+
+  fun findOffenderManagerOverview(staffIdentifier: StaffIdentifier, grade: String): OffenderManagerOverview = offenderManagerRepository.findByOverview(staffIdentifier.teamCode, staffIdentifier.staffCode)?.let {
+    it.capacity = calculateCapacity(it.totalPoints, it.availablePoints)
+    it.grade = grade
+    it.hasWorkload = true
+    it
+  } ?: getDefaultOffenderManagerOverview(staffIdentifier.staffCode, grade)
 
   fun getCases(staffIdentifier: StaffIdentifier): OffenderManagerCases? =
     offenderManagerRepository.findCasesByTeamCodeAndStaffCode(staffIdentifier.staffCode, staffIdentifier.teamCode).let { cases ->
