@@ -35,10 +35,10 @@ class TeamService(
 
         val enrichedTeams = choosePractitionerResponse.teams.mapValues { team ->
           team.value
-            .filter { grades == null || grades.contains(it.grade) }
+            .filter { grades == null || grades.contains(it.getGrade()) }
             .map {
               val teamStaffId = teamStaffId(team.key, it.code)
-              val practitionerWorkload = practitionerWorkloads[teamStaffId] ?: getTeamOverviewForOffenderManagerWithoutWorkload(it.code, it.grade ?: "DMY", team.key)
+              val practitionerWorkload = practitionerWorkloads[teamStaffId] ?: getTeamOverviewForOffenderManagerWithoutWorkload(it.code, it.getGrade(), team.key)
               Practitioner.from(it, practitionerWorkload, practitionerCaseCounts.getOrDefault(teamStaffId, 0))
             }
         }

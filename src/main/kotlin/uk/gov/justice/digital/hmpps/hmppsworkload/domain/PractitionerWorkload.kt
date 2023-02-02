@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ChoosePractitionerResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.CommunityPersonManager
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Name
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PractitionerTeam
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ProbationStatus
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffMember
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.TeamOverview
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.calculateCapacity
 import java.math.BigDecimal
@@ -50,11 +50,11 @@ data class Practitioner constructor(
   val custodyCases: Int
 ) {
   companion object {
-    fun from(practitionerTeam: PractitionerTeam, practitionerWorkload: TeamOverview, caseCount: Int): Practitioner {
+    fun from(staffMember: StaffMember, practitionerWorkload: TeamOverview, caseCount: Int): Practitioner {
       return Practitioner(
-        practitionerTeam.code, practitionerTeam.name,
-        practitionerTeam.email.takeUnless { email -> email.isNullOrBlank() },
-        practitionerTeam.grade ?: "DMY",
+        staffMember.code, staffMember.name,
+        staffMember.email.takeUnless { email -> email.isNullOrBlank() },
+        staffMember.getGrade(),
         calculateCapacity(practitionerWorkload.totalPoints, practitionerWorkload.availablePoints),
         caseCount,
         practitionerWorkload.totalCommunityCases,

@@ -1,6 +1,6 @@
-package uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses
+package uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius
 
-fun choosePractitionerByTeamResponseUnallocated() = """
+fun choosePractitionerByTeamCodesNoCommunityPersonManagerResponse() = """
 {
   "crn": "CRN1",
   "name": {
@@ -11,15 +11,6 @@ fun choosePractitionerByTeamResponseUnallocated() = """
   "probationStatus": {
     "status": "PREVIOUSLY_MANAGED",
     "description": "Previously managed"
-  },
-  "communityPersonManager": {
-    "code": "N03A019U",
-    "name": {
-      "forename": "Derek",
-      "surname": "Pint"
-    },
-    "teamCode": "N03F01",
-    "grade": "PO"
   },
   "teams": {
     "T1": [

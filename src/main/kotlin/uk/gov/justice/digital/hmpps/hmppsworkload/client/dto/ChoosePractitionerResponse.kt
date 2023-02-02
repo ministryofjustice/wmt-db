@@ -10,7 +10,7 @@ data class ChoosePractitionerResponse @JsonCreator constructor(
   val name: Name,
   val probationStatus: ProbationStatus,
   val communityPersonManager: CommunityPersonManager?,
-  val teams: Map<String, List<PractitionerTeam>>
+  val teams: Map<String, List<StaffMember>>
 )
 
 data class Name constructor(
@@ -33,9 +33,11 @@ data class CommunityPersonManager constructor(
   val isUnallocated: Boolean = code.endsWith("U")
 }
 
-data class PractitionerTeam constructor(
+data class StaffMember constructor(
   val code: String,
   val name: Name,
   val email: String?,
-  val grade: String?,
-)
+  private val grade: String?,
+) {
+  fun getGrade(): String = grade ?: "DMY"
+}
