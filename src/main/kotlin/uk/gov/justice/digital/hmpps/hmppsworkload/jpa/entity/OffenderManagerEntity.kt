@@ -21,14 +21,11 @@ import javax.persistence.Table
     ConstructorResult(
       targetClass = OffenderManagerOverview::class,
       columns = [
-        ColumnResult(name = "forename"),
-        ColumnResult(name = "surname"),
         ColumnResult(name = "total_community_cases", type = Int::class),
         ColumnResult(name = "total_filtered_custody_cases", type = Int::class),
         ColumnResult(name = "available_points"),
         ColumnResult(name = "total_points"),
         ColumnResult(name = "key"),
-        ColumnResult(name = "description"),
         ColumnResult(name = "last_updated_on", type = LocalDateTime::class),
         ColumnResult(name = "workload_owner_id", type = Long::class),
         ColumnResult(name = "paroms_due_next_30_days")
@@ -81,7 +78,7 @@ import javax.persistence.Table
   name = "OffenderManagerEntity.findByOverview",
   resultSetMapping = "OffenderManagerOverviewResult",
   query = """SELECT
-    om.forename,om.surname, (w.total_filtered_community_cases + w.total_filtered_license_cases) as total_community_cases, w.total_filtered_custody_cases , wpc.available_points AS available_points, wpc.total_points AS total_points, om."key", t.description, wpc.last_updated_on, wo.id as workload_owner_id, w.paroms_due_next_30_days
+    (w.total_filtered_community_cases + w.total_filtered_license_cases) as total_community_cases, w.total_filtered_custody_cases , wpc.available_points AS available_points, wpc.total_points AS total_points, om."key", wpc.last_updated_on, wo.id as workload_owner_id, w.paroms_due_next_30_days
     FROM app.workload_owner AS wo
     JOIN app.team AS t
         ON wo.team_id = t.id
