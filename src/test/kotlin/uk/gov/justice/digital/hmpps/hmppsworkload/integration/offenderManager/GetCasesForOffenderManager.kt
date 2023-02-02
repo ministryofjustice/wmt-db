@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.CommunityApiExtension.Companion.communityApi
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 
 class GetCasesForOffenderManager : IntegrationTestBase() {
@@ -14,7 +15,7 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `get all cases allocated to offender manager`() {
-    staffCodeResponse(staffCodeOM, teamCode)
+    communityApi.staffCodeResponse(staffCodeOM, teamCode)
     val realTimeCaseDetails = caseDetailsRepository.saveAll(listOf(CaseDetailsEntity("CRN2222", Tier.B3, CaseType.CUSTODY, "Sally", "Smith"), CaseDetailsEntity("CRN3333", Tier.C1, CaseType.COMMUNITY, "John", "Williams"), CaseDetailsEntity("CRN1111", Tier.C1, CaseType.LICENSE, "John", "Doe")))
     val wmtStaff = setupCurrentWmtStaff(staffCodeOM, teamCode)
 
@@ -71,7 +72,7 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `Get staff member without any email`() {
-    staffCodeResponse(staffCodeNO, teamCode, email = null)
+    communityApi.staffCodeResponse(staffCodeNO, teamCode, email = null)
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers/$staffCodeNO/cases")
       .headers {
@@ -91,7 +92,7 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `Get staff member without any WMT active cases`() {
-    staffCodeResponse(staffCodeNO, teamCode)
+    communityApi.staffCodeResponse(staffCodeNO, teamCode)
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers/$staffCodeNO/cases")
       .headers {
@@ -117,7 +118,7 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `still return response if not all offender details are returned`() {
-    staffCodeResponse(staffCodeOM, teamCode)
+    communityApi.staffCodeResponse(staffCodeOM, teamCode)
     val caseDetails = caseDetailsRepository.save(CaseDetailsEntity("CRN1111", Tier.C1, CaseType.LICENSE, "John", "Doe"))
     val wmtStaff = setupCurrentWmtStaff(staffCodeOM, teamCode)
     setupWmtManagedCase(wmtStaff, caseDetails.tier, caseDetails.crn, caseDetails.type)

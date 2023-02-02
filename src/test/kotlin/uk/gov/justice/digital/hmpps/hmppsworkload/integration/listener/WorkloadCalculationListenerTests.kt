@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReferenceType
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.CommunityApiExtension.Companion.communityApi
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadCalculationEntity
@@ -30,7 +31,7 @@ class WorkloadCalculationListenerTests : IntegrationTestBase() {
 
     caseDetailsRepository.save(caseDetailsEntity)
 
-    staffCodeResponse(staffCode, teamCode)
+    communityApi.staffCodeResponse(staffCode, teamCode)
     personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", providerCode = "providerCode", isActive = true))
 
     hmppsDomainSnsClient.publish(
@@ -62,7 +63,7 @@ class WorkloadCalculationListenerTests : IntegrationTestBase() {
 
     caseDetailsRepository.save(caseDetailsEntity)
 
-    staffCodeErrorResponse(staffCode, teamCode)
+    communityApi.staffCodeErrorResponse(staffCode, teamCode)
     personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", providerCode = "providerCode", isActive = true))
 
     hmppsDomainSnsClient.publish(

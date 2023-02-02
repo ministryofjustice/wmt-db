@@ -10,6 +10,10 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType.COMMUNITY
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier.B3
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.AssessRisksNeedsApiExtension.Companion.assessRisksNeedsApi
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.CommunityApiExtension.Companion.communityApi
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSummaryResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveInductionResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.NotificationService
 import java.math.BigInteger
@@ -28,13 +32,13 @@ class SendEmail : IntegrationTestBase() {
     val allocateCase = AllocateCase(crn, BigInteger.valueOf(123456789), sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
     val allocatingOfficerUsername = "AllocatingOfficer"
     val token = "token"
-    singleActiveConvictionResponseForAllConvictions(crn)
-    singleActiveInductionResponse(crn)
-    staffUserNameResponse(allocatingOfficerUsername)
-    riskSummaryErrorResponse(crn)
-    riskPredictorResponse(crn)
-    assessmentCommunityApiResponse(crn)
-    offenderSummaryResponse(crn)
+    communityApi.singleActiveConvictionResponseForAllConvictions(crn)
+    communityApi.singleActiveInductionResponse(crn)
+    communityApi.staffUserNameResponse(allocatingOfficerUsername)
+    assessRisksNeedsApi.riskSummaryErrorResponse(crn)
+    assessRisksNeedsApi.riskPredictorResponse(crn)
+    communityApi.assessmentCommunityApiResponse(crn)
+    communityApi.offenderSummaryResponse(crn)
     caseDetailsRepository.save(CaseDetailsEntity(crn, B3, COMMUNITY, "Jane", "Doe"))
     val emailSendResponse = notificationService.notifyAllocation(
       allocatedOfficer,
@@ -43,8 +47,8 @@ class SendEmail : IntegrationTestBase() {
       allocatingOfficerUsername,
       token
     ).block()
-    verifyRiskSummaryCalled(crn, 2)
-    verifyRiskPredictorCalled(crn, 1)
+    assessRisksNeedsApi.verifyRiskSummaryCalled(crn, 2)
+    assessRisksNeedsApi.verifyRiskPredictorCalled(crn, 1)
     assertEquals(UUID.fromString("d2708c23-d5d2-4455-b26c-7d5d1d5c5733"), emailSendResponse?.first()?.templateId)
   }
 
@@ -56,13 +60,13 @@ class SendEmail : IntegrationTestBase() {
     val allocateCase = AllocateCase(crn, BigInteger.valueOf(123456789), sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
     val allocatingOfficerUsername = "AllocatingOfficer"
     val token = "token"
-    singleActiveConvictionResponseForAllConvictions(crn)
-    singleActiveInductionResponse(crn)
-    staffUserNameResponse(allocatingOfficerUsername)
-    riskSummaryResponse(crn)
-    riskPredictorErrorResponse(crn)
-    assessmentCommunityApiResponse(crn)
-    offenderSummaryResponse(crn)
+    communityApi.singleActiveConvictionResponseForAllConvictions(crn)
+    communityApi.singleActiveInductionResponse(crn)
+    communityApi.staffUserNameResponse(allocatingOfficerUsername)
+    assessRisksNeedsApi.riskSummaryResponse(crn)
+    assessRisksNeedsApi.riskPredictorErrorResponse(crn)
+    communityApi.assessmentCommunityApiResponse(crn)
+    communityApi.offenderSummaryResponse(crn)
     caseDetailsRepository.save(CaseDetailsEntity(crn, B3, COMMUNITY, "Jane", "Doe"))
     val emailSendResponse = notificationService.notifyAllocation(
       allocatedOfficer,
@@ -71,8 +75,8 @@ class SendEmail : IntegrationTestBase() {
       allocatingOfficerUsername,
       token
     ).block()
-    verifyRiskSummaryCalled(crn, 1)
-    verifyRiskPredictorCalled(crn, 2)
+    assessRisksNeedsApi.verifyRiskSummaryCalled(crn, 1)
+    assessRisksNeedsApi.verifyRiskPredictorCalled(crn, 2)
     assertEquals(UUID.fromString("d2708c23-d5d2-4455-b26c-7d5d1d5c5733"), emailSendResponse?.first()?.templateId)
   }
 }

@@ -10,16 +10,19 @@ import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.CommunityApiExtension.Companion.communityApi
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.TierApiExtension.Companion.hmppsTier
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveConvictionResponse
 
 class OffenderDetailsEventListenerTests : IntegrationTestBase() {
 
   @Test
   fun `must save case details when processing new sentence event`() {
     val crn = "J678910"
-    singleActiveConvictionResponseForAllConvictions(crn)
-    singleActiveConvictionResponse(crn)
-    offenderSummaryResponse(crn)
-    tierCalculationResponse(crn)
+    communityApi.singleActiveConvictionResponseForAllConvictions(crn)
+    communityApi.singleActiveConvictionResponse(crn)
+    communityApi.offenderSummaryResponse(crn)
+    hmppsTier.tierCalculationResponse(crn)
 
     hmppsOffenderSnsClient.publish(
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
@@ -43,10 +46,10 @@ class OffenderDetailsEventListenerTests : IntegrationTestBase() {
   @Test
   fun `must save forbidden offender summary as restricted access`() {
     val crn = "J678910"
-    singleActiveConvictionResponseForAllConvictions(crn)
-    singleActiveConvictionResponse(crn)
-    forbiddenOffenderSummaryResponse(crn)
-    tierCalculationResponse(crn)
+    communityApi.singleActiveConvictionResponseForAllConvictions(crn)
+    communityApi.singleActiveConvictionResponse(crn)
+    communityApi.forbiddenOffenderSummaryResponse(crn)
+    hmppsTier.tierCalculationResponse(crn)
 
     hmppsOffenderSnsClient.publish(
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(

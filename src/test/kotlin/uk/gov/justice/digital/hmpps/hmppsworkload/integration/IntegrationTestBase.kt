@@ -10,24 +10,12 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
-import org.mockserver.configuration.Configuration
-import org.mockserver.integration.ClientAndServer
-import org.mockserver.integration.ClientAndServer.startClientAndServer
-import org.mockserver.matchers.Times
-import org.mockserver.model.HttpRequest.request
-import org.mockserver.model.HttpResponse
-import org.mockserver.model.HttpResponse.response
-import org.mockserver.model.HttpStatusCode.INTERNAL_SERVER_ERROR_500
-import org.mockserver.model.MediaType.APPLICATION_JSON
-import org.mockserver.model.Parameter
-import org.mockserver.verify.VerificationTimes
-import org.slf4j.event.Level
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
@@ -51,25 +39,11 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WMT
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WMTWorkloadRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WorkloadPointsCalculationRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WorkloadReportRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.choosePractitionerByTeamCodesNoCommunityPersonManagerResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.choosePractitionerByTeamResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.choosePractitionerByTeamResponseUnallocated
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.choosePractitionerStaffInMultipleTeamsResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.communityApiAssessmentResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.convictionNoSentenceResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.nomsLookupResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.notFoundTierResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSummaryResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveConvictionResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveInductionResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveRequirementNoLengthResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveRequirementResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveUnpaidRequirementResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleInactiveConvictionResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByCodeResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByUserNameResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.successfulRiskPredictorResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.successfulRiskSummaryResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.AssessRisksNeedsApiExtension
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.CommunityApiExtension
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.HmppsAuthApiExtension
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.TierApiExtension
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.WorkforceAllocationsToDeliusExtension
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.OffenderManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PduEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RegionEntity
@@ -96,19 +70,17 @@ import uk.gov.justice.hmpps.sqs.MissingQueueException
 import java.math.BigDecimal
 import java.math.BigInteger
 
+@ExtendWith(
+  AssessRisksNeedsApiExtension::class,
+  CommunityApiExtension::class,
+  TierApiExtension::class,
+  WorkforceAllocationsToDeliusExtension::class,
+  HmppsAuthApiExtension::class
+)
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class IntegrationTestBase {
-
-  private var oauthMock: ClientAndServer =
-    startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 9090)
-  var communityApi: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8092)
-  var hmppsTier: ClientAndServer = startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8082)
-  var assessRisksNeedsApi: ClientAndServer =
-    startClientAndServer(Configuration.configuration().logLevel(Level.WARN), 8085)
-  var workforceAllocationsToDeliusApi: ClientAndServer =
-    startClientAndServer(Configuration.configuration().logLevel(Level.DEBUG), 8084)
 
   @Autowired
   protected lateinit var objectMapper: ObjectMapper
@@ -273,12 +245,6 @@ abstract class IntegrationTestBase {
 
   @BeforeEach
   fun setupDependentServices() {
-
-    communityApi.reset()
-    hmppsTier.reset()
-    assessRisksNeedsApi.reset()
-    workforceAllocationsToDeliusApi.reset()
-    setupOauth()
     personManagerRepository.deleteAll()
     eventManagerRepository.deleteAll()
     requirementManagerRepository.deleteAll()
@@ -307,11 +273,6 @@ abstract class IntegrationTestBase {
 
   @AfterAll
   fun tearDownServer() {
-    communityApi.stop()
-    oauthMock.stop()
-    hmppsTier.stop()
-    assessRisksNeedsApi.stop()
-    workforceAllocationsToDeliusApi.stop()
     personManagerRepository.deleteAll()
     eventManagerRepository.deleteAll()
     requirementManagerRepository.deleteAll()
@@ -479,196 +440,6 @@ abstract class IntegrationTestBase {
 
   protected fun jsonString(any: Any) = objectMapper.writeValueAsString(any) as String
 
-  fun setupOauth() {
-    val response = response().withContentType(APPLICATION_JSON)
-      .withBody(objectMapper.writeValueAsString(mapOf("access_token" to "ABCDE", "token_type" to "bearer")))
-    oauthMock.`when`(request().withPath("/auth/oauth/token")).respond(response)
-  }
-
-  protected fun choosePractitionerByTeamCodesResponse(teamCodes: List<String>, crn: String) {
-    val choosePractitionerRequest =
-      request()
-        .withPath("/allocation-demand/choose-practitioner").withQueryStringParameter("crn", crn).withQueryStringParameter("teamCode", teamCodes.joinToString(separator = ","))
-
-    workforceAllocationsToDeliusApi.`when`(choosePractitionerRequest, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(choosePractitionerByTeamResponse())
-    )
-  }
-
-  protected fun choosePractitionerByTeamCodesResponseUnallocated(teamCodes: List<String>, crn: String) {
-    val choosePractitionerRequest =
-      request()
-        .withPath("/allocation-demand/choose-practitioner").withQueryStringParameter("crn", crn).withQueryStringParameter("teamCode", teamCodes.joinToString(separator = ","))
-
-    workforceAllocationsToDeliusApi.`when`(choosePractitionerRequest, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(choosePractitionerByTeamResponseUnallocated())
-    )
-  }
-
-  protected fun choosePractitionerByTeamCodesResponseNoCommunityPersonManager(teamCodes: List<String>, crn: String) {
-    val choosePractitionerRequest =
-      request()
-        .withPath("/allocation-demand/choose-practitioner").withQueryStringParameter("crn", crn).withQueryStringParameter("teamCode", teamCodes.joinToString(separator = ","))
-
-    workforceAllocationsToDeliusApi.`when`(choosePractitionerRequest, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(choosePractitionerByTeamCodesNoCommunityPersonManagerResponse())
-    )
-  }
-
-  protected fun choosePractitionerStaffInMultipleTeamsResponse(teamCodes: List<String>, crn: String, staffCode: String) {
-    val choosePractitionerRequest =
-      request()
-        .withPath("/allocation-demand/choose-practitioner").withQueryStringParameter("crn", crn).withQueryStringParameter("teamCode", teamCodes.joinToString(separator = ","))
-
-    workforceAllocationsToDeliusApi.`when`(choosePractitionerRequest, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(choosePractitionerStaffInMultipleTeamsResponse())
-    )
-  }
-
-  protected fun tierCalculationResponse(crn: String, tier: String = "B3") {
-    val request = request().withPath("/crn/$crn/tier")
-    hmppsTier.`when`(request, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody("{\"tierScore\":\"${tier}\"}")
-    )
-  }
-
-  protected fun assessmentCommunityApiResponse(crn: String) {
-    val ogrsRequest =
-      request().withPath("/offenders/crn/$crn/assessments")
-
-    communityApi.`when`(ogrsRequest, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(communityApiAssessmentResponse())
-    )
-  }
-
-  protected fun riskPredictorResponse(crn: String) {
-    val request = request().withPath("/risks/crn/$crn/predictors/rsr/history")
-    assessRisksNeedsApi.`when`(request, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(successfulRiskPredictorResponse())
-    )
-  }
-
-  protected fun riskPredictorErrorResponse(crn: String) {
-    val request = request().withPath("/risks/crn/$crn/predictors/rsr/history")
-    assessRisksNeedsApi.`when`(request, Times.exactly(1)).respond(
-      response().withStatusCode(INTERNAL_SERVER_ERROR_500.code()).withContentType(
-        APPLICATION_JSON
-      ).withBody("{}")
-    )
-  }
-
-  protected fun verifyRiskPredictorCalled(crn: String, times: Int) {
-    assessRisksNeedsApi.verify(
-      request()
-        .withPath("/risks/crn/$crn/predictors/rsr/history"),
-      VerificationTimes.exactly(times)
-    )
-  }
-
-  protected fun riskSummaryResponse(crn: String) {
-    val request = request().withPath("/risks/crn/$crn/summary")
-    assessRisksNeedsApi.`when`(request, Times.exactly(2)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(successfulRiskSummaryResponse())
-    )
-  }
-
-  protected fun riskSummaryErrorResponse(crn: String) {
-    val request = request().withPath("/risks/crn/$crn/summary")
-    assessRisksNeedsApi.`when`(request, Times.exactly(2)).respond(
-      response().withStatusCode(INTERNAL_SERVER_ERROR_500.code()).withContentType(
-        APPLICATION_JSON
-      ).withBody("{}")
-    )
-  }
-
-  protected fun verifyRiskSummaryCalled(crn: String, times: Int) {
-    assessRisksNeedsApi.verify(
-      request()
-        .withPath("/risks/crn/$crn/summary"),
-      VerificationTimes.exactly(times)
-    )
-  }
-
-  protected fun tierCalculationNotFoundResponse(crn: String) {
-    val request = request().withPath("/crn/$crn/tier")
-    hmppsTier.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.notFoundResponse().withContentType(APPLICATION_JSON).withBody(notFoundTierResponse())
-    )
-  }
-
-  protected fun singleActiveInductionResponse(crn: String) {
-    val inductionRequest =
-      request().withPath("/offenders/crn/$crn/contact-summary/inductions")
-
-    communityApi.`when`(inductionRequest, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(singleActiveInductionResponse())
-    )
-  }
-
-  protected fun singleActiveConvictionResponse(crn: String) {
-    val convictionsRequest =
-      request()
-        .withPath("/offenders/crn/$crn/convictions").withQueryStringParameter(Parameter("activeOnly", "true"))
-
-    communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(singleActiveConvictionResponse())
-    )
-  }
-
-  protected fun convictionWithNoSentenceResponse(crn: String) {
-    val convictionsRequest =
-      request().withPath("/offenders/crn/$crn/convictions").withQueryStringParameter(Parameter("activeOnly", "true"))
-
-    communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(convictionNoSentenceResponse())
-    )
-  }
-
-  protected fun noConvictionsResponse(crn: String) {
-    val convictionsRequest =
-      request().withPath("/offenders/crn/$crn/convictions").withQueryStringParameter(Parameter("activeOnly", "true"))
-
-    communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody("[]")
-    )
-  }
-
-  protected fun singleActiveConvictionResponseForAllConvictions(crn: String) {
-    val convictionsRequest =
-      request()
-        .withPath("/offenders/crn/$crn/convictions")
-
-    communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(singleActiveConvictionResponse())
-    )
-  }
-
-  protected fun singleInactiveConvictionsResponse(crn: String) {
-    val convictionsRequest =
-      request().withPath("/offenders/crn/$crn/convictions")
-    communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(singleInactiveConvictionResponse())
-    )
-  }
-
-  protected fun offenderSummaryResponse(crn: String) {
-    val summaryRequest =
-      request().withPath("/offenders/crn/$crn")
-
-    communityApi.`when`(summaryRequest, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(offenderSummaryResponse())
-    )
-  }
-
-  protected fun forbiddenOffenderSummaryResponse(crn: String) {
-    val summaryRequest =
-      request().withPath("/offenders/crn/$crn")
-
-    communityApi.`when`(summaryRequest, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withStatusCode(FORBIDDEN.value())
-    )
-  }
-
   protected fun expectWorkloadAllocationCompleteMessages(crn: String): Map<String, HmppsMessage<HmppsAllocationMessage>> {
     numberOfMessagesCurrentlyOnQueue(allocationCompleteClient, allocationCompleteUrl, 3)
     val changeEvents = getAllAllocationMessages()
@@ -701,82 +472,6 @@ abstract class IntegrationTestBase {
       )
     }
     return messages
-  }
-
-  protected fun staffCodeResponse(staffCode: String, teamCode: String, staffGrade: String = "PSM", email: String? = "sheila.hancock@test.justice.gov.uk") {
-    val request = request().withPath("/staff/staffCode/$staffCode")
-    communityApi.`when`(request, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(staffByCodeResponse(staffCode, teamCode, staffGrade, email))
-    )
-  }
-
-  protected fun nomsLookupRespond(crn: String, nomsNumber: String) {
-    val request = request().withPath("/secure/offenders/nomsNumber/$nomsNumber")
-    communityApi.`when`(request, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(nomsLookupResponse(crn, nomsNumber))
-    )
-  }
-
-  protected fun nomsLookupNotFoundRespond(nomsNumber: String) {
-    val request = request().withPath("/secure/offenders/nomsNumber/$nomsNumber")
-    communityApi.`when`(request, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withStatusCode(404)
-    )
-  }
-
-  protected fun staffCodeErrorResponse(staffCode: String, teamCode: String) {
-    val request = request().withPath("/staff/staffCode/$staffCode")
-    communityApi.`when`(request, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withStatusCode(503)
-    )
-  }
-
-  protected fun staffUserNameResponse(userName: String) {
-    val request = request().withPath("/staff/username/$userName")
-    communityApi.`when`(request, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(staffByUserNameResponse(userName))
-    )
-  }
-
-  protected fun singleActiveUnpaidRequirementResponse(crn: String, convictionId: BigInteger) {
-    val convictionsRequest =
-      request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameters(
-        Parameter("activeOnly", "true"),
-        Parameter("excludeSoftDeleted", "true")
-      )
-    communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(singleActiveUnpaidRequirementResponse())
-    )
-  }
-
-  protected fun singleActiveRequirementResponse(
-    crn: String,
-    convictionId: BigInteger,
-    requirementId: BigInteger = BigInteger.valueOf(123456789L)
-  ) {
-    val convictionsRequest =
-      request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameters(
-        Parameter("activeOnly", "true"),
-        Parameter("excludeSoftDeleted", "true")
-      )
-    communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(singleActiveRequirementResponse(requirementId))
-    )
-  }
-
-  protected fun singleActiveRequirementNoLengthResponse(
-    crn: String,
-    convictionId: BigInteger,
-    requirementId: BigInteger = BigInteger.valueOf(123456789L)
-  ) {
-    val convictionsRequest =
-      request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameters(
-        Parameter("activeOnly", "true"),
-        Parameter("excludeSoftDeleted", "true")
-      )
-    communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      response().withContentType(APPLICATION_JSON).withBody(singleActiveRequirementNoLengthResponse(requirementId))
-    )
   }
 
   protected fun verifyAuditMessageOnQueue(): Boolean =

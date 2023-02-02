@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.WorkforceAllocationsToDeliusExtension.Companion.workforceAllocationsToDelius
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import java.math.BigInteger
@@ -18,7 +19,7 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
     val crn = "CRN1"
     val caseDetails = caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Don", "Cole"))
 
-    choosePractitionerByTeamCodesResponse(listOf(teamCode, teamCode2), crn)
+    workforceAllocationsToDelius.choosePractitionerByTeamCodesResponse(listOf(teamCode, teamCode2), crn)
     val firstWmtStaff = setupCurrentWmtStaff("OM1", teamCode)
     val secondWmtStaff = setupCurrentWmtStaff("OM2", teamCode2)
 
@@ -115,7 +116,7 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
     val teamCode2 = "T2"
     val crn = "CRN1"
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Don", "Cole"))
-    choosePractitionerByTeamCodesResponse(listOf(teamCode, teamCode2), crn)
+    workforceAllocationsToDelius.choosePractitionerByTeamCodesResponse(listOf(teamCode, teamCode2), crn)
     val firstWmtStaff = setupCurrentWmtStaff("OM1", teamCode)
     setupCurrentWmtStaff("OM2", teamCode2)
 
@@ -171,7 +172,7 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
     val staffCode = "OM1"
     val crn = "CRN1"
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Don", "Cole"))
-    choosePractitionerByTeamCodesResponse(listOf(teamCode), crn)
+    workforceAllocationsToDelius.choosePractitionerByTeamCodesResponse(listOf(teamCode), crn)
 
     val movedPersonManager = PersonManagerEntity(crn = "CRN3", staffId = BigInteger.valueOf(123456789L), staffCode = staffCode, teamCode = teamCode, createdBy = "USER1", providerCode = "R1", isActive = false)
     personManagerRepository.save(movedPersonManager)
@@ -198,7 +199,7 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Don", "Cole"))
     val staffCode = "OM1"
 
-    choosePractitionerStaffInMultipleTeamsResponse(listOf(teamCode, teamCode2), crn, staffCode)
+    workforceAllocationsToDelius.choosePractitionerStaffInMultipleTeamsResponse(listOf(teamCode, teamCode2), crn, staffCode)
     val firstTeamWorkload = setupCurrentWmtStaff(staffCode, teamCode, 20)
     val secondTeamWorkload = setupCurrentWmtStaff(staffCode, teamCode2, 50)
 
@@ -221,7 +222,7 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
     val crn = "CRN1"
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Don", "Cole"))
 
-    choosePractitionerByTeamCodesResponse(listOf(teamCode), crn)
+    workforceAllocationsToDelius.choosePractitionerByTeamCodesResponse(listOf(teamCode), crn)
     val firstWmtStaff = setupCurrentWmtStaff("OM3", teamCode)
 
     val firstOm = firstWmtStaff.offenderManager.code
@@ -249,7 +250,7 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
     val crn = "CRN1"
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Don", "Cole"))
 
-    choosePractitionerByTeamCodesResponseNoCommunityPersonManager(listOf(teamCode), crn)
+    workforceAllocationsToDelius.choosePractitionerByTeamCodesResponseNoCommunityPersonManager(listOf(teamCode), crn)
     val firstWmtStaff = setupCurrentWmtStaff("OM3", teamCode)
 
     val firstOm = firstWmtStaff.offenderManager.code
@@ -280,7 +281,7 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
     val crn = "CRN1"
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Don", "Cole"))
 
-    choosePractitionerByTeamCodesResponseUnallocated(listOf(teamCode), crn)
+    workforceAllocationsToDelius.choosePractitionerByTeamCodesResponseUnallocated(listOf(teamCode), crn)
     val firstWmtStaff = setupCurrentWmtStaff("OM3", teamCode)
 
     val firstOm = firstWmtStaff.offenderManager.code

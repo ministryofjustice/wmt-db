@@ -2,13 +2,14 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration.staff
 
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.CommunityApiExtension.Companion.communityApi
 
 class GetDeliusStaffByCode : IntegrationTestBase() {
 
   @Test
   fun `get staff by Code`() {
     val staffCode = "Staff01"
-    staffCodeResponse(staffCode, "OM1", "T1")
+    communityApi.staffCodeResponse(staffCode, "OM1", "T1")
     webTestClient.get()
       .uri("/staff/code/$staffCode")
       .headers {

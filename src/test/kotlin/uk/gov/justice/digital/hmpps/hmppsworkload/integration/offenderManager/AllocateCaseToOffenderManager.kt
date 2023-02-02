@@ -20,8 +20,13 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseAllocated
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.AssessRisksNeedsApiExtension.Companion.assessRisksNeedsApi
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.CommunityApiExtension.Companion.communityApi
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.TierApiExtension.Companion.hmppsTier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.request.allocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.emailResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSummaryResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveRequirementResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
@@ -54,15 +59,15 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   @BeforeEach
   fun setupApiCalls() {
     val allocatingOfficerUsername = "SOME_USER"
-    singleActiveConvictionResponseForAllConvictions(crn)
-    singleActiveConvictionResponse(crn)
-    tierCalculationResponse(crn)
-    singleActiveConvictionResponseForAllConvictions(crn)
-    singleActiveInductionResponse(crn)
-    staffUserNameResponse(allocatingOfficerUsername)
-    riskSummaryErrorResponse(crn)
-    riskPredictorResponse(crn)
-    assessmentCommunityApiResponse(crn)
+    communityApi.singleActiveConvictionResponseForAllConvictions(crn)
+    communityApi.singleActiveConvictionResponse(crn)
+    hmppsTier.tierCalculationResponse(crn)
+    communityApi.singleActiveConvictionResponseForAllConvictions(crn)
+    communityApi.singleActiveInductionResponse(crn)
+    communityApi.staffUserNameResponse(allocatingOfficerUsername)
+    assessRisksNeedsApi.riskSummaryErrorResponse(crn)
+    assessRisksNeedsApi.riskPredictorResponse(crn)
+    communityApi.assessmentCommunityApiResponse(crn)
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY, "Jane", "Doe"))
     every { notificationClient.sendEmail(any(), any(), any(), any()) } returns
       SendEmailResponse(
@@ -75,9 +80,9 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can allocate CRN to Staff member`() {
-    staffCodeResponse(staffCode, teamCode)
-    offenderSummaryResponse(crn)
-    singleActiveRequirementResponse(crn, eventId)
+    communityApi.staffCodeResponse(staffCode, teamCode)
+    communityApi.offenderSummaryResponse(crn)
+    communityApi.singleActiveRequirementResponse(crn, eventId)
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
@@ -130,10 +135,10 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `Notify error still keeps entry in db`() {
-    staffCodeResponse(staffCode, teamCode)
-    offenderSummaryResponse(crn)
+    communityApi.staffCodeResponse(staffCode, teamCode)
+    communityApi.offenderSummaryResponse(crn)
     val requirementId = BigInteger.valueOf(75315091L)
-    singleActiveRequirementResponse(crn, eventId, requirementId)
+    communityApi.singleActiveRequirementResponse(crn, eventId, requirementId)
     every { notificationClient.sendEmail(any(), any(), any(), any()) } throws NotificationClientException("An exception")
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY, "Jane", "Doe"))
 
@@ -163,10 +168,10 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `Notify error due to an invalid recipient returns error containing the offending email address`() {
-    staffCodeResponse(staffCode, teamCode)
-    offenderSummaryResponse(crn)
+    communityApi.staffCodeResponse(staffCode, teamCode)
+    communityApi.offenderSummaryResponse(crn)
     val requirementId = BigInteger.valueOf(75315091L)
-    singleActiveRequirementResponse(crn, eventId, requirementId)
+    communityApi.singleActiveRequirementResponse(crn, eventId, requirementId)
     every { notificationClient.sendEmail(any(), any(), any(), any()) } throws NotificationClientException("An exception")
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY, "Jane", "Doe"))
 
@@ -187,9 +192,9 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can allocate a requirement without a length`() {
-    staffCodeResponse(staffCode, teamCode)
-    offenderSummaryResponse(crn)
-    singleActiveRequirementNoLengthResponse(crn, eventId)
+    communityApi.staffCodeResponse(staffCode, teamCode)
+    communityApi.offenderSummaryResponse(crn)
+    communityApi.singleActiveRequirementNoLengthResponse(crn, eventId)
 
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY, "Jane", "Doe"))
 
@@ -216,9 +221,9 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `do not allocate active unpaid requirements`() {
-    staffCodeResponse(staffCode, teamCode)
-    offenderSummaryResponse(crn)
-    singleActiveUnpaidRequirementResponse(crn, eventId)
+    communityApi.staffCodeResponse(staffCode, teamCode)
+    communityApi.offenderSummaryResponse(crn)
+    communityApi.singleActiveUnpaidRequirementResponse(crn, eventId)
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
       .bodyValue(allocateCase(crn, eventId, eventNumber))
@@ -237,10 +242,10 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   @Test
   fun `can allocate an already managed CRN to same staff member`() {
     val requirementId = BigInteger.valueOf(567891234L)
-    staffCodeResponse(staffCode, teamCode)
-    staffCodeResponse(staffCode, teamCode)
-    offenderSummaryResponse(crn)
-    singleActiveRequirementResponse(crn, eventId, requirementId)
+    communityApi.staffCodeResponse(staffCode, teamCode)
+    communityApi.staffCodeResponse(staffCode, teamCode)
+    communityApi.offenderSummaryResponse(crn)
+    communityApi.singleActiveRequirementResponse(crn, eventId, requirementId)
     val storedPersonManager = PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, createdBy = "USER1", providerCode = "PV1", isActive = true)
     personManagerRepository.save(storedPersonManager)
     val storedEventManager = EventManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, eventId = eventId, createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = eventNumber)
@@ -269,11 +274,11 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can allocate an already managed CRN to different staff member`() {
-    staffCodeResponse(staffCode, teamCode)
-    offenderSummaryResponse(crn)
-    singleActiveUnpaidRequirementResponse(crn, eventId)
+    communityApi.staffCodeResponse(staffCode, teamCode)
+    communityApi.offenderSummaryResponse(crn)
+    communityApi.singleActiveUnpaidRequirementResponse(crn, eventId)
     val otherPersonManager = PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", createdBy = "USER1", providerCode = "PV1", isActive = true)
-    staffCodeResponse(otherPersonManager.staffCode, otherPersonManager.teamCode)
+    communityApi.staffCodeResponse(otherPersonManager.staffCode, otherPersonManager.teamCode)
     val storedPersonManager = personManagerRepository.save(otherPersonManager)
     val storedEventManager = eventManagerRepository.save(EventManagerEntity(crn = crn, eventId = eventId, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = eventNumber))
 
@@ -315,12 +320,12 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `only send the email once when clicking allocate multiple times`() {
-    staffCodeResponse(staffCode, teamCode)
-    staffCodeResponse(staffCode, teamCode)
-    offenderSummaryResponse(crn)
-    offenderSummaryResponse(crn)
-    singleActiveRequirementResponse(crn, eventId)
-    singleActiveRequirementResponse(crn, eventId)
+    communityApi.staffCodeResponse(staffCode, teamCode)
+    communityApi.staffCodeResponse(staffCode, teamCode)
+    communityApi.offenderSummaryResponse(crn)
+    communityApi.offenderSummaryResponse(crn)
+    communityApi.singleActiveRequirementResponse(crn, eventId)
+    communityApi.singleActiveRequirementResponse(crn, eventId)
 
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY, "Jane", "Doe"))
 
@@ -357,9 +362,9 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `must emit staff grade to tier allocation telemetry event`() {
-    staffCodeResponse(staffCode, teamCode)
-    offenderSummaryResponse(crn)
-    singleActiveRequirementResponse(crn, eventId)
+    communityApi.staffCodeResponse(staffCode, teamCode)
+    communityApi.offenderSummaryResponse(crn)
+    communityApi.singleActiveRequirementResponse(crn, eventId)
 
     val caseDetailsEntity = CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY, "Jane", "Doe")
     caseDetailsRepository.save(caseDetailsEntity)
@@ -390,9 +395,9 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `must emit staff grade to tier allocation telemetry event without case details`() {
-    staffCodeResponse(staffCode, teamCode)
-    offenderSummaryResponse(crn)
-    singleActiveRequirementResponse(crn, eventId)
+    communityApi.staffCodeResponse(staffCode, teamCode)
+    communityApi.offenderSummaryResponse(crn)
+    communityApi.singleActiveRequirementResponse(crn, eventId)
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
@@ -421,9 +426,9 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can send audit data when allocating`() {
-    staffCodeResponse(staffCode, teamCode)
-    offenderSummaryResponse(crn)
-    singleActiveRequirementResponse(crn, eventId)
+    communityApi.staffCodeResponse(staffCode, teamCode)
+    communityApi.offenderSummaryResponse(crn)
+    communityApi.singleActiveRequirementResponse(crn, eventId)
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
@@ -441,10 +446,10 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `audit data contain required fields`() {
-    staffCodeResponse(staffCode, teamCode)
-    offenderSummaryResponse(crn)
+    communityApi.staffCodeResponse(staffCode, teamCode)
+    communityApi.offenderSummaryResponse(crn)
     val requirementId = BigInteger.valueOf(75315091L)
-    singleActiveRequirementResponse(crn, eventId, requirementId)
+    communityApi.singleActiveRequirementResponse(crn, eventId, requirementId)
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
@@ -464,9 +469,9 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can send email when selecting a second person to receive email`() {
-    staffCodeResponse(staffCode, teamCode)
-    offenderSummaryResponse(crn)
-    singleActiveRequirementResponse(crn, eventId)
+    communityApi.staffCodeResponse(staffCode, teamCode)
+    communityApi.offenderSummaryResponse(crn)
+    communityApi.singleActiveRequirementResponse(crn, eventId)
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
@@ -522,9 +527,9 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   @Test
   fun `sends email by default to allocating officer`() {
     val allocateToEmail = "allocateTo-user@test.justice.gov.uk"
-    staffCodeResponse(staffCode, teamCode, email = allocateToEmail)
-    offenderSummaryResponse(crn)
-    singleActiveRequirementResponse(crn, eventId)
+    communityApi.staffCodeResponse(staffCode, teamCode, email = allocateToEmail)
+    communityApi.offenderSummaryResponse(crn)
+    communityApi.singleActiveRequirementResponse(crn, eventId)
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
@@ -560,9 +565,9 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   @Test
   fun `do not send email to allocating officer`() {
     val allocateToEmail = "allocateTo-user@test.justice.gov.uk"
-    staffCodeResponse(staffCode, teamCode, email = allocateToEmail)
-    offenderSummaryResponse(crn)
-    singleActiveRequirementResponse(crn, eventId)
+    communityApi.staffCodeResponse(staffCode, teamCode, email = allocateToEmail)
+    communityApi.offenderSummaryResponse(crn)
+    communityApi.singleActiveRequirementResponse(crn, eventId)
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
@@ -598,9 +603,9 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `must return event number for event manager allocated`() {
-    staffCodeResponse(staffCode, teamCode)
-    offenderSummaryResponse(crn)
-    singleActiveRequirementResponse(crn, eventId)
+    communityApi.staffCodeResponse(staffCode, teamCode)
+    communityApi.offenderSummaryResponse(crn)
+    communityApi.singleActiveRequirementResponse(crn, eventId)
 
     val response = webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
@@ -650,9 +655,9 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `must return event number for requirement manager allocated`() {
-    staffCodeResponse(staffCode, teamCode)
-    offenderSummaryResponse(crn)
-    singleActiveRequirementResponse(crn, eventId)
+    communityApi.staffCodeResponse(staffCode, teamCode)
+    communityApi.offenderSummaryResponse(crn)
+    communityApi.singleActiveRequirementResponse(crn, eventId)
 
     val response = webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")

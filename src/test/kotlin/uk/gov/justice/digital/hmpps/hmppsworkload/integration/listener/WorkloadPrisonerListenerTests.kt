@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReferenceType
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.CommunityApiExtension.Companion.communityApi
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadCalculationEntity
@@ -30,8 +31,8 @@ class WorkloadPrisonerListenerTests : IntegrationTestBase() {
 
     caseDetailsRepository.save(caseDetailsEntity)
 
-    staffCodeResponse(staffCode, teamCode)
-    nomsLookupRespond(crn, nomsNumber)
+    communityApi.staffCodeResponse(staffCode, teamCode)
+    communityApi.nomsLookupRespond(crn, nomsNumber)
     personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", providerCode = "providerCode", isActive = true))
 
     hmppsDomainSnsClient.publish(
@@ -57,7 +58,7 @@ class WorkloadPrisonerListenerTests : IntegrationTestBase() {
   fun `process prisoner who is unknown to workload`() {
     val crn = "J678910"
     val nomsNumber = "X1111XX"
-    nomsLookupRespond(crn, nomsNumber)
+    communityApi.nomsLookupRespond(crn, nomsNumber)
     hmppsDomainSnsClient.publish(
       PublishRequest(hmppsDomainTopicArn, jsonString(prisonerEvent(nomsNumber))).withMessageAttributes(
         mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("prison-offender-events.prisoner.released"))
@@ -71,7 +72,7 @@ class WorkloadPrisonerListenerTests : IntegrationTestBase() {
   @Test
   fun `process prisoner not in Delius yet`() {
     val nomsNumber = "X1111XX"
-    nomsLookupNotFoundRespond(nomsNumber)
+    communityApi.nomsLookupNotFoundRespond(nomsNumber)
     hmppsDomainSnsClient.publish(
       PublishRequest(hmppsDomainTopicArn, jsonString(prisonerEvent(nomsNumber))).withMessageAttributes(
         mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("prison-offender-events.prisoner.released"))

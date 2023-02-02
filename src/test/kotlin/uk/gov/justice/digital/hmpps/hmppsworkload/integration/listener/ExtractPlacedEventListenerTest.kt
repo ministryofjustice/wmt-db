@@ -12,6 +12,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBas
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.domain.WMTStaff
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.ReductionCategoryEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.ReductionReasonEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.CommunityApiExtension.Companion.communityApi
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadCalculationEntity
@@ -31,7 +32,7 @@ class ExtractPlacedEventListenerTest : IntegrationTestBase() {
     reductionReason = reductionReasonRepository.save(ReductionReasonEntity(reductionCategoryEntity = reductionCategory))
 
     wmtStaff = setupCurrentWmtStaff("STAFF2", "TEAM2")
-    staffCodeResponse(wmtStaff.offenderManager.code, wmtStaff.team.code)
+    communityApi.staffCodeResponse(wmtStaff.offenderManager.code, wmtStaff.team.code)
   }
 
   @Test
