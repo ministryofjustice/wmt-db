@@ -18,7 +18,8 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
     val teamCode = "T1"
     workforceAllocationsToDelius.getImpactResponse(crn, staffCode)
     setupCurrentWmtStaff(staffCode, teamCode)
-    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Jane", "Doe"))
+    val caseDetailsEntity = CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Jane", "Doe")
+    caseDetailsRepository.save(caseDetailsEntity)
 
     webTestClient.get()
       .uri("/team/$teamCode/offenderManager/$staffCode/impact/person/$crn")
@@ -42,6 +43,20 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
       .isEqualTo(staffCode)
       .jsonPath("$.potentialCapacity")
       .isEqualTo(55)
+      .jsonPath("$.tier")
+      .isEqualTo(caseDetailsEntity.tier.name)
+      .jsonPath("$.name.forename")
+      .isEqualTo("Jonathon")
+      .jsonPath("$.name.surname")
+      .isEqualTo("Jones")
+      .jsonPath("$.staff.code")
+      .isEqualTo(staffCode)
+      .jsonPath("$.staff.name.forename")
+      .isEqualTo("Sheila")
+      .jsonPath("$.staff.name.surname")
+      .isEqualTo("Hancock")
+      .jsonPath("$.staff.grade")
+      .isEqualTo("PO")
   }
 
   @Test

@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToD
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerCases
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerPotentialWorkload
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.TierCaseTotals
@@ -38,18 +39,19 @@ class GetOffenderManagerService(
   private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient
 ) {
 
-  fun getPotentialWorkload(staffIdentifier: StaffIdentifier, crn: String): OffenderManagerOverview? {
+  fun getPotentialWorkload(staffIdentifier: StaffIdentifier, crn: String): OffenderManagerPotentialWorkload? {
     return workforceAllocationsToDeliusApiClient.impact(crn, staffIdentifier.staffCode).map { impactResponse ->
       val overview = findOffenderManagerOverview(staffIdentifier, impactResponse.staff.getGrade())
       overview.forename = impactResponse.staff.name.forename
       overview.surname = impactResponse.staff.name.surname
       val currentCaseImpact = getCurrentCasePoints(staffIdentifier, crn)
+      val potentialCase = getPotentialCase(crn)
       overview.potentialCapacity = calculateCapacity(
         overview.totalPoints.minus(currentCaseImpact)
-          .plus(caseCalculator.getPointsForCase(getPotentialCase(crn = crn))),
+          .plus(caseCalculator.getPointsForCase(potentialCase)),
         overview.availablePoints
       )
-      overview
+      OffenderManagerPotentialWorkload.from(overview, impactResponse, potentialCase)
     }.block()
   }
 

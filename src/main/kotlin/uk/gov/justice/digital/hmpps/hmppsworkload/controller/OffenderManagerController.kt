@@ -41,11 +41,7 @@ class OffenderManagerController(
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/team/{teamCode}/offenderManager/{staffCode}/impact/person/{crn}")
   fun getImpactOfAllocation(@PathVariable(required = true) teamCode: String, @PathVariable(required = true) staffCode: String, @PathVariable crn: String): OffenderManagerPotentialWorkload {
-    val potentialWorkload = getOffenderManagerService.getPotentialWorkload(StaffIdentifier(staffCode, teamCode), crn)
-    if (potentialWorkload != null) {
-      return OffenderManagerPotentialWorkload.from(potentialWorkload)
-    }
-    throw EntityNotFoundException("Team $teamCode and staff Code $staffCode combination not found")
+    return getOffenderManagerService.getPotentialWorkload(StaffIdentifier(staffCode, teamCode), crn) ?: throw EntityNotFoundException("Team $teamCode and staff Code $staffCode combination not found")
   }
 
   @Operation(summary = "Retrieves overview of Offender Manager")
