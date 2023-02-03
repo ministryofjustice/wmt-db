@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.CommunityApiExtension.Companion.communityApi
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.WorkforceAllocationsToDeliusExtension.Companion.workforceAllocationsToDelius
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 
 class GetImpactForOffenderManager : IntegrationTestBase() {
@@ -15,9 +16,10 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
     val crn = "CRN1"
     val staffCode = "OM1"
     val teamCode = "T1"
-    communityApi.staffCodeResponse(staffCode, teamCode)
+    workforceAllocationsToDelius.getImpactResponse(crn, staffCode)
     setupCurrentWmtStaff(staffCode, teamCode)
-    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Jane", "Doe"))
+    val caseDetailsEntity = CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Jane", "Doe")
+    caseDetailsRepository.save(caseDetailsEntity)
 
     webTestClient.get()
       .uri("/team/$teamCode/offenderManager/$staffCode/impact/person/$crn")
@@ -41,6 +43,24 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
       .isEqualTo(staffCode)
       .jsonPath("$.potentialCapacity")
       .isEqualTo(55)
+      .jsonPath("$.tier")
+      .isEqualTo(caseDetailsEntity.tier.name)
+      .jsonPath("$.name.forename")
+      .isEqualTo("Jonathon")
+      .jsonPath("$.name.surname")
+      .isEqualTo("Jones")
+      .jsonPath("$.name.combinedName")
+      .isEqualTo("Jonathon Jones")
+      .jsonPath("$.staff.code")
+      .isEqualTo(staffCode)
+      .jsonPath("$.staff.name.forename")
+      .isEqualTo("Sheila")
+      .jsonPath("$.staff.name.surname")
+      .isEqualTo("Hancock")
+      .jsonPath("$.staff.name.combinedName")
+      .isEqualTo("Sheila Hancock")
+      .jsonPath("$.staff.grade")
+      .isEqualTo("PO")
   }
 
   @Test
@@ -49,7 +69,7 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
     val crn = "CRN2222"
     val staffCode = "OM1"
     val teamCode = "T1"
-    communityApi.staffCodeResponse(staffCode, teamCode)
+    workforceAllocationsToDelius.getImpactResponse(crn, staffCode)
     val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
     val caseDetails = caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Jane", "Doe"))
     setupWmtManagedCase(wmtStaff, caseDetails.tier, crn, caseDetails.type)
@@ -84,7 +104,7 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
     val crn = "CRN1"
     val staffCode = "NOWORKLOAD1"
     val teamCode = "T1"
-    communityApi.staffCodeResponse(staffCode, teamCode)
+    workforceAllocationsToDelius.getImpactResponse(crn, staffCode)
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Jane", "Doe"))
     webTestClient.get()
       .uri("/team/$teamCode/offenderManager/$staffCode/impact/person/$crn")
@@ -115,6 +135,7 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
     val crn = "CRN1"
     val staffCode = "NOWORKLOAD1"
     val teamCode = "T1"
+    workforceAllocationsToDelius.getImpactNoGradeResponse(crn, staffCode)
     communityApi.staffCodeResponse(staffCode, teamCode, "UNKNOWNGRADECODE")
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Jane", "Doe"))
     webTestClient.get()

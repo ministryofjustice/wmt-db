@@ -199,7 +199,7 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Don", "Cole"))
     val staffCode = "OM1"
 
-    workforceAllocationsToDelius.choosePractitionerStaffInMultipleTeamsResponse(listOf(teamCode, teamCode2), crn, staffCode)
+    workforceAllocationsToDelius.choosePractitionerStaffInMultipleTeamsResponse(listOf(teamCode, teamCode2), crn)
     val firstTeamWorkload = setupCurrentWmtStaff(staffCode, teamCode, 20)
     val secondTeamWorkload = setupCurrentWmtStaff(staffCode, teamCode2, 50)
 

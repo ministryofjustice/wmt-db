@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses
+package uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius
 
 fun choosePractitionerByTeamResponse() = """
 {
