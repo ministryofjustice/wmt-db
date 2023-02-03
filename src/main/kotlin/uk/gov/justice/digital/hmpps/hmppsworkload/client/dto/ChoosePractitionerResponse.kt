@@ -17,7 +17,9 @@ data class Name constructor(
   val forename: String,
   val middleName: String?,
   val surname: String
-)
+) {
+  fun getCombinedName() = "$forename ${middleName?.takeUnless { it.isBlank() }?.let{ "$middleName " } ?: ""}$surname"
+}
 
 data class ProbationStatus constructor(
   val status: String,
