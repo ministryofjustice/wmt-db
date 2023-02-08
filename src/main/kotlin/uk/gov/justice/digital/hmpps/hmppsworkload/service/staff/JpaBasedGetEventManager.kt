@@ -2,6 +2,8 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service.staff
 
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToDeliusApiClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.CompleteDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.EventDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
@@ -11,7 +13,11 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.EventManagerRep
 import java.util.UUID
 
 @Service
-class JpaBasedGetEventManager(private val eventManagerRepository: EventManagerRepository, private val caseDetailsRepository: CaseDetailsRepository) {
+class JpaBasedGetEventManager(
+  private val eventManagerRepository: EventManagerRepository,
+  private val caseDetailsRepository: CaseDetailsRepository,
+  private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient
+) {
   fun findById(id: UUID): EventManagerEntity? = eventManagerRepository.findByUuid(id)
   fun findLatestByStaffAndTeam(staffIdentifier: StaffIdentifier): EventDetails? =
     eventManagerRepository.findFirstByStaffCodeAndTeamCodeAndIsActiveTrueOrderByCreatedDateDesc(staffIdentifier.staffCode, staffIdentifier.teamCode)?.let { eventManagerEntity ->
@@ -24,5 +30,9 @@ class JpaBasedGetEventManager(private val eventManagerRepository: EventManagerRe
     caseDetailsRepository.findByIdOrNull(eventManagerEntity.crn)?.let { caseDetailsEntity ->
       CaseDetails.from(caseDetailsEntity)
     }
+  }
+
+  fun findCompleteDetailsByCrnAndEventNumber(crn: String, eventNumber: Int): CompleteDetails? = eventManagerRepository.findFirstByCrnAndEventNumberOrderByCreatedDateDesc(crn, eventNumber)?.let { eventManagerEntity ->
+    workforceAllocationsToDeliusApiClient.allocationCompleteDetails(crn, eventNumber.toString(), eventManagerEntity.staffCode).block()
   }
 }

@@ -10,6 +10,7 @@ import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
 import org.mockserver.model.MediaType
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.WorkforceAllocationsToDeliusExtension.Companion.workforceAllocationsToDelius
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.allocationCompleteResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.choosePractitionerByTeamCodesNoCommunityPersonManagerResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.choosePractitionerByTeamResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.choosePractitionerByTeamResponseUnallocated
@@ -101,6 +102,20 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
     workforceAllocationsToDelius.`when`(impactRequest, Times.exactly(1)).respond(
       HttpResponse.response()
         .withContentType(MediaType.APPLICATION_JSON).withBody(impactResponse(crn, staffCode, null))
+    )
+  }
+
+  fun allocationCompleteResponse(crn: String, eventNumber: String, staffCode: String) {
+    val request =
+      HttpRequest.request()
+        .withPath("/allocation-completed/details")
+        .withQueryStringParameter("crn", crn)
+        .withQueryStringParameter("eventNumber", eventNumber)
+        .withQueryStringParameter("staffCode", staffCode)
+
+    workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
+      HttpResponse.response()
+        .withContentType(MediaType.APPLICATION_JSON).withBody(allocationCompleteResponse())
     )
   }
 }
