@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ChoosePractitionerResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.CompleteDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ImpactResponse
 
 class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
@@ -31,6 +32,12 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
     .uri("/allocation-demand/impact?crn=$crn&staff=$staffCode")
     .retrieve()
     .bodyToMono(ImpactResponse::class.java)
+
+  fun allocationCompleteDetails(crn: String, eventNumber: String, staffCode: String): Mono<CompleteDetails> = webClient
+    .get()
+    .uri("/allocation-completed/details?crn=$crn&eventNumber=$eventNumber&staffCode=$staffCode")
+    .retrieve()
+    .bodyToMono(CompleteDetails::class.java)
 }
 
 class MissingChoosePractitioner(msg: String) : RuntimeException(msg)

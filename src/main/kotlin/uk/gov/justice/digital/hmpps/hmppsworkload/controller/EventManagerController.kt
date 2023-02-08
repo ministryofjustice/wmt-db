@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.CompleteDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.EventManagerDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.JpaBasedGetEventManager
@@ -46,4 +47,19 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
     @PathVariable(required = true) eventNumber: Int
   ): CaseDetails =
     getEventManager.findDetailsByCrnAndEventNumber(crn, eventNumber) ?: throw EntityNotFoundException("Case details of event manager not found for crn $crn eventNumber $eventNumber")
+
+  @Operation(summary = "Get Allocation complete details of Event Manager by crn and event number")
+  @ApiResponses(
+    value = [
+      ApiResponse(responseCode = "200", description = "OK"),
+      ApiResponse(responseCode = "404", description = "Result Not Found")
+    ]
+  )
+  @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
+  @GetMapping("/allocation/person/{crn}/event/{eventNumber}/complete-details")
+  fun getCompleteDetailsForEventManager(
+    @PathVariable(required = true) crn: String,
+    @PathVariable(required = true) eventNumber: Int
+  ): CompleteDetails =
+    getEventManager.findCompleteDetailsByCrnAndEventNumber(crn, eventNumber) ?: throw EntityNotFoundException("Complete details of event manager not found for crn $crn eventNumber $eventNumber")
 }
