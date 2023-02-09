@@ -34,7 +34,7 @@ dependencies {
 
   runtimeOnly("com.zaxxer:HikariCP")
   runtimeOnly("org.flywaydb:flyway-core")
-  runtimeOnly("org.postgresql:postgresql:42.5.2")
+  runtimeOnly("org.postgresql:postgresql:42.5.3")
 
   testImplementation("io.jsonwebtoken:jjwt:0.9.1")
   testImplementation("org.mock-server:mockserver-netty:5.15.0")
