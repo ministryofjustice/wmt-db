@@ -76,30 +76,30 @@ class GetOffenderManagerService(
     return overview
   }
 
-  fun getOverview(staffIdentifier: StaffIdentifier): OffenderManagerOverview? =
-    communityApiClient.getStaffByCode(staffIdentifier.staffCode).map { staff ->
-      val overview = findOffenderManagerOverview(staffIdentifier, staff.grade)
-      if (overview.hasWorkload) {
-        overview.nextReductionChange = getReductionService.findNextReductionChange(staffIdentifier)
-        overview.reductionHours = getReductionService.findReductionHours(staffIdentifier)
-        overview.contractedHours = getWeeklyHours.findWeeklyHours(staffIdentifier, staff.grade)
-        offenderManagerRepository.findByCaseloadTotals(overview.workloadOwnerId).let { totals ->
-          overview.tierCaseTotals = totals.map { total -> TierCaseTotals(total.getATotal(), total.getBTotal(), total.getCTotal(), total.getDTotal(), total.untiered) }
-            .fold(TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)) { first, second -> TierCaseTotals(first.A.add(second.A), first.B.add(second.B), first.C.add(second.C), first.D.add(second.D), first.untiered.add(second.untiered)) }
+  fun getOverview(staffIdentifier: StaffIdentifier): OffenderManagerOverview? {
+    val officerView = workforceAllocationsToDeliusApiClient.getOfficerView(staffIdentifier.staffCode).block()
+    val overview = findOffenderManagerOverview(staffIdentifier, officerView.staffGrade)
+    overview.caseEndDue = officerView.casesDueToEndInNext4Weeks
+    overview.releasesDue = officerView.releasesWithinNext4Weeks
+    overview.forename = officerView.name.forename
+    overview.surname = officerView.name.surname
+    overview.grade = officerView.staffGrade
+    overview.email = officerView.email
+    overview.lastAllocatedEvent = getEventManager.findLatestByStaffAndTeam(staffIdentifier)
+
+    if (overview.hasWorkload) {
+      overview.nextReductionChange = getReductionService.findNextReductionChange(staffIdentifier)
+      overview.reductionHours = getReductionService.findReductionHours(staffIdentifier)
+      overview.contractedHours = getWeeklyHours.findWeeklyHours(staffIdentifier, overview.grade)
+      offenderManagerRepository.findByCaseloadTotals(overview.workloadOwnerId).let { totals ->
+        overview.tierCaseTotals = totals.map { total ->
+          TierCaseTotals(total.getATotal(), total.getBTotal(), total.getCTotal(), total.getDTotal(), total.untiered)
         }
-        offenderManagerRepository.findCasesByTeamCodeAndStaffCode(staffIdentifier.staffCode, staffIdentifier.teamCode).let { cases ->
-          val crns = cases.map { case -> case.crn }
-          overview.caseEndDue = getSentenceService.getCasesDueToEndCount(crns)
-          overview.releasesDue = getSentenceService.getCasesDueToBeReleases(crns)
-        }
+          .fold(TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)) { first, second -> TierCaseTotals(first.A.add(second.A), first.B.add(second.B), first.C.add(second.C), first.D.add(second.D), first.untiered.add(second.untiered)) }
       }
-      overview.forename = staff.staff.forenames
-      overview.surname = staff.staff.surname
-      overview.grade = staff.grade
-      overview.email = staff.email
-      overview.lastAllocatedEvent = getEventManager.findLatestByStaffAndTeam(staffIdentifier)
-      overview
-    }.block()
+    }
+    return overview
+  }
 
   fun findOffenderManagerOverview(staffIdentifier: StaffIdentifier, grade: String): OffenderManagerOverview = offenderManagerRepository.findByOverview(staffIdentifier.teamCode, staffIdentifier.staffCode)?.let {
     it.capacity = calculateCapacity(it.totalPoints, it.availablePoints)

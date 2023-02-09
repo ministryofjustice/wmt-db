@@ -6,6 +6,7 @@ import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ChoosePractitionerResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.CompleteDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ImpactResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OfficerView
 
 class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
 
@@ -25,6 +26,18 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
           else -> Mono.error(ex)
         }
       }
+  }
+
+  fun getOfficerView(staffCode: String): Mono<OfficerView> {
+    return webClient
+      .get()
+      .uri("/staff/$staffCode/officer-view")
+      .retrieve()
+      .onStatus(
+        { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
+        { Mono.error(MissingStaffError("staff member not found at $staffCode")) }
+      )
+      .bodyToMono(OfficerView::class.java)
   }
 
   fun impact(crn: String, staffCode: String): Mono<ImpactResponse> = webClient
