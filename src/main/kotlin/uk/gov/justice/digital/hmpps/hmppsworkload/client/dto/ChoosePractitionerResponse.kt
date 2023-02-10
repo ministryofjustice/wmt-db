@@ -40,6 +40,4 @@ data class StaffMember constructor(
   val name: Name,
   val email: String?,
   private val grade: String?,
-) {
-  fun getGrade(): String = grade ?: "DMY"
-}
+) : Grade(grade)

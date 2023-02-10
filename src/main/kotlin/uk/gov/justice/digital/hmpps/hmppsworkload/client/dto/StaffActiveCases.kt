@@ -8,9 +8,7 @@ data class StaffActiveCases @JsonCreator constructor(
   private val grade: String?,
   val email: String?,
   val cases: List<ActiveCase>,
-) {
-  fun getGrade(): String = grade ?: "DMY"
-}
+) : Grade(grade)
 
 data class ActiveCase(
   val crn: String,
