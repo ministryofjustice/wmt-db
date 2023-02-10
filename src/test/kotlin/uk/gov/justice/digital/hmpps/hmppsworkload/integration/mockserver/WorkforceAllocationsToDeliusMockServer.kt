@@ -9,12 +9,14 @@ import org.mockserver.matchers.Times
 import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
 import org.mockserver.model.MediaType
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.domain.ActiveCasesIntegration
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.WorkforceAllocationsToDeliusExtension.Companion.workforceAllocationsToDelius
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.allocationCompleteResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.choosePractitionerByTeamCodesNoCommunityPersonManagerResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.choosePractitionerByTeamResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.choosePractitionerByTeamResponseUnallocated
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.choosePractitionerStaffInMultipleTeamsResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.deliusStaffActiveCasesResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.impactResponse
 
 class WorkforceAllocationsToDeliusExtension : BeforeAllCallback, AfterAllCallback, BeforeEachCallback {
@@ -116,6 +118,16 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
     workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
       HttpResponse.response()
         .withContentType(MediaType.APPLICATION_JSON).withBody(allocationCompleteResponse())
+    )
+  }
+
+  fun staffActiveCasesResponse(staffCode: String, staffGrade: String = "PO", email: String? = "sheila.hancock@test.justice.gov.uk", activeCases: List<ActiveCasesIntegration> = emptyList()) {
+    val request =
+      HttpRequest.request()
+        .withPath("/staff/$staffCode/active-cases")
+    workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
+      HttpResponse.response()
+        .withContentType(MediaType.APPLICATION_JSON).withBody(deliusStaffActiveCasesResponse(staffCode, staffGrade, email, activeCases))
     )
   }
 }

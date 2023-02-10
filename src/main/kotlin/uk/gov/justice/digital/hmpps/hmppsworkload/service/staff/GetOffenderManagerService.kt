@@ -5,11 +5,9 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToDeliusApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerCases
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerPotentialWorkload
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.TierCaseTotals
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
@@ -60,8 +58,9 @@ class GetOffenderManagerService(
       .let { Case(tier = it.tier, type = it.type, crn = crn) }
   }
 
-  private fun getCurrentCasePoints(staffIdentifier: StaffIdentifier, crn: String): BigInteger = offenderManagerRepository.findCaseByTeamCodeAndStaffCodeAndCrn(staffIdentifier.teamCode, staffIdentifier.staffCode, crn)?.let { currentCase ->
-    return caseCalculator.getPointsForCase(Case(Tier.valueOf(currentCase.tier), CaseType.valueOf(currentCase.caseCategory), false, crn))
+  private fun getCurrentCasePoints(staffIdentifier: StaffIdentifier, crn: String): BigInteger = offenderManagerRepository.findCaseByTeamCodeAndStaffCodeAndCrn(staffIdentifier.teamCode, staffIdentifier.staffCode, crn)?.let {
+    val caseDetails = caseDetailsRepository.findByIdOrNull(crn)!!
+    return caseCalculator.getPointsForCase(Case(caseDetails.tier, caseDetails.type, false, crn))
   } ?: BigInteger.ZERO
 
   private fun getDefaultOffenderManagerOverview(staffCode: String, grade: String): OffenderManagerOverview {
@@ -88,9 +87,8 @@ class GetOffenderManagerService(
             .fold(TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)) { first, second -> TierCaseTotals(first.A.add(second.A), first.B.add(second.B), first.C.add(second.C), first.D.add(second.D), first.untiered.add(second.untiered)) }
         }
         offenderManagerRepository.findCasesByTeamCodeAndStaffCode(staffIdentifier.staffCode, staffIdentifier.teamCode).let { cases ->
-          val crns = cases.map { case -> case.crn }
-          overview.caseEndDue = getSentenceService.getCasesDueToEndCount(crns)
-          overview.releasesDue = getSentenceService.getCasesDueToBeReleases(crns)
+          overview.caseEndDue = getSentenceService.getCasesDueToEndCount(cases)
+          overview.releasesDue = getSentenceService.getCasesDueToBeReleases(cases)
         }
       }
       overview.forename = staff.staff.forenames
@@ -110,11 +108,10 @@ class GetOffenderManagerService(
 
   fun getCases(staffIdentifier: StaffIdentifier): OffenderManagerCases? =
     offenderManagerRepository.findCasesByTeamCodeAndStaffCode(staffIdentifier.staffCode, staffIdentifier.teamCode).let { cases ->
-      val crnDetails = getCrnToCaseDetails(cases.map { it.crn })
-      communityApiClient.getStaffByCode(staffIdentifier.staffCode)
-        .map { staffSummary ->
-          val team = staffSummary.teams?.first { team -> team.code == staffIdentifier.teamCode }
-          OffenderManagerCases.from(staffSummary, team!!, cases, crnDetails)
+      val crnDetails = getCrnToCaseDetails(cases)
+      workforceAllocationsToDeliusApiClient.staffActiveCases(staffIdentifier.staffCode, crnDetails.keys)
+        .map { staffActiveCases ->
+          OffenderManagerCases.from(staffActiveCases, crnDetails)
         }.block()
     }
 

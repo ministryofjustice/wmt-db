@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity
 
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerCaseloadTotals
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
 import java.time.LocalDateTime
@@ -61,19 +60,6 @@ import javax.persistence.Table
     )
   ]
 )
-@SqlResultSetMapping(
-  name = "OffenderManagerCases",
-  classes = [
-    ConstructorResult(
-      targetClass = OffenderManagerCase::class,
-      columns = [
-        ColumnResult(name = "crn"),
-        ColumnResult(name = "tier"),
-        ColumnResult(name = "casecategory")
-      ]
-    )
-  ]
-)
 @NamedNativeQuery(
   name = "OffenderManagerEntity.findByOverview",
   resultSetMapping = "OffenderManagerOverviewResult",
@@ -103,10 +89,9 @@ import javax.persistence.Table
 )
 @NamedNativeQuery(
   name = "OffenderManagerEntity.findCasesByTeamCodeAndStaffCode",
-  resultSetMapping = "OffenderManagerCases",
   query = """
   SELECT
-   c.case_ref_no AS crn, cc.category_name AS tier, c."location" AS casecategory
+   c.case_ref_no
     FROM app.case_details AS c
     JOIN app.workload AS w
         ON c.workload_id = w.id
@@ -118,17 +103,14 @@ import javax.persistence.Table
         ON wo.team_id = t.id
     JOIN app.workload_report AS wr
         ON w.workload_report_id = wr.id
-    JOIN app.case_category AS cc
-        ON c.tier_code = cc.category_id
     WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS null and c.row_type = 'N' and t.code = ?2 and om."key" = ?1
 """
 )
 @NamedNativeQuery(
   name = "OffenderManagerEntity.findCaseByTeamCodeAndStaffCodeAndCrn",
-  resultSetMapping = "OffenderManagerCases",
   query = """
   SELECT
-   c.case_ref_no AS crn, cc.category_name AS tier, c."location" AS casecategory
+   c.case_ref_no
     FROM app.case_details AS c
     JOIN app.workload AS w
         ON c.workload_id = w.id
@@ -140,8 +122,6 @@ import javax.persistence.Table
         ON wo.team_id = t.id
     JOIN app.workload_report AS wr
         ON w.workload_report_id = wr.id
-    JOIN app.case_category AS cc
-        ON c.tier_code = cc.category_id
     WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS null and c.row_type = 'N' and t.code = ?1 and om."key" = ?2 and c.case_ref_no = ?3
 """
 )

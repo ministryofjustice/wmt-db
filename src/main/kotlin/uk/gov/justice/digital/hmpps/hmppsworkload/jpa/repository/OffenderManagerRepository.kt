@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.OffenderManagerEntity
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerCaseloadTotals
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
 
@@ -15,9 +14,9 @@ interface OffenderManagerRepository : CrudRepository<OffenderManagerEntity, Long
   @Query(nativeQuery = true)
   fun findByCaseloadTotals(workloadOwnerId: Long): List<OffenderManagerCaseloadTotals>
   @Query(nativeQuery = true)
-  fun findCasesByTeamCodeAndStaffCode(offenderManagerCode: String, teamCode: String): List<OffenderManagerCase>
+  fun findCasesByTeamCodeAndStaffCode(offenderManagerCode: String, teamCode: String): List<String>
   @Query(nativeQuery = true)
-  fun findCaseByTeamCodeAndStaffCodeAndCrn(teamCode: String, offenderManagerCode: String, crn: String): OffenderManagerCase?
+  fun findCaseByTeamCodeAndStaffCodeAndCrn(teamCode: String, offenderManagerCode: String, crn: String): String?
 
   fun findByCode(staffCode: String): OffenderManagerEntity?
 }
