@@ -5,11 +5,9 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToDeliusApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerCases
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerPotentialWorkload
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.TierCaseTotals
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
@@ -17,6 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepo
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.OffenderManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadPointsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.CaseCalculator
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetSentenceService
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetWeeklyHours
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.calculateCapacity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.reduction.GetReductionService
@@ -31,6 +30,7 @@ class GetOffenderManagerService(
   private val getReductionService: GetReductionService,
   private val communityApiClient: CommunityApiClient,
   private val workloadPointsRepository: WorkloadPointsRepository,
+  private val getSentenceService: GetSentenceService,
   private val caseDetailsRepository: CaseDetailsRepository,
   private val getWeeklyHours: GetWeeklyHours,
   private val getEventManager: JpaBasedGetEventManager,
@@ -39,11 +39,10 @@ class GetOffenderManagerService(
 
   fun getPotentialWorkload(staffIdentifier: StaffIdentifier, crn: String): OffenderManagerPotentialWorkload? {
     return workforceAllocationsToDeliusApiClient.impact(crn, staffIdentifier.staffCode).map { impactResponse ->
-      val overview = findOffenderManagerOverview(staffIdentifier, impactResponse.staff.getGrade())
-      overview.forename = impactResponse.staff.name.forename
-      overview.surname = impactResponse.staff.name.surname
-      val currentCaseImpact = getCurrentCasePoints(staffIdentifier, crn)
       val potentialCase = getPotentialCase(crn)
+      val overview = findOffenderManagerOverview(staffIdentifier, impactResponse.staff.getGrade())
+      val currentCaseImpact = getCurrentCasePoints(staffIdentifier, potentialCase)
+
       overview.potentialCapacity = calculateCapacity(
         overview.totalPoints.minus(currentCaseImpact)
           .plus(caseCalculator.getPointsForCase(potentialCase)),
@@ -58,8 +57,8 @@ class GetOffenderManagerService(
       .let { Case(tier = it.tier, type = it.type, crn = crn) }
   }
 
-  private fun getCurrentCasePoints(staffIdentifier: StaffIdentifier, crn: String): BigInteger = offenderManagerRepository.findCaseByTeamCodeAndStaffCodeAndCrn(staffIdentifier.teamCode, staffIdentifier.staffCode, crn)?.let { currentCase ->
-    return caseCalculator.getPointsForCase(Case(Tier.valueOf(currentCase.tier), CaseType.valueOf(currentCase.caseCategory), false, crn))
+  private fun getCurrentCasePoints(staffIdentifier: StaffIdentifier, case: Case): BigInteger = offenderManagerRepository.findCaseByTeamCodeAndStaffCodeAndCrn(staffIdentifier.teamCode, staffIdentifier.staffCode, case.crn)?.let {
+    return caseCalculator.getPointsForCase(case)
   } ?: BigInteger.ZERO
 
   private fun getDefaultOffenderManagerOverview(staffCode: String, grade: String): OffenderManagerOverview {
@@ -108,11 +107,10 @@ class GetOffenderManagerService(
 
   fun getCases(staffIdentifier: StaffIdentifier): OffenderManagerCases? =
     offenderManagerRepository.findCasesByTeamCodeAndStaffCode(staffIdentifier.staffCode, staffIdentifier.teamCode).let { cases ->
-      val crnDetails = getCrnToCaseDetails(cases.map { it.crn })
-      communityApiClient.getStaffByCode(staffIdentifier.staffCode)
-        .map { staffSummary ->
-          val team = staffSummary.teams?.first { team -> team.code == staffIdentifier.teamCode }
-          OffenderManagerCases.from(staffSummary, team!!, cases, crnDetails)
+      val crnDetails = getCrnToCaseDetails(cases)
+      workforceAllocationsToDeliusApiClient.staffActiveCases(staffIdentifier.staffCode, crnDetails.keys)
+        .map { staffActiveCases ->
+          OffenderManagerCases.from(staffActiveCases, crnDetails)
         }.block()
     }
 

@@ -1,12 +1,12 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.client
 
+import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ChoosePractitionerResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.CompleteDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ImpactResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OfficerView
 
 class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
 
@@ -51,6 +51,16 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
     .uri("/allocation-completed/details?crn=$crn&eventNumber=$eventNumber&staffCode=$staffCode")
     .retrieve()
     .bodyToMono(CompleteDetails::class.java)
+
+  fun staffActiveCases(staffCode: String, crns: Collection<String>): Mono<StaffActiveCases> {
+    val requestType = object : ParameterizedTypeReference<Collection<String>>() {}
+    return webClient
+      .post()
+      .uri("/staff/$staffCode/active-cases")
+      .body(Mono.just(crns), requestType)
+      .retrieve()
+      .bodyToMono(StaffActiveCases::class.java)
+  }
 }
 
 class MissingChoosePractitioner(msg: String) : RuntimeException(msg)
