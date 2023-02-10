@@ -20,7 +20,6 @@ class GetCombinedCaseload(
 
     return caseDetailsRepository.findAllById(
       offenderManagerRepository.findCasesByTeamCodeAndStaffCode(staffIdentifier.staffCode, staffIdentifier.teamCode)
-        .map { c -> c.crn }
         .union(
           personManagerRepository.findByStaffCodeAndTeamCodeAndIsActiveIsTrue(
             staffIdentifier.staffCode,

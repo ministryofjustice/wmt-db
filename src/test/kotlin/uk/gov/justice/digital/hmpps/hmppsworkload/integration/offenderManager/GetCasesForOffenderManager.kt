@@ -4,7 +4,8 @@ import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.CommunityApiExtension.Companion.communityApi
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.domain.ActiveCasesIntegration
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.WorkforceAllocationsToDeliusExtension.Companion.workforceAllocationsToDelius
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 
 class GetCasesForOffenderManager : IntegrationTestBase() {
@@ -15,7 +16,14 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `get all cases allocated to offender manager`() {
-    communityApi.staffCodeResponse(staffCodeOM, teamCode)
+    workforceAllocationsToDelius.staffActiveCasesResponse(
+      staffCodeOM,
+      activeCases = listOf(
+        ActiveCasesIntegration("CRN2222", "Sally", "Smith", "CUSTODY"),
+        ActiveCasesIntegration("CRN3333", "John", "Williams", "COMMUNITY"),
+        ActiveCasesIntegration("CRN1111", "John", "Doe", "LICENSE")
+      )
+    )
     val realTimeCaseDetails = caseDetailsRepository.saveAll(listOf(CaseDetailsEntity("CRN2222", Tier.B3, CaseType.CUSTODY, "Sally", "Smith"), CaseDetailsEntity("CRN3333", Tier.C1, CaseType.COMMUNITY, "John", "Williams"), CaseDetailsEntity("CRN1111", Tier.C1, CaseType.LICENSE, "John", "Doe")))
     val wmtStaff = setupCurrentWmtStaff(staffCodeOM, teamCode)
 
@@ -36,43 +44,63 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
       .isEqualTo("Sheila")
       .jsonPath("$.surname")
       .isEqualTo("Hancock")
+      .jsonPath("$.name.forename")
+      .isEqualTo("Sheila")
+      .jsonPath("$.name.surname")
+      .isEqualTo("Hancock")
       .jsonPath("$.grade")
       .isEqualTo("PO")
       .jsonPath("$.code")
       .isEqualTo(staffCodeOM)
       .jsonPath("$.email")
       .isEqualTo("sheila.hancock@test.justice.gov.uk")
-      .jsonPath("$.teamName")
-      .isEqualTo("Test Team")
       .jsonPath("$.activeCases[?(@.crn == 'CRN2222')].tier")
       .isEqualTo("B3")
       .jsonPath("$.activeCases[?(@.crn == 'CRN2222')].caseCategory")
+      .isEqualTo("CUSTODY")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN2222')].type")
       .isEqualTo("CUSTODY")
       .jsonPath("$.activeCases[?(@.crn == 'CRN2222')].forename")
       .isEqualTo("Sally")
       .jsonPath("$.activeCases[?(@.crn == 'CRN2222')].surname")
       .isEqualTo("Smith")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN2222')].name.forename")
+      .isEqualTo("Sally")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN2222')].name.surname")
+      .isEqualTo("Smith")
       .jsonPath("$.activeCases[?(@.crn == 'CRN3333')].tier")
       .isEqualTo("C1")
       .jsonPath("$.activeCases[?(@.crn == 'CRN3333')].caseCategory")
+      .isEqualTo("COMMUNITY")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN3333')].type")
       .isEqualTo("COMMUNITY")
       .jsonPath("$.activeCases[?(@.crn == 'CRN3333')].forename")
       .isEqualTo("John")
       .jsonPath("$.activeCases[?(@.crn == 'CRN3333')].surname")
       .isEqualTo("Williams")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN3333')].name.forename")
+      .isEqualTo("John")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN3333')].name.surname")
+      .isEqualTo("Williams")
       .jsonPath("$.activeCases[?(@.crn == 'CRN1111')].tier")
       .isEqualTo("C1")
       .jsonPath("$.activeCases[?(@.crn == 'CRN1111')].caseCategory")
+      .isEqualTo("LICENSE")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN1111')].type")
       .isEqualTo("LICENSE")
       .jsonPath("$.activeCases[?(@.crn == 'CRN1111')].forename")
       .isEqualTo("John")
       .jsonPath("$.activeCases[?(@.crn == 'CRN1111')].surname")
       .isEqualTo("Doe")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN1111')].name.forename")
+      .isEqualTo("John")
+      .jsonPath("$.activeCases[?(@.crn == 'CRN1111')].name.surname")
+      .isEqualTo("Doe")
   }
 
   @Test
   fun `Get staff member without any email`() {
-    communityApi.staffCodeResponse(staffCodeNO, teamCode, email = null)
+    workforceAllocationsToDelius.staffActiveCasesResponse(staffCodeNO, email = null)
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers/$staffCodeNO/cases")
       .headers {
@@ -92,7 +120,7 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `Get staff member without any WMT active cases`() {
-    communityApi.staffCodeResponse(staffCodeNO, teamCode)
+    workforceAllocationsToDelius.staffActiveCasesResponse(staffCodeNO)
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers/$staffCodeNO/cases")
       .headers {
@@ -110,55 +138,7 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
       .isEqualTo("PO")
       .jsonPath("$.code")
       .isEqualTo(staffCodeNO)
-      .jsonPath("$.teamName")
-      .isEqualTo("Test Team")
       .jsonPath("$.activeCases")
       .isEmpty
-  }
-
-  @Test
-  fun `still return response if not all offender details are returned`() {
-    communityApi.staffCodeResponse(staffCodeOM, teamCode)
-    val caseDetails = caseDetailsRepository.save(CaseDetailsEntity("CRN1111", Tier.C1, CaseType.LICENSE, "John", "Doe"))
-    val wmtStaff = setupCurrentWmtStaff(staffCodeOM, teamCode)
-    setupWmtManagedCase(wmtStaff, caseDetails.tier, caseDetails.crn, caseDetails.type)
-    setupWmtManagedCase(wmtStaff, Tier.B3, "CRN2222", CaseType.CUSTODY)
-    setupWmtManagedCase(wmtStaff, Tier.C1, "CRN3333", CaseType.COMMUNITY)
-
-    webTestClient.get()
-      .uri("/team/$teamCode/offenderManagers/$staffCodeOM/cases")
-      .headers {
-        it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT"))
-      }
-      .exchange()
-      .expectStatus()
-      .isOk
-      .expectBody()
-      .jsonPath("$.forename")
-      .isEqualTo("Sheila")
-      .jsonPath("$.surname")
-      .isEqualTo("Hancock")
-      .jsonPath("$.grade")
-      .isEqualTo("PO")
-      .jsonPath("$.code")
-      .isEqualTo(staffCodeOM)
-      .jsonPath("$.teamName")
-      .isEqualTo("Test Team")
-      .jsonPath("$.activeCases[?(@.crn == 'CRN2222')].tier")
-      .isEqualTo("B3")
-      .jsonPath("$.activeCases[?(@.crn == 'CRN2222')].caseCategory")
-      .isEqualTo("CUSTODY")
-      .jsonPath("$.activeCases[?(@.crn == 'CRN3333')].tier")
-      .isEqualTo("C1")
-      .jsonPath("$.activeCases[?(@.crn == 'CRN3333')].caseCategory")
-      .isEqualTo("COMMUNITY")
-      .jsonPath("$.activeCases[?(@.crn == 'CRN1111')].tier")
-      .isEqualTo("C1")
-      .jsonPath("$.activeCases[?(@.crn == 'CRN1111')].caseCategory")
-      .isEqualTo("LICENSE")
-      .jsonPath("$.activeCases[?(@.crn == 'CRN1111')].forename")
-      .isEqualTo("John")
-      .jsonPath("$.activeCases[?(@.crn == 'CRN1111')].surname")
-      .isEqualTo("Doe")
   }
 }
