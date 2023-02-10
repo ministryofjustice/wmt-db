@@ -162,7 +162,6 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
     val offenderManagerCode = "NOWORKLOAD1"
     workforceAllocationsToDelius.deliusStaffCodeResponse(offenderManagerCode)
 
-    // communityApi.staffCodeResponse(offenderManagerCode, teamCode)
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers/$offenderManagerCode")
       .headers {
@@ -213,7 +212,6 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
     val teamCode = "T1"
     val offenderManagerCode = "NOWORKLOAD1"
     workforceAllocationsToDelius.deliusStaffCodeResponse(offenderManagerCode, email = null)
-    // communityApi.staffCodeResponse(offenderManagerCode, teamCode, "EX", null)
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers/$offenderManagerCode")
       .headers {
@@ -235,7 +233,6 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
   fun `get last allocated event`() {
     val teamCode = "T1"
     val offenderManagerCode = "NOWORKLOAD1"
-    // communityApi.staffCodeResponse(offenderManagerCode, teamCode)
     workforceAllocationsToDelius.deliusStaffCodeResponse(offenderManagerCode)
 
     val eventManager = eventManagerRepository.save(EventManagerEntity(crn = "CRN12345", eventId = BigInteger.TEN, staffId = BigInteger.ONE, staffCode = offenderManagerCode, teamCode = teamCode, createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = null))
