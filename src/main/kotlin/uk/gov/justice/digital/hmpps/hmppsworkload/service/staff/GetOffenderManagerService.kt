@@ -39,11 +39,10 @@ class GetOffenderManagerService(
 
   fun getPotentialWorkload(staffIdentifier: StaffIdentifier, crn: String): OffenderManagerPotentialWorkload? {
     return workforceAllocationsToDeliusApiClient.impact(crn, staffIdentifier.staffCode).map { impactResponse ->
-      val overview = findOffenderManagerOverview(staffIdentifier, impactResponse.staff.getGrade())
-      overview.forename = impactResponse.staff.name.forename
-      overview.surname = impactResponse.staff.name.surname
-      val currentCaseImpact = getCurrentCasePoints(staffIdentifier, crn)
       val potentialCase = getPotentialCase(crn)
+      val overview = findOffenderManagerOverview(staffIdentifier, impactResponse.staff.getGrade())
+      val currentCaseImpact = getCurrentCasePoints(staffIdentifier, potentialCase)
+
       overview.potentialCapacity = calculateCapacity(
         overview.totalPoints.minus(currentCaseImpact)
           .plus(caseCalculator.getPointsForCase(potentialCase)),
@@ -58,9 +57,8 @@ class GetOffenderManagerService(
       .let { Case(tier = it.tier, type = it.type, crn = crn) }
   }
 
-  private fun getCurrentCasePoints(staffIdentifier: StaffIdentifier, crn: String): BigInteger = offenderManagerRepository.findCaseByTeamCodeAndStaffCodeAndCrn(staffIdentifier.teamCode, staffIdentifier.staffCode, crn)?.let {
-    val caseDetails = caseDetailsRepository.findByIdOrNull(crn)!!
-    return caseCalculator.getPointsForCase(Case(caseDetails.tier, caseDetails.type, false, crn))
+  private fun getCurrentCasePoints(staffIdentifier: StaffIdentifier, case: Case): BigInteger = offenderManagerRepository.findCaseByTeamCodeAndStaffCodeAndCrn(staffIdentifier.teamCode, staffIdentifier.staffCode, case.crn)?.let {
+    return caseCalculator.getPointsForCase(case)
   } ?: BigInteger.ZERO
 
   private fun getDefaultOffenderManagerOverview(staffCode: String, grade: String): OffenderManagerOverview {

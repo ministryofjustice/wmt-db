@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.domain
 import com.fasterxml.jackson.annotation.JsonCreator
 import io.swagger.v3.oas.annotations.media.Schema
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ActiveCase
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Name
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffActiveCases
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 
@@ -11,6 +12,8 @@ data class OffenderManagerCases @JsonCreator constructor(
   val forename: String,
   @Schema(description = "Probation Practitioner surname", example = "Smith")
   val surname: String,
+  @Schema(description = "Probation Practitioner name")
+  val name: Name,
   @Schema(description = "Probation Practitioner Grade", example = "PO")
   val grade: String,
   @Schema(description = "Offender Manager Code", example = "OM1")
@@ -21,7 +24,7 @@ data class OffenderManagerCases @JsonCreator constructor(
 ) {
   companion object {
     fun from(staffActiveCases: StaffActiveCases, offenderDetails: Map<String, CaseDetailsEntity>): OffenderManagerCases {
-      return OffenderManagerCases(staffActiveCases.name.forename, staffActiveCases.name.surname, staffActiveCases.getGrade(), staffActiveCases.code, staffActiveCases.cases.map { OffenderManagerActiveCase.from(it, offenderDetails[it.crn]!!) }, staffActiveCases.email)
+      return OffenderManagerCases(staffActiveCases.name.forename, staffActiveCases.name.surname, staffActiveCases.name, staffActiveCases.getGrade(), staffActiveCases.code, staffActiveCases.cases.map { OffenderManagerActiveCase.from(it, offenderDetails[it.crn]!!) }, staffActiveCases.email)
     }
   }
 }
@@ -36,11 +39,15 @@ data class OffenderManagerActiveCase(
   @Schema(description = "Case forename", example = "Sally")
   val forename: String?,
   @Schema(description = "Case surname", example = "Smith")
-  val surname: String?
+  val surname: String?,
+  @Schema(description = "name")
+  val name: Name,
+  @Schema(description = "type")
+  val type: String
 ) {
   companion object {
     fun from(activeCase: ActiveCase, caseDetails: CaseDetailsEntity): OffenderManagerActiveCase {
-      return OffenderManagerActiveCase(activeCase.crn, caseDetails.tier.name, activeCase.type, activeCase.name.forename, activeCase.name.surname)
+      return OffenderManagerActiveCase(activeCase.crn, caseDetails.tier.name, activeCase.type, activeCase.name.forename, activeCase.name.surname, activeCase.name, activeCase.type)
     }
   }
 }
