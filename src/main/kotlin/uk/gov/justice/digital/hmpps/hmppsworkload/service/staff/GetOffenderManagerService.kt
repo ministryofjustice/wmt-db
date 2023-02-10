@@ -17,7 +17,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepo
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.OffenderManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadPointsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.CaseCalculator
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetSentenceService
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetWeeklyHours
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.calculateCapacity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.reduction.GetReductionService
@@ -32,7 +31,6 @@ class GetOffenderManagerService(
   private val getReductionService: GetReductionService,
   private val communityApiClient: CommunityApiClient,
   private val workloadPointsRepository: WorkloadPointsRepository,
-  private val getSentenceService: GetSentenceService,
   private val caseDetailsRepository: CaseDetailsRepository,
   private val getWeeklyHours: GetWeeklyHours,
   private val getEventManager: JpaBasedGetEventManager,
