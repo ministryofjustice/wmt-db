@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service.staff
 
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToDeliusApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerCases
@@ -15,7 +14,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepo
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.OffenderManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadPointsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.CaseCalculator
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetSentenceService
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetWeeklyHours
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.calculateCapacity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.reduction.GetReductionService
@@ -28,9 +26,7 @@ class GetOffenderManagerService(
   private val offenderManagerRepository: OffenderManagerRepository,
   private val caseCalculator: CaseCalculator,
   private val getReductionService: GetReductionService,
-  private val communityApiClient: CommunityApiClient,
   private val workloadPointsRepository: WorkloadPointsRepository,
-  private val getSentenceService: GetSentenceService,
   private val caseDetailsRepository: CaseDetailsRepository,
   private val getWeeklyHours: GetWeeklyHours,
   private val getEventManager: JpaBasedGetEventManager,
@@ -75,12 +71,12 @@ class GetOffenderManagerService(
 
   fun getOverview(staffIdentifier: StaffIdentifier): OffenderManagerOverview? {
     val officerView = workforceAllocationsToDeliusApiClient.getOfficerView(staffIdentifier.staffCode).block()
-    val overview = findOffenderManagerOverview(staffIdentifier, officerView.staffGrade)
+    val overview = findOffenderManagerOverview(staffIdentifier, officerView.grade)
     overview.caseEndDue = officerView.casesDueToEndInNext4Weeks
     overview.releasesDue = officerView.releasesWithinNext4Weeks
     overview.forename = officerView.name.forename
     overview.surname = officerView.name.surname
-    overview.grade = officerView.staffGrade
+    overview.grade = officerView.grade
     overview.email = officerView.email
     overview.lastAllocatedEvent = getEventManager.findLatestByStaffAndTeam(staffIdentifier)
 

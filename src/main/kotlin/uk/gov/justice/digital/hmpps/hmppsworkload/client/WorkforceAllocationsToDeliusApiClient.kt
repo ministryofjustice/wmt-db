@@ -7,6 +7,8 @@ import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ChoosePractitionerResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.CompleteDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ImpactResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OfficerView
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffActiveCases
 
 class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
 

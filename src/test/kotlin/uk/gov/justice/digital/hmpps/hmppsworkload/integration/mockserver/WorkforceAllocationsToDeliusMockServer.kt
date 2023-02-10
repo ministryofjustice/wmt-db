@@ -132,7 +132,7 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
     )
   }
 
-  fun deliusStaffCodeResponse(staffCode: String, staffGrade: String = "PSM", email: String? = "sheila.hancock@test.justice.gov.uk") {
+  fun deliusStaffCodeResponse(staffCode: String, staffGrade: String = "PO", email: String? = "sheila.hancock@test.justice.gov.uk") {
     val request = HttpRequest.request().withPath("/staff/$staffCode/officer-view")
     workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
       HttpResponse.response()

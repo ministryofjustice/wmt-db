@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.client.dto
 
 import com.fasterxml.jackson.annotation.JsonCreator
-import uk.gov.justice.digital.hmpps.hmppsworkload.mapper.deliusToStaffGrade
 import java.math.BigInteger
 
 data class OfficerView @JsonCreator constructor(
@@ -12,6 +11,4 @@ data class OfficerView @JsonCreator constructor(
   val casesDueToEndInNext4Weeks: BigInteger,
   val releasesWithinNext4Weeks: BigInteger,
   val paroleReportsToCompleteInNext4Weeks: BigInteger
-) {
-  var staffGrade: String = deliusToStaffGrade(grade)
-}
+)
