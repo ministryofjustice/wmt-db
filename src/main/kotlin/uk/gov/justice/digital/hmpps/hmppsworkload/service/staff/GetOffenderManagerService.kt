@@ -66,7 +66,6 @@ class GetOffenderManagerService(
     val overview = OverviewOffenderManager(0, 0, availablePoints.toBigInteger(), BigInteger.ZERO, staffCode, LocalDateTime.now(), -1, BigInteger.ZERO)
     overview.capacity = calculateCapacity(overview.totalPoints, overview.availablePoints)
     overview.contractedHours = defaultContractedHours
-    overview.grade = grade
     return overview
   }
 
@@ -78,7 +77,7 @@ class GetOffenderManagerService(
     if (overview.hasWorkload) {
       overview.nextReductionChange = getReductionService.findNextReductionChange(staffIdentifier)
       overview.reductionHours = getReductionService.findReductionHours(staffIdentifier)
-      overview.contractedHours = getWeeklyHours.findWeeklyHours(staffIdentifier, overview.grade)
+      overview.contractedHours = getWeeklyHours.findWeeklyHours(staffIdentifier, officerView.grade)
       offenderManagerRepository.findByCaseloadTotals(overview.workloadOwnerId).let { totals ->
         overview.tierCaseTotals = totals.map { total ->
           TierCaseTotals(total.getATotal(), total.getBTotal(), total.getCTotal(), total.getDTotal(), total.untiered)
@@ -91,7 +90,6 @@ class GetOffenderManagerService(
 
   fun findOffenderManagerOverview(staffIdentifier: StaffIdentifier, grade: String): OverviewOffenderManager = offenderManagerRepository.findByOverview(staffIdentifier.teamCode, staffIdentifier.staffCode)?.let {
     it.capacity = calculateCapacity(it.totalPoints, it.availablePoints)
-    it.grade = grade
     it.hasWorkload = true
     it
   } ?: getDefaultOffenderManagerOverview(staffIdentifier.staffCode, grade)
