@@ -18,7 +18,7 @@ class OffenderDetailsEventListenerTests : IntegrationTestBase() {
   @Test
   fun `must save case details when processing new sentence event`() {
     val crn = "J678910"
-    communityApi.singleActiveConvictionResponseForAllConvictions(crn)
+
     communityApi.singleActiveConvictionResponse(crn)
     communityApi.offenderSummaryResponse(crn)
     hmppsTier.tierCalculationResponse(crn)
@@ -45,7 +45,7 @@ class OffenderDetailsEventListenerTests : IntegrationTestBase() {
   @Test
   fun `must save forbidden offender summary as restricted access`() {
     val crn = "J678910"
-    communityApi.singleActiveConvictionResponseForAllConvictions(crn)
+
     communityApi.singleActiveConvictionResponse(crn)
     communityApi.forbiddenOffenderSummaryResponse(crn)
     hmppsTier.tierCalculationResponse(crn)
