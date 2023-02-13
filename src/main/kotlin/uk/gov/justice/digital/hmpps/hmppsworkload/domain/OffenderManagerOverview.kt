@@ -48,27 +48,27 @@ data class OffenderManagerOverview @JsonCreator constructor(
   val lastAllocatedEvent: LastAllocatedEvent?
 ) {
   companion object {
-    fun from(offenderManagerOverview: OverviewOffenderManager, officerView: OfficerView): OffenderManagerOverview {
+    fun from(overviewOffenderManager: OverviewOffenderManager, officerView: OfficerView): OffenderManagerOverview {
       return OffenderManagerOverview(
         officerView.name.forename,
         officerView.name.surname,
         officerView.grade,
-        offenderManagerOverview.capacity,
-        offenderManagerOverview.code,
+        overviewOffenderManager.capacity,
+        overviewOffenderManager.code,
         officerView.email,
-        offenderManagerOverview.totalCommunityCases.plus(offenderManagerOverview.totalCustodyCases),
-        offenderManagerOverview.contractedHours,
-        offenderManagerOverview.reductionHours,
-        offenderManagerOverview.availablePoints,
-        offenderManagerOverview.totalPoints,
-        offenderManagerOverview.availablePoints.minus(offenderManagerOverview.totalPoints),
-        offenderManagerOverview.lastUpdatedOn,
-        offenderManagerOverview.nextReductionChange,
-        offenderManagerOverview.tierCaseTotals,
-        offenderManagerOverview.paroleReportsDue,
+        overviewOffenderManager.totalCommunityCases.plus(overviewOffenderManager.totalCustodyCases),
+        overviewOffenderManager.contractedHours,
+        overviewOffenderManager.reductionHours,
+        overviewOffenderManager.availablePoints,
+        overviewOffenderManager.totalPoints,
+        overviewOffenderManager.availablePoints.minus(overviewOffenderManager.totalPoints),
+        overviewOffenderManager.lastUpdatedOn,
+        overviewOffenderManager.nextReductionChange,
+        overviewOffenderManager.tierCaseTotals,
+        overviewOffenderManager.paroleReportsDue,
         officerView.casesDueToEndInNext4Weeks,
         officerView.releasesWithinNext4Weeks,
-        offenderManagerOverview.lastAllocatedEvent?.let { LastAllocatedEvent.from(it) }
+        overviewOffenderManager.lastAllocatedEvent?.let { LastAllocatedEvent.from(it) }
       )
     }
   }
