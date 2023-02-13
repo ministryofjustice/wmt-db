@@ -23,7 +23,7 @@ class JpaBasedSavePersonManagerService(
     crn: String
   ): SaveResult<PersonManagerEntity> =
     personManagerRepository.findFirstByCrnOrderByCreatedDateDesc(crn)?.let { personManager ->
-      if (personManager.staffId == deliusStaff.staffIdentifier && personManager.teamCode == teamCode) {
+      if (personManager.staffCode == deliusStaff.staffCode && personManager.teamCode == teamCode) {
         SaveResult(personManager, false)
       } else {
         val currentPersonManager = getPersonManager.findLatestByCrn(crn)
