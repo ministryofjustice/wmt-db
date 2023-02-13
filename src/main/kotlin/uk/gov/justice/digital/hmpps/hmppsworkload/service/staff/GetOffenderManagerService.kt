@@ -73,12 +73,6 @@ class GetOffenderManagerService(
   fun getOverview(staffIdentifier: StaffIdentifier): OffenderManagerOverview? {
     val officerView = workforceAllocationsToDeliusApiClient.getOfficerView(staffIdentifier.staffCode).block()
     val overview = findOffenderManagerOverview(staffIdentifier, officerView.grade)
-    overview.caseEndDue = officerView.casesDueToEndInNext4Weeks
-    overview.releasesDue = officerView.releasesWithinNext4Weeks
-    overview.forename = officerView.name.forename
-    overview.surname = officerView.name.surname
-    overview.grade = officerView.grade
-    overview.email = officerView.email
     overview.lastAllocatedEvent = getEventManager.findLatestByStaffAndTeam(staffIdentifier)
 
     if (overview.hasWorkload) {
@@ -92,7 +86,7 @@ class GetOffenderManagerService(
           .fold(TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)) { first, second -> TierCaseTotals(first.A.add(second.A), first.B.add(second.B), first.C.add(second.C), first.D.add(second.D), first.untiered.add(second.untiered)) }
       }
     }
-    return OffenderManagerOverview.from(overview)
+    return OffenderManagerOverview.from(overview, officerView)
   }
 
   fun findOffenderManagerOverview(staffIdentifier: StaffIdentifier, grade: String): OverviewOffenderManager = offenderManagerRepository.findByOverview(staffIdentifier.teamCode, staffIdentifier.staffCode)?.let {
