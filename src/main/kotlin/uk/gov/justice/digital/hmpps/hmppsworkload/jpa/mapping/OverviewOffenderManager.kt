@@ -7,7 +7,7 @@ import java.math.BigInteger
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
-data class OffenderManagerOverview(
+data class OverviewOffenderManager(
   val totalCommunityCases: Int,
   val totalCustodyCases: Int,
   val availablePoints: BigInteger,

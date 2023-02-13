@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.domain
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import io.swagger.v3.oas.annotations.media.Schema
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OverviewOffenderManager
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.LocalDateTime
@@ -47,7 +47,7 @@ data class OffenderManagerOverview @JsonCreator constructor(
   val lastAllocatedEvent: LastAllocatedEvent?
 ) {
   companion object {
-    fun from(offenderManagerOverview: OffenderManagerOverview): uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerOverview {
+    fun from(offenderManagerOverview: OverviewOffenderManager): OffenderManagerOverview {
       return OffenderManagerOverview(
         offenderManagerOverview.forename,
         offenderManagerOverview.surname,

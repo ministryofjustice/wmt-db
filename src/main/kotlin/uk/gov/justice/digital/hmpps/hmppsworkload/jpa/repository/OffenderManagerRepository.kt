@@ -5,12 +5,12 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.OffenderManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerCaseloadTotals
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OverviewOffenderManager
 
 @Repository
 interface OffenderManagerRepository : CrudRepository<OffenderManagerEntity, Long> {
   @Query(nativeQuery = true)
-  fun findByOverview(teamCode: String, offenderManagerCode: String): OffenderManagerOverview?
+  fun findByOverview(teamCode: String, offenderManagerCode: String): OverviewOffenderManager?
   @Query(nativeQuery = true)
   fun findByCaseloadTotals(workloadOwnerId: Long): List<OffenderManagerCaseloadTotals>
   @Query(nativeQuery = true)

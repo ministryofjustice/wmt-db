@@ -35,10 +35,6 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
       .get()
       .uri("/staff/$staffCode/officer-view")
       .retrieve()
-      .onStatus(
-        { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
-        { Mono.error(MissingStaffError("staff member not found at $staffCode")) }
-      )
       .bodyToMono(OfficerView::class.java)
   }
 
