@@ -56,7 +56,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.OffenderManager
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.ReductionsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.RequirementManagerRepository
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.SentenceRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.TeamRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTCMSRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTCourtReportsRepository
@@ -68,7 +67,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.service.AuditMessage
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
 import java.math.BigDecimal
-import java.math.BigInteger
 
 @ExtendWith(
   AssessRisksNeedsApiExtension::class,
@@ -103,9 +101,6 @@ abstract class IntegrationTestBase {
 
   @Autowired
   protected lateinit var requirementManagerRepository: RequirementManagerRepository
-
-  @Autowired
-  protected lateinit var sentenceRepository: SentenceRepository
 
   @Autowired
   protected lateinit var wmtCourtReportsRepository: WMTCourtReportsRepository
@@ -248,7 +243,6 @@ abstract class IntegrationTestBase {
     personManagerRepository.deleteAll()
     eventManagerRepository.deleteAll()
     requirementManagerRepository.deleteAll()
-    sentenceRepository.deleteAll()
     caseDetailsRepository.deleteAll()
     wmtCourtReportsRepository.deleteAll()
     wmtcmsRepository.deleteAll()
@@ -276,7 +270,6 @@ abstract class IntegrationTestBase {
     personManagerRepository.deleteAll()
     eventManagerRepository.deleteAll()
     requirementManagerRepository.deleteAll()
-    sentenceRepository.deleteAll()
     wmtCourtReportsRepository.deleteAll()
     wmtcmsRepository.deleteAll()
     reductionsRepository.deleteAll()
@@ -436,7 +429,7 @@ abstract class IntegrationTestBase {
     numberOfMessagesCurrentlyOnQueue(hmppsExtractPlacedDlqClient, hmppsExtractPlacedQueue.dlqUrl!!, 0)
   }
 
-  protected fun offenderEvent(crn: String, sentenceId: BigInteger? = null) = HmppsOffenderEvent(crn, sentenceId)
+  protected fun offenderEvent(crn: String) = HmppsOffenderEvent(crn)
 
   protected fun jsonString(any: Any) = objectMapper.writeValueAsString(any) as String
 

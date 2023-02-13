@@ -5,22 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.jms.annotation.JmsListener
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.SaveCaseDetailsService
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.SaveSentenceService
-import java.math.BigInteger
 
 @Component
 class OffenderEventListener(
   private val objectMapper: ObjectMapper,
-  private val saveSentenceService: SaveSentenceService,
   private val saveCaseDetailsService: SaveCaseDetailsService
 ) {
 
   @JmsListener(destination = "hmppsoffenderqueue", containerFactory = "hmppsQueueContainerFactoryProxy")
   fun processMessage(rawMessage: String) {
-    val (crn, sentenceId) = getCase(rawMessage)
-    sentenceId?.run {
-      saveSentenceService.saveSentence(crn, sentenceId)
-    }
+    val (crn) = getCase(rawMessage)
     saveCaseDetailsService.save(crn)
   }
 
@@ -31,8 +25,7 @@ class OffenderEventListener(
 }
 
 data class HmppsOffenderEvent(
-  val crn: String,
-  @JsonProperty("sourceId") val sentenceId: BigInteger?
+  val crn: String
 )
 
 data class SQSMessage(
