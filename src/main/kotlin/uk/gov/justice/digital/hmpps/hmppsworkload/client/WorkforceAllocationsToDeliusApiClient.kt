@@ -7,6 +7,7 @@ import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ChoosePractitionerResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.CompleteDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ImpactResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OfficerView
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffActiveCases
 
 class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
@@ -27,6 +28,14 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
           else -> Mono.error(ex)
         }
       }
+  }
+
+  fun getOfficerView(staffCode: String): Mono<OfficerView> {
+    return webClient
+      .get()
+      .uri("/staff/$staffCode/officer-view")
+      .retrieve()
+      .bodyToMono(OfficerView::class.java)
   }
 
   fun impact(crn: String, staffCode: String): Mono<ImpactResponse> = webClient

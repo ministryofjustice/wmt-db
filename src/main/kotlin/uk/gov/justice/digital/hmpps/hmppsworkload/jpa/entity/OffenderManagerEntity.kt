@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity
 
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerCaseloadTotals
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OverviewOffenderManager
 import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.ColumnResult
@@ -18,7 +18,7 @@ import javax.persistence.Table
   name = "OffenderManagerOverviewResult",
   classes = [
     ConstructorResult(
-      targetClass = OffenderManagerOverview::class,
+      targetClass = OverviewOffenderManager::class,
       columns = [
         ColumnResult(name = "total_community_cases", type = Int::class),
         ColumnResult(name = "total_filtered_custody_cases", type = Int::class),

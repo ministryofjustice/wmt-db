@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ImpactResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Name
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffMember
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OverviewOffenderManager
 import java.math.BigDecimal
 
 data class OffenderManagerPotentialWorkload @JsonCreator constructor(
@@ -20,7 +20,7 @@ data class OffenderManagerPotentialWorkload @JsonCreator constructor(
   val tier: Tier
 ) {
   companion object {
-    fun from(offenderManagerOverview: OffenderManagerOverview, impactResponse: ImpactResponse, potentialCase: Case): OffenderManagerPotentialWorkload {
+    fun from(offenderManagerOverview: OverviewOffenderManager, impactResponse: ImpactResponse, potentialCase: Case): OffenderManagerPotentialWorkload {
       return OffenderManagerPotentialWorkload(
         offenderManagerOverview.capacity,
         offenderManagerOverview.potentialCapacity!!,

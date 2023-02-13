@@ -2,20 +2,19 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service.staff
 
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToDeliusApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Case
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerCases
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerOverview
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OffenderManagerPotentialWorkload
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.TierCaseTotals
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerOverview
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OverviewOffenderManager
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.OffenderManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WorkloadPointsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.CaseCalculator
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetSentenceService
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetWeeklyHours
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.calculateCapacity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.reduction.GetReductionService
@@ -28,9 +27,7 @@ class GetOffenderManagerService(
   private val offenderManagerRepository: OffenderManagerRepository,
   private val caseCalculator: CaseCalculator,
   private val getReductionService: GetReductionService,
-  private val communityApiClient: CommunityApiClient,
   private val workloadPointsRepository: WorkloadPointsRepository,
-  private val getSentenceService: GetSentenceService,
   private val caseDetailsRepository: CaseDetailsRepository,
   private val getWeeklyHours: GetWeeklyHours,
   private val getEventManager: JpaBasedGetEventManager,
@@ -61,43 +58,44 @@ class GetOffenderManagerService(
     return caseCalculator.getPointsForCase(case)
   } ?: BigInteger.ZERO
 
-  private fun getDefaultOffenderManagerOverview(staffCode: String, grade: String): OffenderManagerOverview {
+  private fun getDefaultOffenderManagerOverview(staffCode: String, grade: String): OverviewOffenderManager {
     val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
     val availablePoints = workloadPoints.getDefaultPointsAvailable(grade)
     val defaultContractedHours = workloadPoints.getDefaultContractedHours(grade)
 
-    val overview = OffenderManagerOverview(0, 0, availablePoints.toBigInteger(), BigInteger.ZERO, staffCode, LocalDateTime.now(), -1, BigInteger.ZERO)
+    val overview = OverviewOffenderManager(0, 0, availablePoints.toBigInteger(), BigInteger.ZERO, staffCode, LocalDateTime.now(), -1, BigInteger.ZERO)
     overview.capacity = calculateCapacity(overview.totalPoints, overview.availablePoints)
     overview.contractedHours = defaultContractedHours
     overview.grade = grade
     return overview
   }
 
-  fun getOverview(staffIdentifier: StaffIdentifier): OffenderManagerOverview? =
-    communityApiClient.getStaffByCode(staffIdentifier.staffCode).map { staff ->
-      val overview = findOffenderManagerOverview(staffIdentifier, staff.grade)
-      if (overview.hasWorkload) {
-        overview.nextReductionChange = getReductionService.findNextReductionChange(staffIdentifier)
-        overview.reductionHours = getReductionService.findReductionHours(staffIdentifier)
-        overview.contractedHours = getWeeklyHours.findWeeklyHours(staffIdentifier, staff.grade)
-        offenderManagerRepository.findByCaseloadTotals(overview.workloadOwnerId).let { totals ->
-          overview.tierCaseTotals = totals.map { total -> TierCaseTotals(total.getATotal(), total.getBTotal(), total.getCTotal(), total.getDTotal(), total.untiered) }
-            .fold(TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)) { first, second -> TierCaseTotals(first.A.add(second.A), first.B.add(second.B), first.C.add(second.C), first.D.add(second.D), first.untiered.add(second.untiered)) }
-        }
-        offenderManagerRepository.findCasesByTeamCodeAndStaffCode(staffIdentifier.staffCode, staffIdentifier.teamCode).let { cases ->
-          overview.caseEndDue = getSentenceService.getCasesDueToEndCount(cases)
-          overview.releasesDue = getSentenceService.getCasesDueToBeReleases(cases)
-        }
-      }
-      overview.forename = staff.staff.forenames
-      overview.surname = staff.staff.surname
-      overview.grade = staff.grade
-      overview.email = staff.email
-      overview.lastAllocatedEvent = getEventManager.findLatestByStaffAndTeam(staffIdentifier)
-      overview
-    }.block()
+  fun getOverview(staffIdentifier: StaffIdentifier): OffenderManagerOverview? {
+    val officerView = workforceAllocationsToDeliusApiClient.getOfficerView(staffIdentifier.staffCode).block()
+    val overview = findOffenderManagerOverview(staffIdentifier, officerView.grade)
+    overview.caseEndDue = officerView.casesDueToEndInNext4Weeks
+    overview.releasesDue = officerView.releasesWithinNext4Weeks
+    overview.forename = officerView.name.forename
+    overview.surname = officerView.name.surname
+    overview.grade = officerView.grade
+    overview.email = officerView.email
+    overview.lastAllocatedEvent = getEventManager.findLatestByStaffAndTeam(staffIdentifier)
 
-  fun findOffenderManagerOverview(staffIdentifier: StaffIdentifier, grade: String): OffenderManagerOverview = offenderManagerRepository.findByOverview(staffIdentifier.teamCode, staffIdentifier.staffCode)?.let {
+    if (overview.hasWorkload) {
+      overview.nextReductionChange = getReductionService.findNextReductionChange(staffIdentifier)
+      overview.reductionHours = getReductionService.findReductionHours(staffIdentifier)
+      overview.contractedHours = getWeeklyHours.findWeeklyHours(staffIdentifier, overview.grade)
+      offenderManagerRepository.findByCaseloadTotals(overview.workloadOwnerId).let { totals ->
+        overview.tierCaseTotals = totals.map { total ->
+          TierCaseTotals(total.getATotal(), total.getBTotal(), total.getCTotal(), total.getDTotal(), total.untiered)
+        }
+          .fold(TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)) { first, second -> TierCaseTotals(first.A.add(second.A), first.B.add(second.B), first.C.add(second.C), first.D.add(second.D), first.untiered.add(second.untiered)) }
+      }
+    }
+    return OffenderManagerOverview.from(overview)
+  }
+
+  fun findOffenderManagerOverview(staffIdentifier: StaffIdentifier, grade: String): OverviewOffenderManager = offenderManagerRepository.findByOverview(staffIdentifier.teamCode, staffIdentifier.staffCode)?.let {
     it.capacity = calculateCapacity(it.totalPoints, it.availablePoints)
     it.grade = grade
     it.hasWorkload = true
