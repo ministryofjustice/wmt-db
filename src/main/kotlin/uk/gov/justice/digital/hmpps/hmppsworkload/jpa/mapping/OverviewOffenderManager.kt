@@ -23,8 +23,6 @@ data class OverviewOffenderManager(
   var reductionHours: BigDecimal = BigDecimal.ZERO
   var contractedHours: BigDecimal = BigDecimal.ZERO
   var tierCaseTotals: TierCaseTotals = TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)
-  var caseEndDue = BigInteger.ZERO
-  var releasesDue = BigInteger.ZERO
   var grade = ""
   var lastAllocatedEvent: EventDetails? = null
   var email: String? = null
