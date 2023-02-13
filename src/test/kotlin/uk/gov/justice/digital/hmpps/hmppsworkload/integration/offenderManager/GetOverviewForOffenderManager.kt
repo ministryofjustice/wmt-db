@@ -9,7 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.Reducti
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.ReductionReasonEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.TiersEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.WMTWorkloadEntity
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.CommunityApiExtension.Companion.communityApi
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.WorkforceAllocationsToDeliusExtension.Companion.workforceAllocationsToDelius
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionEntity
@@ -33,7 +33,7 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
   fun `can get overview for an offender manager`() {
     val teamCode = "T1"
     val offenderManagerCode = "OM1"
-    communityApi.staffCodeResponse(offenderManagerCode, teamCode)
+    workforceAllocationsToDelius.deliusStaffCodeResponse(offenderManagerCode)
     val wmtStaff = setupCurrentWmtStaff(offenderManagerCode, teamCode)
     val sentenceWithin30Days = SentenceEntity(BigInteger.TEN, "CRN3333", ZonedDateTime.now().minusMonths(2L), ZonedDateTime.now().plusDays(15L), "SP", null)
     sentenceRepository.save(sentenceWithin30Days)
@@ -140,7 +140,7 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
     val teamCode = "T1"
     val offenderManagerCode = "OM2"
     setupCurrentWmtStaff(offenderManagerCode, teamCode)
-    communityApi.staffCodeResponse(offenderManagerCode, teamCode)
+    workforceAllocationsToDelius.deliusStaffCodeResponse(offenderManagerCode)
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers/$offenderManagerCode")
       .headers {
@@ -160,7 +160,8 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
   fun `can get overview for an offender manager without workload`() {
     val teamCode = "T1"
     val offenderManagerCode = "NOWORKLOAD1"
-    communityApi.staffCodeResponse(offenderManagerCode, teamCode)
+    workforceAllocationsToDelius.deliusStaffCodeResponse(offenderManagerCode)
+
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers/$offenderManagerCode")
       .headers {
@@ -210,7 +211,7 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
   fun `can get overview for an offender manager without email`() {
     val teamCode = "T1"
     val offenderManagerCode = "NOWORKLOAD1"
-    communityApi.staffCodeResponse(offenderManagerCode, teamCode, "EX", null)
+    workforceAllocationsToDelius.deliusStaffCodeResponse(offenderManagerCode, email = null)
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers/$offenderManagerCode")
       .headers {
@@ -232,7 +233,8 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
   fun `get last allocated event`() {
     val teamCode = "T1"
     val offenderManagerCode = "NOWORKLOAD1"
-    communityApi.staffCodeResponse(offenderManagerCode, teamCode)
+    workforceAllocationsToDelius.deliusStaffCodeResponse(offenderManagerCode)
+
     val eventManager = eventManagerRepository.save(EventManagerEntity(crn = "CRN12345", eventId = BigInteger.TEN, staffId = BigInteger.ONE, staffCode = offenderManagerCode, teamCode = teamCode, createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = null))
     val storedEventManager = eventManagerRepository.findByIdOrNull(eventManager.id!!)!!
     val caseDetails = caseDetailsRepository.save(CaseDetailsEntity(storedEventManager.crn, Tier.C3, CaseType.COMMUNITY, "Jane", "Doe"))
