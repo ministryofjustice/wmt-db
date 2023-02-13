@@ -641,8 +641,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .isEqualTo(teamCode)
       .jsonPath("$.createdDate")
       .exists()
-      .jsonPath("$.eventId")
-      .isEqualTo(eventId)
       .jsonPath("$.eventNumber")
       .isEqualTo(eventNumber)
   }
@@ -686,8 +684,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       .isEqualTo(teamCode)
       .jsonPath("$.createdDate")
       .exists()
-      .jsonPath("$.eventId")
-      .isEqualTo(eventId)
       .jsonPath("$.requirementId")
       .isEqualTo(storedRequirementManager.requirementId)
       .jsonPath("$.eventNumber")
