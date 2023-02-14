@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.domain
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import io.swagger.v3.oas.annotations.media.Schema
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OfficerView
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OverviewOffenderManager
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -47,27 +48,27 @@ data class OffenderManagerOverview @JsonCreator constructor(
   val lastAllocatedEvent: LastAllocatedEvent?
 ) {
   companion object {
-    fun from(offenderManagerOverview: OverviewOffenderManager): OffenderManagerOverview {
+    fun from(overviewOffenderManager: OverviewOffenderManager, officerView: OfficerView): OffenderManagerOverview {
       return OffenderManagerOverview(
-        offenderManagerOverview.forename,
-        offenderManagerOverview.surname,
-        offenderManagerOverview.grade,
-        offenderManagerOverview.capacity,
-        offenderManagerOverview.code,
-        offenderManagerOverview.email,
-        offenderManagerOverview.totalCommunityCases.plus(offenderManagerOverview.totalCustodyCases),
-        offenderManagerOverview.contractedHours,
-        offenderManagerOverview.reductionHours,
-        offenderManagerOverview.availablePoints,
-        offenderManagerOverview.totalPoints,
-        offenderManagerOverview.availablePoints.minus(offenderManagerOverview.totalPoints),
-        offenderManagerOverview.lastUpdatedOn,
-        offenderManagerOverview.nextReductionChange,
-        offenderManagerOverview.tierCaseTotals,
-        offenderManagerOverview.paroleReportsDue,
-        offenderManagerOverview.caseEndDue,
-        offenderManagerOverview.releasesDue,
-        offenderManagerOverview.lastAllocatedEvent?.let { LastAllocatedEvent.from(it) }
+        officerView.name.forename,
+        officerView.name.surname,
+        officerView.grade,
+        overviewOffenderManager.capacity,
+        overviewOffenderManager.code,
+        officerView.email,
+        overviewOffenderManager.totalCommunityCases.plus(overviewOffenderManager.totalCustodyCases),
+        overviewOffenderManager.contractedHours,
+        overviewOffenderManager.reductionHours,
+        overviewOffenderManager.availablePoints,
+        overviewOffenderManager.totalPoints,
+        overviewOffenderManager.availablePoints.minus(overviewOffenderManager.totalPoints),
+        overviewOffenderManager.lastUpdatedOn,
+        overviewOffenderManager.nextReductionChange,
+        overviewOffenderManager.tierCaseTotals,
+        overviewOffenderManager.paroleReportsDue,
+        officerView.casesDueToEndInNext4Weeks,
+        officerView.releasesWithinNext4Weeks,
+        overviewOffenderManager.lastAllocatedEvent?.let { LastAllocatedEvent.from(it) }
       )
     }
   }

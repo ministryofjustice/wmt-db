@@ -66,25 +66,18 @@ class GetOffenderManagerService(
     val overview = OverviewOffenderManager(0, 0, availablePoints.toBigInteger(), BigInteger.ZERO, staffCode, LocalDateTime.now(), -1, BigInteger.ZERO)
     overview.capacity = calculateCapacity(overview.totalPoints, overview.availablePoints)
     overview.contractedHours = defaultContractedHours
-    overview.grade = grade
     return overview
   }
 
   fun getOverview(staffIdentifier: StaffIdentifier): OffenderManagerOverview? {
     val officerView = workforceAllocationsToDeliusApiClient.getOfficerView(staffIdentifier.staffCode).block()
     val overview = findOffenderManagerOverview(staffIdentifier, officerView.grade)
-    overview.caseEndDue = officerView.casesDueToEndInNext4Weeks
-    overview.releasesDue = officerView.releasesWithinNext4Weeks
-    overview.forename = officerView.name.forename
-    overview.surname = officerView.name.surname
-    overview.grade = officerView.grade
-    overview.email = officerView.email
     overview.lastAllocatedEvent = getEventManager.findLatestByStaffAndTeam(staffIdentifier)
 
     if (overview.hasWorkload) {
       overview.nextReductionChange = getReductionService.findNextReductionChange(staffIdentifier)
       overview.reductionHours = getReductionService.findReductionHours(staffIdentifier)
-      overview.contractedHours = getWeeklyHours.findWeeklyHours(staffIdentifier, overview.grade)
+      overview.contractedHours = getWeeklyHours.findWeeklyHours(staffIdentifier, officerView.grade)
       offenderManagerRepository.findByCaseloadTotals(overview.workloadOwnerId).let { totals ->
         overview.tierCaseTotals = totals.map { total ->
           TierCaseTotals(total.getATotal(), total.getBTotal(), total.getCTotal(), total.getDTotal(), total.untiered)
@@ -92,12 +85,11 @@ class GetOffenderManagerService(
           .fold(TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)) { first, second -> TierCaseTotals(first.A.add(second.A), first.B.add(second.B), first.C.add(second.C), first.D.add(second.D), first.untiered.add(second.untiered)) }
       }
     }
-    return OffenderManagerOverview.from(overview)
+    return OffenderManagerOverview.from(overview, officerView)
   }
 
   fun findOffenderManagerOverview(staffIdentifier: StaffIdentifier, grade: String): OverviewOffenderManager = offenderManagerRepository.findByOverview(staffIdentifier.teamCode, staffIdentifier.staffCode)?.let {
     it.capacity = calculateCapacity(it.totalPoints, it.availablePoints)
-    it.grade = grade
     it.hasWorkload = true
     it
   } ?: getDefaultOffenderManagerOverview(staffIdentifier.staffCode, grade)
