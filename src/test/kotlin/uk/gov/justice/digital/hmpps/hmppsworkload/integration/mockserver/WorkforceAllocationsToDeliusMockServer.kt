@@ -139,4 +139,11 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
         .withContentType(MediaType.APPLICATION_JSON).withBody(officerOverviewResponse(staffCode, staffGrade, email))
     )
   }
+
+  fun officerViewErrorResponse(staffCode: String) {
+    val request = HttpRequest.request().withPath("/staff/$staffCode/officer-view")
+    workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
+      HttpResponse.response().withStatusCode(503)
+    )
+  }
 }
