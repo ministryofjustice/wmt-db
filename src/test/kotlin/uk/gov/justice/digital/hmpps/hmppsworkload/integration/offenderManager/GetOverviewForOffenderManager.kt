@@ -14,13 +14,11 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.SentenceEntity
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZoneOffset
-import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 class GetOverviewForOffenderManager : IntegrationTestBase() {
@@ -35,13 +33,9 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
     val offenderManagerCode = "OM1"
     workforceAllocationsToDelius.deliusStaffCodeResponse(offenderManagerCode)
     val wmtStaff = setupCurrentWmtStaff(offenderManagerCode, teamCode)
-    val sentenceWithin30Days = SentenceEntity(BigInteger.TEN, "CRN3333", ZonedDateTime.now().minusMonths(2L), ZonedDateTime.now().plusDays(15L), "SP", null)
-    sentenceRepository.save(sentenceWithin30Days)
-    val sentenceAfter30Days = SentenceEntity(BigInteger.ONE, "CRN2222", ZonedDateTime.now().minusMonths(2L), ZonedDateTime.now().plusDays(45L), "SC", ZonedDateTime.now().plusDays(15L))
-    sentenceRepository.save(sentenceAfter30Days)
 
-    setupWmtManagedCase(wmtStaff, Tier.A2, sentenceWithin30Days.crn, CaseType.COMMUNITY)
-    setupWmtManagedCase(wmtStaff, Tier.D2, sentenceAfter30Days.crn, CaseType.CUSTODY)
+    setupWmtManagedCase(wmtStaff, Tier.A2, "CRN3333", CaseType.COMMUNITY)
+    setupWmtManagedCase(wmtStaff, Tier.D2, "CRN2222", CaseType.CUSTODY)
 
     val reductionCategory = reductionCategoryRepository.save(ReductionCategoryEntity())
     val reductionReason = reductionReasonRepository.save(ReductionReasonEntity(reductionCategoryEntity = reductionCategory))
