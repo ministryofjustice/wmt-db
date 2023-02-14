@@ -9,15 +9,15 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.core.publisher.Mono
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.MissingStaffError
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToDeliusApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffSummary
 import javax.persistence.EntityNotFoundException
 
 @RestController
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
-class StaffController(private val communityApiClient: CommunityApiClient) {
+class StaffController(private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient) {
 
   @Operation(summary = "Get Staff by Code")
   @ApiResponses(
@@ -29,10 +29,10 @@ class StaffController(private val communityApiClient: CommunityApiClient) {
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/staff/code/{staffCode}")
   fun getStaffById(@PathVariable(required = true) staffCode: String): Mono<StaffSummary> =
-    communityApiClient.getStaffByCode(staffCode)
+    workforceAllocationsToDeliusApiClient.getOfficerView(staffCode)
       .onErrorMap { ex ->
         when (ex) {
-          is MissingStaffError -> EntityNotFoundException("staff not found for $staffCode")
+          is WebClientResponseException.NotFound -> EntityNotFoundException("staff not found for $staffCode")
           else -> ex
         }
       }

@@ -31,7 +31,7 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
   fun `can get overview for an offender manager`() {
     val teamCode = "T1"
     val offenderManagerCode = "OM1"
-    workforceAllocationsToDelius.deliusStaffCodeResponse(offenderManagerCode)
+    workforceAllocationsToDelius.officerViewResponse(offenderManagerCode)
     val wmtStaff = setupCurrentWmtStaff(offenderManagerCode, teamCode)
 
     setupWmtManagedCase(wmtStaff, Tier.A2, "CRN3333", CaseType.COMMUNITY)
@@ -134,7 +134,7 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
     val teamCode = "T1"
     val offenderManagerCode = "OM2"
     setupCurrentWmtStaff(offenderManagerCode, teamCode)
-    workforceAllocationsToDelius.deliusStaffCodeResponse(offenderManagerCode)
+    workforceAllocationsToDelius.officerViewResponse(offenderManagerCode)
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers/$offenderManagerCode")
       .headers {
@@ -154,7 +154,7 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
   fun `can get overview for an offender manager without workload`() {
     val teamCode = "T1"
     val offenderManagerCode = "NOWORKLOAD1"
-    workforceAllocationsToDelius.deliusStaffCodeResponse(offenderManagerCode)
+    workforceAllocationsToDelius.officerViewResponse(offenderManagerCode)
 
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers/$offenderManagerCode")
@@ -205,7 +205,7 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
   fun `can get overview for an offender manager without email`() {
     val teamCode = "T1"
     val offenderManagerCode = "NOWORKLOAD1"
-    workforceAllocationsToDelius.deliusStaffCodeResponse(offenderManagerCode, email = null)
+    workforceAllocationsToDelius.officerViewResponse(offenderManagerCode, email = null)
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers/$offenderManagerCode")
       .headers {
@@ -227,7 +227,7 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
   fun `get last allocated event`() {
     val teamCode = "T1"
     val offenderManagerCode = "NOWORKLOAD1"
-    workforceAllocationsToDelius.deliusStaffCodeResponse(offenderManagerCode)
+    workforceAllocationsToDelius.officerViewResponse(offenderManagerCode)
 
     val eventManager = eventManagerRepository.save(EventManagerEntity(crn = "CRN12345", eventId = BigInteger.TEN, staffId = BigInteger.ONE, staffCode = offenderManagerCode, teamCode = teamCode, createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = null))
     val storedEventManager = eventManagerRepository.findByIdOrNull(eventManager.id!!)!!
