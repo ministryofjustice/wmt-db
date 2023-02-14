@@ -17,7 +17,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadCalculation
 import uk.gov.justice.digital.hmpps.hmppsworkload.listener.AdditionalInformation
 import uk.gov.justice.digital.hmpps.hmppsworkload.listener.WorkloadCalculationEvent
 import java.math.BigDecimal
-import java.math.BigInteger
 import java.time.LocalDateTime
 
 class WorkloadCalculationListenerTests : IntegrationTestBase() {
@@ -34,7 +33,7 @@ class WorkloadCalculationListenerTests : IntegrationTestBase() {
 
     workforceAllocationsToDelius.officerViewResponse(staffCode)
     communityApi.staffCodeResponse(staffCode, teamCode)
-    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", providerCode = "providerCode", isActive = true))
+    personManagerRepository.save(PersonManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", isActive = true))
 
     hmppsDomainSnsClient.publish(
       PublishRequest(hmppsDomainTopicArn, jsonString(staffAvailableHoursChangedEvent(staffCode, teamCode, availableHours))).withMessageAttributes(
@@ -66,7 +65,7 @@ class WorkloadCalculationListenerTests : IntegrationTestBase() {
     caseDetailsRepository.save(caseDetailsEntity)
 
     workforceAllocationsToDelius.officerViewErrorResponse(staffCode)
-    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", providerCode = "providerCode", isActive = true))
+    personManagerRepository.save(PersonManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", isActive = true))
 
     hmppsDomainSnsClient.publish(
       PublishRequest(hmppsDomainTopicArn, jsonString(staffAvailableHoursChangedEvent(staffCode, teamCode, availableHours))).withMessageAttributes(

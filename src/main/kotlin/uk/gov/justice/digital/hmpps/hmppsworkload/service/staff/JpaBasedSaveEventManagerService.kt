@@ -39,12 +39,10 @@ class JpaBasedSaveEventManagerService(
   ): SaveResult<EventManagerEntity> {
     val eventManagerEntity = EventManagerEntity(
       crn = allocateCase.crn,
-      staffId = deliusStaff.staffIdentifier,
       staffCode = deliusStaff.staffCode,
       teamCode = teamCode,
       eventId = allocateCase.eventId,
       createdBy = loggedInUser,
-      providerCode = deliusStaff.probationArea!!.code,
       isActive = true,
       eventNumber = allocateCase.eventNumber
     )

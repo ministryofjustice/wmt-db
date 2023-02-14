@@ -45,13 +45,11 @@ class JpaBasedSaveRequirementManagerService(
   ): SaveResult<RequirementManagerEntity> {
     val requirementManagerEntity = RequirementManagerEntity(
       crn = allocateCase.crn,
-      staffId = deliusStaff.staffIdentifier,
       staffCode = deliusStaff.staffCode,
       teamCode = teamCode,
       eventId = allocateCase.eventId,
       requirementId = requirement.requirementId,
       createdBy = loggedInUser,
-      providerCode = deliusStaff.probationArea!!.code,
       isActive = true,
       eventNumber = allocateCase.eventNumber
     )

@@ -45,11 +45,9 @@ class JpaBasedSavePersonManagerService(
   ): SaveResult<PersonManagerEntity> {
     val personManagerEntity = PersonManagerEntity(
       crn = crn,
-      staffId = deliusStaff.staffIdentifier,
       staffCode = deliusStaff.staffCode,
       teamCode = teamCode,
       createdBy = loggedInUser,
-      providerCode = deliusStaff.probationArea!!.code,
       isActive = true
     )
     personManagerRepository.save(personManagerEntity)

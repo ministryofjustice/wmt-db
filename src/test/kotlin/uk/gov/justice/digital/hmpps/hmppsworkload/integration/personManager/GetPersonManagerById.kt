@@ -4,14 +4,13 @@ import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.CommunityApiExtension.Companion.communityApi
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
-import java.math.BigInteger
 import java.util.UUID
 
 class GetPersonManagerById : IntegrationTestBase() {
 
   @Test
   fun `can get person manager by Id`() {
-    val storedPersonManager = PersonManagerEntity(crn = "CRN1", staffId = BigInteger.valueOf(123456789L), staffCode = "OM1", teamCode = "T1", createdBy = "USER1", providerCode = "PV1", isActive = true)
+    val storedPersonManager = PersonManagerEntity(crn = "CRN1", staffCode = "OM1", teamCode = "T1", createdBy = "USER1", isActive = true)
     personManagerRepository.save(storedPersonManager)
     communityApi.staffCodeResponse(storedPersonManager.staffCode, storedPersonManager.teamCode)
     webTestClient.get()

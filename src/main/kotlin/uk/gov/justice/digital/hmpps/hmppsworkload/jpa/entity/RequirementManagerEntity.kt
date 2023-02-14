@@ -35,13 +35,7 @@ data class RequirementManagerEntity(
   val requirementId: BigInteger,
 
   @Column
-  val staffId: BigInteger,
-
-  @Column
   val staffCode: String,
-
-  @Column
-  val teamId: BigInteger? = null,
 
   @Column
   val teamCode: String,
@@ -52,9 +46,6 @@ data class RequirementManagerEntity(
   @Column
   @CreatedDate
   var createdDate: ZonedDateTime? = null,
-
-  @Column
-  var providerCode: String,
 
   @Column
   var isActive: Boolean,

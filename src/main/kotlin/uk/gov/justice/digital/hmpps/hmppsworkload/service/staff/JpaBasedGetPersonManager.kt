@@ -22,7 +22,7 @@ class JpaBasedGetPersonManager(
     val personManager = personManagerRepository.findFirstByCrnOrderByCreatedDateDesc(crn)
     if (personManager != null) {
       val staff = communityApiClient.getStaffByCode(personManager.staffCode).block()
-      return PersonManager(personManager.staffCode, personManager.teamCode, personManager.providerCode, staff!!.grade)
+      return PersonManager(personManager.staffCode, personManager.teamCode, staff!!.grade)
     }
     return null
   }

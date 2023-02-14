@@ -7,7 +7,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBas
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.WorkforceAllocationsToDeliusExtension.Companion.workforceAllocationsToDelius
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
-import java.math.BigInteger
 import java.time.ZonedDateTime
 
 class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
@@ -27,16 +26,16 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
     val secondOm = secondWmtStaff.offenderManager.code
     val noWorkloadStaffCode = "NOWORKLOAD1"
 
-    val storedPersonManager = PersonManagerEntity(crn = "CRN5", staffId = BigInteger.valueOf(123456789L), staffCode = firstOm, teamCode = teamCode, createdBy = "USER1", providerCode = "R1", isActive = true)
+    val storedPersonManager = PersonManagerEntity(crn = "CRN5", staffCode = firstOm, teamCode = teamCode, createdBy = "USER1", isActive = true)
     personManagerRepository.save(storedPersonManager)
 
-    val movedPersonManager = PersonManagerEntity(crn = "CRN3", staffId = BigInteger.valueOf(123456789L), staffCode = firstOm, teamCode = teamCode, createdBy = "USER1", providerCode = "R1", createdDate = ZonedDateTime.now().minusDays(5L), isActive = false)
+    val movedPersonManager = PersonManagerEntity(crn = "CRN3", staffCode = firstOm, teamCode = teamCode, createdBy = "USER1", createdDate = ZonedDateTime.now().minusDays(5L), isActive = false)
     personManagerRepository.save(movedPersonManager)
 
-    val newPersonManager = PersonManagerEntity(crn = "CRN3", staffId = BigInteger.valueOf(56789321L), staffCode = secondOm, teamCode = teamCode2, createdBy = "USER2", providerCode = "R1", createdDate = ZonedDateTime.now().minusDays(2L), isActive = true)
+    val newPersonManager = PersonManagerEntity(crn = "CRN3", staffCode = secondOm, teamCode = teamCode2, createdBy = "USER2", createdDate = ZonedDateTime.now().minusDays(2L), isActive = true)
     personManagerRepository.save(newPersonManager)
 
-    val personManagerWithNoWorkload = PersonManagerEntity(crn = "CRN4", staffId = BigInteger.valueOf(56789321L), staffCode = noWorkloadStaffCode, teamCode = "T1", createdBy = "USER2", providerCode = "R1", createdDate = ZonedDateTime.now().minusDays(2L), isActive = true)
+    val personManagerWithNoWorkload = PersonManagerEntity(crn = "CRN4", staffCode = noWorkloadStaffCode, teamCode = "T1", createdBy = "USER2", createdDate = ZonedDateTime.now().minusDays(2L), isActive = true)
     personManagerRepository.save(personManagerWithNoWorkload)
 
     webTestClient.get()
@@ -174,10 +173,10 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Don", "Cole"))
     workforceAllocationsToDelius.choosePractitionerByTeamCodesResponse(listOf(teamCode), crn)
 
-    val movedPersonManager = PersonManagerEntity(crn = "CRN3", staffId = BigInteger.valueOf(123456789L), staffCode = staffCode, teamCode = teamCode, createdBy = "USER1", providerCode = "R1", isActive = false)
+    val movedPersonManager = PersonManagerEntity(crn = "CRN3", staffCode = staffCode, teamCode = teamCode, createdBy = "USER1", isActive = false)
     personManagerRepository.save(movedPersonManager)
 
-    val newPersonManager = PersonManagerEntity(crn = "CRN3", staffId = BigInteger.valueOf(56789321L), staffCode = "STAFF2", teamCode = "TEAM2", createdBy = "USER2", providerCode = "R1", isActive = true)
+    val newPersonManager = PersonManagerEntity(crn = "CRN3", staffCode = "STAFF2", teamCode = "TEAM2", createdBy = "USER2", isActive = true)
     personManagerRepository.save(newPersonManager)
 
     webTestClient.get()
@@ -227,7 +226,7 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
 
     val firstOm = firstWmtStaff.offenderManager.code
 
-    val storedPersonManager = PersonManagerEntity(crn = "CRN1", staffId = BigInteger.valueOf(123456789L), staffCode = firstOm, teamCode = teamCode, createdBy = "USER1", providerCode = "R1", isActive = true)
+    val storedPersonManager = PersonManagerEntity(crn = "CRN1", staffCode = firstOm, teamCode = teamCode, createdBy = "USER1", isActive = true)
     personManagerRepository.save(storedPersonManager)
 
     webTestClient.get()
@@ -255,7 +254,7 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
 
     val firstOm = firstWmtStaff.offenderManager.code
 
-    val storedPersonManager = PersonManagerEntity(crn = "CRN1", staffId = BigInteger.valueOf(123456789L), staffCode = firstOm, teamCode = teamCode, createdBy = "USER1", providerCode = "R1", isActive = true)
+    val storedPersonManager = PersonManagerEntity(crn = "CRN1", staffCode = firstOm, teamCode = teamCode, createdBy = "USER1", isActive = true)
     personManagerRepository.save(storedPersonManager)
 
     webTestClient.get()
@@ -286,7 +285,7 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
 
     val firstOm = firstWmtStaff.offenderManager.code
 
-    val storedPersonManager = PersonManagerEntity(crn = "CRN1", staffId = BigInteger.valueOf(123456789L), staffCode = firstOm, teamCode = teamCode, createdBy = "USER1", providerCode = "R1", isActive = true)
+    val storedPersonManager = PersonManagerEntity(crn = "CRN1", staffCode = firstOm, teamCode = teamCode, createdBy = "USER1", isActive = true)
     personManagerRepository.save(storedPersonManager)
 
     webTestClient.get()
