@@ -16,7 +16,7 @@ private const val TEAM_CODE = "teamCode"
 
 private const val PROVIDER_CODE = "providerCode"
 
-private const val STAFF_ID = "staffId"
+private const val STAFF_CODE = "staffCode"
 
 private const val EVENT_ID = "eventId"
 
@@ -29,8 +29,7 @@ class TelemetryService(@Autowired private val telemetryClient: TelemetryClient) 
       mapOf(
         CRN to personManagerEntity.crn,
         TEAM_CODE to personManagerEntity.teamCode,
-        PROVIDER_CODE to personManagerEntity.providerCode,
-        STAFF_ID to personManagerEntity.staffId.toString(10),
+        STAFF_CODE to personManagerEntity.staffCode,
         "wmtPeriod" to getWmtPeriod(LocalDateTime.now())
       )
     )
@@ -42,8 +41,7 @@ class TelemetryService(@Autowired private val telemetryClient: TelemetryClient) 
       mapOf(
         CRN to eventManagerEntity.crn,
         TEAM_CODE to eventManagerEntity.teamCode,
-        PROVIDER_CODE to eventManagerEntity.providerCode,
-        STAFF_ID to eventManagerEntity.staffId.toString(10),
+        STAFF_CODE to eventManagerEntity.staffCode,
         EVENT_ID to eventManagerEntity.eventId.toString(10)
       )
     )
@@ -55,8 +53,7 @@ class TelemetryService(@Autowired private val telemetryClient: TelemetryClient) 
       mapOf(
         CRN to requirementManagerEntity.crn,
         TEAM_CODE to requirementManagerEntity.teamCode,
-        PROVIDER_CODE to requirementManagerEntity.providerCode,
-        STAFF_ID to requirementManagerEntity.staffId.toString(10),
+        STAFF_CODE to requirementManagerEntity.staffCode,
         EVENT_ID to requirementManagerEntity.eventId.toString(10),
         "requirementId" to requirementManagerEntity.requirementId.toString(10)
       )

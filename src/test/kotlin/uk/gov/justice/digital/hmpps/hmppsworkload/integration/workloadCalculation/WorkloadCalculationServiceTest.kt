@@ -117,10 +117,9 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
   fun `must include caseload count in breakdown`() {
     val staffCode = "STAFF1"
     val teamCode = "TM1"
-    val providerCode = "SC1"
     val staffGrade = "PO"
 
-    personManagerRepository.save(PersonManagerEntity(crn = "CRN1", staffId = BigInteger.ONE, staffCode = staffCode, teamCode = teamCode, createdBy = "USER", providerCode = providerCode, isActive = true))
+    personManagerRepository.save(PersonManagerEntity(crn = "CRN1", staffCode = staffCode, teamCode = teamCode, createdBy = "USER", isActive = true))
 
     caseDetailsRepository.save(CaseDetailsEntity("CRN1", Tier.B2, CaseType.COMMUNITY, "Jane", "Doe"))
 

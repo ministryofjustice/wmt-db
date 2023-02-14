@@ -35,6 +35,7 @@ generic-prometheus-alerts:
     - "Digital-Prison-Services-prod-workload_prisoner_hmpps_dlq"
     - "manage-a-workforce-production-hmpps_extract_placed_dlq"
     - "manage-a-workforce-production-hmpps_reductions_completed_event_dlq"
+    - "probation-integration-prod-workforce-allocations-to-delius-dlq"
   sqsAlertsOldestThreshold: 2
   sqsAlertsTotalMessagesThreshold: 1
   runbookUrl: https://dsdmoj.atlassian.net/wiki/spaces/MaS/pages/3533964702/WMT+Run+book

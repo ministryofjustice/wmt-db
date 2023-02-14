@@ -11,7 +11,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBas
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetCombinedCaseload
-import java.math.BigInteger
 
 class GetCaseloadTest : IntegrationTestBase() {
 
@@ -35,8 +34,8 @@ class GetCaseloadTest : IntegrationTestBase() {
     personManagerRepository.save(
       PersonManagerEntity(
         crn = realtimeCase.crn, staffCode = staffCode,
-        teamCode = teamCode, staffId = BigInteger.TEN, createdBy = "createdBy",
-        providerCode = "providerCode", isActive = true
+        teamCode = teamCode, createdBy = "createdBy",
+        isActive = true
       )
     )
 

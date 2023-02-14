@@ -124,8 +124,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
         mapOf(
           "crn" to crn,
           "teamCode" to teamCode,
-          "providerCode" to "N01",
-          "staffId" to "123456",
+          "staffCode" to staffCode,
           "wmtPeriod" to getWmtPeriod(LocalDateTime.now())
         ),
         null
@@ -246,11 +245,11 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     communityApi.staffCodeResponse(staffCode, teamCode)
     communityApi.offenderSummaryResponse(crn)
     communityApi.singleActiveRequirementResponse(crn, eventId, requirementId)
-    val storedPersonManager = PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, createdBy = "USER1", providerCode = "PV1", isActive = true)
+    val storedPersonManager = PersonManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, createdBy = "USER1", isActive = true)
     personManagerRepository.save(storedPersonManager)
-    val storedEventManager = EventManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, eventId = eventId, createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = eventNumber)
+    val storedEventManager = EventManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, eventId = eventId, createdBy = "USER1", isActive = true, eventNumber = eventNumber)
     eventManagerRepository.save(storedEventManager)
-    val storedRequirementManager = RequirementManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, eventId = eventId, requirementId = requirementId, createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = eventNumber)
+    val storedRequirementManager = RequirementManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, eventId = eventId, requirementId = requirementId, createdBy = "USER1", isActive = true, eventNumber = eventNumber)
     requirementManagerRepository.save(storedRequirementManager)
 
     webTestClient.post()
@@ -277,10 +276,10 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     communityApi.staffCodeResponse(staffCode, teamCode)
     communityApi.offenderSummaryResponse(crn)
     communityApi.singleActiveUnpaidRequirementResponse(crn, eventId)
-    val otherPersonManager = PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", createdBy = "USER1", providerCode = "PV1", isActive = true)
+    val otherPersonManager = PersonManagerEntity(crn = crn, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", createdBy = "USER1", isActive = true)
     communityApi.staffCodeResponse(otherPersonManager.staffCode, otherPersonManager.teamCode)
     val storedPersonManager = personManagerRepository.save(otherPersonManager)
-    val storedEventManager = eventManagerRepository.save(EventManagerEntity(crn = crn, eventId = eventId, staffId = BigInteger.ONE, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = eventNumber))
+    val storedEventManager = eventManagerRepository.save(EventManagerEntity(crn = crn, eventId = eventId, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", createdBy = "USER1", isActive = true, eventNumber = eventNumber))
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
@@ -515,8 +514,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
         mapOf(
           "crn" to crn,
           "teamCode" to teamCode,
-          "providerCode" to "N01",
-          "staffId" to "123456",
+          "staffCode" to staffCode,
           "wmtPeriod" to getWmtPeriod(LocalDateTime.now())
         ),
         null

@@ -29,16 +29,10 @@ data class EventManagerEntity(
   val crn: String,
 
   @Column
-  val staffId: BigInteger,
-
-  @Column
   val eventId: BigInteger,
 
   @Column
   val staffCode: String,
-
-  @Column
-  val teamId: BigInteger? = null,
 
   @Column
   val teamCode: String,
@@ -49,9 +43,6 @@ data class EventManagerEntity(
   @Column
   @CreatedDate
   var createdDate: ZonedDateTime? = null,
-
-  @Column
-  var providerCode: String,
 
   @Column
   var isActive: Boolean,

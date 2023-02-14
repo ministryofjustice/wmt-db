@@ -229,7 +229,7 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
     val offenderManagerCode = "NOWORKLOAD1"
     workforceAllocationsToDelius.officerViewResponse(offenderManagerCode)
 
-    val eventManager = eventManagerRepository.save(EventManagerEntity(crn = "CRN12345", eventId = BigInteger.TEN, staffId = BigInteger.ONE, staffCode = offenderManagerCode, teamCode = teamCode, createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = null))
+    val eventManager = eventManagerRepository.save(EventManagerEntity(crn = "CRN12345", eventId = BigInteger.TEN, staffCode = offenderManagerCode, teamCode = teamCode, createdBy = "USER1", isActive = true, eventNumber = null))
     val storedEventManager = eventManagerRepository.findByIdOrNull(eventManager.id!!)!!
     val caseDetails = caseDetailsRepository.save(CaseDetailsEntity(storedEventManager.crn, Tier.C3, CaseType.COMMUNITY, "Jane", "Doe"))
     webTestClient.get()

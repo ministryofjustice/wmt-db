@@ -15,7 +15,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadCalculationEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.listener.WorkloadPrisonerEvent
 import java.math.BigDecimal
-import java.math.BigInteger
 import java.time.LocalDateTime
 
 class WorkloadPrisonerListenerTests : IntegrationTestBase() {
@@ -33,7 +32,7 @@ class WorkloadPrisonerListenerTests : IntegrationTestBase() {
 
     communityApi.staffCodeResponse(staffCode, teamCode)
     communityApi.nomsLookupRespond(crn, nomsNumber)
-    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", providerCode = "providerCode", isActive = true))
+    personManagerRepository.save(PersonManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", isActive = true))
 
     hmppsDomainSnsClient.publish(
       PublishRequest(hmppsDomainTopicArn, jsonString(prisonerEvent(nomsNumber))).withMessageAttributes(

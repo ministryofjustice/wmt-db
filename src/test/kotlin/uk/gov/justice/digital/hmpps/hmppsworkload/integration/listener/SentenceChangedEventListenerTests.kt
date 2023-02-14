@@ -69,13 +69,12 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     val crn = "J678910"
     val staffCode = "staff1"
     val teamCode = "team1"
-    val staffId = BigInteger.ONE
 
     communityApi.singleActiveConvictionResponse(crn)
     hmppsTier.tierCalculationResponse(crn)
     communityApi.offenderSummaryResponse(crn)
     communityApi.staffCodeResponse(staffCode, teamCode)
-    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", providerCode = "providerCode", isActive = true))
+    personManagerRepository.save(PersonManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", isActive = true))
 
     hmppsOffenderSnsClient.publish(
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
@@ -101,7 +100,6 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     val crn = "J678910"
     val staffCode = "staff1"
     val teamCode = "team1"
-    val staffId = BigInteger.ONE
 
     communityApi.singleActiveConvictionResponse(crn)
     communityApi.offenderSummaryResponse(crn)
@@ -111,7 +109,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     communityApi.offenderSummaryResponse(crn)
     hmppsTier.tierCalculationResponse(crn, Tier.C3.name)
 
-    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", providerCode = "providerCode", isActive = true))
+    personManagerRepository.save(PersonManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", isActive = true))
 
     communityApi.staffCodeResponse(staffCode, teamCode)
     communityApi.staffCodeResponse(staffCode, teamCode)
@@ -158,9 +156,9 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     val crn = "J678910"
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.C1, CaseType.COMMUNITY, "Jane", "Doe"))
 
-    val personManagerEntity = personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = BigInteger.ONE, staffCode = "STFFCDE", teamCode = "TM1", createdBy = "USER1", providerCode = "PV1", isActive = true))
-    val eventManagerEntity = eventManagerRepository.save(EventManagerEntity(crn = crn, eventId = BigInteger.TEN, staffId = BigInteger.ONE, staffCode = "STFFCDE", teamCode = "TM1", createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = null))
-    val requirementManagerEntity = requirementManagerRepository.save(RequirementManagerEntity(crn = crn, eventId = BigInteger.TEN, requirementId = BigInteger.TWO, staffId = BigInteger.ONE, staffCode = "STFFCDE", teamCode = "TM1", createdBy = "USER1", providerCode = "PV1", isActive = true, eventNumber = null))
+    val personManagerEntity = personManagerRepository.save(PersonManagerEntity(crn = crn, staffCode = "STFFCDE", teamCode = "TM1", createdBy = "USER1", isActive = true))
+    val eventManagerEntity = eventManagerRepository.save(EventManagerEntity(crn = crn, eventId = BigInteger.TEN, staffCode = "STFFCDE", teamCode = "TM1", createdBy = "USER1", isActive = true, eventNumber = null))
+    val requirementManagerEntity = requirementManagerRepository.save(RequirementManagerEntity(crn = crn, eventId = BigInteger.TEN, requirementId = BigInteger.TWO, staffCode = "STFFCDE", teamCode = "TM1", createdBy = "USER1", isActive = true, eventNumber = null))
 
     communityApi.singleInactiveConvictionsResponse(crn)
     communityApi.offenderSummaryResponse(crn)
@@ -189,7 +187,6 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     val crn = "J678910"
     val staffCode = "staff1"
     val teamCode = "team1"
-    val staffId = BigInteger.ONE
 
     communityApi.singleActiveConvictionResponse(crn)
     communityApi.offenderSummaryResponse(crn)
@@ -197,7 +194,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
 
     val caseDetailsEntity = CaseDetailsEntity(crn, Tier.C3, CaseType.COMMUNITY, "Jane", "Doe")
     communityApi.staffCodeResponse(staffCode, teamCode)
-    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", providerCode = "providerCode", isActive = true))
+    personManagerRepository.save(PersonManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", isActive = true))
     caseDetailsRepository.save(caseDetailsEntity)
 
     hmppsOffenderSnsClient.publish(
@@ -217,7 +214,6 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     val crn = "J678910"
     val staffCode = "staff1"
     val teamCode = "team1"
-    val staffId = BigInteger.ONE
 
     communityApi.singleActiveConvictionResponse(crn)
     communityApi.offenderSummaryResponse(crn)
@@ -228,7 +224,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     caseDetailsRepository.save(caseDetailsEntity)
 
     communityApi.staffCodeResponse(staffCode, teamCode)
-    personManagerRepository.save(PersonManagerEntity(crn = crn, staffId = staffId, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", providerCode = "providerCode", isActive = true))
+    personManagerRepository.save(PersonManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", isActive = true))
 
     hmppsOffenderSnsClient.publish(
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(

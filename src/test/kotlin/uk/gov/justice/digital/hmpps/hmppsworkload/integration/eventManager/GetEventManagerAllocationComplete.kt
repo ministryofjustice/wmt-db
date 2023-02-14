@@ -10,7 +10,7 @@ class GetEventManagerAllocationComplete : IntegrationTestBase() {
 
   @Test
   fun `can get allocation complete details by crn and event number`() {
-    val storedEventManager = EventManagerEntity(crn = "CRN1", staffId = BigInteger.valueOf(123456789L), staffCode = "OM1", teamCode = "T1", createdBy = "USER1", providerCode = "PV1", eventId = BigInteger.valueOf(567891234L), isActive = true, eventNumber = 2)
+    val storedEventManager = EventManagerEntity(crn = "CRN1", staffCode = "OM1", teamCode = "T1", createdBy = "USER1", eventId = BigInteger.valueOf(567891234L), isActive = true, eventNumber = 2)
     eventManagerRepository.save(storedEventManager)
 
     workforceAllocationsToDelius.allocationCompleteResponse(storedEventManager.crn, storedEventManager.eventNumber.toString(), storedEventManager.staffCode)

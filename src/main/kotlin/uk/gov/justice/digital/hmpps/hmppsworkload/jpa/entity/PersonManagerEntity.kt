@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity
 
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import java.math.BigInteger
 import java.time.ZonedDateTime
 import java.util.UUID
 import javax.persistence.Column
@@ -29,13 +28,7 @@ data class PersonManagerEntity(
   val crn: String,
 
   @Column
-  val staffId: BigInteger,
-
-  @Column
   val staffCode: String,
-
-  @Column
-  val teamId: BigInteger? = null,
 
   @Column
   val teamCode: String,
@@ -46,9 +39,6 @@ data class PersonManagerEntity(
   @Column
   @CreatedDate
   var createdDate: ZonedDateTime? = null,
-
-  @Column
-  var providerCode: String,
 
   @Column
   var isActive: Boolean
