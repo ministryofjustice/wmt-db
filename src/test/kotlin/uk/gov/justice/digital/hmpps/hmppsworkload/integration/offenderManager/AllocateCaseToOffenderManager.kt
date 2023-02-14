@@ -23,6 +23,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBas
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.AssessRisksNeedsApiExtension.Companion.assessRisksNeedsApi
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.CommunityApiExtension.Companion.communityApi
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.TierApiExtension.Companion.hmppsTier
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.WorkforceAllocationsToDeliusExtension.Companion.workforceAllocationsToDelius
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.request.allocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.emailResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSummaryResponse
@@ -274,10 +275,11 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   @Test
   fun `can allocate an already managed CRN to different staff member`() {
     communityApi.staffCodeResponse(staffCode, teamCode)
+
     communityApi.offenderSummaryResponse(crn)
     communityApi.singleActiveUnpaidRequirementResponse(crn, eventId)
     val otherPersonManager = PersonManagerEntity(crn = crn, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", createdBy = "USER1", isActive = true)
-    communityApi.staffCodeResponse(otherPersonManager.staffCode, otherPersonManager.teamCode)
+    workforceAllocationsToDelius.officerViewResponse(otherPersonManager.staffCode)
     val storedPersonManager = personManagerRepository.save(otherPersonManager)
     val storedEventManager = eventManagerRepository.save(EventManagerEntity(crn = crn, eventId = eventId, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", createdBy = "USER1", isActive = true, eventNumber = eventNumber))
 
