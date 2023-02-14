@@ -24,7 +24,7 @@ class JpaBasedSaveEventManagerService(
     allocateCase: AllocateCase,
     loggedInUser: String
   ): SaveResult<EventManagerEntity> = eventManagerRepository.findFirstByCrnAndEventNumberOrderByCreatedDateDesc(allocateCase.crn, allocateCase.eventNumber)?.let { eventManager ->
-    if (eventManager.staffId == deliusStaff.staffIdentifier && eventManager.teamCode == teamCode) {
+    if (eventManager.staffCode == deliusStaff.staffCode && eventManager.teamCode == teamCode) {
       return SaveResult(eventManager, false)
     }
     eventManager.isActive = false

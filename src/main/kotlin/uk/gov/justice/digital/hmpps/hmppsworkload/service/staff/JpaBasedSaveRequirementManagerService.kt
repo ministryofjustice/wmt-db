@@ -26,7 +26,7 @@ class JpaBasedSaveRequirementManagerService(
       .filter { requirement -> requirement.requirementTypeMainCategory.code != "W" }
       .map { requirement ->
         requirementManagerRepository.findFirstByCrnAndEventNumberAndRequirementIdOrderByCreatedDateDesc(allocateCase.crn, allocateCase.eventNumber, requirement.requirementId)?.let { requirementManagerEntity ->
-          if (requirementManagerEntity.staffId == deliusStaff.staffIdentifier && requirementManagerEntity.teamCode == teamCode) {
+          if (requirementManagerEntity.staffCode == deliusStaff.staffCode && requirementManagerEntity.teamCode == teamCode) {
             SaveResult(requirementManagerEntity, false)
           } else {
             requirementManagerEntity.isActive = false
