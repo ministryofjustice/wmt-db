@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.jms.annotation.JmsListener
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToDeliusApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.WorkloadCalculationService
@@ -14,7 +14,7 @@ import java.math.BigDecimal
 class WorkloadCalculationEventListener(
   private val objectMapper: ObjectMapper,
   private val workloadCalculationService: WorkloadCalculationService,
-  @Qualifier("communityApiClient") private val communityApiClient: CommunityApiClient
+  @Qualifier("workforceAllocationsToDeliusApiClient") private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient
 ) {
 
   @JmsListener(destination = "workloadcalculationqueue", containerFactory = "hmppsQueueContainerFactoryProxy")
@@ -25,7 +25,7 @@ class WorkloadCalculationEventListener(
       workloadCalculationEvent.personReference.identifiers.find { it.type == "staffCode" }!!.value,
       workloadCalculationEvent.personReference.identifiers.find { it.type == "teamCode" }!!.value
     )
-    val staffGrade = communityApiClient.getStaffByCode(staffIdentifier.staffCode).map { it.grade }.block()!!
+    val staffGrade = workforceAllocationsToDeliusApiClient.getOfficerView(staffIdentifier.staffCode).map { it.grade }.block()!!
     workloadCalculationService.saveWorkloadCalculation(staffIdentifier, staffGrade, availableHours)
   }
 
