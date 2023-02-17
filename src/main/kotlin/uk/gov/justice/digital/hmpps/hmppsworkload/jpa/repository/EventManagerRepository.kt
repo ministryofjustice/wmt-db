@@ -16,6 +16,4 @@ interface EventManagerRepository : CrudRepository<EventManagerEntity, Long> {
   fun setInactiveTrueFor(crn: String): Int
 
   fun findFirstByCrnAndEventNumberOrderByCreatedDateDesc(crn: String, eventNumber: Int): EventManagerEntity?
-
-  fun findByEventNumberIsNull(): List<EventManagerEntity>
 }
