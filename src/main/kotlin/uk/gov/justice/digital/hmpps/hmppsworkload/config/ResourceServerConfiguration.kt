@@ -28,8 +28,7 @@ class ResourceServerConfiguration {
           "/v3/api-docs/**",
           "/swagger-ui/**",
           "/swagger-ui.html",
-          "/queue-admin/retry-all-dlqs",
-          "/admin/migrate-event-identifiers"
+          "/queue-admin/retry-all-dlqs"
         )
           .permitAll().anyRequest().authenticated()
       }.oauth2ResourceServer().jwt().jwtAuthenticationConverter(AuthAwareTokenConverter())

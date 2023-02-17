@@ -57,13 +57,6 @@ class CommunityApiClient(private val webClient: WebClient) {
     .retrieve()
     .bodyToFlux(Conviction::class.java)
 
-  fun getConvictionById(crn: String, convictionId: BigInteger): Mono<Conviction?> = webClient
-    .get()
-    .uri("/offenders/crn/$crn/convictions/$convictionId")
-    .retrieve()
-    .bodyToMono(Conviction::class.java).onErrorResume {
-      Mono.empty()
-    }
   fun getSummaryByCrn(crn: String): Mono<PersonSummary> {
     return webClient
       .get()
