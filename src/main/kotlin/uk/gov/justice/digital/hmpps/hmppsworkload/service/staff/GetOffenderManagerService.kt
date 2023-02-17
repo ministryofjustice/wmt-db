@@ -71,13 +71,13 @@ class GetOffenderManagerService(
 
   fun getOverview(staffIdentifier: StaffIdentifier): OffenderManagerOverview? {
     val officerView = workforceAllocationsToDeliusApiClient.getOfficerView(staffIdentifier.staffCode).block()
-    val overview = findOffenderManagerOverview(staffIdentifier, officerView.grade)
+    val overview = findOffenderManagerOverview(staffIdentifier, officerView.getGrade())
     overview.lastAllocatedEvent = getEventManager.findLatestByStaffAndTeam(staffIdentifier)
 
     if (overview.hasWorkload) {
       overview.nextReductionChange = getReductionService.findNextReductionChange(staffIdentifier)
       overview.reductionHours = getReductionService.findReductionHours(staffIdentifier)
-      overview.contractedHours = getWeeklyHours.findWeeklyHours(staffIdentifier, officerView.grade)
+      overview.contractedHours = getWeeklyHours.findWeeklyHours(staffIdentifier, officerView.getGrade())
       offenderManagerRepository.findByCaseloadTotals(overview.workloadOwnerId).let { totals ->
         overview.tierCaseTotals = totals.map { total ->
           TierCaseTotals(total.getATotal(), total.getBTotal(), total.getCTotal(), total.getDTotal(), total.untiered)

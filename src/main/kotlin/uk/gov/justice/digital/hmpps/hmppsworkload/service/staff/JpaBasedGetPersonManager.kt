@@ -21,7 +21,7 @@ class JpaBasedGetPersonManager(
     val personManager = personManagerRepository.findFirstByCrnOrderByCreatedDateDesc(crn)
     if (personManager != null) {
       val staff = workforceAllocationsToDeliusApiClient.getOfficerView(personManager.staffCode).block()
-      return PersonManager(personManager.staffCode, personManager.teamCode, staff!!.grade)
+      return PersonManager(personManager.staffCode, personManager.teamCode, staff!!.getGrade())
     }
     return null
   }

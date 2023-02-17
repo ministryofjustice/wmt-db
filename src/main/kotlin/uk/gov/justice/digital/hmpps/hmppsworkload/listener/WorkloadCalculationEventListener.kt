@@ -25,7 +25,7 @@ class WorkloadCalculationEventListener(
       workloadCalculationEvent.personReference.identifiers.find { it.type == "staffCode" }!!.value,
       workloadCalculationEvent.personReference.identifiers.find { it.type == "teamCode" }!!.value
     )
-    val staffGrade = workforceAllocationsToDeliusApiClient.getOfficerView(staffIdentifier.staffCode).map { it.grade }.block()!!
+    val staffGrade = workforceAllocationsToDeliusApiClient.getOfficerView(staffIdentifier.staffCode).map { it.getGrade() }.block()!!
     workloadCalculationService.saveWorkloadCalculation(staffIdentifier, staffGrade, availableHours)
   }
 

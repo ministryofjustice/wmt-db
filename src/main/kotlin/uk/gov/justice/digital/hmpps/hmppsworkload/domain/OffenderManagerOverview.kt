@@ -52,7 +52,7 @@ data class OffenderManagerOverview @JsonCreator constructor(
       return OffenderManagerOverview(
         officerView.name.forename,
         officerView.name.surname,
-        officerView.grade,
+        officerView.getGrade(),
         overviewOffenderManager.capacity,
         overviewOffenderManager.code,
         officerView.email,
