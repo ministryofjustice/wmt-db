@@ -213,4 +213,13 @@ class CommunityApiMockServer : ClientAndServer(MOCKSERVER_PORT) {
       )
     )
   }
+
+  fun convictionById(crn: String, convictionId: BigInteger) {
+    val convictionsRequest =
+      HttpRequest.request().withPath("/offenders/crn/$crn/convictions/$convictionId")
+    CommunityApiExtension.communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
+      HttpResponse.response()
+        .withContentType(MediaType.APPLICATION_JSON).withBody(uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.convictionByIdResponse())
+    )
+  }
 }
