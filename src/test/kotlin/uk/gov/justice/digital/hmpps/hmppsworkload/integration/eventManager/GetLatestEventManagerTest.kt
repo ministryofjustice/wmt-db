@@ -12,7 +12,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBas
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.JpaBasedGetEventManager
-import java.math.BigInteger
 
 class GetLatestEventManagerTest : IntegrationTestBase() {
 
@@ -26,9 +25,9 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
 
     val savedEntity = eventManagerRepository.save(
       EventManagerEntity(
-        crn = "CRN6634", eventId = BigInteger.TEN, staffCode = staffCode,
-        teamCode = teamCode, createdBy = "createdBy",
-        isActive = true, eventNumber = null
+        crn = "CRN6634", staffCode = staffCode, teamCode = teamCode,
+        createdBy = "createdBy", isActive = true,
+        eventNumber = 1
       )
     )
     val eventManagerEntity = eventManagerRepository.findByIdOrNull(savedEntity.id!!)!!
@@ -46,9 +45,9 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
     val teamCode = "T1"
     eventManagerRepository.save(
       EventManagerEntity(
-        crn = "CRN6634", eventId = BigInteger.TEN, staffCode = staffCode,
-        teamCode = teamCode, createdBy = "createdBy",
-        isActive = true, eventNumber = null
+        crn = "CRN6634", staffCode = staffCode, teamCode = teamCode,
+        createdBy = "createdBy", isActive = true,
+        eventNumber = 1
       )
     )
 
@@ -62,9 +61,9 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
 
     val eventManagerEntity = eventManagerRepository.save(
       EventManagerEntity(
-        crn = "CRN6634", eventId = BigInteger.TEN, staffCode = staffCode,
-        teamCode = teamCode, createdBy = "createdBy",
-        isActive = true, eventNumber = null
+        crn = "CRN6634", staffCode = staffCode, teamCode = teamCode,
+        createdBy = "createdBy", isActive = true,
+        eventNumber = 1
       )
     )
 
@@ -72,9 +71,9 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
 
     val savedEntity = eventManagerRepository.save(
       EventManagerEntity(
-        crn = "CRN9977", eventId = BigInteger.TWO, staffCode = staffCode,
-        teamCode = teamCode, createdBy = "createdBy",
-        isActive = true, eventNumber = null
+        crn = "CRN9977", staffCode = staffCode, teamCode = teamCode,
+        createdBy = "createdBy", isActive = true,
+        eventNumber = 1
       )
     )
     val latestEventManagerEntity = eventManagerRepository.findByIdOrNull(savedEntity.id!!)!!
@@ -94,9 +93,9 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
 
     val savedEntity = eventManagerRepository.save(
       EventManagerEntity(
-        crn = "CRN6634", eventId = BigInteger.TEN, staffCode = staffCode,
-        teamCode = teamCode, createdBy = "createdBy",
-        isActive = false, eventNumber = null
+        crn = "CRN6634", staffCode = staffCode, teamCode = teamCode,
+        createdBy = "createdBy", isActive = false,
+        eventNumber = 1
       )
     )
     val eventManagerEntity = eventManagerRepository.findByIdOrNull(savedEntity.id!!)!!
@@ -105,9 +104,9 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
 
     eventManagerRepository.save(
       EventManagerEntity(
-        crn = eventManagerEntity.crn, eventId = eventManagerEntity.eventId, staffCode = "ADIFFEENTCODE",
-        teamCode = teamCode, createdBy = "createdBy",
-        isActive = true, eventNumber = null
+        crn = eventManagerEntity.crn, staffCode = "ADIFFEENTCODE", teamCode = teamCode,
+        createdBy = "createdBy", isActive = true,
+        eventNumber = 1
       )
     )
 

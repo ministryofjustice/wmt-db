@@ -4,13 +4,19 @@ import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.WorkforceAllocationsToDeliusExtension.Companion.workforceAllocationsToDelius
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
-import java.math.BigInteger
 
 class GetEventManagerAllocationComplete : IntegrationTestBase() {
 
   @Test
   fun `can get allocation complete details by crn and event number`() {
-    val storedEventManager = EventManagerEntity(crn = "CRN1", staffCode = "OM1", teamCode = "T1", createdBy = "USER1", eventId = BigInteger.valueOf(567891234L), isActive = true, eventNumber = 2)
+    val storedEventManager = EventManagerEntity(
+      crn = "CRN1",
+      staffCode = "OM1",
+      teamCode = "T1",
+      createdBy = "USER1",
+      isActive = true,
+      eventNumber = 2
+    )
     eventManagerRepository.save(storedEventManager)
 
     workforceAllocationsToDelius.allocationCompleteResponse(storedEventManager.crn, storedEventManager.eventNumber.toString(), storedEventManager.staffCode)

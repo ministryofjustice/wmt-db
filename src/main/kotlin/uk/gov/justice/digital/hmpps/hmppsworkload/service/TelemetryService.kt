@@ -18,7 +18,7 @@ private const val PROVIDER_CODE = "providerCode"
 
 private const val STAFF_CODE = "staffCode"
 
-private const val EVENT_ID = "eventId"
+private const val EVENT_NUMBER = "eventNumber"
 
 @Component
 class TelemetryService(@Autowired private val telemetryClient: TelemetryClient) {
@@ -42,7 +42,7 @@ class TelemetryService(@Autowired private val telemetryClient: TelemetryClient) 
         CRN to eventManagerEntity.crn,
         TEAM_CODE to eventManagerEntity.teamCode,
         STAFF_CODE to eventManagerEntity.staffCode,
-        EVENT_ID to eventManagerEntity.eventId.toString(10)
+        EVENT_NUMBER to eventManagerEntity.eventNumber.toString(10)
       )
     )
   }
@@ -54,7 +54,7 @@ class TelemetryService(@Autowired private val telemetryClient: TelemetryClient) 
         CRN to requirementManagerEntity.crn,
         TEAM_CODE to requirementManagerEntity.teamCode,
         STAFF_CODE to requirementManagerEntity.staffCode,
-        EVENT_ID to requirementManagerEntity.eventId.toString(10),
+        EVENT_NUMBER to requirementManagerEntity.eventNumber.toString(10),
         "requirementId" to requirementManagerEntity.requirementId.toString(10)
       )
     )

@@ -29,9 +29,6 @@ data class RequirementManagerEntity(
   val crn: String,
 
   @Column
-  val eventId: BigInteger,
-
-  @Column
   val requirementId: BigInteger,
 
   @Column
@@ -51,5 +48,5 @@ data class RequirementManagerEntity(
   var isActive: Boolean,
 
   @Column
-  var eventNumber: Int?
+  var eventNumber: Int
 )
