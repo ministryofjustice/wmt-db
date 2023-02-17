@@ -11,8 +11,6 @@ interface RequirementManagerRepository : CrudRepository<RequirementManagerEntity
   fun findFirstByCrnAndEventNumberAndRequirementIdOrderByCreatedDateDesc(crn: String, eventNumber: Int, requirementId: BigInteger): RequirementManagerEntity?
   fun findByUuid(id: UUID): RequirementManagerEntity?
 
-  fun findByEventNumberIsNull(): List<RequirementManagerEntity>
-
   @Modifying
   @Query("update RequirementManagerEntity r set r.isActive= false where r.crn = ?1")
   fun setInactiveTrueFor(crn: String): Int
