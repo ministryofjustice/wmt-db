@@ -26,8 +26,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.TierApi
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.WorkforceAllocationsToDeliusExtension.Companion.workforceAllocationsToDelius
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.request.allocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.emailResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSummaryResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveRequirementResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
@@ -248,9 +246,24 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     communityApi.singleActiveRequirementResponse(crn, eventId, requirementId)
     val storedPersonManager = PersonManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, createdBy = "USER1", isActive = true)
     personManagerRepository.save(storedPersonManager)
-    val storedEventManager = EventManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, eventId = eventId, createdBy = "USER1", isActive = true, eventNumber = eventNumber)
+    val storedEventManager = EventManagerEntity(
+      crn = crn,
+      staffCode = staffCode,
+      teamCode = teamCode,
+      createdBy = "USER1",
+      isActive = true,
+      eventNumber = eventNumber
+    )
     eventManagerRepository.save(storedEventManager)
-    val storedRequirementManager = RequirementManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, eventId = eventId, requirementId = requirementId, createdBy = "USER1", isActive = true, eventNumber = eventNumber)
+    val storedRequirementManager = RequirementManagerEntity(
+      crn = crn,
+      requirementId = requirementId,
+      staffCode = staffCode,
+      teamCode = teamCode,
+      createdBy = "USER1",
+      isActive = true,
+      eventNumber = eventNumber
+    )
     requirementManagerRepository.save(storedRequirementManager)
 
     webTestClient.post()
@@ -281,7 +294,16 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     val otherPersonManager = PersonManagerEntity(crn = crn, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", createdBy = "USER1", isActive = true)
     workforceAllocationsToDelius.officerViewResponse(otherPersonManager.staffCode)
     val storedPersonManager = personManagerRepository.save(otherPersonManager)
-    val storedEventManager = eventManagerRepository.save(EventManagerEntity(crn = crn, eventId = eventId, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", createdBy = "USER1", isActive = true, eventNumber = eventNumber))
+    val storedEventManager = eventManagerRepository.save(
+      EventManagerEntity(
+        crn = crn,
+        staffCode = "ADIFFERENTCODE",
+        teamCode = "TEAMCODE",
+        createdBy = "USER1",
+        isActive = true,
+        eventNumber = eventNumber
+      )
+    )
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")

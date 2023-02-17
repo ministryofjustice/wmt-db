@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity
 
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import java.math.BigInteger
 import java.time.ZonedDateTime
 import java.util.UUID
 import javax.persistence.Column
@@ -29,9 +28,6 @@ data class EventManagerEntity(
   val crn: String,
 
   @Column
-  val eventId: BigInteger,
-
-  @Column
   val staffCode: String,
 
   @Column
@@ -48,5 +44,5 @@ data class EventManagerEntity(
   var isActive: Boolean,
 
   @Column
-  var eventNumber: Int?
+  var eventNumber: Int
 )

@@ -15,7 +15,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
 import java.math.BigDecimal
-import java.math.BigInteger
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -229,7 +228,16 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
     val offenderManagerCode = "NOWORKLOAD1"
     workforceAllocationsToDelius.officerViewResponse(offenderManagerCode)
 
-    val eventManager = eventManagerRepository.save(EventManagerEntity(crn = "CRN12345", eventId = BigInteger.TEN, staffCode = offenderManagerCode, teamCode = teamCode, createdBy = "USER1", isActive = true, eventNumber = null))
+    val eventManager = eventManagerRepository.save(
+      EventManagerEntity(
+        crn = "CRN12345",
+        staffCode = offenderManagerCode,
+        teamCode = teamCode,
+        createdBy = "USER1",
+        isActive = true,
+        eventNumber = 1
+      )
+    )
     val storedEventManager = eventManagerRepository.findByIdOrNull(eventManager.id!!)!!
     val caseDetails = caseDetailsRepository.save(CaseDetailsEntity(storedEventManager.crn, Tier.C3, CaseType.COMMUNITY, "Jane", "Doe"))
     webTestClient.get()

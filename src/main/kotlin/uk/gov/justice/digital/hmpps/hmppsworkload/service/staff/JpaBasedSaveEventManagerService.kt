@@ -41,7 +41,6 @@ class JpaBasedSaveEventManagerService(
       crn = allocateCase.crn,
       staffCode = deliusStaff.staffCode,
       teamCode = teamCode,
-      eventId = allocateCase.eventId,
       createdBy = loggedInUser,
       isActive = true,
       eventNumber = allocateCase.eventNumber
