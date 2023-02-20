@@ -49,24 +49,20 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   private lateinit var telemetryClient: TelemetryClient
 
   private val crn = "CRN1"
-  private val staffId = BigInteger.valueOf(123456L)
 
   private val staffCode = "OM1"
   private val teamCode = "T1"
   private val eventId = BigInteger.valueOf(123456789L)
   private val eventNumber = 1
+  private val requirementId = BigInteger.valueOf(645234212L)
+  private val allocatingOfficerUsername = "SOME_USER"
   @BeforeEach
   fun setupApiCalls() {
-    val allocatingOfficerUsername = "SOME_USER"
-    communityApi.singleActiveConvictionResponseForAllConvictions(crn)
-    communityApi.singleActiveConvictionResponse(crn)
+
+    workforceAllocationsToDelius.allocationResponse(crn, eventNumber, staffCode, allocatingOfficerUsername)
     hmppsTier.tierCalculationResponse(crn)
-    communityApi.singleActiveConvictionResponseForAllConvictions(crn)
-    communityApi.singleActiveInductionResponse(crn)
-    communityApi.staffUserNameResponse(allocatingOfficerUsername)
     assessRisksNeedsApi.riskSummaryErrorResponse(crn)
     assessRisksNeedsApi.riskPredictorResponse(crn)
-    communityApi.assessmentCommunityApiResponse(crn)
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY, "Jane", "Doe"))
     every { notificationClient.sendEmail(any(), any(), any(), any()) } returns
       SendEmailResponse(
@@ -79,9 +75,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can allocate CRN to Staff member`() {
-    communityApi.staffCodeResponse(staffCode, teamCode)
-    communityApi.offenderSummaryResponse(crn)
-    communityApi.singleActiveRequirementResponse(crn, eventId)
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
@@ -133,10 +126,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `Notify error still keeps entry in db`() {
-    communityApi.staffCodeResponse(staffCode, teamCode)
-    communityApi.offenderSummaryResponse(crn)
-    val requirementId = BigInteger.valueOf(75315091L)
-    communityApi.singleActiveRequirementResponse(crn, eventId, requirementId)
     every { notificationClient.sendEmail(any(), any(), any(), any()) } throws NotificationClientException("An exception")
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY, "Jane", "Doe"))
 
@@ -166,10 +155,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `Notify error due to an invalid recipient returns error containing the offending email address`() {
-    communityApi.staffCodeResponse(staffCode, teamCode)
-    communityApi.offenderSummaryResponse(crn)
-    val requirementId = BigInteger.valueOf(75315091L)
-    communityApi.singleActiveRequirementResponse(crn, eventId, requirementId)
+
     every { notificationClient.sendEmail(any(), any(), any(), any()) } throws NotificationClientException("An exception")
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY, "Jane", "Doe"))
 
@@ -189,61 +175,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   }
 
   @Test
-  fun `can allocate a requirement without a length`() {
-    communityApi.staffCodeResponse(staffCode, teamCode)
-    communityApi.offenderSummaryResponse(crn)
-    communityApi.singleActiveRequirementNoLengthResponse(crn, eventId)
-
-    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY, "Jane", "Doe"))
-
-    webTestClient.post()
-      .uri("/team/$teamCode/offenderManager/$staffCode/case")
-      .bodyValue(allocateCase(crn, eventId, eventNumber))
-      .headers {
-        it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
-        it.contentType = MediaType.APPLICATION_JSON
-      }
-      .exchange()
-      .expectStatus()
-      .isOk
-      .expectBody()
-      .jsonPath("$.personManagerId")
-      .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
-      .jsonPath("$.eventManagerId")
-      .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
-      .jsonPath("$.requirementManagerIds[0]")
-      .value(MatchesPattern.matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
-
-    expectWorkloadAllocationCompleteMessages(crn)
-  }
-
-  @Test
-  fun `do not allocate active unpaid requirements`() {
-    communityApi.staffCodeResponse(staffCode, teamCode)
-    communityApi.offenderSummaryResponse(crn)
-    communityApi.singleActiveUnpaidRequirementResponse(crn, eventId)
-    webTestClient.post()
-      .uri("/team/$teamCode/offenderManager/$staffCode/case")
-      .bodyValue(allocateCase(crn, eventId, eventNumber))
-      .headers {
-        it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
-        it.contentType = MediaType.APPLICATION_JSON
-      }
-      .exchange()
-      .expectStatus()
-      .isOk
-      .expectBody()
-      .jsonPath("$.requirementManagerIds")
-      .isEmpty
-  }
-
-  @Test
   fun `can allocate an already managed CRN to same staff member`() {
-    val requirementId = BigInteger.valueOf(567891234L)
-    communityApi.staffCodeResponse(staffCode, teamCode)
-    communityApi.staffCodeResponse(staffCode, teamCode)
-    communityApi.offenderSummaryResponse(crn)
-    communityApi.singleActiveRequirementResponse(crn, eventId, requirementId)
     val storedPersonManager = PersonManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, createdBy = "USER1", isActive = true)
     personManagerRepository.save(storedPersonManager)
     val storedEventManager = EventManagerEntity(
@@ -287,10 +219,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can allocate an already managed CRN to different staff member`() {
-    communityApi.staffCodeResponse(staffCode, teamCode)
-
-    communityApi.offenderSummaryResponse(crn)
-    communityApi.singleActiveUnpaidRequirementResponse(crn, eventId)
     val otherPersonManager = PersonManagerEntity(crn = crn, staffCode = "ADIFFERENTCODE", teamCode = "TEAMCODE", createdBy = "USER1", isActive = true)
     workforceAllocationsToDelius.officerViewResponse(otherPersonManager.staffCode)
     val storedPersonManager = personManagerRepository.save(otherPersonManager)
@@ -343,12 +271,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `only send the email once when clicking allocate multiple times`() {
-    communityApi.staffCodeResponse(staffCode, teamCode)
-    communityApi.staffCodeResponse(staffCode, teamCode)
-    communityApi.offenderSummaryResponse(crn)
-    communityApi.offenderSummaryResponse(crn)
-    communityApi.singleActiveRequirementResponse(crn, eventId)
-    communityApi.singleActiveRequirementResponse(crn, eventId)
+    workforceAllocationsToDelius.allocationResponse(crn, eventNumber, staffCode, allocatingOfficerUsername)
 
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY, "Jane", "Doe"))
 
@@ -385,9 +308,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `must emit staff grade to tier allocation telemetry event`() {
-    communityApi.staffCodeResponse(staffCode, teamCode)
-    communityApi.offenderSummaryResponse(crn)
-    communityApi.singleActiveRequirementResponse(crn, eventId)
 
     val caseDetailsEntity = CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY, "Jane", "Doe")
     caseDetailsRepository.save(caseDetailsEntity)
@@ -407,7 +327,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
         TelemetryEventType.STAFF_GRADE_TIER_ALLOCATED.eventName,
         mapOf(
           "teamCode" to teamCode,
-          "providerCode" to "N01",
           "staffGrade" to "PO",
           "tier" to caseDetailsEntity.tier.name,
         ),
@@ -418,9 +337,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `must emit staff grade to tier allocation telemetry event without case details`() {
-    communityApi.staffCodeResponse(staffCode, teamCode)
-    communityApi.offenderSummaryResponse(crn)
-    communityApi.singleActiveRequirementResponse(crn, eventId)
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
@@ -438,7 +354,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
         TelemetryEventType.STAFF_GRADE_TIER_ALLOCATED.eventName,
         mapOf(
           "teamCode" to teamCode,
-          "providerCode" to "N01",
           "staffGrade" to "PO",
           "tier" to "A0",
         ),
@@ -449,9 +364,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can send audit data when allocating`() {
-    communityApi.staffCodeResponse(staffCode, teamCode)
-    communityApi.offenderSummaryResponse(crn)
-    communityApi.singleActiveRequirementResponse(crn, eventId)
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
@@ -469,10 +381,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `audit data contain required fields`() {
-    communityApi.staffCodeResponse(staffCode, teamCode)
-    communityApi.offenderSummaryResponse(crn)
-    val requirementId = BigInteger.valueOf(75315091L)
-    communityApi.singleActiveRequirementResponse(crn, eventId, requirementId)
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
@@ -492,9 +400,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can send email when selecting a second person to receive email`() {
-    communityApi.staffCodeResponse(staffCode, teamCode)
-    communityApi.offenderSummaryResponse(crn)
-    communityApi.singleActiveRequirementResponse(crn, eventId)
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")

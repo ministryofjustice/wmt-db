@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforc
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.choosePractitionerByTeamResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.choosePractitionerByTeamResponseUnallocated
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.choosePractitionerStaffInMultipleTeamsResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.deliusAllocationResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.deliusStaffActiveCasesResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.impactResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.officerOverviewResponse
@@ -144,6 +145,18 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
     val request = HttpRequest.request().withPath("/staff/$staffCode/officer-view")
     workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
       HttpResponse.response().withStatusCode(503)
+    )
+  }
+
+  fun allocationResponse(crn: String, eventNumber: Int, staffCode: String, allocatingStaffUsername: String) {
+    val request =
+      HttpRequest.request()
+        .withPath("/allocation-demand/$crn/$eventNumber/allocation")
+        .withQueryStringParameter("staff", staffCode)
+        .withQueryStringParameter("allocatingStaffUsername", allocatingStaffUsername)
+    workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
+      HttpResponse.response()
+        .withContentType(MediaType.APPLICATION_JSON).withBody(deliusAllocationResponse(crn, staffCode))
     )
   }
 }

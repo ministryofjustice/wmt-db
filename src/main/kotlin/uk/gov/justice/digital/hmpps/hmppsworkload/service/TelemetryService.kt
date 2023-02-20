@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 import com.microsoft.applicationinsights.TelemetryClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.DeliusStaff
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffMember
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
@@ -13,8 +13,6 @@ import java.time.LocalDateTime
 private const val CRN = "crn"
 
 private const val TEAM_CODE = "teamCode"
-
-private const val PROVIDER_CODE = "providerCode"
 
 private const val STAFF_CODE = "staffCode"
 
@@ -60,13 +58,12 @@ class TelemetryService(@Autowired private val telemetryClient: TelemetryClient) 
     )
   }
 
-  fun trackStaffGradeToTierAllocated(caseDetailsEntity: CaseDetailsEntity?, deliusStaff: DeliusStaff, teamCode: String) {
+  fun trackStaffGradeToTierAllocated(caseDetailsEntity: CaseDetailsEntity?, deliusStaff: StaffMember, teamCode: String) {
     trackEvent(
       TelemetryEventType.STAFF_GRADE_TIER_ALLOCATED,
       mapOf(
         TEAM_CODE to teamCode,
-        PROVIDER_CODE to deliusStaff.probationArea!!.code,
-        "staffGrade" to deliusStaff.grade,
+        "staffGrade" to deliusStaff.getGrade(),
         "tier" to caseDetailsEntity?.tier?.name
       )
     )

@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service.staff
 
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.DeliusStaff
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffMember
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.SaveResult
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
@@ -20,11 +20,11 @@ class JpaBasedSaveEventManagerService(
    */
   override fun saveEventManager(
     teamCode: String,
-    deliusStaff: DeliusStaff,
+    deliusStaff: StaffMember,
     allocateCase: AllocateCase,
     loggedInUser: String
   ): SaveResult<EventManagerEntity> = eventManagerRepository.findFirstByCrnAndEventNumberOrderByCreatedDateDesc(allocateCase.crn, allocateCase.eventNumber)?.let { eventManager ->
-    if (eventManager.staffCode == deliusStaff.staffCode && eventManager.teamCode == teamCode) {
+    if (eventManager.staffCode == deliusStaff.code && eventManager.teamCode == teamCode) {
       return SaveResult(eventManager, false)
     }
     eventManager.isActive = false
@@ -33,13 +33,13 @@ class JpaBasedSaveEventManagerService(
 
   private fun saveEventManagerEntity(
     allocateCase: AllocateCase,
-    deliusStaff: DeliusStaff,
+    deliusStaff: StaffMember,
     teamCode: String,
     loggedInUser: String
   ): SaveResult<EventManagerEntity> {
     val eventManagerEntity = EventManagerEntity(
       crn = allocateCase.crn,
-      staffCode = deliusStaff.staffCode,
+      staffCode = deliusStaff.code,
       teamCode = teamCode,
       createdBy = loggedInUser,
       isActive = true,
