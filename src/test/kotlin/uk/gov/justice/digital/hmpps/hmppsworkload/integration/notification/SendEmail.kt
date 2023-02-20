@@ -11,7 +11,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.getAllocationDetai
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.AssessRisksNeedsApiExtension.Companion.assessRisksNeedsApi
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.NotificationService
-import java.math.BigInteger
 import java.util.UUID
 
 class SendEmail : IntegrationTestBase() {
@@ -22,7 +21,7 @@ class SendEmail : IntegrationTestBase() {
   @Test
   fun `sends an email when ROSH cannot be retrieved`() {
     val crn = "X123456"
-    val allocateCase = AllocateCase(crn, BigInteger.valueOf(123456789), sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
+    val allocateCase = AllocateCase(crn, sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
     val token = "token"
     val allocationDetails = getAllocationDetails(crn)
 
@@ -43,7 +42,7 @@ class SendEmail : IntegrationTestBase() {
   fun `sends an email when risk predictor cannot be retrieved`() {
 
     val crn = "X123456"
-    val allocateCase = AllocateCase(crn, BigInteger.valueOf(123456789), sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
+    val allocateCase = AllocateCase(crn, sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
     val token = "token"
     val allocationDetails = getAllocationDetails(crn)
     assessRisksNeedsApi.riskSummaryResponse(crn)

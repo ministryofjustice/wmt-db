@@ -51,7 +51,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   private val staffCode = "OM1"
   private val teamCode = "T1"
-  private val eventId = BigInteger.valueOf(123456789L)
   private val eventNumber = 1
   private val requirementId = BigInteger.valueOf(645234212L)
   private val allocatingOfficerUsername = "SOME_USER"
@@ -77,7 +76,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
-      .bodyValue(allocateCase(crn, eventId, eventNumber))
+      .bodyValue(allocateCase(crn, eventNumber))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
         it.contentType = MediaType.APPLICATION_JSON
@@ -130,7 +129,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
-      .bodyValue(allocateCase(crn, eventId, eventNumber))
+      .bodyValue(allocateCase(crn, eventNumber))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
         it.contentType = MediaType.APPLICATION_JSON
@@ -160,7 +159,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
-      .bodyValue(allocateCase(crn, eventId, eventNumber))
+      .bodyValue(allocateCase(crn, eventNumber))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
         it.contentType = MediaType.APPLICATION_JSON
@@ -199,7 +198,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
-      .bodyValue(allocateCase(crn, eventId, eventNumber))
+      .bodyValue(allocateCase(crn, eventNumber))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
         it.contentType = MediaType.APPLICATION_JSON
@@ -234,7 +233,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
-      .bodyValue(allocateCase(crn, eventId, eventNumber))
+      .bodyValue(allocateCase(crn, eventNumber))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
         it.contentType = MediaType.APPLICATION_JSON
@@ -276,7 +275,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
-      .bodyValue(allocateCase(crn, eventId, eventNumber))
+      .bodyValue(allocateCase(crn, eventNumber))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
         it.contentType = MediaType.APPLICATION_JSON
@@ -292,7 +291,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
-      .bodyValue(allocateCase(crn, eventId, eventNumber))
+      .bodyValue(allocateCase(crn, eventNumber))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
         it.contentType = MediaType.APPLICATION_JSON
@@ -312,7 +311,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     caseDetailsRepository.save(caseDetailsEntity)
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
-      .bodyValue(allocateCase(crn, eventId, eventNumber))
+      .bodyValue(allocateCase(crn, eventNumber))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
         it.contentType = MediaType.APPLICATION_JSON
@@ -339,7 +338,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
-      .bodyValue(allocateCase(crn, eventId, eventNumber))
+      .bodyValue(allocateCase(crn, eventNumber))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
         it.contentType = MediaType.APPLICATION_JSON
@@ -366,7 +365,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
-      .bodyValue(allocateCase(crn, eventId, eventNumber))
+      .bodyValue(allocateCase(crn, eventNumber))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
         it.contentType = MediaType.APPLICATION_JSON
@@ -383,7 +382,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
-      .bodyValue(allocateCase(crn, eventId, eventNumber))
+      .bodyValue(allocateCase(crn, eventNumber))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
         it.contentType = MediaType.APPLICATION_JSON
@@ -402,7 +401,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
-      .bodyValue(allocateCase(crn, eventId, eventNumber))
+      .bodyValue(allocateCase(crn, eventNumber))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
         it.contentType = MediaType.APPLICATION_JSON
@@ -458,7 +457,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
-      .bodyValue(allocateCase(crn, eventId, eventNumber))
+      .bodyValue(allocateCase(crn, eventNumber))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
         it.contentType = MediaType.APPLICATION_JSON
@@ -495,7 +494,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
-      .bodyValue(allocateCase(crn, eventId, eventNumber, false))
+      .bodyValue(allocateCase(crn, eventNumber, false))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
         it.contentType = MediaType.APPLICATION_JSON
@@ -530,7 +529,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
     val response = webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
-      .bodyValue(allocateCase(crn, eventId, eventNumber))
+      .bodyValue(allocateCase(crn, eventNumber))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
         it.contentType = MediaType.APPLICATION_JSON
@@ -571,7 +570,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
     val response = webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
-      .bodyValue(allocateCase(crn, eventId, eventNumber))
+      .bodyValue(allocateCase(crn, eventNumber))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
         it.contentType = MediaType.APPLICATION_JSON

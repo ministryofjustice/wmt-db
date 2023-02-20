@@ -7,7 +7,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBas
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 
-class GetLatestEventManagerByEventIdTest : IntegrationTestBase() {
+class GetLatestEventManagerByEventNumberTest : IntegrationTestBase() {
 
   @Test
   fun `can get case details by crn and event number`() {
