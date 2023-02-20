@@ -148,7 +148,7 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
     )
   }
 
-  fun allocationResponse(crn: String, eventNumber: Int, staffCode: String, allocatingStaffUsername: String) {
+  fun allocationResponse(crn: String, eventNumber: Int, staffCode: String, allocatingStaffUsername: String, allocateToEmail: String = "sheila.hancock@test.justice.gov.uk") {
     val request =
       HttpRequest.request()
         .withPath("/allocation-demand/$crn/$eventNumber/allocation")
@@ -156,7 +156,7 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
         .withQueryStringParameter("allocatingStaffUsername", allocatingStaffUsername)
     workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
       HttpResponse.response()
-        .withContentType(MediaType.APPLICATION_JSON).withBody(deliusAllocationResponse(crn, staffCode))
+        .withContentType(MediaType.APPLICATION_JSON).withBody(deliusAllocationResponse(crn, staffCode, allocateToEmail))
     )
   }
 }

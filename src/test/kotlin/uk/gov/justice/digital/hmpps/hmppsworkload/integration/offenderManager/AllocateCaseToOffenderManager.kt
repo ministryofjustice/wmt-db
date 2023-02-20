@@ -21,7 +21,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.AssessRisksNeedsApiExtension.Companion.assessRisksNeedsApi
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.CommunityApiExtension.Companion.communityApi
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.TierApiExtension.Companion.hmppsTier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.WorkforceAllocationsToDeliusExtension.Companion.workforceAllocationsToDelius
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.request.allocateCase
@@ -454,9 +453,8 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   @Test
   fun `sends email by default to allocating officer`() {
     val allocateToEmail = "allocateTo-user@test.justice.gov.uk"
-    communityApi.staffCodeResponse(staffCode, teamCode, email = allocateToEmail)
-    communityApi.offenderSummaryResponse(crn)
-    communityApi.singleActiveRequirementResponse(crn, eventId)
+    workforceAllocationsToDelius.reset()
+    workforceAllocationsToDelius.allocationResponse(crn, eventNumber, staffCode, allocatingOfficerUsername, allocateToEmail)
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
@@ -492,9 +490,8 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   @Test
   fun `do not send email to allocating officer`() {
     val allocateToEmail = "allocateTo-user@test.justice.gov.uk"
-    communityApi.staffCodeResponse(staffCode, teamCode, email = allocateToEmail)
-    communityApi.offenderSummaryResponse(crn)
-    communityApi.singleActiveRequirementResponse(crn, eventId)
+    workforceAllocationsToDelius.reset()
+    workforceAllocationsToDelius.allocationResponse(crn, eventNumber, staffCode, allocatingOfficerUsername, allocateToEmail)
 
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
@@ -530,9 +527,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `must return event number for event manager allocated`() {
-    communityApi.staffCodeResponse(staffCode, teamCode)
-    communityApi.offenderSummaryResponse(crn)
-    communityApi.singleActiveRequirementResponse(crn, eventId)
 
     val response = webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
@@ -574,9 +568,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `must return event number for requirement manager allocated`() {
-    communityApi.staffCodeResponse(staffCode, teamCode)
-    communityApi.offenderSummaryResponse(crn)
-    communityApi.singleActiveRequirementResponse(crn, eventId)
 
     val response = webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")

@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius
 
-fun deliusAllocationResponse(crn: String, staffCode: String) = """
+fun deliusAllocationResponse(crn: String, staffCode: String, allocateToEmail: String) = """
   {
     "crn": "$crn",
     "name": {
@@ -14,7 +14,7 @@ fun deliusAllocationResponse(crn: String, staffCode: String) = """
         "forename": "Sheila",
         "surname": "Hancock"
       },
-      "email": "Sheila.Hancock@test.justice.gov.uk",
+      "email": "$allocateToEmail",
       "grade": "PO"
     },
     "allocatingStaff": {
@@ -23,7 +23,7 @@ fun deliusAllocationResponse(crn: String, staffCode: String) = """
         "forename": "Sheila",
         "surname": "Hancock"
       },
-      "email": "Sheila.Hancock@test.justice.gov.uk",
+      "email": "sheila.hancock@test.justice.gov.uk",
       "grade": "SPO"
     },
     "ogrs": {
