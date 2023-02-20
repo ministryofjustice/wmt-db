@@ -14,7 +14,7 @@ fun deliusAllocationResponse(crn: String, staffCode: String) = """
         "forename": "Sheila",
         "surname": "Hancock"
       },
-      "email": "Sheila.Hancock@justice.gov.uk",
+      "email": "Sheila.Hancock@test.justice.gov.uk",
       "grade": "PO"
     },
     "allocatingStaff": {
@@ -23,7 +23,7 @@ fun deliusAllocationResponse(crn: String, staffCode: String) = """
         "forename": "Sheila",
         "surname": "Hancock"
       },
-      "email": "Sheila.Hancock@justice.gov.uk",
+      "email": "Sheila.Hancock@test.justice.gov.uk",
       "grade": "SPO"
     },
     "ogrs": {
