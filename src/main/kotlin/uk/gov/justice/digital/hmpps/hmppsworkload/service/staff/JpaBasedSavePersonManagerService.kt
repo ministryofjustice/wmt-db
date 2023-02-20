@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service.staff
 
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.DeliusStaff
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffMember
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.SaveResult
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
@@ -18,12 +18,12 @@ class JpaBasedSavePersonManagerService(
   @Transactional
   override fun savePersonManager(
     teamCode: String,
-    deliusStaff: DeliusStaff,
+    deliusStaff: StaffMember,
     loggedInUser: String,
     crn: String
   ): SaveResult<PersonManagerEntity> =
     personManagerRepository.findFirstByCrnOrderByCreatedDateDesc(crn)?.let { personManager ->
-      if (personManager.staffCode == deliusStaff.staffCode && personManager.teamCode == teamCode) {
+      if (personManager.staffCode == deliusStaff.code && personManager.teamCode == teamCode) {
         SaveResult(personManager, false)
       } else {
         val currentPersonManager = getPersonManager.findLatestByCrn(crn)
@@ -38,20 +38,20 @@ class JpaBasedSavePersonManagerService(
     } ?: createPersonManager(deliusStaff, teamCode, loggedInUser, crn)
 
   private fun createPersonManager(
-    deliusStaff: DeliusStaff,
+    deliusStaff: StaffMember,
     teamCode: String,
     loggedInUser: String,
     crn: String
   ): SaveResult<PersonManagerEntity> {
     val personManagerEntity = PersonManagerEntity(
       crn = crn,
-      staffCode = deliusStaff.staffCode,
+      staffCode = deliusStaff.code,
       teamCode = teamCode,
       createdBy = loggedInUser,
       isActive = true
     )
     personManagerRepository.save(personManagerEntity)
-    workloadCalculationService.saveWorkloadCalculation(StaffIdentifier(deliusStaff.staffCode, teamCode), deliusStaff.grade)
+    workloadCalculationService.saveWorkloadCalculation(StaffIdentifier(deliusStaff.code, teamCode), deliusStaff.getGrade())
     return SaveResult(personManagerEntity, true)
   }
 }

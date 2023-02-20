@@ -11,12 +11,10 @@ import org.mockserver.model.HttpResponse
 import org.mockserver.model.MediaType
 import org.mockserver.model.Parameter
 import org.springframework.http.HttpStatus
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.communityApiAssessmentResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.convictionNoSentenceResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.nomsLookupResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleInactiveConvictionResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByCodeResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByUserNameResponse
 import java.math.BigInteger
 
 class CommunityApiExtension : BeforeAllCallback, AfterAllCallback, BeforeEachCallback {
@@ -40,25 +38,6 @@ class CommunityApiMockServer : ClientAndServer(MOCKSERVER_PORT) {
 
   companion object {
     private const val MOCKSERVER_PORT = 8092
-  }
-
-  fun assessmentCommunityApiResponse(crn: String) {
-    val ogrsRequest =
-      HttpRequest.request().withPath("/offenders/crn/$crn/assessments")
-
-    CommunityApiExtension.communityApi.`when`(ogrsRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(communityApiAssessmentResponse())
-    )
-  }
-
-  fun singleActiveInductionResponse(crn: String) {
-    val inductionRequest =
-      HttpRequest.request().withPath("/offenders/crn/$crn/contact-summary/inductions")
-
-    CommunityApiExtension.communityApi.`when`(inductionRequest, Times.exactly(1)).respond(
-      HttpResponse.response()
-        .withContentType(MediaType.APPLICATION_JSON).withBody(uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveInductionResponse())
-    )
   }
 
   fun singleActiveConvictionResponse(crn: String) {
@@ -89,17 +68,6 @@ class CommunityApiMockServer : ClientAndServer(MOCKSERVER_PORT) {
 
     CommunityApiExtension.communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
       HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody("[]")
-    )
-  }
-
-  fun singleActiveConvictionResponseForAllConvictions(crn: String) {
-    val convictionsRequest =
-      HttpRequest.request()
-        .withPath("/offenders/crn/$crn/convictions")
-
-    CommunityApiExtension.communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      HttpResponse.response()
-        .withContentType(MediaType.APPLICATION_JSON).withBody(uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveConvictionResponse())
     )
   }
 
@@ -152,32 +120,6 @@ class CommunityApiMockServer : ClientAndServer(MOCKSERVER_PORT) {
     )
   }
 
-  fun staffCodeErrorResponse(staffCode: String, teamCode: String) {
-    val request = HttpRequest.request().withPath("/staff/staffCode/$staffCode")
-    CommunityApiExtension.communityApi.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withStatusCode(503)
-    )
-  }
-
-  fun staffUserNameResponse(userName: String) {
-    val request = HttpRequest.request().withPath("/staff/username/$userName")
-    CommunityApiExtension.communityApi.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(staffByUserNameResponse(userName))
-    )
-  }
-
-  fun singleActiveUnpaidRequirementResponse(crn: String, convictionId: BigInteger) {
-    val convictionsRequest =
-      HttpRequest.request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameters(
-        Parameter("activeOnly", "true"),
-        Parameter("excludeSoftDeleted", "true")
-      )
-    CommunityApiExtension.communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      HttpResponse.response()
-        .withContentType(MediaType.APPLICATION_JSON).withBody(uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveUnpaidRequirementResponse())
-    )
-  }
-
   fun singleActiveRequirementResponse(
     crn: String,
     convictionId: BigInteger,
@@ -191,25 +133,6 @@ class CommunityApiMockServer : ClientAndServer(MOCKSERVER_PORT) {
     CommunityApiExtension.communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
       HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(
         uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveRequirementResponse(requirementId)
-      )
-    )
-  }
-
-  fun singleActiveRequirementNoLengthResponse(
-    crn: String,
-    convictionId: BigInteger,
-    requirementId: BigInteger = BigInteger.valueOf(123456789L)
-  ) {
-    val convictionsRequest =
-      HttpRequest.request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameters(
-        Parameter("activeOnly", "true"),
-        Parameter("excludeSoftDeleted", "true")
-      )
-    CommunityApiExtension.communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(
-        uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveRequirementNoLengthResponse(
-          requirementId
-        )
       )
     )
   }

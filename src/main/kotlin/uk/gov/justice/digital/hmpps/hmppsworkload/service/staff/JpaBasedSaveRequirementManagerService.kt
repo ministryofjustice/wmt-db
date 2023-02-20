@@ -1,8 +1,8 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service.staff
 
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ConvictionRequirement
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.DeliusStaff
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Requirement
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffMember
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.SaveResult
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RequirementManagerEntity
@@ -17,16 +17,15 @@ class JpaBasedSaveRequirementManagerService(
   @Transactional
   override fun saveRequirementManagers(
     teamCode: String,
-    deliusStaff: DeliusStaff,
+    deliusStaff: StaffMember,
     allocateCase: AllocateCase,
     loggedInUser: String,
-    requirements: List<ConvictionRequirement>
+    requirements: List<Requirement>
   ): List<SaveResult<RequirementManagerEntity>> {
     return requirements
-      .filter { requirement -> requirement.requirementTypeMainCategory.code != "W" }
       .map { requirement ->
-        requirementManagerRepository.findFirstByCrnAndEventNumberAndRequirementIdOrderByCreatedDateDesc(allocateCase.crn, allocateCase.eventNumber, requirement.requirementId)?.let { requirementManagerEntity ->
-          if (requirementManagerEntity.staffCode == deliusStaff.staffCode && requirementManagerEntity.teamCode == teamCode) {
+        requirementManagerRepository.findFirstByCrnAndEventNumberAndRequirementIdOrderByCreatedDateDesc(allocateCase.crn, allocateCase.eventNumber, requirement.id)?.let { requirementManagerEntity ->
+          if (requirementManagerEntity.staffCode == deliusStaff.code && requirementManagerEntity.teamCode == teamCode) {
             SaveResult(requirementManagerEntity, false)
           } else {
             requirementManagerEntity.isActive = false
@@ -38,15 +37,15 @@ class JpaBasedSaveRequirementManagerService(
 
   private fun saveRequirementManagerEntity(
     allocateCase: AllocateCase,
-    deliusStaff: DeliusStaff,
+    deliusStaff: StaffMember,
     teamCode: String,
     loggedInUser: String,
-    requirement: ConvictionRequirement
+    requirement: Requirement
   ): SaveResult<RequirementManagerEntity> {
     val requirementManagerEntity = RequirementManagerEntity(
       crn = allocateCase.crn,
-      requirementId = requirement.requirementId,
-      staffCode = deliusStaff.staffCode,
+      requirementId = requirement.id,
+      staffCode = deliusStaff.code,
       teamCode = teamCode,
       createdBy = loggedInUser,
       isActive = true,

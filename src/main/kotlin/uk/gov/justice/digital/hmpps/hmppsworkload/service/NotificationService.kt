@@ -1,21 +1,18 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.AssessRisksNeedsApiClient
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Contact
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Conviction
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ConvictionRequirement
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.DeliusStaff
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Offence
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderAssessment
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.AllocationDetails
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.InitialAppointment
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenceDetails
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Requirement
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskOGRS
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskPredictor
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskSummary
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffMember
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
@@ -26,7 +23,6 @@ import uk.gov.service.notify.NotificationClientException
 import uk.gov.service.notify.SendEmailResponse
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 
 const val SCORE_UNAVAILABLE = "Score Unavailable"
@@ -36,25 +32,24 @@ private const val NOT_APPLICABLE = "N/A"
 class NotificationService(
   private val notificationClient: NotificationClientApi,
   @Value("\${application.notify.allocation.template}") private val allocationTemplateId: String,
-  @Qualifier("communityApiClient") private val communityApiClient: CommunityApiClient,
   private val assessRisksNeedsApiClient: AssessRisksNeedsApiClient,
   private val caseDetailsRepository: CaseDetailsRepository
 ) {
 
-  fun notifyAllocation(allocatedOfficer: DeliusStaff, requirements: List<ConvictionRequirement>, allocateCase: AllocateCase, allocatingOfficerUsername: String, token: String): Mono<List<SendEmailResponse>> {
-    return getNotifyData(allocateCase.crn, allocatingOfficerUsername, token, allocateCase.eventNumber).map { notifyData ->
+  fun notifyAllocation(allocationDetails: AllocationDetails, allocateCase: AllocateCase, token: String): Mono<List<SendEmailResponse>> {
+    return getNotifyData(allocateCase.crn, token).map { notifyData ->
       val caseDetails = caseDetailsRepository.findByIdOrNull(allocateCase.crn)!!
       val parameters = mapOf(
-        "officer_name" to "${allocatedOfficer.staff.forenames} ${allocatedOfficer.staff.surname}",
-        "induction_statement" to mapInductionAppointment(notifyData.initialAppointments, caseDetails.type, notifyData.conviction.sentence!!.startDate),
-        "requirements" to mapRequirements(requirements),
-      ).plus(getRiskParameters(notifyData.riskSummary, notifyData.riskPredictors, notifyData.assessment))
-        .plus(getConvictionParameters(notifyData.conviction))
-        .plus(getPersonOnProbationParameters(notifyData.personSummary, allocateCase))
-        .plus(getLoggedInUserParameters(notifyData.allocatingDeliusStaff))
+        "officer_name" to "${allocationDetails.staff.name.getCombinedName()}",
+        "induction_statement" to mapInductionAppointment(allocationDetails.initialAppointment, caseDetails.type),
+        "requirements" to mapRequirements(allocationDetails.activeRequirements),
+      ).plus(getRiskParameters(notifyData.riskSummary, notifyData.riskPredictors, allocationDetails.ogrs))
+        .plus(getConvictionParameters(allocationDetails))
+        .plus(getPersonOnProbationParameters(allocationDetails.name.getCombinedName(), allocateCase))
+        .plus(getLoggedInUserParameters(allocationDetails.allocatingStaff))
       val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
-      emailTo.add(allocatedOfficer.email!!)
-      if (allocateCase.sendEmailCopyToAllocatingOfficer) emailTo.add(notifyData.allocatingDeliusStaff.email)
+      emailTo.add(allocationDetails.staff.email!!)
+      if (allocateCase.sendEmailCopyToAllocatingOfficer) emailTo.add(allocationDetails.allocatingStaff.email)
       emailTo.map { email -> addRecipientTo400Response(email) { notificationClient.sendEmail(allocationTemplateId, email, parameters, null) } }
     }
   }
@@ -72,25 +67,25 @@ class NotificationService(
     }
   }
 
-  private fun getLoggedInUserParameters(loggedInUser: DeliusStaff): Map<String, Any> = mapOf(
-    "allocatingOfficerName" to "${loggedInUser.staff.forenames} ${loggedInUser.staff.surname}",
-    "allocatingOfficerGrade" to loggedInUser.grade
+  private fun getLoggedInUserParameters(loggedInUser: StaffMember): Map<String, Any> = mapOf(
+    "allocatingOfficerName" to "${loggedInUser.name.getCombinedName()}",
+    "allocatingOfficerGrade" to loggedInUser.getGrade()
   )
 
-  private fun getPersonOnProbationParameters(personSummary: PersonSummary, allocateCase: AllocateCase): Map<String, Any> = mapOf(
-    "case_name" to "${personSummary.firstName} ${personSummary.surname}",
+  private fun getPersonOnProbationParameters(name: String, allocateCase: AllocateCase): Map<String, Any> = mapOf(
+    "case_name" to name,
     "crn" to allocateCase.crn,
     "notes" to allocateCase.instructions,
   )
 
-  private fun getConvictionParameters(conviction: Conviction): Map<String, Any> = mapOf(
-    "court_name" to conviction.courtAppearance!!.courtName,
-    "sentence_date" to conviction.courtAppearance.appearanceDate.format(DateUtils.notifyDateFormat),
-    "offences" to mapOffences(conviction.offences!!),
-    "order" to conviction.sentence!!.mapOrder()
+  private fun getConvictionParameters(allocationDetails: AllocationDetails): Map<String, Any> = mapOf(
+    "court_name" to allocationDetails.court!!.name,
+    "sentence_date" to allocationDetails.court.appearanceDate.format(DateUtils.notifyDateFormat),
+    "offences" to mapOffences(allocationDetails.offences!!),
+    "order" to "${allocationDetails.sentence.description} (${allocationDetails.sentence.length})"
   )
 
-  private fun getRiskParameters(riskSummary: RiskSummary?, riskPredictors: List<RiskPredictor>, assessment: OffenderAssessment?): Map<String, Any> {
+  private fun getRiskParameters(riskSummary: RiskSummary?, riskPredictors: List<RiskPredictor>, assessment: RiskOGRS?): Map<String, Any> {
     val latestRiskPredictor =
       riskPredictors.filter { riskPredictor -> riskPredictor.rsrScoreLevel != null && riskPredictor.rsrPercentageScore != null }
         .maxByOrNull { riskPredictor -> riskPredictor.completedDate ?: LocalDateTime.MIN }
@@ -98,7 +93,7 @@ class NotificationService(
     val rsrPercentage = latestRiskPredictor?.rsrPercentageScore?.toString() ?: NOT_APPLICABLE
     val rosh = riskSummary?.overallRiskLevel?.capitalize() ?: SCORE_UNAVAILABLE
     val ogrsLevel = assessment?.getOgrsLevel() ?: SCORE_UNAVAILABLE
-    val ogrsPercentage = assessment?.ogrsScore?.toString() ?: NOT_APPLICABLE
+    val ogrsPercentage = assessment?.score?.toString() ?: NOT_APPLICABLE
     return mapOf(
       "rosh" to rosh,
       "rsrLevel" to rsrLevel,
@@ -108,16 +103,15 @@ class NotificationService(
     )
   }
 
-  private fun mapInductionAppointment(appointments: List<Contact>, caseType: CaseType, sentenceStartDate: LocalDate): String {
+  private fun mapInductionAppointment(initialAppointment: InitialAppointment?, caseType: CaseType): String {
     return when (caseType) {
       CaseType.CUSTODY -> "no initial appointment needed"
       else -> {
-        val mostRecentAppointment = appointments.maxByOrNull { it.contactStart }
-        if (mostRecentAppointment != null) {
-          return if (ChronoUnit.DAYS.between(sentenceStartDate.atStartOfDay(ZoneId.systemDefault()), mostRecentAppointment.contactStart) >= 0) {
-            "their initial appointment is scheduled for ${mostRecentAppointment.contactStart.format(DateUtils.notifyDateFormat)}"
+        if (initialAppointment != null) {
+          return if (ChronoUnit.DAYS.between(LocalDate.now(), initialAppointment.date) >= 0) {
+            "their initial appointment is scheduled for ${initialAppointment.date.format(DateUtils.notifyDateFormat)}"
           } else {
-            "their initial appointment was scheduled for ${mostRecentAppointment.contactStart.format(DateUtils.notifyDateFormat)}"
+            "their initial appointment was scheduled for ${initialAppointment.date.format(DateUtils.notifyDateFormat)}"
           }
         }
         return "no date found for the initial appointment, please check with your team"
@@ -125,35 +119,23 @@ class NotificationService(
     }
   }
 
-  private fun mapOffences(offences: List<Offence>): List<String> = offences
-    .map { offence -> offence.detail.mainCategoryDescription }
+  private fun mapOffences(offences: List<OffenceDetails>): List<String> = offences
+    .map { offence -> offence.mainCategory }
 
-  private fun mapRequirements(requirements: List<ConvictionRequirement>): List<String> = requirements
-    .map { requirement -> "${requirement.requirementTypeMainCategory.description}: ${requirement.requirementTypeSubCategory.description} ${requirement.length ?: ""} ${requirement.lengthUnit ?: ""}".trimEnd() }
+  private fun mapRequirements(requirements: List<Requirement>): List<String> = requirements
+    .map { requirement -> "${requirement.mainCategory}: ${requirement.subCategory} ${requirement.length}".trimEnd() }
 
-  private fun getNotifyData(crn: String, allocatingOfficerUsername: String, token: String, eventNumber: Int): Mono<NotifyData> {
-    val conviction = communityApiClient.getAllConvictions(crn).filter { it.eventNumber == eventNumber }.blockFirst()
+  private fun getNotifyData(crn: String, token: String): Mono<NotifyData> {
     return Mono.zip(
-      communityApiClient.getStaffByUsername(allocatingOfficerUsername),
       assessRisksNeedsApiClient.getRiskSummary(crn, token),
-      assessRisksNeedsApiClient.getRiskPredictors(crn, token),
-      communityApiClient.getAssessment(crn),
-      communityApiClient.getSummaryByCrn(crn)
-    )
-      .flatMap { results ->
-        communityApiClient.getInductionContacts(crn, conviction.sentence!!.startDate).map { initialAppointments ->
-          NotifyData(conviction, initialAppointments, results.t1, results.t2.orElse(null), results.t3, results.t4.orElse(null), results.t5)
-        }
-      }
+      assessRisksNeedsApiClient.getRiskPredictors(crn, token)
+    ).map { results ->
+      NotifyData(results.t1.orElse(null), results.t2)
+    }
   }
 }
 
 data class NotifyData(
-  val conviction: Conviction,
-  val initialAppointments: List<Contact>,
-  val allocatingDeliusStaff: DeliusStaff,
   val riskSummary: RiskSummary?,
-  val riskPredictors: List<RiskPredictor>,
-  val assessment: OffenderAssessment?,
-  val personSummary: PersonSummary
+  val riskPredictors: List<RiskPredictor>
 )
