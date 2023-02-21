@@ -41,7 +41,7 @@ class NotificationServiceTests {
     notificationClient, templateId,
     assessRisksNeedsApiClient, hmppsCaseDetailsRepo
   )
-  private val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
+  private val allocateCase = AllocateCase("CRN1111", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
   private val personSummary = PersonSummary("John", "Doe")
 
   @BeforeEach
@@ -357,7 +357,7 @@ class NotificationServiceTests {
   @Test
   fun `must add notes when they exist`() {
     val allocationDetails = getAllocationDetails(allocateCase.crn)
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, "Some Notes", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
+    val allocateCase = AllocateCase("CRN1111", "Some Notes", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
 
     val token = "token"
 
@@ -371,7 +371,7 @@ class NotificationServiceTests {
   @Test
   fun `must add allocating officer name`() {
     val allocationDetails = getAllocationDetails(allocateCase.crn)
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, "Some Notes", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
+    val allocateCase = AllocateCase("CRN1111", "Some Notes", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
     val token = "token"
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, token)
@@ -398,7 +398,7 @@ class NotificationServiceTests {
     val allocationDetails = getAllocationDetails(allocateCase.crn)
     val firstEmail = "first@email.com"
     val secondEmail = "second@email.com"
-    val allocateCase = AllocateCase("CRN1111", BigInteger.TEN, "instructions", listOf(firstEmail, secondEmail), false, 1)
+    val allocateCase = AllocateCase("CRN1111", "instructions", listOf(firstEmail, secondEmail), false, 1)
     val token = "token"
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, token).block()
