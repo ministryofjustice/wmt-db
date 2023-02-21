@@ -40,7 +40,7 @@ class NotificationService(
     return getNotifyData(allocateCase.crn, token).map { notifyData ->
       val caseDetails = caseDetailsRepository.findByIdOrNull(allocateCase.crn)!!
       val parameters = mapOf(
-        "officer_name" to "${allocationDetails.staff.name.getCombinedName()}",
+        "officer_name" to allocationDetails.staff.name.getCombinedName(),
         "induction_statement" to mapInductionAppointment(allocationDetails.initialAppointment, caseDetails.type),
         "requirements" to mapRequirements(allocationDetails.activeRequirements),
       ).plus(getRiskParameters(notifyData.riskSummary, notifyData.riskPredictors, allocationDetails.ogrs))
@@ -68,7 +68,7 @@ class NotificationService(
   }
 
   private fun getLoggedInUserParameters(loggedInUser: StaffMember): Map<String, Any> = mapOf(
-    "allocatingOfficerName" to "${loggedInUser.name.getCombinedName()}",
+    "allocatingOfficerName" to loggedInUser.name.getCombinedName(),
     "allocatingOfficerGrade" to loggedInUser.getGrade()
   )
 
@@ -79,9 +79,9 @@ class NotificationService(
   )
 
   private fun getConvictionParameters(allocationDetails: AllocationDetails): Map<String, Any> = mapOf(
-    "court_name" to allocationDetails.court!!.name,
+    "court_name" to allocationDetails.court.name,
     "sentence_date" to allocationDetails.court.appearanceDate.format(DateUtils.notifyDateFormat),
-    "offences" to mapOffences(allocationDetails.offences!!),
+    "offences" to mapOffences(allocationDetails.offences),
     "order" to "${allocationDetails.sentence.description} (${allocationDetails.sentence.length})"
   )
 
