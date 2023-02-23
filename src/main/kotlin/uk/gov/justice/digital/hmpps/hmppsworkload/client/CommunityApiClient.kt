@@ -6,7 +6,6 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Conviction
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenderDetails
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
 
 class CommunityApiClient(private val webClient: WebClient) {
 
@@ -16,24 +15,6 @@ class CommunityApiClient(private val webClient: WebClient) {
       .uri("/offenders/crn/$crn/convictions?activeOnly=true")
       .retrieve()
       .bodyToFlux(Conviction::class.java)
-  }
-
-  fun getSummaryByCrn(crn: String): Mono<PersonSummary> {
-    return webClient
-      .get()
-      .uri("/offenders/crn/$crn")
-      .retrieve()
-      .onStatus(
-        { httpStatus -> HttpStatus.FORBIDDEN == httpStatus },
-        { Mono.error(ForbiddenOffenderError("Unable to access offender details for $crn")) }
-      )
-      .bodyToMono(PersonSummary::class.java)
-      .onErrorResume { ex ->
-        when (ex) {
-          is ForbiddenOffenderError -> Mono.just(PersonSummary("Restricted", "Access"))
-          else -> Mono.error(ex)
-        }
-      }
   }
 
   fun getCrn(nomsNumber: String): Mono<String> {
@@ -55,6 +36,6 @@ class CommunityApiClient(private val webClient: WebClient) {
   }
 }
 
-private class ForbiddenOffenderError(msg: String) : RuntimeException(msg)
+// private class ForbiddenOffenderError(msg: String) : RuntimeException(msg)
 
 private class MissingOffenderError(msg: String) : RuntimeException(msg)

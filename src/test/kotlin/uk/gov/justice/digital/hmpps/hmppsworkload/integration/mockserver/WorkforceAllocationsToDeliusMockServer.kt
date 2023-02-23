@@ -9,6 +9,8 @@ import org.mockserver.matchers.Times
 import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
 import org.mockserver.model.MediaType
+import org.springframework.http.HttpStatus
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.domain.ActiveCasesIntegration
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.WorkforceAllocationsToDeliusExtension.Companion.workforceAllocationsToDelius
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.allocationCompleteResponse
@@ -20,6 +22,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforc
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.deliusStaffActiveCasesResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.impactResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.officerOverviewResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.personSummaryResponse
 
 class WorkforceAllocationsToDeliusExtension : BeforeAllCallback, AfterAllCallback, BeforeEachCallback {
 
@@ -157,6 +160,23 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
     workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
       HttpResponse.response()
         .withContentType(MediaType.APPLICATION_JSON).withBody(deliusAllocationResponse(crn, staffCode, allocateToEmail))
+    )
+  }
+
+  fun personResourceResponse(crn: String, forename: String, middleName: String, surname: String, type: CaseType?) {
+    val request = HttpRequest.request().withPath("/person/$crn")
+    workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
+      HttpResponse.response()
+        .withContentType(MediaType.APPLICATION_JSON).withBody(personSummaryResponse(crn, forename, middleName, surname, type))
+    )
+  }
+
+  fun forbiddenPersonResourceResponse(crn: String) {
+    val summaryRequest =
+      HttpRequest.request().withPath("/person/$crn")
+
+    workforceAllocationsToDelius.`when`(summaryRequest, Times.exactly(1)).respond(
+      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withStatusCode(HttpStatus.FORBIDDEN.value())
     )
   }
 }

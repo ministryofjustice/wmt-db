@@ -11,7 +11,6 @@ import org.springframework.data.repository.findByIdOrNull
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.AssessRisksNeedsApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenceDetails
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Requirement
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskOGRS
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskPredictor
@@ -42,7 +41,6 @@ class NotificationServiceTests {
     assessRisksNeedsApiClient, hmppsCaseDetailsRepo
   )
   private val allocateCase = AllocateCase("CRN1111", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
-  private val personSummary = PersonSummary("John", "Doe")
 
   @BeforeEach
   fun setup() {
@@ -63,7 +61,7 @@ class NotificationServiceTests {
     notificationService.notifyAllocation(allocationDetails, allocateCase, token).block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), isNull()) }
-    Assertions.assertEquals("${allocationDetails.name.getCombinedName()}", parameters.captured["case_name"])
+    Assertions.assertEquals(allocationDetails.name.getCombinedName(), parameters.captured["case_name"])
   }
 
   @Test
@@ -91,7 +89,7 @@ class NotificationServiceTests {
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), isNull()) }
-    Assertions.assertEquals("${allocationDetails.staff.name.getCombinedName()}", parameters.captured["officer_name"])
+    Assertions.assertEquals(allocationDetails.staff.name.getCombinedName(), parameters.captured["officer_name"])
   }
 
   @Test
@@ -378,7 +376,7 @@ class NotificationServiceTests {
       .block()
     val parameters = slot<MutableMap<String, Any>>()
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), isNull()) }
-    Assertions.assertEquals("${allocationDetails.allocatingStaff.name.getCombinedName()}", parameters.captured["allocatingOfficerName"])
+    Assertions.assertEquals(allocationDetails.allocatingStaff.name.getCombinedName(), parameters.captured["allocatingOfficerName"])
   }
 
   @Test
