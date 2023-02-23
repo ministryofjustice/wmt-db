@@ -5,7 +5,6 @@ import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.CommunityApiExtension.Companion.communityApi
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.WorkforceAllocationsToDeliusExtension.Companion.workforceAllocationsToDelius
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 
@@ -112,7 +111,6 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
     val staffCode = "NOWORKLOAD1"
     val teamCode = "T1"
     workforceAllocationsToDelius.getImpactNoGradeResponse(crn, staffCode)
-    communityApi.staffCodeResponse(staffCode, teamCode, "UNKNOWNGRADECODE")
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.B3, CaseType.CUSTODY, "Jane", "Doe"))
     webTestClient.get()
       .uri("/team/$teamCode/offenderManager/$staffCode/impact/person/$crn")

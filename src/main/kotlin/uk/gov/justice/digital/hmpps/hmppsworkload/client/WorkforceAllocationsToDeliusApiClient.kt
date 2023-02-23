@@ -46,7 +46,7 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
       .bodyToMono(PersonSummary::class.java)
       .onErrorResume { ex ->
         when (ex) {
-          is ForbiddenOffenderError -> Mono.just(PersonSummary("Restricted Access", Name("Restricted", "", "Access",), CaseType.UNKNOWN))
+          is ForbiddenOffenderError -> Mono.just(PersonSummary(crn, Name("Restricted", "", "Access",), CaseType.UNKNOWN))
           else -> Mono.error(ex)
         }
       }
