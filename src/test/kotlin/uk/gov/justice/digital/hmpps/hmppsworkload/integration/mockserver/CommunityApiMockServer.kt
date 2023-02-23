@@ -10,12 +10,10 @@ import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
 import org.mockserver.model.MediaType
 import org.mockserver.model.Parameter
-import org.springframework.http.HttpStatus
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.convictionNoSentenceResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.nomsLookupResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleInactiveConvictionResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.staffByCodeResponse
-import java.math.BigInteger
 
 class CommunityApiExtension : BeforeAllCallback, AfterAllCallback, BeforeEachCallback {
 
@@ -79,25 +77,6 @@ class CommunityApiMockServer : ClientAndServer(MOCKSERVER_PORT) {
     )
   }
 
-  fun offenderSummaryResponse(crn: String) {
-    val summaryRequest =
-      HttpRequest.request().withPath("/offenders/crn/$crn")
-
-    CommunityApiExtension.communityApi.`when`(summaryRequest, Times.exactly(1)).respond(
-      HttpResponse.response()
-        .withContentType(MediaType.APPLICATION_JSON).withBody(uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.offenderSummaryResponse())
-    )
-  }
-
-  fun forbiddenOffenderSummaryResponse(crn: String) {
-    val summaryRequest =
-      HttpRequest.request().withPath("/offenders/crn/$crn")
-
-    CommunityApiExtension.communityApi.`when`(summaryRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withStatusCode(HttpStatus.FORBIDDEN.value())
-    )
-  }
-
   fun staffCodeResponse(staffCode: String, teamCode: String, staffGrade: String = "PSM", email: String? = "sheila.hancock@test.justice.gov.uk") {
     val request = HttpRequest.request().withPath("/staff/staffCode/$staffCode")
     CommunityApiExtension.communityApi.`when`(request, Times.exactly(1)).respond(
@@ -117,23 +96,6 @@ class CommunityApiMockServer : ClientAndServer(MOCKSERVER_PORT) {
     val request = HttpRequest.request().withPath("/secure/offenders/nomsNumber/$nomsNumber")
     CommunityApiExtension.communityApi.`when`(request, Times.exactly(1)).respond(
       HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withStatusCode(404)
-    )
-  }
-
-  fun singleActiveRequirementResponse(
-    crn: String,
-    convictionId: BigInteger,
-    requirementId: BigInteger = BigInteger.valueOf(123456789L)
-  ) {
-    val convictionsRequest =
-      HttpRequest.request().withPath("/offenders/crn/$crn/convictions/$convictionId/requirements").withQueryStringParameters(
-        Parameter("activeOnly", "true"),
-        Parameter("excludeSoftDeleted", "true")
-      )
-    CommunityApiExtension.communityApi.`when`(convictionsRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(
-        uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.singleActiveRequirementResponse(requirementId)
-      )
     )
   }
 }

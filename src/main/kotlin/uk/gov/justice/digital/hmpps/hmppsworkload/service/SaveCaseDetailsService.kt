@@ -5,6 +5,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.CommunityApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.HmppsTierApiClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToDeliusApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PersonManager
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
@@ -22,16 +23,17 @@ class SaveCaseDetailsService(
   private val caseDetailsRepository: CaseDetailsRepository,
   private val workloadCalculationService: WorkloadCalculationService,
   private val getPersonManager: GetPersonManager,
-  private val updateWorkloadService: UpdateWorkloadService
+  private val updateWorkloadService: UpdateWorkloadService,
+  private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient
 ) {
 
   fun save(crn: String) {
     val convictions = communityApiClient.getActiveConvictions(crn).collectList().block()!!
-    val personSummary = communityApiClient.getSummaryByCrn(crn).block()!!
+    val personSummary = workforceAllocationsToDeliusApiClient.getSummaryByCrn(crn).block()!!
     caseTypeMapper.getCaseType(convictions).takeUnless { it == CaseType.UNKNOWN }?.let { caseType ->
       hmppsTierApiClient.getTierByCrn(crn).map {
         val tier = Tier.valueOf(it)
-        CaseDetailsEntity(crn, tier, caseType, personSummary.firstName, personSummary.surname)
+        CaseDetailsEntity(crn, tier, caseType, personSummary.name.forename, personSummary.name.surname)
       }.block()?.let {
         caseDetailsRepository.save(it)
         val staff: PersonManager? = getPersonManager.findLatestByCrn(crn)

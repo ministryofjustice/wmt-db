@@ -12,6 +12,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.CommunityApiExtension.Companion.communityApi
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.TierApiExtension.Companion.hmppsTier
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.WorkforceAllocationsToDeliusExtension.Companion.workforceAllocationsToDelius
 
 class OffenderDetailsEventListenerTests : IntegrationTestBase() {
 
@@ -20,7 +21,7 @@ class OffenderDetailsEventListenerTests : IntegrationTestBase() {
     val crn = "J678910"
 
     communityApi.singleActiveConvictionResponse(crn)
-    communityApi.offenderSummaryResponse(crn)
+    workforceAllocationsToDelius.personResourceResponse("J678910", "Jane", "hi, hi", "Doe", CaseType.CUSTODY)
     hmppsTier.tierCalculationResponse(crn)
 
     hmppsOffenderSnsClient.publish(
@@ -47,7 +48,8 @@ class OffenderDetailsEventListenerTests : IntegrationTestBase() {
     val crn = "J678910"
 
     communityApi.singleActiveConvictionResponse(crn)
-    communityApi.forbiddenOffenderSummaryResponse(crn)
+    // communityApi.forbiddenOffenderSummaryResponse(crn)
+    workforceAllocationsToDelius.forbiddenPersonResourceResponse(crn)
     hmppsTier.tierCalculationResponse(crn)
 
     hmppsOffenderSnsClient.publish(

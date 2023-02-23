@@ -31,7 +31,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
   fun `case type is unknown if there is no sentence`() {
     val crn = "J678910"
     communityApi.convictionWithNoSentenceResponse(crn)
-    communityApi.offenderSummaryResponse(crn)
+    workforceAllocationsToDelius.personResourceResponse("J678910", "Jane", "hi, hi", "Doe", CaseType.CUSTODY)
     hmppsTier.tierCalculationResponse(crn)
     hmppsOffenderSnsClient.publish(
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
@@ -50,7 +50,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
   fun `do not write case details if there is no tier`() {
     val crn = "J678910"
     communityApi.singleActiveConvictionResponse(crn)
-    communityApi.offenderSummaryResponse(crn)
+    workforceAllocationsToDelius.personResourceResponse("J678910", "Jane", "hi, hi", "Doe", CaseType.CUSTODY)
     hmppsTier.tierCalculationNotFoundResponse(crn)
     hmppsOffenderSnsClient.publish(
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
@@ -73,7 +73,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
 
     communityApi.singleActiveConvictionResponse(crn)
     hmppsTier.tierCalculationResponse(crn)
-    communityApi.offenderSummaryResponse(crn)
+    workforceAllocationsToDelius.personResourceResponse("J678910", "Jane", "hi, hi", "Doe", CaseType.CUSTODY)
     communityApi.staffCodeResponse(staffCode, teamCode)
     personManagerRepository.save(PersonManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", isActive = true))
 
@@ -103,11 +103,11 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     val teamCode = "team1"
 
     communityApi.singleActiveConvictionResponse(crn)
-    communityApi.offenderSummaryResponse(crn)
+    workforceAllocationsToDelius.personResourceResponse("J678910", "Jane", "hi, hi", "Doe", CaseType.CUSTODY)
     hmppsTier.tierCalculationResponse(crn)
 
     communityApi.singleActiveConvictionResponse(crn)
-    communityApi.offenderSummaryResponse(crn)
+    workforceAllocationsToDelius.personResourceResponse("J678910", "Jane", "hi, hi", "Doe", CaseType.CUSTODY)
     hmppsTier.tierCalculationResponse(crn, Tier.C3.name)
 
     personManagerRepository.save(PersonManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", isActive = true))
@@ -136,7 +136,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
   fun `case details not saved if no active convictions exist`() {
     val crn = "J678910"
     communityApi.singleInactiveConvictionsResponse(crn)
-    communityApi.offenderSummaryResponse(crn)
+    workforceAllocationsToDelius.personResourceResponse("J678910", "Jane", "hi, hi", "Doe", CaseType.CUSTODY)
     communityApi.noConvictionsResponse(crn)
 
     val sentenceChangedEvent =
@@ -181,7 +181,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     )
 
     communityApi.singleInactiveConvictionsResponse(crn)
-    communityApi.offenderSummaryResponse(crn)
+    workforceAllocationsToDelius.personResourceResponse("J678910", "Jane", "hi, hi", "Doe", CaseType.CUSTODY)
     communityApi.noConvictionsResponse(crn)
 
     val sentenceChangedEvent =
@@ -209,7 +209,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     val teamCode = "team1"
 
     communityApi.singleActiveConvictionResponse(crn)
-    communityApi.offenderSummaryResponse(crn)
+    workforceAllocationsToDelius.personResourceResponse("J678910", "Jane", "hi, hi", "Doe", CaseType.CUSTODY)
     hmppsTier.tierCalculationResponse(crn)
 
     val caseDetailsEntity = CaseDetailsEntity(crn, Tier.C3, CaseType.COMMUNITY, "Jane", "Doe")
@@ -236,7 +236,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     val teamCode = "team1"
 
     communityApi.singleActiveConvictionResponse(crn)
-    communityApi.offenderSummaryResponse(crn)
+    workforceAllocationsToDelius.personResourceResponse("J678910", "Jane", "hi, hi", "Doe", CaseType.CUSTODY)
     hmppsTier.tierCalculationResponse(crn)
 
     val caseDetailsEntity = CaseDetailsEntity(crn, Tier.C3, CaseType.COMMUNITY, "Jane", "Doe")
