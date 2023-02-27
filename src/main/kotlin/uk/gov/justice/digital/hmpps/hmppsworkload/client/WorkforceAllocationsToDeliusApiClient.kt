@@ -8,11 +8,9 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.AllocationDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ChoosePractitionerResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.CompleteDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ImpactResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Name
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OfficerView
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffActiveCases
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 
 class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
 
@@ -44,17 +42,12 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
       .uri("/person/$crnOrNoms")
       .retrieve()
       .onStatus(
-        { httpStatus -> HttpStatus.FORBIDDEN == httpStatus },
-        { Mono.error(ForbiddenOffenderError("Unable to access offender details for $crnOrNoms")) }
-      )
-      .onStatus(
         { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
         { Mono.error(MissingOffenderError("No offender found for $crnOrNoms")) }
       )
       .bodyToMono(PersonSummary::class.java)
       .onErrorResume { ex ->
         when (ex) {
-          is ForbiddenOffenderError -> Mono.just(PersonSummary(crnOrNoms, Name("Restricted", "", "Access",), CaseType.UNKNOWN))
           is MissingOffenderError -> Mono.empty()
           else -> Mono.error(ex)
         }
@@ -100,5 +93,4 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
 }
 
 class MissingChoosePractitioner(msg: String) : RuntimeException(msg)
-private class ForbiddenOffenderError(msg: String) : RuntimeException(msg)
 private class MissingOffenderError(msg: String) : RuntimeException(msg)
