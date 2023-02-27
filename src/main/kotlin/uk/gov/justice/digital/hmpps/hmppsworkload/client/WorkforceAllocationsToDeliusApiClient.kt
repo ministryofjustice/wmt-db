@@ -34,19 +34,28 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
       }
   }
 
-  fun getSummaryByCrn(crn: String): Mono<PersonSummary> {
+  /**
+   * Returns the Person Summary from person-resources/workforce api
+   * @param crnOrNoms: CRN or NOMS
+   */
+  fun getSummaryByCrn(crnOrNoms: String): Mono<PersonSummary> {
     return webClient
       .get()
-      .uri("/person/$crn")
+      .uri("/person/$crnOrNoms")
       .retrieve()
       .onStatus(
         { httpStatus -> HttpStatus.FORBIDDEN == httpStatus },
-        { Mono.error(ForbiddenOffenderError("Unable to access offender details for $crn")) }
+        { Mono.error(ForbiddenOffenderError("Unable to access offender details for $crnOrNoms")) }
+      )
+      .onStatus(
+        { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
+        { Mono.error(MissingOffenderError("No offender found for $crnOrNoms")) }
       )
       .bodyToMono(PersonSummary::class.java)
       .onErrorResume { ex ->
         when (ex) {
-          is ForbiddenOffenderError -> Mono.just(PersonSummary(crn, Name("Restricted", "", "Access",), CaseType.UNKNOWN))
+          is ForbiddenOffenderError -> Mono.just(PersonSummary(crnOrNoms, Name("Restricted", "", "Access",), CaseType.UNKNOWN))
+          is MissingOffenderError -> Mono.empty()
           else -> Mono.error(ex)
         }
       }
@@ -92,3 +101,4 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
 
 class MissingChoosePractitioner(msg: String) : RuntimeException(msg)
 private class ForbiddenOffenderError(msg: String) : RuntimeException(msg)
+private class MissingOffenderError(msg: String) : RuntimeException(msg)

@@ -9,7 +9,6 @@ generic-service:
   env:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.json
     OAUTH_ENDPOINT_URL: https://sign-in.hmpps.service.justice.gov.uk/auth
-    COMMUNITY_ENDPOINT_URL: https://community-api-secure.probation.service.justice.gov.uk/secure
     HMPPS_TIER_ENDPOINT_URL: https://hmpps-tier.hmpps.service.justice.gov.uk
     INGRESS_URL: *ingressHost
     ASSESS_RISKS_NEEDS_ENDPOINT_URL: https://assess-risks-and-needs.hmpps.service.justice.gov.uk

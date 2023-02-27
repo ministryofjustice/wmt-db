@@ -163,8 +163,8 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
     )
   }
 
-  fun personResourceResponse(crn: String, forename: String, middleName: String, surname: String, type: CaseType?) {
-    val request = HttpRequest.request().withPath("/person/$crn")
+  fun personResourceResponse(crnOrNoms: String, crn: String, forename: String = "Jane", middleName: String = "middleName", surname: String = "Doe", type: CaseType = CaseType.CUSTODY) {
+    val request = HttpRequest.request().withPath("/person/$crnOrNoms")
     workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
       HttpResponse.response()
         .withContentType(MediaType.APPLICATION_JSON).withBody(personSummaryResponse(crn, forename, middleName, surname, type))
@@ -177,6 +177,13 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
 
     workforceAllocationsToDelius.`when`(summaryRequest, Times.exactly(1)).respond(
       HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withStatusCode(HttpStatus.FORBIDDEN.value())
+    )
+  }
+
+  fun notFoundPersonResourceResponse(crn: String) {
+    val request = HttpRequest.request().withPath("/person/$crn")
+    workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
+      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withStatusCode(404)
     )
   }
 }

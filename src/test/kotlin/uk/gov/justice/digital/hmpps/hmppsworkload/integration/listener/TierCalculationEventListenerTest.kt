@@ -21,7 +21,7 @@ class TierCalculationEventListenerTest : IntegrationTestBase() {
   @Test
   fun `saves updated tiers`() {
     val crn = "J678910"
-    WorkforceAllocationsToDeliusExtension.workforceAllocationsToDelius.personResourceResponse("J678910", "Jane", "MiddleName", "Doe", CaseType.CUSTODY)
+    WorkforceAllocationsToDeliusExtension.workforceAllocationsToDelius.personResourceResponse(crn, crn = crn)
     hmppsTier.tierCalculationResponse(crn)
     hmppsDomainSnsClient.publish(
       PublishRequest(hmppsDomainTopicArn, objectMapper.writeValueAsString(tierCalculationEvent(crn)))
