@@ -19,7 +19,7 @@ class OffenderDetailsEventListenerTests : IntegrationTestBase() {
   fun `must save case details when processing new sentence event`() {
     val crn = "J678910"
 
-    workforceAllocationsToDelius.personResourceResponse(crn, crn = crn)
+    workforceAllocationsToDelius.personResourceResponse(crn)
     hmppsTier.tierCalculationResponse(crn)
 
     hmppsOffenderSnsClient.publish(

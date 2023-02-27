@@ -162,7 +162,7 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
     )
   }
 
-  fun personResourceResponse(crnOrNoms: String, crn: String, type: String? = "", forename: String = "Jane", middleName: String = "middleName", surname: String = "Doe", caseType: CaseType = CaseType.CUSTODY) {
+  fun personResourceResponse(crn: String, crnOrNoms: String = crn, type: String? = "", forename: String = "Jane", middleName: String = "middleName", surname: String = "Doe", caseType: CaseType = CaseType.CUSTODY) {
     val request = HttpRequest.request().withPath("/person/$crnOrNoms")
       .withQueryStringParameter("type", type)
     workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
