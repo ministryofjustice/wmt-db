@@ -24,7 +24,7 @@ class SaveCaseDetailsService(
 ) {
 
   fun save(crn: String) {
-    val personSummary = workforceAllocationsToDeliusApiClient.getSummaryByCrn(crn).block()!!
+    val personSummary = workforceAllocationsToDeliusApiClient.getSummaryByCrnOrNoms(crn, "CRN").block()!!
     personSummary.takeUnless { it.type == CaseType.UNKNOWN }?.type?.let { caseType ->
       hmppsTierApiClient.getTierByCrn(crn).map {
         val tier = Tier.valueOf(it)

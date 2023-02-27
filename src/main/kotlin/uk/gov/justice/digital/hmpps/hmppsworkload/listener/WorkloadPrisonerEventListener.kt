@@ -20,7 +20,7 @@ class WorkloadPrisonerEventListener(
   @JmsListener(destination = "workloadprisonerqueue", containerFactory = "hmppsQueueContainerFactoryProxy")
   fun processMessage(rawMessage: String) {
     val nomsNumber = getNomsNumber(rawMessage)
-    workforceAllocationsToDeliusApiClient.getSummaryByCrn(nomsNumber).block()?.let {
+    workforceAllocationsToDeliusApiClient.getSummaryByCrnOrNoms(nomsNumber, "NOMS").block()?.let {
       getPersonManager.findLatestByCrn(it.crn)?.let { personManager ->
         workloadCalculationService.saveWorkloadCalculation(StaffIdentifier(personManager.staffCode, personManager.teamCode), personManager.staffGrade)
       }

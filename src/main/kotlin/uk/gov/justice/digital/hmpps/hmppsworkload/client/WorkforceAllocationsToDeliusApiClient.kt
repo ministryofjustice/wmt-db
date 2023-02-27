@@ -34,12 +34,13 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
 
   /**
    * Returns the Person Summary from person-resources/workforce api
-   * @param crnOrNoms: CRN or NOMS
+   * @param crnOrNoms: CRN or NOMS number. Default CRN.
+   * @param type: query variable for CRN or NOMS.
    */
-  fun getSummaryByCrn(crnOrNoms: String): Mono<PersonSummary> {
+  fun getSummaryByCrnOrNoms(crnOrNoms: String, type: String? = ""): Mono<PersonSummary> {
     return webClient
       .get()
-      .uri("/person/$crnOrNoms")
+      .uri("/person/$crnOrNoms?type=$type")
       .retrieve()
       .onStatus(
         { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },

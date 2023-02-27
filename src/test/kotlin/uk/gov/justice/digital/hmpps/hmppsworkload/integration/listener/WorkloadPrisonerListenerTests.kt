@@ -30,7 +30,7 @@ class WorkloadPrisonerListenerTests : IntegrationTestBase() {
 
     caseDetailsRepository.save(caseDetailsEntity)
     workforceAllocationsToDelius.officerViewResponse(staffCode)
-    workforceAllocationsToDelius.personResourceResponse(crnOrNoms = nomsNumber, crn = crn, forename = "John", surname = "Smith", type = CaseType.COMMUNITY)
+    workforceAllocationsToDelius.personResourceResponse(crnOrNoms = nomsNumber, crn = crn, type = "NOMS", forename = "John", surname = "Smith", caseType = CaseType.COMMUNITY)
 
     personManagerRepository.save(PersonManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", isActive = true))
 
@@ -57,7 +57,7 @@ class WorkloadPrisonerListenerTests : IntegrationTestBase() {
   fun `process prisoner who is unknown to workload`() {
     val crn = "J678910"
     val nomsNumber = "X1111XX"
-    workforceAllocationsToDelius.personResourceResponse(crnOrNoms = nomsNumber, crn = crn)
+    workforceAllocationsToDelius.personResourceResponse(crnOrNoms = nomsNumber, crn = crn, type = "NOMS")
     hmppsDomainSnsClient.publish(
       PublishRequest(hmppsDomainTopicArn, jsonString(prisonerEvent(nomsNumber))).withMessageAttributes(
         mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("prison-offender-events.prisoner.released"))
