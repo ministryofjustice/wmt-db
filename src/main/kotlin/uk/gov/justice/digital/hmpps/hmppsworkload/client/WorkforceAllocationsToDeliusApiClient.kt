@@ -44,7 +44,7 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
       .retrieve()
       .onStatus(
         { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
-        { Mono.error(MissingOffenderError("No offender found for $crnOrNoms")) }
+        { Mono.error(MissingOffenderError("No offender found for ${if (type == "NOMS") "NOMS" else "CRN"}: $crnOrNoms")) }
       )
       .bodyToMono(PersonSummary::class.java)
       .onErrorResume { ex ->
