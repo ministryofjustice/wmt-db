@@ -29,7 +29,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
   @Test
   fun `case type is unknown if there is no sentence`() {
     val crn = "J678910"
-    workforceAllocationsToDelius.personResourceResponse(crnOrNoms = "J678910", crn = "J678910", type = CaseType.UNKNOWN)
+    workforceAllocationsToDelius.personResourceResponse(crnOrNoms = crn, crn = crn, type = CaseType.UNKNOWN)
     hmppsTier.tierCalculationResponse(crn)
     hmppsOffenderSnsClient.publish(
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
