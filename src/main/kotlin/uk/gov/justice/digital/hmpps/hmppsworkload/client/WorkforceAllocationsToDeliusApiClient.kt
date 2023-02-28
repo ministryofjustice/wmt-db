@@ -8,9 +8,11 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.AllocationDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ChoosePractitionerResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.CompleteDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ImpactResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Name
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OfficerView
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffActiveCases
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 
 class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
 
@@ -32,27 +34,36 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
       }
   }
 
-  /**
-   * Returns the Person Summary from person-resources/workforce api
-   * @param crnOrNoms: CRN or NOMS number. Default CRN.
-   * @param type: query variable for CRN or NOMS.
-   */
-  fun getSummaryByCrnOrNoms(crnOrNoms: String, type: String? = ""): Mono<PersonSummary> {
-    return webClient
-      .get()
-      .uri("/person/$crnOrNoms?type=$type")
-      .retrieve()
-      .onStatus(
-        { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
-        { Mono.error(MissingOffenderError("No offender found for ${if (type == "NOMS") "NOMS" else "CRN"}: $crnOrNoms")) }
-      )
-      .bodyToMono(PersonSummary::class.java)
+  fun getPersonByCrn(crn: String): Mono<PersonSummary> {
+    return getPerson(crn, "CRN")
+      .onErrorResume { ex ->
+        when (ex) {
+          is MissingOffenderError -> Mono.just(PersonSummary(crn, Name("Unknown", "", "Unknown"), CaseType.UNKNOWN))
+          else -> Mono.error(ex)
+        }
+      }
+  }
+
+  fun getPersonByNoms(noms: String): Mono<PersonSummary> {
+    return getPerson(noms, "NOMS")
       .onErrorResume { ex ->
         when (ex) {
           is MissingOffenderError -> Mono.empty()
           else -> Mono.error(ex)
         }
       }
+  }
+
+  private fun getPerson(identifier: String, identifierType: String): Mono<PersonSummary> {
+    return webClient
+      .get()
+      .uri("/person/$identifier?type=$identifierType")
+      .retrieve()
+      .onStatus(
+        { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
+        { Mono.error(MissingOffenderError("No offender by $identifierType found for : $identifier")) }
+      )
+      .bodyToMono(PersonSummary::class.java)
   }
 
   fun getOfficerView(staffCode: String): Mono<OfficerView> {

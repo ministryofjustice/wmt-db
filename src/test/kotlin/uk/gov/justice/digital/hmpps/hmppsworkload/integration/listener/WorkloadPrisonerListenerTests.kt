@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReferenceType
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.TierApiExtension.Companion.hmppsTier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.WorkforceAllocationsToDeliusExtension.Companion.workforceAllocationsToDelius
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
@@ -30,7 +31,8 @@ class WorkloadPrisonerListenerTests : IntegrationTestBase() {
 
     caseDetailsRepository.save(caseDetailsEntity)
     workforceAllocationsToDelius.officerViewResponse(staffCode)
-    workforceAllocationsToDelius.personResourceResponse(crnOrNoms = nomsNumber, crn = crn, type = "NOMS", forename = "John", surname = "Smith", caseType = CaseType.COMMUNITY)
+    workforceAllocationsToDelius.personResponseByNoms(nomsNumber, crn, CaseType.COMMUNITY)
+    hmppsTier.tierCalculationResponse(crn)
 
     personManagerRepository.save(PersonManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", isActive = true))
 
@@ -41,6 +43,7 @@ class WorkloadPrisonerListenerTests : IntegrationTestBase() {
     )
 
     noMessagesOnWorkloadPrisonerQueue()
+    noMessagesOnWorkloadPrisonerDLQ()
 
     val actualWorkloadCalcEntity: WorkloadCalculationEntity? =
       workloadCalculationRepository.findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode, teamCode)
@@ -57,7 +60,7 @@ class WorkloadPrisonerListenerTests : IntegrationTestBase() {
   fun `process prisoner who is unknown to workload`() {
     val crn = "J678910"
     val nomsNumber = "X1111XX"
-    workforceAllocationsToDelius.personResourceResponse(crnOrNoms = nomsNumber, crn = crn, type = "NOMS")
+    workforceAllocationsToDelius.personResponseByNoms(nomsNumber, crn)
     hmppsDomainSnsClient.publish(
       PublishRequest(hmppsDomainTopicArn, jsonString(prisonerEvent(nomsNumber))).withMessageAttributes(
         mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("prison-offender-events.prisoner.released"))
@@ -71,7 +74,7 @@ class WorkloadPrisonerListenerTests : IntegrationTestBase() {
   @Test
   fun `process prisoner not in Delius yet`() {
     val nomsNumber = "X1111XX"
-    workforceAllocationsToDelius.notFoundPersonResourceResponse(nomsNumber)
+    workforceAllocationsToDelius.notFoundPersonResourceResponse(nomsNumber, "NOMS")
     hmppsDomainSnsClient.publish(
       PublishRequest(hmppsDomainTopicArn, jsonString(prisonerEvent(nomsNumber))).withMessageAttributes(
         mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("prison-offender-events.prisoner.released"))

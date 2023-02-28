@@ -13,7 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReferenceType
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.TierApiExtension.Companion.hmppsTier
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.WorkforceAllocationsToDeliusExtension
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.WorkforceAllocationsToDeliusExtension.Companion.workforceAllocationsToDelius
 import uk.gov.justice.digital.hmpps.hmppsworkload.listener.TierCalculationEventListener.CalculationEventData
 
 class TierCalculationEventListenerTest : IntegrationTestBase() {
@@ -21,7 +21,7 @@ class TierCalculationEventListenerTest : IntegrationTestBase() {
   @Test
   fun `saves updated tiers`() {
     val crn = "J678910"
-    WorkforceAllocationsToDeliusExtension.workforceAllocationsToDelius.personResourceResponse(crn)
+    workforceAllocationsToDelius.personResponseByCrn(crn)
     hmppsTier.tierCalculationResponse(crn)
     hmppsDomainSnsClient.publish(
       PublishRequest(hmppsDomainTopicArn, objectMapper.writeValueAsString(tierCalculationEvent(crn)))

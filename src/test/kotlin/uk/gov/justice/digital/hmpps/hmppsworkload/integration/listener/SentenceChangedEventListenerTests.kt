@@ -29,7 +29,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
   @Test
   fun `case type is unknown if there is no sentence`() {
     val crn = "J678910"
-    workforceAllocationsToDelius.personResourceResponse(crn, caseType = CaseType.UNKNOWN)
+    workforceAllocationsToDelius.personResponseByCrn(crn, caseType = CaseType.UNKNOWN)
     hmppsTier.tierCalculationResponse(crn)
     hmppsOffenderSnsClient.publish(
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
@@ -47,7 +47,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
   @Test
   fun `do not write case details if there is no tier`() {
     val crn = "J678910"
-    workforceAllocationsToDelius.personResourceResponse(crn,)
+    workforceAllocationsToDelius.personResponseByCrn(crn)
     hmppsTier.tierCalculationNotFoundResponse(crn)
     hmppsOffenderSnsClient.publish(
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
@@ -69,7 +69,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     val teamCode = "team1"
 
     hmppsTier.tierCalculationResponse(crn)
-    workforceAllocationsToDelius.personResourceResponse(crn)
+    workforceAllocationsToDelius.personResponseByCrn(crn)
     personManagerRepository.save(PersonManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", isActive = true))
 
     hmppsOffenderSnsClient.publish(
@@ -97,10 +97,10 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     val staffCode = "staff1"
     val teamCode = "team1"
 
-    workforceAllocationsToDelius.personResourceResponse(crn)
+    workforceAllocationsToDelius.personResponseByCrn(crn)
     hmppsTier.tierCalculationResponse(crn)
 
-    workforceAllocationsToDelius.personResourceResponse(crn)
+    workforceAllocationsToDelius.personResponseByCrn(crn)
     hmppsTier.tierCalculationResponse(crn, Tier.C3.name)
 
     personManagerRepository.save(PersonManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", isActive = true))
@@ -126,7 +126,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
   @Test
   fun `case details not saved if no active convictions exist`() {
     val crn = "J678910"
-    workforceAllocationsToDelius.personResourceResponse(crn)
+    workforceAllocationsToDelius.personResponseByCrn(crn)
 
     val sentenceChangedEvent =
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
@@ -169,7 +169,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
       )
     )
 
-    workforceAllocationsToDelius.personResourceResponse(crn)
+    workforceAllocationsToDelius.personResponseByCrn(crn)
 
     val sentenceChangedEvent =
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
@@ -195,7 +195,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     val staffCode = "staff1"
     val teamCode = "team1"
 
-    workforceAllocationsToDelius.personResourceResponse(crn)
+    workforceAllocationsToDelius.personResponseByCrn(crn)
     hmppsTier.tierCalculationResponse(crn)
 
     val caseDetailsEntity = CaseDetailsEntity(crn, Tier.C3, CaseType.COMMUNITY, "Jane", "Doe")
@@ -220,7 +220,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     val staffCode = "staff1"
     val teamCode = "team1"
 
-    workforceAllocationsToDelius.personResourceResponse(crn)
+    workforceAllocationsToDelius.personResponseByCrn(crn)
     hmppsTier.tierCalculationResponse(crn)
 
     val caseDetailsEntity = CaseDetailsEntity(crn, Tier.C3, CaseType.COMMUNITY, "Jane", "Doe")
