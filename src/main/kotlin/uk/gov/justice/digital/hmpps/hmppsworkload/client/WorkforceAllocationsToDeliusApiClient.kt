@@ -8,11 +8,9 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.AllocationDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ChoosePractitionerResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.CompleteDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ImpactResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Name
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OfficerView
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffActiveCases
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 
 class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
 
@@ -34,19 +32,24 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
       }
   }
 
-  fun getSummaryByCrn(crn: String): Mono<PersonSummary> {
+  /**
+   * Returns the Person Summary from person-resources/workforce api
+   * @param crnOrNoms: CRN or NOMS number. Default CRN.
+   * @param type: query variable for CRN or NOMS.
+   */
+  fun getSummaryByCrnOrNoms(crnOrNoms: String, type: String? = ""): Mono<PersonSummary> {
     return webClient
       .get()
-      .uri("/person/$crn")
+      .uri("/person/$crnOrNoms?type=$type")
       .retrieve()
       .onStatus(
-        { httpStatus -> HttpStatus.FORBIDDEN == httpStatus },
-        { Mono.error(ForbiddenOffenderError("Unable to access offender details for $crn")) }
+        { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
+        { Mono.error(MissingOffenderError("No offender found for ${if (type == "NOMS") "NOMS" else "CRN"}: $crnOrNoms")) }
       )
       .bodyToMono(PersonSummary::class.java)
       .onErrorResume { ex ->
         when (ex) {
-          is ForbiddenOffenderError -> Mono.just(PersonSummary("Restricted Access", Name("Restricted", "", "Access",), CaseType.UNKNOWN))
+          is MissingOffenderError -> Mono.empty()
           else -> Mono.error(ex)
         }
       }
@@ -91,4 +94,4 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
 }
 
 class MissingChoosePractitioner(msg: String) : RuntimeException(msg)
-private class ForbiddenOffenderError(msg: String) : RuntimeException(msg)
+private class MissingOffenderError(msg: String) : RuntimeException(msg)

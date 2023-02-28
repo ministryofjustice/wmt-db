@@ -40,7 +40,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WMT
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WorkloadPointsCalculationRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.repository.WorkloadReportRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.AssessRisksNeedsApiExtension
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.CommunityApiExtension
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.HmppsAuthApiExtension
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.TierApiExtension
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.WorkforceAllocationsToDeliusExtension
@@ -70,7 +69,6 @@ import java.math.BigDecimal
 
 @ExtendWith(
   AssessRisksNeedsApiExtension::class,
-  CommunityApiExtension::class,
   TierApiExtension::class,
   WorkforceAllocationsToDeliusExtension::class,
   HmppsAuthApiExtension::class
