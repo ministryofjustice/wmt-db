@@ -162,18 +162,26 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
     )
   }
 
-  fun personResourceResponse(crn: String, crnOrNoms: String = crn, type: String? = "", forename: String = "Jane", middleName: String = "middleName", surname: String = "Doe", caseType: CaseType = CaseType.CUSTODY) {
-    val request = HttpRequest.request().withPath("/person/$crnOrNoms")
-      .withQueryStringParameter("type", type)
+  fun personResponseByCrn(crn: String, caseType: CaseType = CaseType.CUSTODY) {
+    personResourceResponse(crn, "CRN", crn, caseType)
+  }
+
+  fun personResponseByNoms(noms: String, crn: String, caseType: CaseType = CaseType.CUSTODY) {
+    personResourceResponse(noms, "NOMS", crn, caseType)
+  }
+
+  private fun personResourceResponse(identifier: String, identifierType: String, crn: String, caseType: CaseType) {
+    val request = HttpRequest.request().withPath("/person/$identifier")
+      .withQueryStringParameter("type", identifierType)
     workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
       HttpResponse.response()
-        .withContentType(MediaType.APPLICATION_JSON).withBody(personSummaryResponse(crn, forename, middleName, surname, caseType))
+        .withContentType(MediaType.APPLICATION_JSON).withBody(personSummaryResponse(crn, caseType))
     )
   }
 
-  fun notFoundPersonResourceResponse(crnOrNoms: String, type: String? = "") {
-    val request = HttpRequest.request().withPath("/person/$crnOrNoms")
-      .withQueryStringParameter("type", type)
+  fun notFoundPersonResourceResponse(identifier: String, identifierType: String) {
+    val request = HttpRequest.request().withPath("/person/$identifier")
+      .withQueryStringParameter("type", identifierType)
     workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
       HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withStatusCode(404)
     )

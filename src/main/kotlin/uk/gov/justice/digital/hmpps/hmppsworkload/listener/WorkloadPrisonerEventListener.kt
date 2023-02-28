@@ -3,28 +3,19 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.listener
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.jms.annotation.JmsListener
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToDeliusApiClient
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.WorkloadCalculationService
-import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.GetPersonManager
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.SaveCaseDetailsService
 
 @Component
 class WorkloadPrisonerEventListener(
   private val objectMapper: ObjectMapper,
-  private val workloadCalculationService: WorkloadCalculationService,
-  private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient,
-  private val getPersonManager: GetPersonManager
+  private val saveCaseDetailsService: SaveCaseDetailsService
 ) {
 
   @JmsListener(destination = "workloadprisonerqueue", containerFactory = "hmppsQueueContainerFactoryProxy")
   fun processMessage(rawMessage: String) {
     val nomsNumber = getNomsNumber(rawMessage)
-    workforceAllocationsToDeliusApiClient.getSummaryByCrnOrNoms(nomsNumber, "NOMS").block()?.let {
-      getPersonManager.findLatestByCrn(it.crn)?.let { personManager ->
-        workloadCalculationService.saveWorkloadCalculation(StaffIdentifier(personManager.staffCode, personManager.teamCode), personManager.staffGrade)
-      }
-    }
+    saveCaseDetailsService.saveByNoms(nomsNumber)
   }
 
   private fun getNomsNumber(rawMessage: String): String {

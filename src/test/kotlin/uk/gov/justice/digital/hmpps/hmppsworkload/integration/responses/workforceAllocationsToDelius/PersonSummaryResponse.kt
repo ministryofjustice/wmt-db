@@ -2,14 +2,14 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workfor
 
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 
-fun personSummaryResponse(crn: String, forename: String, middleName: String, surname: String, type: CaseType?): String {
+fun personSummaryResponse(crn: String, type: CaseType?): String {
   return """
 {
   "crn": "$crn",
   "name": {
-    "forename": "$forename",
-    "middleName": "$middleName",
-    "surname": "$surname"
+    "forename": "Jane",
+    "middleName": "",
+    "surname": "Doe"
   },
   "type": "$type"
 }

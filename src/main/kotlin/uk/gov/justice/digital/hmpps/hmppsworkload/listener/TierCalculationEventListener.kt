@@ -16,7 +16,7 @@ class TierCalculationEventListener(
   @JmsListener(destination = "tiercalcqueue", containerFactory = "hmppsQueueContainerFactoryProxy")
   fun processMessage(rawMessage: String) {
     val calculationEventData = readMessage(rawMessage)
-    saveCaseDetailsService.save(crnFrom(calculationEventData))
+    saveCaseDetailsService.saveByCrn(crnFrom(calculationEventData))
   }
 
   private fun readMessage(wrapper: String?): CalculationEventData {

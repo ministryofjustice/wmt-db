@@ -32,19 +32,22 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
       }
   }
 
-  /**
-   * Returns the Person Summary from person-resources/workforce api
-   * @param crnOrNoms: CRN or NOMS number. Default CRN.
-   * @param type: query variable for CRN or NOMS.
-   */
-  fun getSummaryByCrnOrNoms(crnOrNoms: String, type: String? = ""): Mono<PersonSummary> {
+  fun getPersonByCrn(crn: String): Mono<PersonSummary> {
+    return getPerson(crn, "CRN")
+  }
+
+  fun getPersonByNoms(noms: String): Mono<PersonSummary> {
+    return getPerson(noms, "NOMS")
+  }
+
+  private fun getPerson(identifier: String, identifierType: String): Mono<PersonSummary> {
     return webClient
       .get()
-      .uri("/person/$crnOrNoms?type=$type")
+      .uri("/person/$identifier?type=$identifierType")
       .retrieve()
       .onStatus(
         { httpStatus -> HttpStatus.NOT_FOUND == httpStatus },
-        { Mono.error(MissingOffenderError("No offender found for ${if (type == "NOMS") "NOMS" else "CRN"}: $crnOrNoms")) }
+        { Mono.error(MissingOffenderError("No offender by $identifierType found for : $identifier")) }
       )
       .bodyToMono(PersonSummary::class.java)
       .onErrorResume { ex ->

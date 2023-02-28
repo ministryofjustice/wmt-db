@@ -5,6 +5,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.HmppsTierApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToDeliusApiClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PersonManager
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
@@ -23,22 +24,38 @@ class SaveCaseDetailsService(
   private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient
 ) {
 
-  fun save(crn: String) {
-    val personSummary = workforceAllocationsToDeliusApiClient.getSummaryByCrnOrNoms(crn, "CRN").block()!!
-    personSummary.takeUnless { it.type == CaseType.UNKNOWN }?.type?.let { caseType ->
-      hmppsTierApiClient.getTierByCrn(crn).map {
+  fun saveByCrn(crn: String) {
+    val personSummary = workforceAllocationsToDeliusApiClient.getPersonByCrn(crn).block()
+    savePerson(personSummary)
+  }
+
+  fun saveByNoms(noms: String) {
+    val personSummary = workforceAllocationsToDeliusApiClient.getPersonByNoms(noms).block()
+    savePerson(personSummary)
+  }
+
+  private fun savePerson(
+    personSummary: PersonSummary?
+  ) {
+    personSummary?.takeUnless { it.type == CaseType.UNKNOWN }?.type?.let { caseType ->
+      hmppsTierApiClient.getTierByCrn(personSummary.crn).map {
         val tier = Tier.valueOf(it)
-        CaseDetailsEntity(crn, tier, caseType, personSummary.name.forename, personSummary.name.surname)
+        CaseDetailsEntity(personSummary.crn, tier, caseType, personSummary.name.forename, personSummary.name.surname)
       }.block()?.let {
         caseDetailsRepository.save(it)
-        val staff: PersonManager? = getPersonManager.findLatestByCrn(crn)
+        val staff: PersonManager? = getPersonManager.findLatestByCrn(personSummary.crn)
         if (staff != null) {
-          workloadCalculationService.saveWorkloadCalculation(StaffIdentifier(staff.staffCode, staff.teamCode), staff.staffGrade)
+          workloadCalculationService.saveWorkloadCalculation(
+            StaffIdentifier(staff.staffCode, staff.teamCode),
+            staff.staffGrade
+          )
         }
       }
-    } ?: caseDetailsRepository.findByIdOrNull(crn)?.let {
-      caseDetailsRepository.delete(it)
-      updateWorkloadService.setWorkloadInactive(crn)
+    } ?: personSummary?.crn?.let { crn ->
+      caseDetailsRepository.findByIdOrNull(crn)?.let {
+        caseDetailsRepository.delete(it)
+        updateWorkloadService.setWorkloadInactive(crn)
+      }
     }
   }
 }

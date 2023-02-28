@@ -15,7 +15,7 @@ class OffenderEventListener(
   @JmsListener(destination = "hmppsoffenderqueue", containerFactory = "hmppsQueueContainerFactoryProxy")
   fun processMessage(rawMessage: String) {
     val (crn) = getCase(rawMessage)
-    saveCaseDetailsService.save(crn)
+    saveCaseDetailsService.saveByCrn(crn)
   }
 
   private fun getCase(rawMessage: String): HmppsOffenderEvent {
