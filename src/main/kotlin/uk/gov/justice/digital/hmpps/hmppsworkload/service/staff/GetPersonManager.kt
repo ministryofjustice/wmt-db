@@ -7,5 +7,5 @@ import java.util.UUID
 interface GetPersonManager {
   fun findById(id: UUID): PersonManagerDetails?
 
-  fun findLatestByCrn(crn: String): PersonManager?
+  suspend fun findLatestByCrn(crn: String): PersonManager?
 }

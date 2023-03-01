@@ -24,25 +24,25 @@ class SaveCaseDetailsService(
   private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient
 ) {
 
-  fun saveByCrn(crn: String) {
-    val personSummary = workforceAllocationsToDeliusApiClient.getPersonByCrn(crn).block()
+  suspend fun saveByCrn(crn: String) {
+    val personSummary = workforceAllocationsToDeliusApiClient.getPersonByCrn(crn)
     savePerson(personSummary)
   }
 
-  fun saveByNoms(noms: String) {
-    val personSummary = workforceAllocationsToDeliusApiClient.getPersonByNoms(noms).block()
+  suspend fun saveByNoms(noms: String) {
+    val personSummary = workforceAllocationsToDeliusApiClient.getPersonByNoms(noms)
     savePerson(personSummary)
   }
 
-  private fun savePerson(
+  private suspend fun savePerson(
     personSummary: PersonSummary?
   ) {
     personSummary?.takeUnless { it.type == CaseType.UNKNOWN }?.type?.let { caseType ->
-      hmppsTierApiClient.getTierByCrn(personSummary.crn).map {
+      hmppsTierApiClient.getTierByCrn(personSummary.crn)?.let {
         val tier = Tier.valueOf(it)
-        CaseDetailsEntity(personSummary.crn, tier, caseType, personSummary.name.forename, personSummary.name.surname)
-      }.block()?.let {
-        caseDetailsRepository.save(it)
+        val caseDetails =
+          CaseDetailsEntity(personSummary.crn, tier, caseType, personSummary.name.forename, personSummary.name.surname)
+        caseDetailsRepository.save(caseDetails)
         val staff: PersonManager? = getPersonManager.findLatestByCrn(personSummary.crn)
         if (staff != null) {
           workloadCalculationService.saveWorkloadCalculation(

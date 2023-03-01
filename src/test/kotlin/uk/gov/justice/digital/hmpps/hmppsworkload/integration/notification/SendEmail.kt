@@ -1,8 +1,12 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.notification
 
+import kotlinx.coroutines.reactor.asCoroutineContext
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpHeaders
+import reactor.util.context.Context
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType.COMMUNITY
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier.B3
@@ -19,10 +23,10 @@ class SendEmail : IntegrationTestBase() {
   lateinit var notificationService: NotificationService
 
   @Test
-  fun `sends an email when ROSH cannot be retrieved`() {
+  fun `sends an email when ROSH cannot be retrieved`() = runBlocking(Context.of(HttpHeaders.AUTHORIZATION, "token").asCoroutineContext()) {
+
     val crn = "X123456"
     val allocateCase = AllocateCase(crn, sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
-    val token = "token"
     val allocationDetails = getAllocationDetails(crn)
 
     assessRisksNeedsApi.riskSummaryErrorResponse(crn)
@@ -30,31 +34,28 @@ class SendEmail : IntegrationTestBase() {
     caseDetailsRepository.save(CaseDetailsEntity(crn, B3, COMMUNITY, "Jane", "Doe"))
     val emailSendResponse = notificationService.notifyAllocation(
       allocationDetails,
-      allocateCase,
-      token
-    ).block()
+      allocateCase
+    )
     assessRisksNeedsApi.verifyRiskSummaryCalled(crn, 2)
     assessRisksNeedsApi.verifyRiskPredictorCalled(crn, 1)
-    assertEquals(UUID.fromString("d2708c23-d5d2-4455-b26c-7d5d1d5c5733"), emailSendResponse?.first()?.templateId)
+    assertEquals(UUID.fromString("d2708c23-d5d2-4455-b26c-7d5d1d5c5733"), emailSendResponse.first().templateId)
   }
 
   @Test
-  fun `sends an email when risk predictor cannot be retrieved`() {
+  fun `sends an email when risk predictor cannot be retrieved`() = runBlocking(Context.of(HttpHeaders.AUTHORIZATION, "token").asCoroutineContext()) {
 
     val crn = "X123456"
     val allocateCase = AllocateCase(crn, sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
-    val token = "token"
     val allocationDetails = getAllocationDetails(crn)
     assessRisksNeedsApi.riskSummaryResponse(crn)
     assessRisksNeedsApi.riskPredictorErrorResponse(crn)
     caseDetailsRepository.save(CaseDetailsEntity(crn, B3, COMMUNITY, "Jane", "Doe"))
     val emailSendResponse = notificationService.notifyAllocation(
       allocationDetails,
-      allocateCase,
-      token
-    ).block()
+      allocateCase
+    )
     assessRisksNeedsApi.verifyRiskSummaryCalled(crn, 1)
     assessRisksNeedsApi.verifyRiskPredictorCalled(crn, 2)
-    assertEquals(UUID.fromString("d2708c23-d5d2-4455-b26c-7d5d1d5c5733"), emailSendResponse?.first()?.templateId)
+    assertEquals(UUID.fromString("d2708c23-d5d2-4455-b26c-7d5d1d5c5733"), emailSendResponse.first().templateId)
   }
 }

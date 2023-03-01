@@ -27,6 +27,6 @@ class PersonManagerController(private val getPersonManager: GetPersonManager) {
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("\${person.manager.getByIdPath}")
-  fun getPersonManagerById(@PathVariable(required = true) id: UUID): PersonManagerDetails =
+  suspend fun getPersonManagerById(@PathVariable(required = true) id: UUID): PersonManagerDetails =
     getPersonManager.findById(id) ?: throw EntityNotFoundException("Person Manager not found for id $id")
 }

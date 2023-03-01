@@ -16,7 +16,7 @@ class JpaBasedSavePersonManagerService(
   private val getPersonManager: GetPersonManager,
 ) : SavePersonManagerService {
   @Transactional
-  override fun savePersonManager(
+  override suspend fun savePersonManager(
     teamCode: String,
     deliusStaff: StaffMember,
     loggedInUser: String,
@@ -29,6 +29,7 @@ class JpaBasedSavePersonManagerService(
         val currentPersonManager = getPersonManager.findLatestByCrn(crn)
         createPersonManager(deliusStaff, teamCode, loggedInUser, crn).also {
           personManager.isActive = false
+          personManagerRepository.save(personManager)
           workloadCalculationService.saveWorkloadCalculation(
             StaffIdentifier(currentPersonManager!!.staffCode, currentPersonManager.teamCode),
             currentPersonManager.staffGrade

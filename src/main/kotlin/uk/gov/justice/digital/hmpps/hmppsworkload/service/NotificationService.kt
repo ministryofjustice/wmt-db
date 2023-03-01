@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.AssessRisksNeedsApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.AllocationDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.InitialAppointment
@@ -36,22 +35,21 @@ class NotificationService(
   private val caseDetailsRepository: CaseDetailsRepository
 ) {
 
-  fun notifyAllocation(allocationDetails: AllocationDetails, allocateCase: AllocateCase, token: String): Mono<List<SendEmailResponse>> {
-    return getNotifyData(allocateCase.crn, token).map { notifyData ->
-      val caseDetails = caseDetailsRepository.findByIdOrNull(allocateCase.crn)!!
-      val parameters = mapOf(
-        "officer_name" to allocationDetails.staff.name.getCombinedName(),
-        "induction_statement" to mapInductionAppointment(allocationDetails.initialAppointment, caseDetails.type),
-        "requirements" to mapRequirements(allocationDetails.activeRequirements),
-      ).plus(getRiskParameters(notifyData.riskSummary, notifyData.riskPredictors, allocationDetails.ogrs))
-        .plus(getConvictionParameters(allocationDetails))
-        .plus(getPersonOnProbationParameters(allocationDetails.name.getCombinedName(), allocateCase))
-        .plus(getLoggedInUserParameters(allocationDetails.allocatingStaff))
-      val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
-      emailTo.add(allocationDetails.staff.email!!)
-      if (allocateCase.sendEmailCopyToAllocatingOfficer) emailTo.add(allocationDetails.allocatingStaff.email)
-      emailTo.map { email -> addRecipientTo400Response(email) { notificationClient.sendEmail(allocationTemplateId, email, parameters, null) } }
-    }
+  suspend fun notifyAllocation(allocationDetails: AllocationDetails, allocateCase: AllocateCase): List<SendEmailResponse> {
+    val notifyData = getNotifyData(allocateCase.crn)
+    val caseDetails = caseDetailsRepository.findByIdOrNull(allocateCase.crn)!!
+    val parameters = mapOf(
+      "officer_name" to allocationDetails.staff.name.getCombinedName(),
+      "induction_statement" to mapInductionAppointment(allocationDetails.initialAppointment, caseDetails.type),
+      "requirements" to mapRequirements(allocationDetails.activeRequirements),
+    ).plus(getRiskParameters(notifyData.riskSummary, notifyData.riskPredictors, allocationDetails.ogrs))
+      .plus(getConvictionParameters(allocationDetails))
+      .plus(getPersonOnProbationParameters(allocationDetails.name.getCombinedName(), allocateCase))
+      .plus(getLoggedInUserParameters(allocationDetails.allocatingStaff))
+    val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
+    emailTo.add(allocationDetails.staff.email!!)
+    if (allocateCase.sendEmailCopyToAllocatingOfficer) emailTo.add(allocationDetails.allocatingStaff.email)
+    return emailTo.map { email -> addRecipientTo400Response(email) { notificationClient.sendEmail(allocationTemplateId, email, parameters, null) } }
   }
 
   class NotificationInvalidSenderException(emailRecipient: String) : Exception("Unable to deliver to recipient $emailRecipient")
@@ -125,13 +123,8 @@ class NotificationService(
   private fun mapRequirements(requirements: List<Requirement>): List<String> = requirements
     .map { requirement -> "${requirement.mainCategory}: ${requirement.subCategory} ${requirement.length}".trimEnd() }
 
-  private fun getNotifyData(crn: String, token: String): Mono<NotifyData> {
-    return Mono.zip(
-      assessRisksNeedsApiClient.getRiskSummary(crn, token),
-      assessRisksNeedsApiClient.getRiskPredictors(crn, token)
-    ).map { results ->
-      NotifyData(results.t1.orElse(null), results.t2)
-    }
+  private suspend fun getNotifyData(crn: String): NotifyData {
+    return NotifyData(assessRisksNeedsApiClient.getRiskSummary(crn), assessRisksNeedsApiClient.getRiskPredictors(crn))
   }
 }
 

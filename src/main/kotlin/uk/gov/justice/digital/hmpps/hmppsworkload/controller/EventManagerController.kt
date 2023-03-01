@@ -29,7 +29,7 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("\${event.manager.getByIdPath}")
-  fun getEventManagerById(@PathVariable(required = true) id: UUID): EventManagerDetails =
+  suspend fun getEventManagerById(@PathVariable(required = true) id: UUID): EventManagerDetails =
     getEventManager.findById(id)?.let { eventManagerEntity -> EventManagerDetails.from(eventManagerEntity) }
       ?: throw EntityNotFoundException("Event Manager not found for id $id")
 
@@ -42,7 +42,7 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/allocation/person/{crn}/event/{eventNumber}/details")
-  fun getCaseDetailsForEventManager(
+  suspend fun getCaseDetailsForEventManager(
     @PathVariable(required = true) crn: String,
     @PathVariable(required = true) eventNumber: Int
   ): CaseDetails =
@@ -57,7 +57,7 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/allocation/person/{crn}/event/{eventNumber}/complete-details")
-  fun getCompleteDetailsForEventManager(
+  suspend fun getCompleteDetailsForEventManager(
     @PathVariable(required = true) crn: String,
     @PathVariable(required = true) eventNumber: Int
   ): CompleteDetails =
