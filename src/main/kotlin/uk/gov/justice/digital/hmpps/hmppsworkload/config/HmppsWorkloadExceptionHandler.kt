@@ -15,7 +15,7 @@ import javax.validation.ValidationException
 @RestControllerAdvice
 class HmppsWorkloadExceptionHandler {
   @ExceptionHandler(ValidationException::class)
-  fun handleValidationException(e: Exception): ResponseEntity<ErrorResponse> {
+  suspend fun handleValidationException(e: Exception): ResponseEntity<ErrorResponse> {
     log.error("Validation exception", e)
     return ResponseEntity
       .status(BAD_REQUEST)
@@ -29,7 +29,7 @@ class HmppsWorkloadExceptionHandler {
   }
 
   @ExceptionHandler(EntityNotFoundException::class)
-  fun handleEntityNotFoundException(e: Exception): ResponseEntity<ErrorResponse> {
+  suspend fun handleEntityNotFoundException(e: Exception): ResponseEntity<ErrorResponse> {
     log.error("Entity not found", e)
     return ResponseEntity
       .status(NOT_FOUND)
@@ -43,7 +43,7 @@ class HmppsWorkloadExceptionHandler {
   }
 
   @ExceptionHandler(AccessDeniedException::class)
-  fun handleAccessDeniedException(e: Exception): ResponseEntity<ErrorResponse> {
+  suspend fun handleAccessDeniedException(e: Exception): ResponseEntity<ErrorResponse> {
     return ResponseEntity
       .status(HttpStatus.FORBIDDEN)
       .body(
@@ -56,7 +56,7 @@ class HmppsWorkloadExceptionHandler {
   }
 
   @ExceptionHandler(java.lang.Exception::class)
-  fun handleException(e: java.lang.Exception): ResponseEntity<ErrorResponse?>? {
+  suspend fun handleException(e: java.lang.Exception): ResponseEntity<ErrorResponse?>? {
     log.error("Unexpected exception", e)
     return ResponseEntity
       .status(INTERNAL_SERVER_ERROR)

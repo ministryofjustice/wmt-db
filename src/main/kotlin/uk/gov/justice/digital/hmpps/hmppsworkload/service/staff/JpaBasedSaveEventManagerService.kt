@@ -28,6 +28,7 @@ class JpaBasedSaveEventManagerService(
       return SaveResult(eventManager, false)
     }
     eventManager.isActive = false
+    eventManagerRepository.save(eventManager)
     saveEventManagerEntity(allocateCase, deliusStaff, teamCode, loggedInUser)
   } ?: saveEventManagerEntity(allocateCase, deliusStaff, teamCode, loggedInUser)
 

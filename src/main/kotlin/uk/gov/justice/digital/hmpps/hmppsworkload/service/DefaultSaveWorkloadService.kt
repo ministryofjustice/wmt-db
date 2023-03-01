@@ -28,13 +28,12 @@ class DefaultSaveWorkloadService(
   private val caseDetailsRepository: CaseDetailsRepository
 ) {
 
-  fun saveWorkload(
+  suspend fun saveWorkload(
     allocatedStaffId: StaffIdentifier,
     allocateCase: AllocateCase,
-    loggedInUser: String,
-    authToken: String
+    loggedInUser: String
   ): CaseAllocated {
-    val allocationData = workforceAllocationsToDeliusApiClient.allocationDetails(allocateCase.crn, allocateCase.eventNumber, allocatedStaffId.staffCode, loggedInUser).block()!!
+    val allocationData = workforceAllocationsToDeliusApiClient.allocationDetails(allocateCase.crn, allocateCase.eventNumber, allocatedStaffId.staffCode, loggedInUser)
     val personManagerSaveResult = savePersonManagerService.savePersonManager(
       allocatedStaffId.teamCode,
       allocationData.staff,
@@ -44,8 +43,7 @@ class DefaultSaveWorkloadService(
     val eventManagerSaveResult = saveEventManagerService.saveEventManager(allocatedStaffId.teamCode, allocationData.staff, allocateCase, loggedInUser).also { afterEventManagerSaved(it) }
     val requirementManagerSaveResults = saveRequirementManagerService.saveRequirementManagers(allocatedStaffId.teamCode, allocationData.staff, allocateCase, loggedInUser, allocationData.activeRequirements).also { afterRequirementManagersSaved(it) }
     if (personManagerSaveResult.hasChanged || eventManagerSaveResult.hasChanged || requirementManagerSaveResults.any { it.hasChanged }) {
-      notificationService.notifyAllocation(allocationData, allocateCase, authToken)
-        .block()
+      notificationService.notifyAllocation(allocationData, allocateCase)
       sqsSuccessPublisher.auditAllocation(allocateCase.crn, allocateCase.eventNumber, loggedInUser, allocationData.activeRequirements.map { it.id })
     }
     return CaseAllocated(personManagerSaveResult.entity.uuid, eventManagerSaveResult.entity.uuid, requirementManagerSaveResults.map { it.entity.uuid })

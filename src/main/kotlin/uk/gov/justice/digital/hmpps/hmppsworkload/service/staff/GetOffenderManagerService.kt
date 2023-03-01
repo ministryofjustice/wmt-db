@@ -34,19 +34,18 @@ class GetOffenderManagerService(
   private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient
 ) {
 
-  fun getPotentialWorkload(staffIdentifier: StaffIdentifier, crn: String): OffenderManagerPotentialWorkload? {
-    return workforceAllocationsToDeliusApiClient.impact(crn, staffIdentifier.staffCode).map { impactResponse ->
-      val potentialCase = getPotentialCase(crn)
-      val overview = findOffenderManagerOverview(staffIdentifier, impactResponse.staff.getGrade())
-      val currentCaseImpact = getCurrentCasePoints(staffIdentifier, potentialCase)
+  suspend fun getPotentialWorkload(staffIdentifier: StaffIdentifier, crn: String): OffenderManagerPotentialWorkload? {
+    val impactResponse = workforceAllocationsToDeliusApiClient.impact(crn, staffIdentifier.staffCode)
+    val potentialCase = getPotentialCase(crn)
+    val overview = findOffenderManagerOverview(staffIdentifier, impactResponse.staff.getGrade())
+    val currentCaseImpact = getCurrentCasePoints(staffIdentifier, potentialCase)
 
-      overview.potentialCapacity = calculateCapacity(
-        overview.totalPoints.minus(currentCaseImpact)
-          .plus(caseCalculator.getPointsForCase(potentialCase)),
-        overview.availablePoints
-      )
-      OffenderManagerPotentialWorkload.from(overview, impactResponse, potentialCase)
-    }.block()
+    overview.potentialCapacity = calculateCapacity(
+      overview.totalPoints.minus(currentCaseImpact)
+        .plus(caseCalculator.getPointsForCase(potentialCase)),
+      overview.availablePoints
+    )
+    return OffenderManagerPotentialWorkload.from(overview, impactResponse, potentialCase)
   }
 
   private fun getPotentialCase(crn: String): Case {
@@ -69,8 +68,8 @@ class GetOffenderManagerService(
     return overview
   }
 
-  fun getOverview(staffIdentifier: StaffIdentifier): OffenderManagerOverview? {
-    val officerView = workforceAllocationsToDeliusApiClient.getOfficerView(staffIdentifier.staffCode).block()
+  suspend fun getOverview(staffIdentifier: StaffIdentifier): OffenderManagerOverview? {
+    val officerView = workforceAllocationsToDeliusApiClient.getOfficerView(staffIdentifier.staffCode)
     val overview = findOffenderManagerOverview(staffIdentifier, officerView.getGrade())
     overview.lastAllocatedEvent = getEventManager.findLatestByStaffAndTeam(staffIdentifier)
 
@@ -94,13 +93,11 @@ class GetOffenderManagerService(
     it
   } ?: getDefaultOffenderManagerOverview(staffIdentifier.staffCode, grade)
 
-  fun getCases(staffIdentifier: StaffIdentifier): OffenderManagerCases? =
+  suspend fun getCases(staffIdentifier: StaffIdentifier): OffenderManagerCases? =
     offenderManagerRepository.findCasesByTeamCodeAndStaffCode(staffIdentifier.staffCode, staffIdentifier.teamCode).let { cases ->
       val crnDetails = getCrnToCaseDetails(cases)
-      workforceAllocationsToDeliusApiClient.staffActiveCases(staffIdentifier.staffCode, crnDetails.keys)
-        .map { staffActiveCases ->
-          OffenderManagerCases.from(staffActiveCases, crnDetails)
-        }.block()
+      val staffActiveCases = workforceAllocationsToDeliusApiClient.staffActiveCases(staffIdentifier.staffCode, crnDetails.keys)
+      OffenderManagerCases.from(staffActiveCases, crnDetails)
     }
 
   private fun getCrnToCaseDetails(crns: List<String>): Map<String, CaseDetailsEntity> {

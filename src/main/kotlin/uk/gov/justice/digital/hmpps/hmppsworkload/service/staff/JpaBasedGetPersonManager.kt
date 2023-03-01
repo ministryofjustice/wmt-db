@@ -17,11 +17,11 @@ class JpaBasedGetPersonManager(
     PersonManagerDetails.from(entity)
   }
 
-  override fun findLatestByCrn(crn: String): PersonManager? {
+  override suspend fun findLatestByCrn(crn: String): PersonManager? {
     val personManager = personManagerRepository.findFirstByCrnOrderByCreatedDateDesc(crn)
     if (personManager != null) {
-      val staff = workforceAllocationsToDeliusApiClient.getOfficerView(personManager.staffCode).block()
-      return PersonManager(personManager.staffCode, personManager.teamCode, staff!!.getGrade())
+      val staff = workforceAllocationsToDeliusApiClient.getOfficerView(personManager.staffCode)
+      return PersonManager(personManager.staffCode, personManager.teamCode, staff.getGrade())
     }
     return null
   }

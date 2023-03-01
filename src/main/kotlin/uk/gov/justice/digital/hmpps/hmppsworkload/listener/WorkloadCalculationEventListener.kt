@@ -1,6 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.listener
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.future.future
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.jms.annotation.JmsListener
 import org.springframework.stereotype.Component
@@ -25,8 +28,10 @@ class WorkloadCalculationEventListener(
       workloadCalculationEvent.personReference.identifiers.find { it.type == "staffCode" }!!.value,
       workloadCalculationEvent.personReference.identifiers.find { it.type == "teamCode" }!!.value
     )
-    val staffGrade = workforceAllocationsToDeliusApiClient.getOfficerView(staffIdentifier.staffCode).map { it.getGrade() }.block()!!
-    workloadCalculationService.saveWorkloadCalculation(staffIdentifier, staffGrade, availableHours)
+    CoroutineScope(Dispatchers.Default).future {
+      val staffGrade = workforceAllocationsToDeliusApiClient.getOfficerView(staffIdentifier.staffCode).getGrade()
+      workloadCalculationService.saveWorkloadCalculation(staffIdentifier, staffGrade, availableHours)
+    }.get()
   }
 
   private fun getWorkloadCalculationEvent(rawMessage: String): WorkloadCalculationEvent {

@@ -1,8 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Flux
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToDeliusApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Practitioner
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PractitionerWorkload
@@ -24,38 +25,37 @@ class TeamService(
   private val caseDetailsRepository: CaseDetailsRepository,
   private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient
 ) {
-  fun getPractitioners(teamCodes: List<String>, crn: String, grades: List<String>?): PractitionerWorkload? {
-    return workforceAllocationsToDeliusApiClient.choosePractitioners(crn, teamCodes)
-      .map { choosePractitionerResponse ->
-        val practitionerWorkloads = teamRepository.findAllByTeamCodes(teamCodes).associateBy { teamStaffId(it.teamCode, it.staffCode) }
-        val caseCountAfter = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).minusDays(7L)
-        val practitionerCaseCounts = personManagerRepository.findByTeamCodeInAndCreatedDateGreaterThanEqualAndIsActiveIsTrue(teamCodes, caseCountAfter)
-          .groupBy { teamStaffId(it.teamCode, it.staffCode) }
-          .mapValues { countEntry -> countEntry.value.size }
+  suspend fun getPractitioners(teamCodes: List<String>, crn: String, grades: List<String>?): PractitionerWorkload? {
+    return workforceAllocationsToDeliusApiClient.choosePractitioners(crn, teamCodes)?.let { choosePractitionerResponse ->
+      val practitionerWorkloads = teamRepository.findAllByTeamCodes(teamCodes).associateBy { teamStaffId(it.teamCode, it.staffCode) }
+      val caseCountAfter = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).minusDays(7L)
+      val practitionerCaseCounts = personManagerRepository.findByTeamCodeInAndCreatedDateGreaterThanEqualAndIsActiveIsTrue(teamCodes, caseCountAfter)
+        .groupBy { teamStaffId(it.teamCode, it.staffCode) }
+        .mapValues { countEntry -> countEntry.value.size }
 
-        val enrichedTeams = choosePractitionerResponse.teams.mapValues { team ->
-          team.value
-            .filter { grades == null || grades.contains(it.getGrade()) }
-            .map {
-              val teamStaffId = teamStaffId(team.key, it.code)
-              val practitionerWorkload = practitionerWorkloads[teamStaffId] ?: getTeamOverviewForOffenderManagerWithoutWorkload(it.code, it.getGrade(), team.key)
-              Practitioner.from(it, practitionerWorkload, practitionerCaseCounts.getOrDefault(teamStaffId, 0))
-            }
-        }
-        PractitionerWorkload.from(
-          choosePractitionerResponse,
-          caseDetailsRepository.findByIdOrNull(crn)!!.tier,
-          enrichedTeams
-        )
-      }.block()
+      val enrichedTeams = choosePractitionerResponse.teams.mapValues { team ->
+        team.value
+          .filter { grades == null || grades.contains(it.getGrade()) }
+          .map {
+            val teamStaffId = teamStaffId(team.key, it.code)
+            val practitionerWorkload = practitionerWorkloads[teamStaffId] ?: getTeamOverviewForOffenderManagerWithoutWorkload(it.code, it.getGrade(), team.key)
+            Practitioner.from(it, practitionerWorkload, practitionerCaseCounts.getOrDefault(teamStaffId, 0))
+          }
+      }
+      PractitionerWorkload.from(
+        choosePractitionerResponse,
+        caseDetailsRepository.findByIdOrNull(crn)!!.tier,
+        enrichedTeams
+      )
+    }
   }
 
   private fun teamStaffId(teamCode: String, staffCode: String) = "$teamCode-$staffCode"
 
-  fun getWorkloadCases(teams: List<String>): Flux<WorkloadCase> {
-    return Flux.fromIterable(teamRepository.findWorkloadCountCaseByCode(teams))
-      .map { WorkloadCase(it.teamCode, it.totalCases, calculateCapacity(it.totalPoints.toBigInteger(), it.availablePoints.toBigInteger()).toDouble()) }
-  }
+  suspend fun getWorkloadCases(teams: List<String>): Flow<WorkloadCase> =
+    teamRepository.findWorkloadCountCaseByCode(teams).map {
+      WorkloadCase(it.teamCode, it.totalCases, calculateCapacity(it.totalPoints.toBigInteger(), it.availablePoints.toBigInteger()).toDouble())
+    }.asFlow()
 
   private fun getTeamOverviewForOffenderManagerWithoutWorkload(
     staffCode: String,

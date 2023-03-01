@@ -7,6 +7,10 @@ plugins {
 }
 
 configurations {
+  implementation { exclude(module = "spring-boot-starter-web") }
+  implementation { exclude(module = "spring-boot-starter-tomcat") }
+  implementation { exclude(module = "applicationinsights-spring-boot-starter") }
+  implementation { exclude(module = "applicationinsights-logging-logback") }
   testImplementation { exclude(group = "org.junit.vintage") }
 }
 
@@ -23,12 +27,22 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:1.2.0")
 
-  implementation("org.springdoc:springdoc-openapi-ui:1.6.14")
+  implementation("org.springdoc:springdoc-openapi-webflux-ui:1.6.14")
   implementation("org.springdoc:springdoc-openapi-kotlin:1.6.14")
-  implementation("org.springdoc:springdoc-openapi-data-rest:1.6.14")
 
+  implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.6.4")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.4")
+
+  // go to open telemetry, when upgrading to spring boot 3 these can be removed
+  implementation("io.opentelemetry:opentelemetry-api:1.23.1")
+  implementation("com.microsoft.azure:applicationinsights-core:3.4.10")
+  agentDeps("com.microsoft.azure:applicationinsights-agent:3.4.10")
+
   implementation("uk.gov.service.notify:notifications-java-client:3.19.0-RELEASE")
   implementation("com.vladmihalcea:hibernate-types-52:2.21.1")
 
@@ -41,6 +55,8 @@ dependencies {
   testImplementation("org.awaitility:awaitility-kotlin:4.2.0")
   testImplementation("io.mockk:mockk:1.13.4")
   testImplementation("com.ninja-squad:springmockk:4.0.0")
+
+  testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
 }
 
 java {

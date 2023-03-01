@@ -1,5 +1,6 @@
 hmpps:
   sqs:
+    reactiveApi: true
     queueAdminRole: ROLE_QUEUE_WORKLOAD_ADMIN
     queues:
       hmppsauditqueue:

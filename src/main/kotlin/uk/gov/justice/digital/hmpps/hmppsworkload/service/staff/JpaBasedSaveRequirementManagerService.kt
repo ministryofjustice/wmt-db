@@ -29,6 +29,7 @@ class JpaBasedSaveRequirementManagerService(
             SaveResult(requirementManagerEntity, false)
           } else {
             requirementManagerEntity.isActive = false
+            requirementManagerRepository.save(requirementManagerEntity)
             saveRequirementManagerEntity(allocateCase, deliusStaff, teamCode, loggedInUser, requirement)
           }
         } ?: saveRequirementManagerEntity(allocateCase, deliusStaff, teamCode, loggedInUser, requirement)

@@ -6,5 +6,5 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 
 interface SavePersonManagerService {
 
-  fun savePersonManager(teamCode: String, deliusStaff: StaffMember, loggedInUser: String, crn: String): SaveResult<PersonManagerEntity>
+  suspend fun savePersonManager(teamCode: String, deliusStaff: StaffMember, loggedInUser: String, crn: String): SaveResult<PersonManagerEntity>
 }

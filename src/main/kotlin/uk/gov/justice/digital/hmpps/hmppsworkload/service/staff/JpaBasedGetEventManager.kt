@@ -32,7 +32,7 @@ class JpaBasedGetEventManager(
     }
   }
 
-  fun findCompleteDetailsByCrnAndEventNumber(crn: String, eventNumber: Int): CompleteDetails? = eventManagerRepository.findFirstByCrnAndEventNumberOrderByCreatedDateDesc(crn, eventNumber)?.let { eventManagerEntity ->
-    workforceAllocationsToDeliusApiClient.allocationCompleteDetails(crn, eventNumber.toString(), eventManagerEntity.staffCode).block()
+  suspend fun findCompleteDetailsByCrnAndEventNumber(crn: String, eventNumber: Int): CompleteDetails? = eventManagerRepository.findFirstByCrnAndEventNumberOrderByCreatedDateDesc(crn, eventNumber)?.let { eventManagerEntity ->
+    workforceAllocationsToDeliusApiClient.allocationCompleteDetails(crn, eventNumber.toString(), eventManagerEntity.staffCode)
   }
 }
