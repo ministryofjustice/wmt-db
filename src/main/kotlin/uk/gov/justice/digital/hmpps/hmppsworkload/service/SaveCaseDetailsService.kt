@@ -40,8 +40,7 @@ class SaveCaseDetailsService(
     personSummary?.takeUnless { it.type == CaseType.UNKNOWN }?.type?.let { caseType ->
       hmppsTierApiClient.getTierByCrn(personSummary.crn)?.let {
         val tier = Tier.valueOf(it)
-        val caseDetails =
-          CaseDetailsEntity(personSummary.crn, tier, caseType, personSummary.name.forename, personSummary.name.surname)
+        val caseDetails = CaseDetailsEntity(personSummary.crn, tier, caseType, personSummary.name.forename, personSummary.name.surname)
         caseDetailsRepository.save(caseDetails)
         val staff: PersonManager? = getPersonManager.findLatestByCrn(personSummary.crn)
         if (staff != null) {
