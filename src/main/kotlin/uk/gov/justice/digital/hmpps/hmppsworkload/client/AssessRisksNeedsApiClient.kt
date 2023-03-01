@@ -1,13 +1,12 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.client
 
-import kotlinx.coroutines.flow.toList
-import org.slf4j.LoggerFactory
+import kotlinx.coroutines.reactor.awaitSingle
+import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.core.ParameterizedTypeReference
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.WebClientResponseException
-import org.springframework.web.reactive.function.client.awaitBody
-import org.springframework.web.reactive.function.client.bodyToFlow
+import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskPredictor
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskSummary
 
@@ -15,37 +14,27 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskSummary
 class AssessRisksNeedsApiClient(@Qualifier("assessRiskNeedsApiWebClient") private val webClient: WebClient) {
 
   suspend fun getRiskSummary(crn: String): RiskSummary? {
-    repeat(2) {
-      try {
-        return webClient
-          .get()
-          .uri("/risks/crn/$crn/summary")
-          .retrieve()
-          .awaitBody()
-      } catch (e: WebClientResponseException) {
-        log.error("retrying retrieving risk summary", e)
-      }
-    }
-    return null
+    return webClient
+      .get()
+      .uri("/risks/crn/$crn/summary")
+      .retrieve()
+      .bodyToMono(RiskSummary::class.java)
+      .retry(1)
+      .onErrorResume {
+        Mono.empty()
+      }.awaitSingleOrNull()
   }
 
   suspend fun getRiskPredictors(crn: String): List<RiskPredictor> {
-    repeat(2) {
-      try {
-        return webClient
-          .get()
-          .uri("/risks/crn/$crn/predictors/rsr/history")
-          .retrieve()
-          .bodyToFlow<RiskPredictor>()
-          .toList()
-      } catch (e: WebClientResponseException) {
-        log.error("retrying retrieving risk predictors", e)
-      }
-    }
-    return emptyList()
-  }
-
-  companion object {
-    private val log = LoggerFactory.getLogger(this::class.java)
+    val responseType = object : ParameterizedTypeReference<List<RiskPredictor>>() {}
+    return webClient
+      .get()
+      .uri("/risks/crn/$crn/predictors/rsr/history")
+      .retrieve()
+      .bodyToMono(responseType)
+      .retry(1)
+      .onErrorResume {
+        Mono.just(emptyList())
+      }.awaitSingle()
   }
 }
