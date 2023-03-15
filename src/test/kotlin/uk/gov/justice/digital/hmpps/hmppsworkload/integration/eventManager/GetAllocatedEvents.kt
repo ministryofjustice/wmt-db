@@ -120,6 +120,38 @@ class GetAllocatedEvents : IntegrationTestBase() {
       .doesNotExist()
   }
 
+  @Test
+  fun `don't return allocated event managers who have no Delius details`() {
+    val noDeliusDetailsEventManager = eventManagerRepository.save(
+      EventManagerEntity(
+        crn = "CRN1",
+        staffCode = "OM1",
+        teamCode = "T1",
+        createdBy = loggedInUser,
+        isActive = true,
+        eventNumber = 2
+      )
+    )
+
+    workforceAllocationsToDelius.allocationDetailsResponse(emptyList())
+
+    caseDetailsRepository.save(CaseDetailsEntity(crn = noDeliusDetailsEventManager.crn, tier = Tier.B2, type = CaseType.COMMUNITY, "", ""))
+
+    webTestClient.get()
+      .uri(
+        "/allocation/events/me?since=${thirtyDaysInPast()}"
+      )
+      .headers {
+        it.authToken(roles = listOf("ROLE_WORKLOAD_READ", loggedInUser))
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody()
+      .jsonPath("$.cases[?(@.crn == '${noDeliusDetailsEventManager.crn}')]")
+      .doesNotExist()
+  }
+
   private fun thirtyDaysInPast(): String? =
     ZonedDateTime.now().minusDays(30).truncatedTo(ChronoUnit.DAYS).withZoneSameInstant(ZoneOffset.UTC).format(
       DateTimeFormatter.ISO_OFFSET_DATE_TIME
