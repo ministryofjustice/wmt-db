@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
+import java.time.ZonedDateTime
 import java.util.UUID
 
 interface EventManagerRepository : CrudRepository<EventManagerEntity, Long> {
@@ -16,4 +17,6 @@ interface EventManagerRepository : CrudRepository<EventManagerEntity, Long> {
   fun setInactiveTrueFor(crn: String): Int
 
   fun findFirstByCrnAndEventNumberOrderByCreatedDateDesc(crn: String, eventNumber: Int): EventManagerEntity?
+
+  fun findByCreatedDateGreaterThanEqualAndCreatedByAndIsActiveTrue(since: ZonedDateTime, username: String): List<EventManagerEntity>
 }
