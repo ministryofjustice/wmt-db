@@ -31,14 +31,14 @@ class GetAllocatedEvents : IntegrationTestBase() {
 
     val caseDetails = caseDetailsRepository.save(CaseDetailsEntity(crn = storedEventManager.crn, tier = Tier.B2, type = CaseType.COMMUNITY, "", ""))
 
-    workforceAllocationsToDelius.allocationDetails(listOf(AllocationDetailIntegration(storedEventManager.crn, storedEventManager.staffCode)))
+    workforceAllocationsToDelius.allocationDetailsResponse(listOf(AllocationDetailIntegration(storedEventManager.crn, storedEventManager.staffCode)))
 
     webTestClient.get()
       .uri(
         "/allocation/events/me?since=${thirtyDaysInPast()}"
       )
       .headers {
-        it.authToken(roles = listOf("ROLE_WORKLOAD_READ"))
+        it.authToken(roles = listOf("ROLE_WORKLOAD_READ", loggedInUser))
       }
       .exchange()
       .expectStatus()
@@ -76,14 +76,14 @@ class GetAllocatedEvents : IntegrationTestBase() {
 
     caseDetailsRepository.save(CaseDetailsEntity(crn = oldEventManager.crn, tier = Tier.B2, type = CaseType.COMMUNITY, "", ""))
 
-    workforceAllocationsToDelius.allocationDetails(listOf(AllocationDetailIntegration(oldEventManager.crn, oldEventManager.staffCode)))
+    workforceAllocationsToDelius.allocationDetailsResponse(listOf(AllocationDetailIntegration(oldEventManager.crn, oldEventManager.staffCode)))
 
     webTestClient.get()
       .uri(
         "/allocation/events/me?since=${thirtyDaysInPast()}"
       )
       .headers {
-        it.authToken(roles = listOf("ROLE_WORKLOAD_READ"))
+        it.authToken(roles = listOf("ROLE_WORKLOAD_READ", loggedInUser))
       }
       .exchange()
       .expectStatus()
@@ -112,7 +112,7 @@ class GetAllocatedEvents : IntegrationTestBase() {
         "/allocation/events/me?since=${thirtyDaysInPast()}"
       )
       .headers {
-        it.authToken(roles = listOf("ROLE_WORKLOAD_READ"))
+        it.authToken(roles = listOf("ROLE_WORKLOAD_READ", loggedInUser))
       }
       .exchange()
       .expectStatus()

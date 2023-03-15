@@ -15,7 +15,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.domain.ActiveCases
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.domain.AllocationDetailIntegration
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.WorkforceAllocationsToDeliusExtension.Companion.workforceAllocationsToDelius
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.allocationCompleteResponse
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.allocationDetailsResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.choosePractitionerByTeamCodesNoCommunityPersonManagerResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.choosePractitionerByTeamResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.choosePractitionerByTeamResponseUnallocated
@@ -190,11 +189,11 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
     )
   }
 
-  fun allocationDetails(allocationDetails: List<AllocationDetailIntegration>) {
+  fun allocationDetailsResponse(allocationDetails: List<AllocationDetailIntegration>) {
     val request = HttpRequest.request().withPath("/allocation/details").withMethod(HttpMethod.POST.name)
 
     workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(allocationDetailsResponse(allocationDetails))
+      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.allocationDetailsResponse(allocationDetails))
     )
   }
 }
