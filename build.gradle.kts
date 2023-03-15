@@ -27,8 +27,8 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:1.2.0")
 
-  implementation("org.springdoc:springdoc-openapi-webflux-ui:1.6.14")
-  implementation("org.springdoc:springdoc-openapi-kotlin:1.6.14")
+  implementation("org.springdoc:springdoc-openapi-webflux-ui:1.6.15")
+  implementation("org.springdoc:springdoc-openapi-kotlin:1.6.15")
 
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
@@ -39,7 +39,7 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.4")
 
   // go to open telemetry, when upgrading to spring boot 3 these can be removed
-  implementation("io.opentelemetry:opentelemetry-api:1.23.1")
+  implementation("io.opentelemetry:opentelemetry-api:1.24.0")
   implementation("com.microsoft.azure:applicationinsights-core:3.4.10")
   agentDeps("com.microsoft.azure:applicationinsights-agent:3.4.10")
 
@@ -54,7 +54,7 @@ dependencies {
   testImplementation("org.mock-server:mockserver-netty:5.15.0")
   testImplementation("org.awaitility:awaitility-kotlin:4.2.0")
   testImplementation("io.mockk:mockk:1.13.4")
-  testImplementation("com.ninja-squad:springmockk:4.0.1")
+  testImplementation("com.ninja-squad:springmockk:4.0.2")
 
   testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
 }
