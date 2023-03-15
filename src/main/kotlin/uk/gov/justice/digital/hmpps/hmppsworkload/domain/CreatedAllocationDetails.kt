@@ -10,7 +10,11 @@ import java.time.ZonedDateTime
 data class CreatedAllocationDetails(val cases: List<CreatedAllocationDetail>) {
   companion object {
     fun from(eventManagers: List<EventManagerEntity>, eventManagerDetails: Map<String, AllocationDetail>, caseDetails: Map<String, CaseDetailsEntity>): CreatedAllocationDetails {
-      return CreatedAllocationDetails(eventManagers.map { CreatedAllocationDetail.from(eventManagerDetails[it.crn]!!, caseDetails[it.crn]!!, it) })
+      return CreatedAllocationDetails(
+        eventManagers
+          .filter { eventManagerDetails.containsKey(it.crn) && caseDetails.containsKey(it.crn) }
+          .map { CreatedAllocationDetail.from(eventManagerDetails[it.crn]!!, caseDetails[it.crn]!!, it) }
+      )
     }
   }
 }

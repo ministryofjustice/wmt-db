@@ -35,9 +35,7 @@ class GetAllocatedEvents : IntegrationTestBase() {
 
     webTestClient.get()
       .uri(
-        "/allocation/events/me?since=${ZonedDateTime.now().minusDays(30).truncatedTo(ChronoUnit.DAYS).withZoneSameInstant(ZoneOffset.UTC).format(
-          DateTimeFormatter.ISO_OFFSET_DATE_TIME
-        )}"
+        "/allocation/events/me?since=${thirtyDaysInPast()}"
       )
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_READ"))
@@ -82,9 +80,7 @@ class GetAllocatedEvents : IntegrationTestBase() {
 
     webTestClient.get()
       .uri(
-        "/allocation/events/me?since=${ZonedDateTime.now().minusDays(30).truncatedTo(ChronoUnit.DAYS).withZoneSameInstant(ZoneOffset.UTC).format(
-          DateTimeFormatter.ISO_OFFSET_DATE_TIME
-        )}"
+        "/allocation/events/me?since=${thirtyDaysInPast()}"
       )
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_READ"))
@@ -96,4 +92,38 @@ class GetAllocatedEvents : IntegrationTestBase() {
       .jsonPath("$.cases[?(@.crn == '${oldEventManager.crn}')]")
       .doesNotExist()
   }
+
+  @Test
+  fun `only retrieve active event managers`() {
+    val loggedInUser = "SOME_USER"
+    val inactiveEventManager = eventManagerRepository.save(
+      EventManagerEntity(
+        crn = "CRN1",
+        staffCode = "OM1",
+        teamCode = "T1",
+        createdBy = loggedInUser,
+        isActive = false,
+        eventNumber = 2
+      )
+    )
+
+    webTestClient.get()
+      .uri(
+        "/allocation/events/me?since=${thirtyDaysInPast()}"
+      )
+      .headers {
+        it.authToken(roles = listOf("ROLE_WORKLOAD_READ"))
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody()
+      .jsonPath("$.cases[?(@.crn == '${inactiveEventManager.crn}')]")
+      .doesNotExist()
+  }
+
+  private fun thirtyDaysInPast(): String? =
+    ZonedDateTime.now().minusDays(30).truncatedTo(ChronoUnit.DAYS).withZoneSameInstant(ZoneOffset.UTC).format(
+      DateTimeFormatter.ISO_OFFSET_DATE_TIME
+    )
 }

@@ -39,8 +39,8 @@ class JpaBasedGetEventManager(
   }
 
   suspend fun findAllocationsBy(since: ZonedDateTime, name: String): CreatedAllocationDetails {
-    val allocatedEventManagers = eventManagerRepository.findByCreatedDateGreaterThanEqualAndCreatedBy(since, name)
-    val allocatedEventManagerDetails = workforceAllocationsToDeliusApiClient.allocationDetails(allocatedEventManagers).cases.associateBy { it.crn }
+    val allocatedEventManagers = eventManagerRepository.findByCreatedDateGreaterThanEqualAndCreatedByAndIsActiveTrue(since, name)
+    val allocatedEventManagerDetails = allocatedEventManagers.takeUnless { it.isEmpty() }?.let { workforceAllocationsToDeliusApiClient.allocationDetails(allocatedEventManagers).cases.associateBy { it.crn } } ?: emptyMap()
     val caseDetails = caseDetailsRepository.findAllById(allocatedEventManagers.map { it.crn }).associateBy { it.crn }
     return CreatedAllocationDetails.from(allocatedEventManagers, allocatedEventManagerDetails, caseDetails)
   }
