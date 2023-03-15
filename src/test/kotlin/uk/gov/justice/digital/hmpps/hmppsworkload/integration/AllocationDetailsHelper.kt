@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration
 
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.AllocationDetails
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.AllocationDemandDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Court
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.InitialAppointment
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Name
@@ -18,7 +18,7 @@ fun getAllocationDetails(
   offenceDetails: List<OffenceDetails> = emptyList(),
   activeRequirements: List<Requirement> = emptyList(),
   ogrs: RiskOGRS? = null
-) = AllocationDetails(
+) = AllocationDemandDetails(
   crn,
   Name(
     "Jonathon",

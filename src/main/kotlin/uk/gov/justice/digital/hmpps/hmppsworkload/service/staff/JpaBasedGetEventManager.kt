@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToDeliusApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.CompleteDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseDetails
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CreatedAllocationDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.EventDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
@@ -34,5 +35,12 @@ class JpaBasedGetEventManager(
 
   suspend fun findCompleteDetailsByCrnAndEventNumber(crn: String, eventNumber: Int): CompleteDetails? = eventManagerRepository.findFirstByCrnAndEventNumberOrderByCreatedDateDesc(crn, eventNumber)?.let { eventManagerEntity ->
     workforceAllocationsToDeliusApiClient.allocationCompleteDetails(crn, eventNumber.toString(), eventManagerEntity.staffCode)
+  }
+
+  suspend fun findAllocationsBy(name: String): CreatedAllocationDetails {
+    val allocatedEventManagers = eventManagerRepository.findByCreatedBy(name)
+    val allocatedEventManagerDetails = workforceAllocationsToDeliusApiClient.allocationDetails(allocatedEventManagers).cases.associateBy { it.crn }
+    val caseDetails = caseDetailsRepository.findAllById(allocatedEventManagers.map { it.crn }).associateBy { it.crn }
+    return CreatedAllocationDetails.from(allocatedEventManagers, allocatedEventManagerDetails, caseDetails)
   }
 }
