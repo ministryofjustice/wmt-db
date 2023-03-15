@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.AssessRisksNeedsApiClient
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.AllocationDetails
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.AllocationDemandDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.InitialAppointment
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenceDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Requirement
@@ -35,20 +35,20 @@ class NotificationService(
   private val caseDetailsRepository: CaseDetailsRepository,
 ) {
 
-  suspend fun notifyAllocation(allocationDetails: AllocationDetails, allocateCase: AllocateCase): List<SendEmailResponse> {
+  suspend fun notifyAllocation(allocationDemandDetails: AllocationDemandDetails, allocateCase: AllocateCase): List<SendEmailResponse> {
     val notifyData = getNotifyData(allocateCase.crn)
     val caseDetails = caseDetailsRepository.findByIdOrNull(allocateCase.crn)!!
     val parameters = mapOf(
-      "officer_name" to allocationDetails.staff.name.getCombinedName(),
-      "induction_statement" to mapInductionAppointment(allocationDetails.initialAppointment, caseDetails.type),
-      "requirements" to mapRequirements(allocationDetails.activeRequirements),
-    ).plus(getRiskParameters(notifyData.riskSummary, notifyData.riskPredictors, allocationDetails.ogrs))
-      .plus(getConvictionParameters(allocationDetails))
-      .plus(getPersonOnProbationParameters(allocationDetails.name.getCombinedName(), allocateCase))
-      .plus(getLoggedInUserParameters(allocationDetails.allocatingStaff))
+      "officer_name" to allocationDemandDetails.staff.name.getCombinedName(),
+      "induction_statement" to mapInductionAppointment(allocationDemandDetails.initialAppointment, caseDetails.type),
+      "requirements" to mapRequirements(allocationDemandDetails.activeRequirements),
+    ).plus(getRiskParameters(notifyData.riskSummary, notifyData.riskPredictors, allocationDemandDetails.ogrs))
+      .plus(getConvictionParameters(allocationDemandDetails))
+      .plus(getPersonOnProbationParameters(allocationDemandDetails.name.getCombinedName(), allocateCase))
+      .plus(getLoggedInUserParameters(allocationDemandDetails.allocatingStaff))
     val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
-    emailTo.add(allocationDetails.staff.email!!)
-    if (allocateCase.sendEmailCopyToAllocatingOfficer) emailTo.add(allocationDetails.allocatingStaff.email)
+    emailTo.add(allocationDemandDetails.staff.email!!)
+    if (allocateCase.sendEmailCopyToAllocatingOfficer) emailTo.add(allocationDemandDetails.allocatingStaff.email)
     return emailTo.map { email -> addRecipientTo400Response(email) { notificationClient.sendEmail(allocationTemplateId, email, parameters, null) } }
   }
 
@@ -76,11 +76,11 @@ class NotificationService(
     "notes" to allocateCase.instructions,
   )
 
-  private fun getConvictionParameters(allocationDetails: AllocationDetails): Map<String, Any> = mapOf(
-    "court_name" to allocationDetails.court.name,
-    "sentence_date" to allocationDetails.court.appearanceDate.format(DateUtils.notifyDateFormat),
-    "offences" to mapOffences(allocationDetails.offences),
-    "order" to "${allocationDetails.sentence.description} (${allocationDetails.sentence.length})",
+  private fun getConvictionParameters(allocationDemandDetails: AllocationDemandDetails): Map<String, Any> = mapOf(
+    "court_name" to allocationDemandDetails.court.name,
+    "sentence_date" to allocationDemandDetails.court.appearanceDate.format(DateUtils.notifyDateFormat),
+    "offences" to mapOffences(allocationDemandDetails.offences),
+    "order" to "${allocationDemandDetails.sentence.description} (${allocationDemandDetails.sentence.length})",
   )
 
   private fun getRiskParameters(riskSummary: RiskSummary?, riskPredictors: List<RiskPredictor>, assessment: RiskOGRS?): Map<String, Any> {

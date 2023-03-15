@@ -381,10 +381,10 @@ abstract class IntegrationTestBase {
     workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false),
   )
 
-  internal fun HttpHeaders.authToken(roles: List<String> = emptyList()) {
+  internal fun HttpHeaders.authToken(roles: List<String> = emptyList(), subject: String = "SOME_USER") {
     this.setBearerAuth(
       jwtAuthHelper.createJwt(
-        subject = "SOME_USER",
+        subject = subject,
         roles = roles,
         clientId = "some-client",
       ),

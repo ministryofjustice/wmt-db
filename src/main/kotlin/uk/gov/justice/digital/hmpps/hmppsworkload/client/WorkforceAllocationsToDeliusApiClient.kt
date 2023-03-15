@@ -2,13 +2,16 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.client
 
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.ClientResponse
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.awaitBody
 import org.springframework.web.reactive.function.client.awaitExchangeOrNull
 import org.springframework.web.reactive.function.client.createExceptionAndAwait
 import reactor.core.publisher.Mono
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.AllocationDemandDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.AllocationDetails
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.AllocationDetailsRequest
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ChoosePractitionerResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.CompleteDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ImpactResponse
@@ -17,6 +20,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OfficerView
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffActiveCases
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 
 class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
 
@@ -90,10 +94,19 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
       .awaitBody()
   }
 
-  suspend fun allocationDetails(crn: String, eventNumber: Int, staffCode: String, loggedInUser: String): AllocationDetails =
+  suspend fun allocationDetails(crn: String, eventNumber: Int, staffCode: String, loggedInUser: String): AllocationDemandDetails =
     webClient
       .get()
       .uri("/allocation-demand/$crn/$eventNumber/allocation?staff=$staffCode&allocatingStaffUsername=$loggedInUser")
+      .retrieve()
+      .awaitBody()
+
+  suspend fun allocationDetails(eventManagers: List<EventManagerEntity>): AllocationDetails =
+    webClient
+      .post()
+      .uri("/allocation/details")
+      .contentType(MediaType.APPLICATION_JSON)
+      .bodyValue(AllocationDetailsRequest.from(eventManagers))
       .retrieve()
       .awaitBody()
 }
