@@ -15,9 +15,9 @@ import java.time.temporal.ChronoUnit
 
 class GetAllocatedEvents : IntegrationTestBase() {
 
+  private val loggedInUser = "SOME_USER"
   @Test
   fun `can get all allocated events by logged in user`() {
-    val loggedInUser = "SOME_USER"
     val storedEventManager = eventManagerRepository.save(
       EventManagerEntity(
         crn = "CRN1",
@@ -60,7 +60,6 @@ class GetAllocatedEvents : IntegrationTestBase() {
 
   @Test
   fun `only get cases since`() {
-    val loggedInUser = "SOME_USER"
     val oldEventManager = eventManagerRepository.save(
       EventManagerEntity(
         crn = "CRN1",
@@ -95,7 +94,6 @@ class GetAllocatedEvents : IntegrationTestBase() {
 
   @Test
   fun `only retrieve active event managers`() {
-    val loggedInUser = "SOME_USER"
     val inactiveEventManager = eventManagerRepository.save(
       EventManagerEntity(
         crn = "CRN1",
