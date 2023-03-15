@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
+import java.time.ZonedDateTime
 import java.util.UUID
 
 interface EventManagerRepository : CrudRepository<EventManagerEntity, Long> {
@@ -17,5 +18,5 @@ interface EventManagerRepository : CrudRepository<EventManagerEntity, Long> {
 
   fun findFirstByCrnAndEventNumberOrderByCreatedDateDesc(crn: String, eventNumber: Int): EventManagerEntity?
 
-  fun findByCreatedBy(username: String): List<EventManagerEntity>
+  fun findByCreatedDateGreaterThanEqualAndCreatedBy(since: ZonedDateTime, username: String): List<EventManagerEntity>
 }

@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.EventManagerRepository
+import java.time.ZonedDateTime
 import java.util.UUID
 
 @Service
@@ -37,8 +38,8 @@ class JpaBasedGetEventManager(
     workforceAllocationsToDeliusApiClient.allocationCompleteDetails(crn, eventNumber.toString(), eventManagerEntity.staffCode)
   }
 
-  suspend fun findAllocationsBy(name: String): CreatedAllocationDetails {
-    val allocatedEventManagers = eventManagerRepository.findByCreatedBy(name)
+  suspend fun findAllocationsBy(since: ZonedDateTime, name: String): CreatedAllocationDetails {
+    val allocatedEventManagers = eventManagerRepository.findByCreatedDateGreaterThanEqualAndCreatedBy(since, name)
     val allocatedEventManagerDetails = workforceAllocationsToDeliusApiClient.allocationDetails(allocatedEventManagers).cases.associateBy { it.crn }
     val caseDetails = caseDetailsRepository.findAllById(allocatedEventManagers.map { it.crn }).associateBy { it.crn }
     return CreatedAllocationDetails.from(allocatedEventManagers, allocatedEventManagerDetails, caseDetails)

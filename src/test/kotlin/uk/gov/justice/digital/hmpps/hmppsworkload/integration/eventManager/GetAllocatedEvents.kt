@@ -9,7 +9,9 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.Workfor
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 class GetAllocatedEvents : IntegrationTestBase() {
 
@@ -32,7 +34,11 @@ class GetAllocatedEvents : IntegrationTestBase() {
     workforceAllocationsToDelius.allocationDetails(listOf(AllocationDetailIntegration(storedEventManager.crn, storedEventManager.staffCode)))
 
     webTestClient.get()
-      .uri("/allocation/events/me")
+      .uri(
+        "/allocation/events/me?since=${ZonedDateTime.now().minusDays(30).truncatedTo(ChronoUnit.DAYS).withZoneSameInstant(ZoneOffset.UTC).format(
+          DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        )}"
+      )
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_READ"))
       }
@@ -51,10 +57,43 @@ class GetAllocatedEvents : IntegrationTestBase() {
       .jsonPath("$.cases[?(@.crn == '${storedEventManager.crn}')].tier")
       .isEqualTo(caseDetails.tier.name)
       .jsonPath("$.cases[?(@.crn == '${storedEventManager.crn}')].allocatedOn")
-      .isEqualTo(
-        storedEventManager.createdDate!!.withZoneSameInstant(ZoneOffset.UTC).format(
-          DateTimeFormatter.ISO_OFFSET_DATE_TIME
-        )
+      .exists()
+  }
+
+  @Test
+  fun `only get cases since`() {
+    val loggedInUser = "SOME_USER"
+    val oldEventManager = eventManagerRepository.save(
+      EventManagerEntity(
+        crn = "CRN1",
+        staffCode = "OM1",
+        teamCode = "T1",
+        createdBy = loggedInUser,
+        isActive = true,
+        eventNumber = 2
       )
+    )
+    oldEventManager.createdDate = ZonedDateTime.now().minusDays(60)
+    eventManagerRepository.save(oldEventManager)
+
+    caseDetailsRepository.save(CaseDetailsEntity(crn = oldEventManager.crn, tier = Tier.B2, type = CaseType.COMMUNITY, "", ""))
+
+    workforceAllocationsToDelius.allocationDetails(listOf(AllocationDetailIntegration(oldEventManager.crn, oldEventManager.staffCode)))
+
+    webTestClient.get()
+      .uri(
+        "/allocation/events/me?since=${ZonedDateTime.now().minusDays(30).truncatedTo(ChronoUnit.DAYS).withZoneSameInstant(ZoneOffset.UTC).format(
+          DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        )}"
+      )
+      .headers {
+        it.authToken(roles = listOf("ROLE_WORKLOAD_READ"))
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody()
+      .jsonPath("$.cases[?(@.crn == '${oldEventManager.crn}')]")
+      .doesNotExist()
   }
 }

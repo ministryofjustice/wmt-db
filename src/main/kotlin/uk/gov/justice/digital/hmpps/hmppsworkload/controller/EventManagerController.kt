@@ -3,18 +3,21 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.controller
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.CompleteDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CreatedAllocationDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.EventManagerDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.JpaBasedGetEventManager
+import java.time.ZonedDateTime
 import java.util.UUID
 import javax.persistence.EntityNotFoundException
 
@@ -73,6 +76,6 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/allocation/events/me")
-  suspend fun getAllocationsByLoggedInUser(authentication: Authentication): CreatedAllocationDetails =
-    getEventManager.findAllocationsBy(authentication.name)
+  suspend fun getAllocationsByLoggedInUser(@RequestParam(required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) since: ZonedDateTime, authentication: Authentication): CreatedAllocationDetails =
+    getEventManager.findAllocationsBy(since, authentication.name)
 }
