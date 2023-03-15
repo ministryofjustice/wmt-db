@@ -15,6 +15,6 @@ interface WorkloadCalculator {
     contactsPerformedByOthers: List<Contact>,
     contactTypeWeightings: Map<String, Int>,
     t2aWorkloadPoints: WorkloadPointsEntity,
-    workloadPoints: WorkloadPointsEntity
+    workloadPoints: WorkloadPointsEntity,
   ): BigInteger
 }

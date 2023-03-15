@@ -24,8 +24,8 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
   @ApiResponses(
     value = [
       ApiResponse(responseCode = "200", description = "OK"),
-      ApiResponse(responseCode = "404", description = "Result Not Found")
-    ]
+      ApiResponse(responseCode = "404", description = "Result Not Found"),
+    ],
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("\${event.manager.getByIdPath}")
@@ -37,14 +37,14 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
   @ApiResponses(
     value = [
       ApiResponse(responseCode = "200", description = "OK"),
-      ApiResponse(responseCode = "404", description = "Result Not Found")
-    ]
+      ApiResponse(responseCode = "404", description = "Result Not Found"),
+    ],
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/allocation/person/{crn}/event/{eventNumber}/details")
   suspend fun getCaseDetailsForEventManager(
     @PathVariable(required = true) crn: String,
-    @PathVariable(required = true) eventNumber: Int
+    @PathVariable(required = true) eventNumber: Int,
   ): CaseDetails =
     getEventManager.findDetailsByCrnAndEventNumber(crn, eventNumber) ?: throw EntityNotFoundException("Case details of event manager not found for crn $crn eventNumber $eventNumber")
 
@@ -52,14 +52,14 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
   @ApiResponses(
     value = [
       ApiResponse(responseCode = "200", description = "OK"),
-      ApiResponse(responseCode = "404", description = "Result Not Found")
-    ]
+      ApiResponse(responseCode = "404", description = "Result Not Found"),
+    ],
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/allocation/person/{crn}/event/{eventNumber}/complete-details")
   suspend fun getCompleteDetailsForEventManager(
     @PathVariable(required = true) crn: String,
-    @PathVariable(required = true) eventNumber: Int
+    @PathVariable(required = true) eventNumber: Int,
   ): CompleteDetails =
     getEventManager.findCompleteDetailsByCrnAndEventNumber(crn, eventNumber) ?: throw EntityNotFoundException("Complete details of event manager not found for crn $crn eventNumber $eventNumber")
 }

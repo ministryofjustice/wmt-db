@@ -21,8 +21,8 @@ class GetCasesForOffenderManager : IntegrationTestBase() {
       activeCases = listOf(
         ActiveCasesIntegration("CRN2222", "Sally", "Smith", "CUSTODY"),
         ActiveCasesIntegration("CRN3333", "John", "Williams", "COMMUNITY"),
-        ActiveCasesIntegration("CRN1111", "John", "Doe", "LICENSE")
-      )
+        ActiveCasesIntegration("CRN1111", "John", "Doe", "LICENSE"),
+      ),
     )
     val realTimeCaseDetails = caseDetailsRepository.saveAll(listOf(CaseDetailsEntity("CRN2222", Tier.B3, CaseType.CUSTODY, "Sally", "Smith"), CaseDetailsEntity("CRN3333", Tier.C1, CaseType.COMMUNITY, "John", "Williams"), CaseDetailsEntity("CRN1111", Tier.C1, CaseType.LICENSE, "John", "Doe")))
     val wmtStaff = setupCurrentWmtStaff(staffCodeOM, teamCode)

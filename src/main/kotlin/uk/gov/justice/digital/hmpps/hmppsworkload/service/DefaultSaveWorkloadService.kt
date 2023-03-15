@@ -25,20 +25,20 @@ class DefaultSaveWorkloadService(
   private val notificationService: NotificationService,
   private val telemetryService: TelemetryService,
   private val sqsSuccessPublisher: SqsSuccessPublisher,
-  private val caseDetailsRepository: CaseDetailsRepository
+  private val caseDetailsRepository: CaseDetailsRepository,
 ) {
 
   suspend fun saveWorkload(
     allocatedStaffId: StaffIdentifier,
     allocateCase: AllocateCase,
-    loggedInUser: String
+    loggedInUser: String,
   ): CaseAllocated {
     val allocationData = workforceAllocationsToDeliusApiClient.allocationDetails(allocateCase.crn, allocateCase.eventNumber, allocatedStaffId.staffCode, loggedInUser)
     val personManagerSaveResult = savePersonManagerService.savePersonManager(
       allocatedStaffId.teamCode,
       allocationData.staff,
       loggedInUser,
-      allocateCase.crn
+      allocateCase.crn,
     ).also { afterPersonManagerSaved(it, allocationData.staff) }
     val eventManagerSaveResult = saveEventManagerService.saveEventManager(allocatedStaffId.teamCode, allocationData.staff, allocateCase, loggedInUser).also { afterEventManagerSaved(it) }
     val requirementManagerSaveResults = saveRequirementManagerService.saveRequirementManagers(allocatedStaffId.teamCode, allocationData.staff, allocateCase, loggedInUser, allocationData.activeRequirements).also { afterRequirementManagersSaved(it) }
@@ -57,7 +57,7 @@ class DefaultSaveWorkloadService(
       sqsSuccessPublisher.updatePerson(
         personManagerSaveResult.entity.crn,
         personManagerSaveResult.entity.uuid,
-        personManagerSaveResult.entity.createdDate!!
+        personManagerSaveResult.entity.createdDate!!,
       )
     }
   }

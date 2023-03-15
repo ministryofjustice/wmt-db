@@ -54,10 +54,12 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
 
     personManagerRepository.save(
       PersonManagerEntity(
-        crn = realtimeCase.crn, staffCode = staffCode,
-        teamCode = teamCode, createdBy = "createdBy",
-        isActive = true
-      )
+        crn = realtimeCase.crn,
+        staffCode = staffCode,
+        teamCode = teamCode,
+        createdBy = "createdBy",
+        isActive = true,
+      ),
     )
 
     // realtime
@@ -70,7 +72,6 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
 
   @Test
   fun `must return one case when offender manager and person manager have entries for the same CRN`() {
-
     val staffCode = "OM1"
     val teamCode = "T1"
 
@@ -79,10 +80,12 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
 
     personManagerRepository.save(
       PersonManagerEntity(
-        crn = realtimeCase.crn, staffCode = staffCode,
-        teamCode = teamCode, createdBy = "createdBy",
-        isActive = true
-      )
+        crn = realtimeCase.crn,
+        staffCode = staffCode,
+        teamCode = teamCode,
+        createdBy = "createdBy",
+        isActive = true,
+      ),
     )
 
     val wmtStaff = setupCurrentWmtStaff(staffCode, teamCode)
@@ -92,9 +95,9 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
 
     Assertions.assertEquals(1, actualCases.size)
   }
+
   @Test
   fun `must not be in caseload if allocated to another staff member`() {
-
     val originalStaffCode = "STAFF1"
     val teamCode = "TEAM!"
     val newStaffCode = "STAFF2"
@@ -104,18 +107,22 @@ class GetCombinedCaseloadTest : IntegrationTestBase() {
 
     personManagerRepository.save(
       PersonManagerEntity(
-        crn = realtimeCase.crn, staffCode = originalStaffCode,
-        teamCode = teamCode, createdBy = "createdBy",
-        isActive = false
-      )
+        crn = realtimeCase.crn,
+        staffCode = originalStaffCode,
+        teamCode = teamCode,
+        createdBy = "createdBy",
+        isActive = false,
+      ),
     )
 
     personManagerRepository.save(
       PersonManagerEntity(
-        crn = realtimeCase.crn, staffCode = newStaffCode,
-        teamCode = teamCode, createdBy = "createdBy",
-        isActive = true
-      )
+        crn = realtimeCase.crn,
+        staffCode = newStaffCode,
+        teamCode = teamCode,
+        createdBy = "createdBy",
+        isActive = true,
+      ),
     )
 
     val actualCases = getCaseLoad.getCases(StaffIdentifier("STAFF1", "TEAM!"))

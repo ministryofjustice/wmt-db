@@ -15,12 +15,12 @@ data class AllocationDetails @JsonCreator constructor(
   val sentence: SentenceDetails,
   val court: Court,
   val offences: List<OffenceDetails>,
-  val activeRequirements: List<Requirement>
+  val activeRequirements: List<Requirement>,
 )
 
 data class RiskOGRS(
   val lastUpdatedDate: LocalDate,
-  val score: Int
+  val score: Int,
 ) {
   fun getOgrsLevel(): String = when {
     score <= 49 -> "Low"
@@ -33,21 +33,21 @@ data class RiskOGRS(
 data class SentenceDetails(
   val description: String,
   val date: ZonedDateTime,
-  val length: String
+  val length: String,
 )
 
 data class OffenceDetails(
-  val mainCategory: String
+  val mainCategory: String,
 )
 
 data class Court(
   val name: String,
-  val appearanceDate: LocalDate
+  val appearanceDate: LocalDate,
 )
 
 data class Requirement(
   val mainCategory: String,
   val subCategory: String,
   val length: String,
-  val id: BigInteger
+  val id: BigInteger,
 )

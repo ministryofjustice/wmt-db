@@ -12,12 +12,12 @@ data class Sentence @JsonCreator constructor(
   val startDate: LocalDate,
   val sentenceId: BigInteger,
   val expectedSentenceEndDate: LocalDate? = null,
-  val terminationDate: LocalDate? = null
+  val terminationDate: LocalDate? = null,
 ) {
   fun mapOrder(): String = "$description ($originalLength $originalLengthUnits)"
 }
 
 data class SentenceType @JsonCreator constructor(
   val code: String,
-  val description: String
+  val description: String,
 )

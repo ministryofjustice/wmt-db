@@ -37,8 +37,10 @@ class NotificationServiceTests {
   private val assessRisksNeedsApiClient = mockk<AssessRisksNeedsApiClient>()
   private val templateId = "templateId"
   private val notificationService = NotificationService(
-    notificationClient, templateId,
-    assessRisksNeedsApiClient, hmppsCaseDetailsRepo
+    notificationClient,
+    templateId,
+    assessRisksNeedsApiClient,
+    hmppsCaseDetailsRepo,
   )
   private val allocateCase = AllocateCase("CRN1111", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
 
@@ -167,8 +169,10 @@ class NotificationServiceTests {
   @Test
   fun `must add requirements`() = runBlocking {
     val requirement = Requirement(
-      "Main Category", "Sub Category",
-      "1 Year", BigInteger.ONE
+      "Main Category",
+      "Sub Category",
+      "1 Year",
+      BigInteger.ONE,
     )
     val allocationDetails = getAllocationDetails(allocateCase.crn, activeRequirements = listOf(requirement))
 
@@ -181,8 +185,10 @@ class NotificationServiceTests {
   @Test
   fun `must add requirements without length`() = runBlocking {
     val requirement = Requirement(
-      "Main Category", "Sub Category",
-      "", BigInteger.ONE
+      "Main Category",
+      "Sub Category",
+      "",
+      BigInteger.ONE,
     )
     val allocationDetails = getAllocationDetails(allocateCase.crn, activeRequirements = listOf(requirement))
 

@@ -48,5 +48,5 @@ data class RequirementManagerEntity(
   var isActive: Boolean,
 
   @Column
-  var eventNumber: Int
+  var eventNumber: Int,
 )

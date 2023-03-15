@@ -44,6 +44,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @MockkBean
   private lateinit var notificationClient: NotificationClientApi
+
   @MockkBean
   private lateinit var telemetryClient: TelemetryClient
 
@@ -54,9 +55,9 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   private val eventNumber = 1
   private val requirementId = BigInteger.valueOf(645234212L)
   private val allocatingOfficerUsername = "SOME_USER"
+
   @BeforeEach
   fun setupApiCalls() {
-
     workforceAllocationsToDelius.allocationResponse(crn, eventNumber, staffCode, allocatingOfficerUsername)
     hmppsTier.tierCalculationResponse(crn)
     assessRisksNeedsApi.riskSummaryErrorResponse(crn)
@@ -64,7 +65,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY, "Jane", "Doe"))
     every { notificationClient.sendEmail(any(), any(), any(), any()) } returns
       SendEmailResponse(
-        emailResponse()
+        emailResponse(),
       )
 
     every { telemetryClient.trackEvent(any(), any(), null) } returns Unit
@@ -73,7 +74,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can allocate CRN to Staff member`() {
-
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
       .bodyValue(allocateCase(crn, eventNumber))
@@ -104,7 +104,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       { Assertions.assertEquals(staffCode, actualWorkloadCalcEntity.staffCode) },
       { Assertions.assertEquals(teamCode, actualWorkloadCalcEntity.teamCode) },
       { Assertions.assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity.calculatedDate.dayOfMonth) },
-      { Assertions.assertEquals(1, actualWorkloadCalcEntity.breakdownData.caseloadCount) }
+      { Assertions.assertEquals(1, actualWorkloadCalcEntity.breakdownData.caseloadCount) },
     )
 
     verify(exactly = 2) { notificationClient.sendEmail(any(), any(), any(), any()) }
@@ -115,9 +115,9 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
           "crn" to crn,
           "teamCode" to teamCode,
           "staffCode" to staffCode,
-          "wmtPeriod" to getWmtPeriod(LocalDateTime.now())
+          "wmtPeriod" to getWmtPeriod(LocalDateTime.now()),
         ),
-        null
+        null,
       )
     }
   }
@@ -153,7 +153,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `Notify error due to an invalid recipient returns error containing the offending email address`() {
-
     every { notificationClient.sendEmail(any(), any(), any(), any()) } throws NotificationClientException("An exception")
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY, "Jane", "Doe"))
 
@@ -182,7 +181,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       teamCode = teamCode,
       createdBy = "USER1",
       isActive = true,
-      eventNumber = eventNumber
+      eventNumber = eventNumber,
     )
     eventManagerRepository.save(storedEventManager)
     val storedRequirementManager = RequirementManagerEntity(
@@ -192,7 +191,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       teamCode = teamCode,
       createdBy = "USER1",
       isActive = true,
-      eventNumber = eventNumber
+      eventNumber = eventNumber,
     )
     requirementManagerRepository.save(storedRequirementManager)
 
@@ -227,8 +226,8 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
         teamCode = "TEAMCODE",
         createdBy = "USER1",
         isActive = true,
-        eventNumber = eventNumber
-      )
+        eventNumber = eventNumber,
+      ),
     )
 
     webTestClient.post()
@@ -257,7 +256,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     Assertions.assertAll(
       { Assertions.assertEquals(storedPersonManager.staffCode, actualWorkloadCalcEntity!!.staffCode) },
       { Assertions.assertEquals(storedPersonManager.teamCode, actualWorkloadCalcEntity!!.teamCode) },
-      { Assertions.assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity!!.calculatedDate.dayOfMonth) }
+      { Assertions.assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity!!.calculatedDate.dayOfMonth) },
     )
 
     val previousPersonManager = personManagerRepository.findByIdOrNull(storedPersonManager.id!!)!!
@@ -306,7 +305,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `must emit staff grade to tier allocation telemetry event`() {
-
     val caseDetailsEntity = CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY, "Jane", "Doe")
     caseDetailsRepository.save(caseDetailsEntity)
     webTestClient.post()
@@ -328,14 +326,13 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
           "staffGrade" to "PO",
           "tier" to caseDetailsEntity.tier.name,
         ),
-        null
+        null,
       )
     }
   }
 
   @Test
   fun `must emit staff grade to tier allocation telemetry event without case details`() {
-
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
       .bodyValue(allocateCase(crn, eventNumber))
@@ -355,14 +352,13 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
           "staffGrade" to "PO",
           "tier" to "A0",
         ),
-        null
+        null,
       )
     }
   }
 
   @Test
   fun `can send audit data when allocating`() {
-
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
       .bodyValue(allocateCase(crn, eventNumber))
@@ -379,7 +375,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `audit data contain required fields`() {
-
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
       .bodyValue(allocateCase(crn, eventNumber))
@@ -398,7 +393,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can send email when selecting a second person to receive email`() {
-
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
       .bodyValue(allocateCase(crn, eventNumber))
@@ -429,7 +423,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       { Assertions.assertEquals(staffCode, actualWorkloadCalcEntity.staffCode) },
       { Assertions.assertEquals(teamCode, actualWorkloadCalcEntity.teamCode) },
       { Assertions.assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity.calculatedDate.dayOfMonth) },
-      { Assertions.assertEquals(1, actualWorkloadCalcEntity.breakdownData.caseloadCount) }
+      { Assertions.assertEquals(1, actualWorkloadCalcEntity.breakdownData.caseloadCount) },
     )
     // verify that the additional email got an email
     verify(exactly = 1) { notificationClient.sendEmail(any(), "additionalEmailReceiver@test.justice.gov.uk", any(), any()) }
@@ -442,9 +436,9 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
           "crn" to crn,
           "teamCode" to teamCode,
           "staffCode" to staffCode,
-          "wmtPeriod" to getWmtPeriod(LocalDateTime.now())
+          "wmtPeriod" to getWmtPeriod(LocalDateTime.now()),
         ),
-        null
+        null,
       )
     }
   }
@@ -486,6 +480,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     // verify that the allocate-to user received an email.
     verify(exactly = 1) { notificationClient.sendEmail(any(), allocateToEmail, any(), any()) }
   }
+
   @Test
   fun `do not send email to allocating officer`() {
     val allocateToEmail = "allocateTo-user@test.justice.gov.uk"
@@ -526,7 +521,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `must return event number for event manager allocated`() {
-
     val response = webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
       .bodyValue(allocateCase(crn, eventNumber))
@@ -567,7 +561,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `must return event number for requirement manager allocated`() {
-
     val response = webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
       .bodyValue(allocateCase(crn, eventNumber))

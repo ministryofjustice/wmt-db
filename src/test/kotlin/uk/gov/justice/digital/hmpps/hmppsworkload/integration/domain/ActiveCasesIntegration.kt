@@ -4,5 +4,5 @@ data class ActiveCasesIntegration(
   val crn: String,
   val firstName: String,
   val surname: String,
-  val type: String
+  val type: String,
 )

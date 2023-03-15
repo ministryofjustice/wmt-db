@@ -27,6 +27,6 @@ data class WMTWorkloadOwnerEntity(
   val offenderManager: OffenderManagerEntity,
 
   @Column
-  val contractedHours: BigDecimal
+  val contractedHours: BigDecimal,
 
 )

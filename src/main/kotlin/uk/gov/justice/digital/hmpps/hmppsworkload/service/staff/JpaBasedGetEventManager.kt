@@ -16,7 +16,7 @@ import java.util.UUID
 class JpaBasedGetEventManager(
   private val eventManagerRepository: EventManagerRepository,
   private val caseDetailsRepository: CaseDetailsRepository,
-  private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient
+  private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient,
 ) {
   fun findById(id: UUID): EventManagerEntity? = eventManagerRepository.findByUuid(id)
   fun findLatestByStaffAndTeam(staffIdentifier: StaffIdentifier): EventDetails? =

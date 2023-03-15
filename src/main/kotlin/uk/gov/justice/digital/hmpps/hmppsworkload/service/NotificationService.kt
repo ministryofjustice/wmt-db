@@ -32,7 +32,7 @@ class NotificationService(
   private val notificationClient: NotificationClientApi,
   @Value("\${application.notify.allocation.template}") private val allocationTemplateId: String,
   private val assessRisksNeedsApiClient: AssessRisksNeedsApiClient,
-  private val caseDetailsRepository: CaseDetailsRepository
+  private val caseDetailsRepository: CaseDetailsRepository,
 ) {
 
   suspend fun notifyAllocation(allocationDetails: AllocationDetails, allocateCase: AllocateCase): List<SendEmailResponse> {
@@ -67,7 +67,7 @@ class NotificationService(
 
   private fun getLoggedInUserParameters(loggedInUser: StaffMember): Map<String, Any> = mapOf(
     "allocatingOfficerName" to loggedInUser.name.getCombinedName(),
-    "allocatingOfficerGrade" to loggedInUser.getGrade()
+    "allocatingOfficerGrade" to loggedInUser.getGrade(),
   )
 
   private fun getPersonOnProbationParameters(name: String, allocateCase: AllocateCase): Map<String, Any> = mapOf(
@@ -80,7 +80,7 @@ class NotificationService(
     "court_name" to allocationDetails.court.name,
     "sentence_date" to allocationDetails.court.appearanceDate.format(DateUtils.notifyDateFormat),
     "offences" to mapOffences(allocationDetails.offences),
-    "order" to "${allocationDetails.sentence.description} (${allocationDetails.sentence.length})"
+    "order" to "${allocationDetails.sentence.description} (${allocationDetails.sentence.length})",
   )
 
   private fun getRiskParameters(riskSummary: RiskSummary?, riskPredictors: List<RiskPredictor>, assessment: RiskOGRS?): Map<String, Any> {
@@ -130,5 +130,5 @@ class NotificationService(
 
 data class NotifyData(
   val riskSummary: RiskSummary?,
-  val riskPredictors: List<RiskPredictor>
+  val riskPredictors: List<RiskPredictor>,
 )

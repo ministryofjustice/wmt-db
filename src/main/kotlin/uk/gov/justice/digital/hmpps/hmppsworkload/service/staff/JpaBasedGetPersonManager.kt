@@ -11,7 +11,7 @@ import java.util.UUID
 @Service
 class JpaBasedGetPersonManager(
   private val personManagerRepository: PersonManagerRepository,
-  @Qualifier("workforceAllocationsToDeliusApiClient") private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient
+  @Qualifier("workforceAllocationsToDeliusApiClient") private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient,
 ) : GetPersonManager {
   override fun findById(id: UUID): PersonManagerDetails? = personManagerRepository.findByUuid(id)?.let { entity ->
     PersonManagerDetails.from(entity)

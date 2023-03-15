@@ -25,10 +25,13 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
 
     val savedEntity = eventManagerRepository.save(
       EventManagerEntity(
-        crn = "CRN6634", staffCode = staffCode, teamCode = teamCode,
-        createdBy = "createdBy", isActive = true,
-        eventNumber = 1
-      )
+        crn = "CRN6634",
+        staffCode = staffCode,
+        teamCode = teamCode,
+        createdBy = "createdBy",
+        isActive = true,
+        eventNumber = 1,
+      ),
     )
     val eventManagerEntity = eventManagerRepository.findByIdOrNull(savedEntity.id!!)!!
     val realtimeCase = EventDetails(Tier.A1, CaseType.LICENSE, eventManagerEntity.crn, eventManagerEntity.createdDate!!)
@@ -45,10 +48,13 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
     val teamCode = "T1"
     eventManagerRepository.save(
       EventManagerEntity(
-        crn = "CRN6634", staffCode = staffCode, teamCode = teamCode,
-        createdBy = "createdBy", isActive = true,
-        eventNumber = 1
-      )
+        crn = "CRN6634",
+        staffCode = staffCode,
+        teamCode = teamCode,
+        createdBy = "createdBy",
+        isActive = true,
+        eventNumber = 1,
+      ),
     )
 
     Assertions.assertNull(getEventManager.findLatestByStaffAndTeam(StaffIdentifier(staffCode, teamCode)))
@@ -61,20 +67,26 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
 
     val eventManagerEntity = eventManagerRepository.save(
       EventManagerEntity(
-        crn = "CRN6634", staffCode = staffCode, teamCode = teamCode,
-        createdBy = "createdBy", isActive = true,
-        eventNumber = 1
-      )
+        crn = "CRN6634",
+        staffCode = staffCode,
+        teamCode = teamCode,
+        createdBy = "createdBy",
+        isActive = true,
+        eventNumber = 1,
+      ),
     )
 
     caseDetailsRepository.save(CaseDetailsEntity(eventManagerEntity.crn, Tier.A1, CaseType.LICENSE, "Jane", "Doe"))
 
     val savedEntity = eventManagerRepository.save(
       EventManagerEntity(
-        crn = "CRN9977", staffCode = staffCode, teamCode = teamCode,
-        createdBy = "createdBy", isActive = true,
-        eventNumber = 1
-      )
+        crn = "CRN9977",
+        staffCode = staffCode,
+        teamCode = teamCode,
+        createdBy = "createdBy",
+        isActive = true,
+        eventNumber = 1,
+      ),
     )
     val latestEventManagerEntity = eventManagerRepository.findByIdOrNull(savedEntity.id!!)!!
     val realtimeCase = EventDetails(Tier.C3, CaseType.COMMUNITY, latestEventManagerEntity.crn, latestEventManagerEntity.createdDate!!)
@@ -93,10 +105,13 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
 
     val savedEntity = eventManagerRepository.save(
       EventManagerEntity(
-        crn = "CRN6634", staffCode = staffCode, teamCode = teamCode,
-        createdBy = "createdBy", isActive = false,
-        eventNumber = 1
-      )
+        crn = "CRN6634",
+        staffCode = staffCode,
+        teamCode = teamCode,
+        createdBy = "createdBy",
+        isActive = false,
+        eventNumber = 1,
+      ),
     )
     val eventManagerEntity = eventManagerRepository.findByIdOrNull(savedEntity.id!!)!!
     val realtimeCase = EventDetails(Tier.A1, CaseType.LICENSE, eventManagerEntity.crn, eventManagerEntity.createdDate!!)
@@ -104,10 +119,13 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
 
     eventManagerRepository.save(
       EventManagerEntity(
-        crn = eventManagerEntity.crn, staffCode = "ADIFFEENTCODE", teamCode = teamCode,
-        createdBy = "createdBy", isActive = true,
-        eventNumber = 1
-      )
+        crn = eventManagerEntity.crn,
+        staffCode = "ADIFFEENTCODE",
+        teamCode = teamCode,
+        createdBy = "createdBy",
+        isActive = true,
+        eventNumber = 1,
+      ),
     )
 
     Assertions.assertNull(getEventManager.findLatestByStaffAndTeam(StaffIdentifier(staffCode, teamCode)))

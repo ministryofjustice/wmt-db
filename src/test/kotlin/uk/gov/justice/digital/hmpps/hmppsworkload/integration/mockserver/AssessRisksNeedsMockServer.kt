@@ -42,7 +42,7 @@ class AssessRisksNeedsMockServer : ClientAndServer(MOCKSERVER_PORT) {
   fun riskPredictorResponse(crn: String) {
     val request = HttpRequest.request().withPath("/risks/crn/$crn/predictors/rsr/history")
     AssessRisksNeedsApiExtension.assessRisksNeedsApi.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(successfulRiskPredictorResponse())
+      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(successfulRiskPredictorResponse()),
     )
   }
 
@@ -50,8 +50,8 @@ class AssessRisksNeedsMockServer : ClientAndServer(MOCKSERVER_PORT) {
     val request = HttpRequest.request().withPath("/risks/crn/$crn/predictors/rsr/history")
     AssessRisksNeedsApiExtension.assessRisksNeedsApi.`when`(request, Times.exactly(1)).respond(
       HttpResponse.response().withStatusCode(HttpStatusCode.INTERNAL_SERVER_ERROR_500.code()).withContentType(
-        MediaType.APPLICATION_JSON
-      ).withBody("{}")
+        MediaType.APPLICATION_JSON,
+      ).withBody("{}"),
     )
   }
 
@@ -59,14 +59,14 @@ class AssessRisksNeedsMockServer : ClientAndServer(MOCKSERVER_PORT) {
     AssessRisksNeedsApiExtension.assessRisksNeedsApi.verify(
       HttpRequest.request()
         .withPath("/risks/crn/$crn/predictors/rsr/history"),
-      VerificationTimes.exactly(times)
+      VerificationTimes.exactly(times),
     )
   }
 
   fun riskSummaryResponse(crn: String) {
     val request = HttpRequest.request().withPath("/risks/crn/$crn/summary")
     AssessRisksNeedsApiExtension.assessRisksNeedsApi.`when`(request, Times.exactly(2)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(successfulRiskSummaryResponse())
+      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(successfulRiskSummaryResponse()),
     )
   }
 
@@ -74,8 +74,8 @@ class AssessRisksNeedsMockServer : ClientAndServer(MOCKSERVER_PORT) {
     val request = HttpRequest.request().withPath("/risks/crn/$crn/summary")
     AssessRisksNeedsApiExtension.assessRisksNeedsApi.`when`(request, Times.exactly(2)).respond(
       HttpResponse.response().withStatusCode(HttpStatusCode.INTERNAL_SERVER_ERROR_500.code()).withContentType(
-        MediaType.APPLICATION_JSON
-      ).withBody("{}")
+        MediaType.APPLICATION_JSON,
+      ).withBody("{}"),
     )
   }
 
@@ -83,7 +83,7 @@ class AssessRisksNeedsMockServer : ClientAndServer(MOCKSERVER_PORT) {
     AssessRisksNeedsApiExtension.assessRisksNeedsApi.verify(
       HttpRequest.request()
         .withPath("/risks/crn/$crn/summary"),
-      VerificationTimes.exactly(times)
+      VerificationTimes.exactly(times),
     )
   }
 }

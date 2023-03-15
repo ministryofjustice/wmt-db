@@ -23,7 +23,7 @@ class TeamService(
   private val workloadPointsRepository: WorkloadPointsRepository,
   private val personManagerRepository: PersonManagerRepository,
   private val caseDetailsRepository: CaseDetailsRepository,
-  private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient
+  private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient,
 ) {
   suspend fun getPractitioners(teamCodes: List<String>, crn: String, grades: List<String>?): PractitionerWorkload? {
     return workforceAllocationsToDeliusApiClient.choosePractitioners(crn, teamCodes)?.let { choosePractitionerResponse ->
@@ -45,7 +45,7 @@ class TeamService(
       PractitionerWorkload.from(
         choosePractitionerResponse,
         caseDetailsRepository.findByIdOrNull(crn)!!.tier,
-        enrichedTeams
+        enrichedTeams,
       )
     }
   }
@@ -60,11 +60,15 @@ class TeamService(
   private fun getTeamOverviewForOffenderManagerWithoutWorkload(
     staffCode: String,
     grade: String,
-    teamCode: String
+    teamCode: String,
   ): TeamOverview {
     return TeamOverview(
-      0, 0,
-      defaultAvailablePointsForGrade(grade), BigInteger.ZERO, staffCode, teamCode
+      0,
+      0,
+      defaultAvailablePointsForGrade(grade),
+      BigInteger.ZERO,
+      staffCode,
+      teamCode,
     )
   }
 

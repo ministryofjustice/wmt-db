@@ -35,8 +35,8 @@ class WorkloadCalculationListenerTests : IntegrationTestBase() {
 
     hmppsDomainSnsClient.publish(
       PublishRequest(hmppsDomainTopicArn, jsonString(staffAvailableHoursChangedEvent(staffCode, teamCode, availableHours))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("staff.available.hours.changed"))
-      )
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("staff.available.hours.changed")),
+      ),
     )
 
     noMessagesOnWorkloadCalculationEventsQueue()
@@ -48,7 +48,7 @@ class WorkloadCalculationListenerTests : IntegrationTestBase() {
       { Assertions.assertEquals(staffCode, actualWorkloadCalcEntity?.staffCode) },
       { Assertions.assertEquals(teamCode, actualWorkloadCalcEntity?.teamCode) },
       { Assertions.assertEquals(availableHours, actualWorkloadCalcEntity?.breakdownData?.availableHours) },
-      { Assertions.assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity?.calculatedDate?.dayOfMonth) }
+      { Assertions.assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity?.calculatedDate?.dayOfMonth) },
     )
   }
 
@@ -67,8 +67,8 @@ class WorkloadCalculationListenerTests : IntegrationTestBase() {
 
     hmppsDomainSnsClient.publish(
       PublishRequest(hmppsDomainTopicArn, jsonString(staffAvailableHoursChangedEvent(staffCode, teamCode, availableHours))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("staff.available.hours.changed"))
-      )
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("staff.available.hours.changed")),
+      ),
     )
 
     noMessagesOnWorkloadCalculationEventsQueue()
@@ -77,6 +77,7 @@ class WorkloadCalculationListenerTests : IntegrationTestBase() {
   }
 
   private fun staffAvailableHoursChangedEvent(staffCode: String, teamCode: String, availableHours: BigDecimal) = WorkloadCalculationEvent(
-    AdditionalInformation(availableHours), PersonReference(listOf(PersonReferenceType("staffCode", staffCode), PersonReferenceType("teamCode", teamCode)))
+    AdditionalInformation(availableHours),
+    PersonReference(listOf(PersonReferenceType("staffCode", staffCode), PersonReferenceType("teamCode", teamCode))),
   )
 }

@@ -10,7 +10,7 @@ import javax.transaction.Transactional
 class UpdateWorkloadService(
   private val personManagerRepository: PersonManagerRepository,
   private val eventManagerRepository: EventManagerRepository,
-  private val requirementManagerRepository: RequirementManagerRepository
+  private val requirementManagerRepository: RequirementManagerRepository,
 ) {
 
   @Transactional

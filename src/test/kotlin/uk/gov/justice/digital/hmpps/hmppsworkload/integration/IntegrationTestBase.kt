@@ -71,7 +71,7 @@ import java.math.BigDecimal
   AssessRisksNeedsApiExtension::class,
   TierApiExtension::class,
   WorkforceAllocationsToDeliusExtension::class,
-  HmppsAuthApiExtension::class
+  HmppsAuthApiExtension::class,
 )
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles("test")
@@ -297,37 +297,37 @@ abstract class IntegrationTestBase {
     val region = regionRepository.findByCode("REGION1") ?: regionRepository.save(
       RegionEntity(
         code = "REGION1",
-        description = "Region 1"
-      )
+        description = "Region 1",
+      ),
     )
     val pdu = pduRepository.findByCode("PDU1") ?: pduRepository.save(
       PduEntity(
         code = "PDU1",
         description = "Local Delivery Unit (Actually a Probation Delivery Unit)",
-        region = region
-      )
+        region = region,
+      ),
     )
     val team = teamRepository.findByCode(teamCode) ?: teamRepository.save(
       TeamEntity(
         code = teamCode,
         description = "Team 1",
-        ldu = pdu
-      )
+        ldu = pdu,
+      ),
     )
     val offenderManager = offenderManagerRepository.findByCode(staffCode) ?: offenderManagerRepository.save(
       OffenderManagerEntity(
         code = staffCode,
         forename = "Jane",
         surname = "Doe",
-        typeId = 1
-      )
+        typeId = 1,
+      ),
     )
     val workloadOwner = wmtWorkloadOwnerRepository.save(
       WMTWorkloadOwnerEntity(
         offenderManager = offenderManager,
         team = team,
-        contractedHours = BigDecimal.valueOf(37.5)
-      )
+        contractedHours = BigDecimal.valueOf(37.5),
+      ),
     )
     val workloadReport = workloadReportRepository.findByEffectiveFromIsNotNullAndEffectiveToIsNull()
       ?: workloadReportRepository.save((WorkloadReportEntity()))
@@ -339,8 +339,8 @@ abstract class IntegrationTestBase {
         totalFilteredCustodyCases = totalFilteredCustodyCases,
         totalFilteredLicenseCases = 5,
         institutionalReportsDueInNextThirtyDays = 5,
-        totalFilteredCases = 35
-      )
+        totalFilteredCases = 35,
+      ),
     )
     val currentWmtPointsWeightings = getWmtWorkloadWeightings()
     val workloadPointsCalculation = workloadPointsCalculationRepository.save(
@@ -350,8 +350,8 @@ abstract class IntegrationTestBase {
         t2aWorkloadPoints = currentWmtPointsWeightings.t2aWeightings,
         workload = wmtWorkload,
         totalPoints = 500,
-        availablePoints = 1000
-      )
+        availablePoints = 1000,
+      ),
     )
     return WMTStaff(offenderManager, team, workloadOwner, wmtWorkload, workloadPointsCalculation)
   }
@@ -364,8 +364,8 @@ abstract class IntegrationTestBase {
         crn = crn,
         tierCategory = tierCategory,
         caseType = caseType,
-        teamCode = wmtStaff.team.code
-      )
+        teamCode = wmtStaff.team.code,
+      ),
     )
   }
 
@@ -378,7 +378,7 @@ abstract class IntegrationTestBase {
 
   protected fun getWmtWorkloadWeightings(): WMTPointsWeightings = WMTPointsWeightings(
     workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(true),
-    workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
+    workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false),
   )
 
   internal fun HttpHeaders.authToken(roles: List<String> = emptyList()) {
@@ -386,8 +386,8 @@ abstract class IntegrationTestBase {
       jwtAuthHelper.createJwt(
         subject = "SOME_USER",
         roles = roles,
-        clientId = "some-client"
-      )
+        clientId = "some-client",
+      ),
     )
   }
 
@@ -459,7 +459,7 @@ abstract class IntegrationTestBase {
           val sqsMessage = objectMapper.readValue(it.body, SQSMessage::class.java)
           val personAllocationMessageType = object : TypeReference<HmppsMessage<HmppsAllocationMessage>>() {}
           objectMapper.readValue(sqsMessage.Message, personAllocationMessageType)
-        }
+        },
       )
     }
     return messages
@@ -492,5 +492,5 @@ abstract class IntegrationTestBase {
 
 data class SQSMessage(
   val Message: String,
-  val MessageId: String
+  val MessageId: String,
 )

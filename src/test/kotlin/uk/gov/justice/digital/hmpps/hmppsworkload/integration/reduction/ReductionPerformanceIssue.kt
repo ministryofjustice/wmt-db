@@ -28,7 +28,7 @@ class ReductionPerformanceIssue : IntegrationTestBase() {
       wmtStaff.wmtWorkloadOwnerEntity,
       listOf(ReductionStatus.DELETED, ReductionStatus.ARCHIVED),
       ZonedDateTime.now(),
-      ZonedDateTime.now()
+      ZonedDateTime.now(),
     )
 
     Assertions.assertThat(result).extracting("id").containsOnly(expectedReduction.id!!)

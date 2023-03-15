@@ -5,6 +5,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBas
 
 class GetTeamWorkloadAndCasesByTeamCode : IntegrationTestBase() {
   val teamCode = "T1"
+
   @Test
   fun `can get workload and cases by team code`() {
     val wmtStaff = setupCurrentWmtStaff("STAFF1", teamCode)

@@ -18,5 +18,5 @@ data class CaseCategoryEntity(
   @Column
   val categoryId: Int = 1,
   @Column
-  val categoryName: String = "A1"
+  val categoryName: String = "A1",
 ) : Serializable

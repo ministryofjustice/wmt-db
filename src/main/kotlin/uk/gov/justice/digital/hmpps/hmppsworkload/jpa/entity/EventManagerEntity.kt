@@ -44,5 +44,5 @@ data class EventManagerEntity(
   var isActive: Boolean,
 
   @Column
-  var eventNumber: Int
+  var eventNumber: Int,
 )

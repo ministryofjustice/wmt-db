@@ -22,5 +22,5 @@ data class AdjustmentReasonEntity constructor(
   val categoryId: Long = 1,
 
   @Column(name = "points")
-  val points: Int
+  val points: Int,
 )

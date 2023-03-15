@@ -36,7 +36,7 @@ class WebClientUserEnhancementConfiguration(
   @Bean
   fun hmppsTierWebClientUserEnhancedAppScope(
     clientRegistrationRepository: ReactiveClientRegistrationRepository,
-    builder: WebClient.Builder
+    builder: WebClient.Builder,
   ): WebClient {
     return getOAuthWebClient(authorizedClientManagerUserEnhanced(clientRegistrationRepository, builder), builder, hmppsTierApiRootUri, "hmpps-tier-api")
   }
@@ -81,7 +81,7 @@ class WebClientUserEnhancementConfiguration(
     authorizedClientManager: ReactiveOAuth2AuthorizedClientManager,
     builder: WebClient.Builder,
     rootUri: String,
-    registrationId: String
+    registrationId: String,
   ): WebClient {
     val oauth2Client = ServerOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
     oauth2Client.setDefaultClientRegistrationId(registrationId)
@@ -103,7 +103,7 @@ class WebClientUserEnhancementConfiguration(
   @Bean
   fun workforceAllocationsToDeliusApiWebClientUserEnhancedAppScope(
     clientRegistrationRepository: ReactiveClientRegistrationRepository,
-    builder: WebClient.Builder
+    builder: WebClient.Builder,
   ): WebClient {
     return getOAuthWebClient(authorizedClientManagerUserEnhanced(clientRegistrationRepository, builder), builder, workforceAllocationsToDeliusApiRootUri, "workforce-allocations-to-delius-api")
   }

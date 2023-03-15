@@ -26,8 +26,8 @@ class TierCalculationEventListenerTest : IntegrationTestBase() {
     hmppsDomainSnsClient.publish(
       PublishRequest(hmppsDomainTopicArn, objectMapper.writeValueAsString(tierCalculationEvent(crn)))
         .withMessageAttributes(
-          mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("TIER_CALCULATION_COMPLETE"))
-        )
+          mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("TIER_CALCULATION_COMPLETE")),
+        ),
     )
 
     await untilCallTo {
@@ -42,6 +42,6 @@ class TierCalculationEventListenerTest : IntegrationTestBase() {
   }
 
   private fun tierCalculationEvent(crn: String) = CalculationEventData(
-    PersonReference(listOf(PersonReferenceType("CRN", crn)))
+    PersonReference(listOf(PersonReferenceType("CRN", crn))),
   )
 }

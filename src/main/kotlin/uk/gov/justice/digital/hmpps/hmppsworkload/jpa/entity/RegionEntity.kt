@@ -19,5 +19,5 @@ data class RegionEntity(
   val code: String,
 
   @Column
-  val description: String
+  val description: String,
 )

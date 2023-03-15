@@ -16,7 +16,7 @@ fun calculateCapacity(totalPoints: BigInteger, availablePoints: BigInteger): Big
 fun calculateAvailablePoints(
   pointsForGrade: BigDecimal,
   contractedHoursForGrade: BigDecimal,
-  availableHours: BigDecimal
+  availableHours: BigDecimal,
 ): BigInteger {
   if (availableHours > ZERO && contractedHoursForGrade != ZERO) {
     val percentageToWork = availableHours.divide(contractedHoursForGrade, 15, HALF_UP)

@@ -37,14 +37,14 @@ class TierMockServer : ClientAndServer(MOCKSERVER_PORT) {
   fun tierCalculationResponse(crn: String, tier: String = "B3") {
     val request = HttpRequest.request().withPath("/crn/$crn/tier")
     hmppsTier.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody("{\"tierScore\":\"${tier}\"}")
+      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody("{\"tierScore\":\"${tier}\"}"),
     )
   }
 
   fun tierCalculationNotFoundResponse(crn: String) {
     val request = HttpRequest.request().withPath("/crn/$crn/tier")
     hmppsTier.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.notFoundResponse().withContentType(MediaType.APPLICATION_JSON).withBody(notFoundTierResponse())
+      HttpResponse.notFoundResponse().withContentType(MediaType.APPLICATION_JSON).withBody(notFoundTierResponse()),
     )
   }
 }
