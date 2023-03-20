@@ -40,7 +40,7 @@ class SqsSuccessPublisher(
   @Value("\${ingress.url}") private val ingressUrl: String,
   @Value("\${person.manager.getByIdPath}") private val personManagerLookupPath: String,
   @Value("\${event.manager.getByIdPath}") private val eventManagerLookupPath: String,
-  @Value("\${requirement.manager.getByIdPath}") private val requirementManagerLookupPath: String
+  @Value("\${requirement.manager.getByIdPath}") private val requirementManagerLookupPath: String,
 ) {
 
   private val domainTopic by lazy {
@@ -62,14 +62,14 @@ class SqsSuccessPublisher(
       "Person allocated event",
       generateDetailsUri(personManagerLookupPath, allocationId),
       timeUpdated.format(
-        DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        DateTimeFormatter.ISO_OFFSET_DATE_TIME,
       ),
       HmppsAllocationMessage(allocationId),
-      PersonReference(listOf(PersonReferenceType("CRN", crn)))
+      PersonReference(listOf(PersonReferenceType("CRN", crn))),
     )
     domainTopic.snsClient.publish(
       PublishRequest(domainTopic.arn, objectMapper.writeValueAsString(hmppsPersonEvent))
-        .withMessageAttributes(mapOf(EVENT_TYPE to MessageAttributeValue().withDataType(STRING).withStringValue(hmppsPersonEvent.eventType)))
+        .withMessageAttributes(mapOf(EVENT_TYPE to MessageAttributeValue().withDataType(STRING).withStringValue(hmppsPersonEvent.eventType))),
     ).also {
       log.info(LOG_TEMPLATE, hmppsPersonEvent.eventType, crn, allocationId)
     }
@@ -79,16 +79,19 @@ class SqsSuccessPublisher(
 
   fun updateEvent(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
     val hmppsEventAllocatedEvent = HmppsMessage(
-      "event.manager.allocated", 1, "Event allocated event", generateDetailsUri(eventManagerLookupPath, allocationId),
+      "event.manager.allocated",
+      1,
+      "Event allocated event",
+      generateDetailsUri(eventManagerLookupPath, allocationId),
       timeUpdated.format(
-        DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        DateTimeFormatter.ISO_OFFSET_DATE_TIME,
       ),
       HmppsAllocationMessage(allocationId),
-      PersonReference(listOf(PersonReferenceType("CRN", crn)))
+      PersonReference(listOf(PersonReferenceType("CRN", crn))),
     )
     domainTopic.snsClient.publish(
       PublishRequest(domainTopic.arn, objectMapper.writeValueAsString(hmppsEventAllocatedEvent))
-        .withMessageAttributes(mapOf(EVENT_TYPE to MessageAttributeValue().withDataType(STRING).withStringValue(hmppsEventAllocatedEvent.eventType)))
+        .withMessageAttributes(mapOf(EVENT_TYPE to MessageAttributeValue().withDataType(STRING).withStringValue(hmppsEventAllocatedEvent.eventType))),
     ).also {
       log.info(LOG_TEMPLATE, hmppsEventAllocatedEvent.eventType, crn, allocationId)
     }
@@ -96,16 +99,19 @@ class SqsSuccessPublisher(
 
   fun updateRequirement(crn: String, allocationId: UUID, timeUpdated: ZonedDateTime) {
     val hmppsRequirementAllocatedEvent = HmppsMessage(
-      "requirement.manager.allocated", 1, "Requirement allocated event", generateDetailsUri(requirementManagerLookupPath, allocationId),
+      "requirement.manager.allocated",
+      1,
+      "Requirement allocated event",
+      generateDetailsUri(requirementManagerLookupPath, allocationId),
       timeUpdated.format(
-        DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        DateTimeFormatter.ISO_OFFSET_DATE_TIME,
       ),
       HmppsAllocationMessage(allocationId),
-      PersonReference(listOf(PersonReferenceType("CRN", crn)))
+      PersonReference(listOf(PersonReferenceType("CRN", crn))),
     )
     domainTopic.snsClient.publish(
       PublishRequest(domainTopic.arn, objectMapper.writeValueAsString(hmppsRequirementAllocatedEvent))
-        .withMessageAttributes(mapOf(EVENT_TYPE to MessageAttributeValue().withDataType(STRING).withStringValue(hmppsRequirementAllocatedEvent.eventType)))
+        .withMessageAttributes(mapOf(EVENT_TYPE to MessageAttributeValue().withDataType(STRING).withStringValue(hmppsRequirementAllocatedEvent.eventType))),
     ).also {
       log.info(LOG_TEMPLATE, hmppsRequirementAllocatedEvent.eventType, crn, allocationId)
     }
@@ -114,9 +120,9 @@ class SqsSuccessPublisher(
   fun outOfDateReductionsProcessed() {
     val sendMessage = SendMessageRequest(
       hmppsReductionsCompletedQueue.queueUrl,
-      getReductionChangeMessage()
+      getReductionChangeMessage(),
     ).withMessageAttributes(
-      mapOf("eventType" to com.amazonaws.services.sqs.model.MessageAttributeValue().withDataType("String").withStringValue("OUT_OF_DATE_REDUCTIONS"))
+      mapOf("eventType" to com.amazonaws.services.sqs.model.MessageAttributeValue().withDataType("String").withStringValue("OUT_OF_DATE_REDUCTIONS")),
     )
     log.info("publishing event type OUT_OF_DATE_REDUCTIONS")
     hmppsReductionsCompletedQueue.sqsClient.sendMessage(sendMessage)
@@ -126,48 +132,51 @@ class SqsSuccessPublisher(
     crn: String,
     eventNumber: Int,
     loggedInUser: String,
-    requirementIds: List<BigInteger>
+    requirementIds: List<BigInteger>,
   ) {
     val auditData = AuditData(
       crn,
       eventNumber,
-      requirementIds
+      requirementIds,
     )
 
     val sendMessage = SendMessageRequest(
       hmppsAuditQueue.queueUrl,
       objectMapper.writeValueAsString(
-        AuditMessage(operationId = UUID.randomUUID().toString(), who = loggedInUser, details = objectMapper.writeValueAsString(auditData))
-      )
+        AuditMessage(operationId = UUID.randomUUID().toString(), who = loggedInUser, details = objectMapper.writeValueAsString(auditData)),
+      ),
     )
     hmppsAuditQueue.sqsClient.sendMessage(sendMessage)
   }
   fun auditReduction(reductionEntity: ReductionEntity, reductionStatus: String) {
     val reductionsAuditData = ReductionsAuditData(
       reductionEntity.workloadOwner.offenderManager.code,
-      reductionEntity.id!!
+      reductionEntity.id!!,
     )
 
     val sendMessage = SendMessageRequest(
       hmppsAuditQueue.queueUrl,
       objectMapper.writeValueAsString(
-        AuditMessage(operationId = UUID.randomUUID().toString(), who = "system_user", details = objectMapper.writeValueAsString(reductionsAuditData), what = reductionStatus)
-      )
+        AuditMessage(operationId = UUID.randomUUID().toString(), who = "system_user", details = objectMapper.writeValueAsString(reductionsAuditData), what = reductionStatus),
+      ),
     )
     hmppsAuditQueue.sqsClient.sendMessage(sendMessage)
   }
   fun staffAvailableHoursChange(staffCode: String, teamCode: String, availableHours: BigDecimal) {
     val staffAvailableHoursChangeMessage = HmppsMessage(
-      "staff.available.hours.changed", 1, "Staff Available hours changed", "",
+      "staff.available.hours.changed",
+      1,
+      "Staff Available hours changed",
+      "",
       ZonedDateTime.now().format(
-        DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        DateTimeFormatter.ISO_OFFSET_DATE_TIME,
       ),
       StaffAvailableHours(availableHours),
-      PersonReference(listOf(PersonReferenceType("staffCode", staffCode), PersonReferenceType("teamCode", teamCode)))
+      PersonReference(listOf(PersonReferenceType("staffCode", staffCode), PersonReferenceType("teamCode", teamCode))),
     )
     domainTopic.snsClient.publish(
       PublishRequest(domainTopic.arn, objectMapper.writeValueAsString(staffAvailableHoursChangeMessage))
-        .withMessageAttributes(mapOf(EVENT_TYPE to MessageAttributeValue().withDataType(STRING).withStringValue(staffAvailableHoursChangeMessage.eventType)))
+        .withMessageAttributes(mapOf(EVENT_TYPE to MessageAttributeValue().withDataType(STRING).withStringValue(staffAvailableHoursChangeMessage.eventType))),
     ).also {
       log.info("staff available hours changed message for {} in team {}", staffCode, teamCode)
     }
@@ -181,8 +190,8 @@ class SqsSuccessPublisher(
       "",
       ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
       objectMapper.createObjectNode(),
-      PersonReference(emptyList())
-    )
+      PersonReference(emptyList()),
+    ),
   )
 
   companion object {
@@ -195,10 +204,10 @@ data class AuditMessage(val operationId: String, val what: String = "CASE_ALLOCA
 data class AuditData(
   val crn: String,
   val eventNumber: Int,
-  val requirementIds: List<BigInteger>
+  val requirementIds: List<BigInteger>,
 )
 
 data class ReductionsAuditData(
   val staffCode: String,
-  val reductionId: Long
+  val reductionId: Long,
 )

@@ -9,5 +9,5 @@ data class BreakdownDataEntity(
   val contactsPerformedByOthersCount: Map<String, Int>,
   val contactTypeWeightings: Map<String, Int>,
   val caseloadCount: Int,
-  val availableHours: BigDecimal
+  val availableHours: BigDecimal,
 ) : Serializable

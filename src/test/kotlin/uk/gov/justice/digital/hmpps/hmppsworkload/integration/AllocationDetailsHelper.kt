@@ -17,45 +17,45 @@ fun getAllocationDetails(
   initialAppointment: LocalDate? = null,
   offenceDetails: List<OffenceDetails> = emptyList(),
   activeRequirements: List<Requirement> = emptyList(),
-  ogrs: RiskOGRS? = null
+  ogrs: RiskOGRS? = null,
 ) = AllocationDemandDetails(
   crn,
   Name(
     "Jonathon",
     "",
-    "Jones"
+    "Jones",
   ),
   StaffMember(
     "STAFF1",
     Name(
       "Staff",
       "",
-      "Member"
+      "Member",
     ),
     "simulate-delivered@notifications.service.gov.uk",
-    "PO"
+    "PO",
   ),
   StaffMember(
     "STAFF2",
     Name(
       "Allocating",
       "",
-      "Member"
+      "Member",
     ),
     null,
-    "SPO"
+    "SPO",
   ),
   initialAppointment?.let { InitialAppointment(initialAppointment) },
   ogrs,
   SentenceDetails(
     "CUSTODY",
     ZonedDateTime.now(),
-    "6 Months"
+    "6 Months",
   ),
   Court(
     "Court Name",
-    LocalDate.now()
+    LocalDate.now(),
   ),
   offenceDetails,
-  activeRequirements
+  activeRequirements,
 )

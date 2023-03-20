@@ -13,10 +13,9 @@ class CapacityCalculatorTest {
 
   @Test
   fun `can calculate available points`() {
-
     Assertions.assertEquals(
       BigInteger.valueOf(2070),
-      calculateAvailableHours(availablePoints, defaultContractedHoursForGrade, currentHours, reductionHours)
+      calculateAvailableHours(availablePoints, defaultContractedHoursForGrade, currentHours, reductionHours),
     )
   }
 
@@ -26,7 +25,7 @@ class CapacityCalculatorTest {
 
     Assertions.assertEquals(
       BigInteger.valueOf(1658),
-      calculateAvailableHours(availablePoints, defaultContractedHoursForGrade, currentHours, reductionHours)
+      calculateAvailableHours(availablePoints, defaultContractedHoursForGrade, currentHours, reductionHours),
     )
   }
 
@@ -34,12 +33,12 @@ class CapacityCalculatorTest {
     availablePoints: Double,
     defaultContractedHoursForGrade: Double,
     currentHours: Double,
-    reductionHours: Double
+    reductionHours: Double,
   ): BigInteger {
     return calculateAvailablePoints(
       BigDecimal.valueOf(availablePoints),
       BigDecimal.valueOf(defaultContractedHoursForGrade),
-      BigDecimal.valueOf(currentHours) - BigDecimal.valueOf(reductionHours)
+      BigDecimal.valueOf(currentHours) - BigDecimal.valueOf(reductionHours),
     )
   }
 }

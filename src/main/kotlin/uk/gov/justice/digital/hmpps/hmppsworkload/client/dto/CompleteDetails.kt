@@ -8,7 +8,7 @@ data class CompleteDetails @JsonCreator constructor(
   val name: Name,
   val type: String,
   val initialAppointment: InitialAppointment?,
-  val staff: StaffMember?
+  val staff: StaffMember?,
 )
 
 data class InitialAppointment(val date: LocalDate)

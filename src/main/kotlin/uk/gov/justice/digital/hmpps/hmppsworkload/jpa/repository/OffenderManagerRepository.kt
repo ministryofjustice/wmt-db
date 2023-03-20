@@ -11,10 +11,13 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OverviewOffenderMa
 interface OffenderManagerRepository : CrudRepository<OffenderManagerEntity, Long> {
   @Query(nativeQuery = true)
   fun findByOverview(teamCode: String, offenderManagerCode: String): OverviewOffenderManager?
+
   @Query(nativeQuery = true)
   fun findByCaseloadTotals(workloadOwnerId: Long): List<OffenderManagerCaseloadTotals>
+
   @Query(nativeQuery = true)
   fun findCasesByTeamCodeAndStaffCode(offenderManagerCode: String, teamCode: String): List<String>
+
   @Query(nativeQuery = true)
   fun findCaseByTeamCodeAndStaffCodeAndCrn(teamCode: String, offenderManagerCode: String, crn: String): String?
 

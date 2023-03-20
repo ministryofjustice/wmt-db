@@ -38,8 +38,8 @@ class WorkloadPrisonerListenerTests : IntegrationTestBase() {
 
     hmppsDomainSnsClient.publish(
       PublishRequest(hmppsDomainTopicArn, jsonString(prisonerEvent(nomsNumber))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("prison-offender-events.prisoner.released"))
-      )
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("prison-offender-events.prisoner.released")),
+      ),
     )
 
     noMessagesOnWorkloadPrisonerQueue()
@@ -52,7 +52,7 @@ class WorkloadPrisonerListenerTests : IntegrationTestBase() {
       { Assertions.assertEquals(staffCode, actualWorkloadCalcEntity?.staffCode) },
       { Assertions.assertEquals(teamCode, actualWorkloadCalcEntity?.teamCode) },
       { Assertions.assertEquals(availableHours, actualWorkloadCalcEntity?.breakdownData?.availableHours) },
-      { Assertions.assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity?.calculatedDate?.dayOfMonth) }
+      { Assertions.assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity?.calculatedDate?.dayOfMonth) },
     )
   }
 
@@ -63,8 +63,8 @@ class WorkloadPrisonerListenerTests : IntegrationTestBase() {
     workforceAllocationsToDelius.personResponseByNoms(nomsNumber, crn)
     hmppsDomainSnsClient.publish(
       PublishRequest(hmppsDomainTopicArn, jsonString(prisonerEvent(nomsNumber))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("prison-offender-events.prisoner.released"))
-      )
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("prison-offender-events.prisoner.released")),
+      ),
     )
 
     noMessagesOnWorkloadPrisonerQueue()
@@ -77,8 +77,8 @@ class WorkloadPrisonerListenerTests : IntegrationTestBase() {
     workforceAllocationsToDelius.notFoundPersonResourceResponse(nomsNumber, "NOMS")
     hmppsDomainSnsClient.publish(
       PublishRequest(hmppsDomainTopicArn, jsonString(prisonerEvent(nomsNumber))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("prison-offender-events.prisoner.released"))
-      )
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("prison-offender-events.prisoner.released")),
+      ),
     )
 
     noMessagesOnWorkloadPrisonerQueue()
@@ -87,7 +87,7 @@ class WorkloadPrisonerListenerTests : IntegrationTestBase() {
 
   private fun prisonerEvent(nomsNumber: String) = WorkloadPrisonerEvent(
     PersonReference(
-      listOf(PersonReferenceType("NOMS", nomsNumber))
-    )
+      listOf(PersonReferenceType("NOMS", nomsNumber)),
+    ),
   )
 }

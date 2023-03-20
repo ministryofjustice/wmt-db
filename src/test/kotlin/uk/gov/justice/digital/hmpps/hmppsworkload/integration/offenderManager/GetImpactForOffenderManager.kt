@@ -56,7 +56,6 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `must not change capacity if case already allocated to the officer and is classified the same`() {
-
     val crn = "CRN2222"
     val staffCode = "OM1"
     val teamCode = "T1"
@@ -83,7 +82,6 @@ class GetImpactForOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can get impact for an offender manager without workload`() {
-
     val crn = "CRN1"
     val staffCode = "NOWORKLOAD1"
     val teamCode = "T1"

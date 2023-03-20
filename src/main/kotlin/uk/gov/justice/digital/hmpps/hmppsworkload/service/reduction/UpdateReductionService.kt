@@ -14,7 +14,7 @@ import javax.transaction.Transactional
 class UpdateReductionService(
   private val reductionsRepository: ReductionsRepository,
   private val sqsSuccessPublisher: SqsSuccessPublisher,
-  private val requestStaffCalculationService: RequestStaffCalculationService
+  private val requestStaffCalculationService: RequestStaffCalculationService,
 ) {
 
   @Transactional
@@ -41,6 +41,6 @@ class UpdateReductionService(
 
   private fun findOutOfDateReductions(): OutOfDateReductions = OutOfDateReductions(
     reductionsRepository.findByEffectiveFromBeforeAndEffectiveToAfterAndStatus(ZonedDateTime.now(), ZonedDateTime.now(), ReductionStatus.SCHEDULED),
-    reductionsRepository.findByEffectiveToBeforeAndStatus(ZonedDateTime.now(), ReductionStatus.ACTIVE)
+    reductionsRepository.findByEffectiveToBeforeAndStatus(ZonedDateTime.now(), ReductionStatus.ACTIVE),
   )
 }

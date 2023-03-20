@@ -28,8 +28,8 @@ class TelemetryService(@Autowired private val telemetryClient: TelemetryClient) 
         CRN to personManagerEntity.crn,
         TEAM_CODE to personManagerEntity.teamCode,
         STAFF_CODE to personManagerEntity.staffCode,
-        "wmtPeriod" to getWmtPeriod(LocalDateTime.now())
-      )
+        "wmtPeriod" to getWmtPeriod(LocalDateTime.now()),
+      ),
     )
   }
 
@@ -40,8 +40,8 @@ class TelemetryService(@Autowired private val telemetryClient: TelemetryClient) 
         CRN to eventManagerEntity.crn,
         TEAM_CODE to eventManagerEntity.teamCode,
         STAFF_CODE to eventManagerEntity.staffCode,
-        EVENT_NUMBER to eventManagerEntity.eventNumber.toString(10)
-      )
+        EVENT_NUMBER to eventManagerEntity.eventNumber.toString(10),
+      ),
     )
   }
 
@@ -53,8 +53,8 @@ class TelemetryService(@Autowired private val telemetryClient: TelemetryClient) 
         TEAM_CODE to requirementManagerEntity.teamCode,
         STAFF_CODE to requirementManagerEntity.staffCode,
         EVENT_NUMBER to requirementManagerEntity.eventNumber.toString(10),
-        "requirementId" to requirementManagerEntity.requirementId.toString(10)
-      )
+        "requirementId" to requirementManagerEntity.requirementId.toString(10),
+      ),
     )
   }
 
@@ -64,8 +64,8 @@ class TelemetryService(@Autowired private val telemetryClient: TelemetryClient) 
       mapOf(
         TEAM_CODE to teamCode,
         "staffGrade" to deliusStaff.getGrade(),
-        "tier" to caseDetailsEntity?.tier?.name
-      )
+        "tier" to caseDetailsEntity?.tier?.name,
+      ),
     )
   }
   private fun trackEvent(eventType: TelemetryEventType, customDimensions: Map<String, String?>) {

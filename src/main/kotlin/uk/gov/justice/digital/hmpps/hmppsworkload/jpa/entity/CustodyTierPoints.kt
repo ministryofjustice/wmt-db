@@ -57,7 +57,7 @@ data class CustodyTierPoints(
       Tier.D3 to D3Points,
       Tier.D2 to D2Points,
       Tier.D1 to D1Points,
-      Tier.D0 to D0Points
+      Tier.D0 to D0Points,
     )
   }
 }

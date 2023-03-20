@@ -16,7 +16,7 @@ data class PersonManagerDetails @JsonCreator constructor(
   @Schema(description = "Created date")
   val createdDate: ZonedDateTime,
   @Schema(description = "crn")
-  val crn: String
+  val crn: String,
 ) {
   companion object {
     fun from(personManagerEntity: PersonManagerEntity): PersonManagerDetails {
@@ -25,7 +25,7 @@ data class PersonManagerDetails @JsonCreator constructor(
         personManagerEntity.staffCode,
         personManagerEntity.teamCode,
         personManagerEntity.createdDate!!,
-        personManagerEntity.crn
+        personManagerEntity.crn,
       )
     }
   }

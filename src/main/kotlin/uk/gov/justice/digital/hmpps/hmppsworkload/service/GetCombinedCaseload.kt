@@ -11,21 +11,20 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRe
 class GetCombinedCaseload(
   private val offenderManagerRepository: OffenderManagerRepository,
   private val personManagerRepository: PersonManagerRepository,
-  private val caseDetailsRepository: CaseDetailsRepository
+  private val caseDetailsRepository: CaseDetailsRepository,
 ) {
   /***
    * Get combined Cases from WMT (offenderManagerRepository) and realtime cases (personManagerRepository).
    */
   fun getCases(staffIdentifier: StaffIdentifier): List<Case> {
-
     return caseDetailsRepository.findAllById(
       offenderManagerRepository.findCasesByTeamCodeAndStaffCode(staffIdentifier.staffCode, staffIdentifier.teamCode)
         .union(
           personManagerRepository.findByStaffCodeAndTeamCodeAndIsActiveIsTrue(
             staffIdentifier.staffCode,
-            staffIdentifier.teamCode
-          ).map { c -> c.crn }
-        )
+            staffIdentifier.teamCode,
+          ).map { c -> c.crn },
+        ),
     )
       .map { cde -> Case(cde.tier, cde.type, false, cde.crn) }
   }

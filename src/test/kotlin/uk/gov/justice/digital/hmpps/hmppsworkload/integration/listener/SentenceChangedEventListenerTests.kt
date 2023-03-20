@@ -33,8 +33,8 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     hmppsTier.tierCalculationResponse(crn)
     hmppsOffenderSnsClient.publish(
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED"))
-      )
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED")),
+      ),
     )
 
     noMessagesOnOffenderEventsQueue()
@@ -51,8 +51,8 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     hmppsTier.tierCalculationNotFoundResponse(crn)
     hmppsOffenderSnsClient.publish(
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED"))
-      )
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED")),
+      ),
     )
 
     noMessagesOnOffenderEventsQueue()
@@ -74,8 +74,8 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
 
     hmppsOffenderSnsClient.publish(
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED"))
-      )
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED")),
+      ),
     )
 
     await untilCallTo {
@@ -107,7 +107,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
 
     val sentenceChangedEvent =
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED"))
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED")),
       )
 
     hmppsOffenderSnsClient.publish(sentenceChangedEvent)
@@ -130,7 +130,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
 
     val sentenceChangedEvent =
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED"))
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED")),
       )
 
     hmppsOffenderSnsClient.publish(sentenceChangedEvent)
@@ -154,8 +154,8 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
         teamCode = "TM1",
         createdBy = "USER1",
         isActive = true,
-        eventNumber = 1
-      )
+        eventNumber = 1,
+      ),
     )
     val requirementManagerEntity = requirementManagerRepository.save(
       RequirementManagerEntity(
@@ -165,15 +165,15 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
         teamCode = "TM1",
         createdBy = "USER1",
         isActive = true,
-        eventNumber = 1
-      )
+        eventNumber = 1,
+      ),
     )
 
     workforceAllocationsToDelius.personResponseByCrn(crn)
 
     val sentenceChangedEvent =
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED"))
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED")),
       )
 
     hmppsOffenderSnsClient.publish(sentenceChangedEvent)
@@ -204,8 +204,8 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
 
     hmppsOffenderSnsClient.publish(
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED"))
-      )
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED")),
+      ),
     )
 
     noMessagesOnOffenderEventsQueue()
@@ -232,8 +232,8 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
 
     hmppsOffenderSnsClient.publish(
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED"))
-      )
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED")),
+      ),
     )
 
     noMessagesOnOffenderEventsQueue()
@@ -244,7 +244,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     Assertions.assertAll(
       { assertEquals(staffCode, actualWorkloadCalcEntity?.staffCode) },
       { assertEquals(teamCode, actualWorkloadCalcEntity?.teamCode) },
-      { assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity?.calculatedDate?.dayOfMonth) }
+      { assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity?.calculatedDate?.dayOfMonth) },
     )
   }
 }

@@ -7,5 +7,5 @@ data class TierCaseTotals(
   val B: BigDecimal,
   val C: BigDecimal,
   val D: BigDecimal,
-  val untiered: BigDecimal
+  val untiered: BigDecimal,
 )

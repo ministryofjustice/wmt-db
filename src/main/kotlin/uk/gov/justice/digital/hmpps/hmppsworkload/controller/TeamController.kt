@@ -18,15 +18,15 @@ import javax.persistence.EntityNotFoundException
 @RestController
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 class TeamController(
-  private val teamService: TeamService
+  private val teamService: TeamService,
 ) {
 
   @Operation(summary = "Retrieve Team summary by Team Code")
   @ApiResponses(
     value = [
       ApiResponse(responseCode = "200", description = "OK"),
-      ApiResponse(responseCode = "404", description = "Result Not Found")
-    ]
+      ApiResponse(responseCode = "404", description = "Result Not Found"),
+    ],
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/team/choose-practitioner")
@@ -37,7 +37,7 @@ class TeamController(
   @ApiResponses(
     value = [
       ApiResponse(responseCode = "200", description = "OK"),
-    ]
+    ],
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT')")
   @GetMapping("/team/workloadcases")

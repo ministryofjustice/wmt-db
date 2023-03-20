@@ -10,7 +10,7 @@ import javax.transaction.Transactional
 
 @Service
 class JpaBasedSaveEventManagerService(
-  private val eventManagerRepository: EventManagerRepository
+  private val eventManagerRepository: EventManagerRepository,
 ) : SaveEventManagerService {
 
   @Transactional
@@ -22,7 +22,7 @@ class JpaBasedSaveEventManagerService(
     teamCode: String,
     deliusStaff: StaffMember,
     allocateCase: AllocateCase,
-    loggedInUser: String
+    loggedInUser: String,
   ): SaveResult<EventManagerEntity> = eventManagerRepository.findFirstByCrnAndEventNumberOrderByCreatedDateDesc(allocateCase.crn, allocateCase.eventNumber)?.let { eventManager ->
     if (eventManager.staffCode == deliusStaff.code && eventManager.teamCode == teamCode) {
       return SaveResult(eventManager, false)
@@ -36,7 +36,7 @@ class JpaBasedSaveEventManagerService(
     allocateCase: AllocateCase,
     deliusStaff: StaffMember,
     teamCode: String,
-    loggedInUser: String
+    loggedInUser: String,
   ): SaveResult<EventManagerEntity> {
     val eventManagerEntity = EventManagerEntity(
       crn = allocateCase.crn,
@@ -44,7 +44,7 @@ class JpaBasedSaveEventManagerService(
       teamCode = teamCode,
       createdBy = loggedInUser,
       isActive = true,
-      eventNumber = allocateCase.eventNumber
+      eventNumber = allocateCase.eventNumber,
     )
     eventManagerRepository.save(eventManagerEntity)
     return SaveResult(eventManagerEntity, true)

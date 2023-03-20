@@ -70,7 +70,7 @@ data class WorkloadPointsEntity(
   val licenseARMAssessmentWeighting: BigInteger,
 
   @Column(name = "weighting_arms_comm")
-  val communityARMAssessmentWeighting: BigInteger
+  val communityARMAssessmentWeighting: BigInteger,
 
 ) {
   fun getTierPointsMap(caseType: CaseType): Map<Tier, BigInteger> = when (caseType) {

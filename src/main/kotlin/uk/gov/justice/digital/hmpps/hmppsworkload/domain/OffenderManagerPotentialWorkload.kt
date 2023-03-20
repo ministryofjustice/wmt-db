@@ -17,7 +17,7 @@ data class OffenderManagerPotentialWorkload @JsonCreator constructor(
   val name: Name,
   @Schema(description = "Name of staff member")
   val staff: StaffMember,
-  val tier: Tier
+  val tier: Tier,
 ) {
   companion object {
     fun from(offenderManagerOverview: OverviewOffenderManager, impactResponse: ImpactResponse, potentialCase: Case): OffenderManagerPotentialWorkload {
@@ -26,7 +26,7 @@ data class OffenderManagerPotentialWorkload @JsonCreator constructor(
         offenderManagerOverview.potentialCapacity!!,
         impactResponse.name,
         impactResponse.staff,
-        potentialCase.tier
+        potentialCase.tier,
       )
     }
   }

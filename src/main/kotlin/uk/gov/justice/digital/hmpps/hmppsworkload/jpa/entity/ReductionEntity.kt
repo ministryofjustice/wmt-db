@@ -39,5 +39,5 @@ data class ReductionEntity(
   var status: ReductionStatus,
 
   @Column(name = "reduction_reason_id")
-  val reductionReasonId: Long
+  val reductionReasonId: Long,
 )

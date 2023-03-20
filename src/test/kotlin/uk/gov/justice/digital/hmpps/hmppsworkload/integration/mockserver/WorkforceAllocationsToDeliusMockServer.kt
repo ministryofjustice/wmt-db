@@ -53,7 +53,7 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
         .withPath("/allocation-demand/choose-practitioner").withQueryStringParameter("crn", crn).withQueryStringParameter("teamCode", teamCodes.joinToString(separator = ","))
 
     workforceAllocationsToDelius.`when`(choosePractitionerRequest, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(choosePractitionerByTeamResponse())
+      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(choosePractitionerByTeamResponse()),
     )
   }
 
@@ -64,7 +64,7 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
 
     workforceAllocationsToDelius.`when`(choosePractitionerRequest, Times.exactly(1)).respond(
       HttpResponse.response()
-        .withContentType(MediaType.APPLICATION_JSON).withBody(choosePractitionerByTeamResponseUnallocated())
+        .withContentType(MediaType.APPLICATION_JSON).withBody(choosePractitionerByTeamResponseUnallocated()),
     )
   }
 
@@ -75,8 +75,8 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
 
     workforceAllocationsToDelius.`when`(choosePractitionerRequest, Times.exactly(1)).respond(
       HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(
-        choosePractitionerByTeamCodesNoCommunityPersonManagerResponse()
-      )
+        choosePractitionerByTeamCodesNoCommunityPersonManagerResponse(),
+      ),
     )
   }
 
@@ -87,7 +87,7 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
 
     workforceAllocationsToDelius.`when`(choosePractitionerRequest, Times.exactly(1)).respond(
       HttpResponse.response()
-        .withContentType(MediaType.APPLICATION_JSON).withBody(choosePractitionerStaffInMultipleTeamsResponse())
+        .withContentType(MediaType.APPLICATION_JSON).withBody(choosePractitionerStaffInMultipleTeamsResponse()),
     )
   }
 
@@ -98,7 +98,7 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
 
     workforceAllocationsToDelius.`when`(impactRequest, Times.exactly(1)).respond(
       HttpResponse.response()
-        .withContentType(MediaType.APPLICATION_JSON).withBody(impactResponse(crn, staffCode, "PO"))
+        .withContentType(MediaType.APPLICATION_JSON).withBody(impactResponse(crn, staffCode, "PO")),
     )
   }
 
@@ -109,7 +109,7 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
 
     workforceAllocationsToDelius.`when`(impactRequest, Times.exactly(1)).respond(
       HttpResponse.response()
-        .withContentType(MediaType.APPLICATION_JSON).withBody(impactResponse(crn, staffCode, null))
+        .withContentType(MediaType.APPLICATION_JSON).withBody(impactResponse(crn, staffCode, null)),
     )
   }
 
@@ -123,7 +123,7 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
 
     workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
       HttpResponse.response()
-        .withContentType(MediaType.APPLICATION_JSON).withBody(allocationCompleteResponse())
+        .withContentType(MediaType.APPLICATION_JSON).withBody(allocationCompleteResponse()),
     )
   }
 
@@ -133,7 +133,7 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
         .withPath("/staff/$staffCode/active-cases")
     workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
       HttpResponse.response()
-        .withContentType(MediaType.APPLICATION_JSON).withBody(deliusStaffActiveCasesResponse(staffCode, staffGrade, email, activeCases))
+        .withContentType(MediaType.APPLICATION_JSON).withBody(deliusStaffActiveCasesResponse(staffCode, staffGrade, email, activeCases)),
     )
   }
 
@@ -141,14 +141,14 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
     val request = HttpRequest.request().withPath("/staff/$staffCode/officer-view")
     workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
       HttpResponse.response()
-        .withContentType(MediaType.APPLICATION_JSON).withBody(officerOverviewResponse(staffCode, staffGrade, email))
+        .withContentType(MediaType.APPLICATION_JSON).withBody(officerOverviewResponse(staffCode, staffGrade, email)),
     )
   }
 
   fun officerViewErrorResponse(staffCode: String) {
     val request = HttpRequest.request().withPath("/staff/$staffCode/officer-view")
     workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.response().withStatusCode(503)
+      HttpResponse.response().withStatusCode(503),
     )
   }
 
@@ -160,7 +160,7 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
         .withQueryStringParameter("allocatingStaffUsername", allocatingStaffUsername)
     workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
       HttpResponse.response()
-        .withContentType(MediaType.APPLICATION_JSON).withBody(deliusAllocationResponse(crn, staffCode, allocateToEmail))
+        .withContentType(MediaType.APPLICATION_JSON).withBody(deliusAllocationResponse(crn, staffCode, allocateToEmail)),
     )
   }
 
@@ -177,7 +177,7 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
       .withQueryStringParameter("type", identifierType)
     workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
       HttpResponse.response()
-        .withContentType(MediaType.APPLICATION_JSON).withBody(personSummaryResponse(crn, caseType))
+        .withContentType(MediaType.APPLICATION_JSON).withBody(personSummaryResponse(crn, caseType)),
     )
   }
 
@@ -185,7 +185,7 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
     val request = HttpRequest.request().withPath("/person/$identifier")
       .withQueryStringParameter("type", identifierType)
     workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withStatusCode(404)
+      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withStatusCode(404),
     )
   }
 
@@ -193,7 +193,7 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
     val request = HttpRequest.request().withPath("/allocation/details").withMethod(HttpMethod.POST.name)
 
     workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
-      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.allocationDetailsResponse(allocationDetails))
+      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.allocationDetailsResponse(allocationDetails)),
     )
   }
 }

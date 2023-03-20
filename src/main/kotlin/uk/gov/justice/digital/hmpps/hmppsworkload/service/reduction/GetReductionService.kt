@@ -12,17 +12,21 @@ import java.time.ZonedDateTime
 class GetReductionService(private val reductionsRepository: ReductionsRepository, private val workloadOwnerRepository: WMTWorkloadOwnerRepository) {
 
   private val excludeStatuses = listOf(
-    ReductionStatus.ARCHIVED, ReductionStatus.DELETED
+    ReductionStatus.ARCHIVED,
+    ReductionStatus.DELETED,
   )
 
   fun findNextReductionChange(staffIdentifier: StaffIdentifier): ZonedDateTime? = workloadOwnerRepository.findFirstByOffenderManagerCodeAndTeamCodeOrderByIdDesc(staffIdentifier.staffCode, staffIdentifier.teamCode)?.let { workloadOwner ->
     reductionsRepository.findUpcomingReductions(
-      workloadOwner, excludeStatuses, ZonedDateTime.now(), ZonedDateTime.now()
+      workloadOwner,
+      excludeStatuses,
+      ZonedDateTime.now(),
+      ZonedDateTime.now(),
     )
       .flatMap { reduction ->
         listOf(
           reduction.effectiveFrom,
-          reduction.effectiveTo
+          reduction.effectiveTo,
         )
       }.filter { date -> !date.isBefore(ZonedDateTime.now()) }
       .minByOrNull { it }
@@ -31,7 +35,10 @@ class GetReductionService(private val reductionsRepository: ReductionsRepository
   fun findReductionHours(staffIdentifier: StaffIdentifier): BigDecimal = (
     workloadOwnerRepository.findFirstByOffenderManagerCodeAndTeamCodeOrderByIdDesc(staffIdentifier.staffCode, staffIdentifier.teamCode)?.let { workloadOwner ->
       reductionsRepository.findByWorkloadOwnerAndEffectiveFromLessThanAndEffectiveToGreaterThanAndStatusNotIn(
-        workloadOwner, ZonedDateTime.now(), ZonedDateTime.now(), excludeStatuses
+        workloadOwner,
+        ZonedDateTime.now(),
+        ZonedDateTime.now(),
+        excludeStatuses,
       )
         .map { it.hours }
         .fold(BigDecimal.ZERO) { first, second -> first.add(second) }

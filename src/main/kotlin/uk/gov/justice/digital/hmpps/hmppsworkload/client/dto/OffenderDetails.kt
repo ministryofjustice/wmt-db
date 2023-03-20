@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.client.dto
 
 data class OffenderDetails(
-  val otherIds: OtherIds
+  val otherIds: OtherIds,
 )
 
 data class OtherIds(

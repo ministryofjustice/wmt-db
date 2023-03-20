@@ -23,7 +23,7 @@ class WorkloadCalculationService(
   private val weeklyHours: GetWeeklyHours,
   private val getReductionService: GetReductionService,
   private val workloadCalculationRepository: WorkloadCalculationRepository,
-  private val getCaseLoad: GetCombinedCaseload
+  private val getCaseLoad: GetCombinedCaseload,
 ) {
 
   fun saveWorkloadCalculation(
@@ -31,18 +31,18 @@ class WorkloadCalculationService(
     staffGrade: String,
     availableHours: BigDecimal = getAvailableHours(
       staffIdentifier,
-      staffGrade
-    )
+      staffGrade,
+    ),
   ): WorkloadCalculationEntity {
     return workloadCalculationRepository.save(calculate(staffIdentifier.staffCode, staffIdentifier.teamCode, staffGrade, availableHours))
   }
 
   private fun getAvailableHours(
     staffIdentifier: StaffIdentifier,
-    staffGrade: String
+    staffGrade: String,
   ): BigDecimal {
     return this.weeklyHours.findWeeklyHours(staffIdentifier, staffGrade) - getReductionService.findReductionHours(
-      staffIdentifier
+      staffIdentifier,
     )
   }
 
@@ -63,10 +63,13 @@ class WorkloadCalculationService(
       contactsPerformedByOthers,
       contactTypeWeightings,
       t2aWorkloadPoints,
-      workloadPointsWeighting
+      workloadPointsWeighting,
     )
     return WorkloadCalculationEntity(
-      availablePoints = availablePoints, workloadPoints = workloadPoints, staffCode = staffIdentifier.staffCode, teamCode = staffIdentifier.teamCode,
+      availablePoints = availablePoints,
+      workloadPoints = workloadPoints,
+      staffCode = staffIdentifier.staffCode,
+      teamCode = staffIdentifier.teamCode,
       breakdownData = BreakdownDataEntity(
         getCourtReportCounts(courtReports, CourtReportType.STANDARD),
         getCourtReportCounts(courtReports, CourtReportType.FAST),
@@ -74,8 +77,8 @@ class WorkloadCalculationService(
         getContactTypeCodeCounts(contactsPerformedByOthers),
         contactTypeWeightings,
         cases.size,
-        availableHours
-      )
+        availableHours,
+      ),
     )
   }
 

@@ -28,5 +28,5 @@ data class WMTCMSEntity(
   val personManagerStaffCode: String,
 
   @Column(name = "om_team_key")
-  val personManagerTeamCode: String
+  val personManagerTeamCode: String,
 )

@@ -17,7 +17,7 @@ import java.math.BigDecimal
 class WorkloadCalculationEventListener(
   private val objectMapper: ObjectMapper,
   private val workloadCalculationService: WorkloadCalculationService,
-  @Qualifier("workforceAllocationsToDeliusApiClient") private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient
+  @Qualifier("workforceAllocationsToDeliusApiClient") private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient,
 ) {
 
   @JmsListener(destination = "workloadcalculationqueue", containerFactory = "hmppsQueueContainerFactoryProxy")
@@ -26,7 +26,7 @@ class WorkloadCalculationEventListener(
     val availableHours = workloadCalculationEvent.additionalInformation.availableHours
     val staffIdentifier = StaffIdentifier(
       workloadCalculationEvent.personReference.identifiers.find { it.type == "staffCode" }!!.value,
-      workloadCalculationEvent.personReference.identifiers.find { it.type == "teamCode" }!!.value
+      workloadCalculationEvent.personReference.identifiers.find { it.type == "teamCode" }!!.value,
     )
     CoroutineScope(Dispatchers.Default).future {
       val staffGrade = workforceAllocationsToDeliusApiClient.getOfficerView(staffIdentifier.staffCode).getGrade()
@@ -42,9 +42,9 @@ class WorkloadCalculationEventListener(
 
 data class WorkloadCalculationEvent(
   val additionalInformation: AdditionalInformation,
-  val personReference: PersonReference
+  val personReference: PersonReference,
 )
 
 data class AdditionalInformation(
-  val availableHours: BigDecimal
+  val availableHours: BigDecimal,
 )

@@ -19,13 +19,13 @@ data class PractitionerWorkload @JsonCreator constructor(
   val tier: Tier,
   val probationStatus: ProbationStatus,
   val communityPersonManager: CommunityPersonManager?,
-  val teams: Map<String, List<Practitioner>>
+  val teams: Map<String, List<Practitioner>>,
 ) {
   companion object {
     fun from(
       choosePractitionerResponse: ChoosePractitionerResponse,
       tier: Tier,
-      teams: Map<String, List<Practitioner>>
+      teams: Map<String, List<Practitioner>>,
     ): PractitionerWorkload {
       return PractitionerWorkload(
         choosePractitionerResponse.crn,
@@ -33,7 +33,7 @@ data class PractitionerWorkload @JsonCreator constructor(
         tier,
         choosePractitionerResponse.probationStatus,
         choosePractitionerResponse.communityPersonManager?.takeUnless { it.isUnallocated },
-        teams
+        teams,
       )
     }
   }
@@ -47,18 +47,19 @@ data class Practitioner constructor(
   val workload: BigDecimal,
   val casesPastWeek: Int,
   val communityCases: Int,
-  val custodyCases: Int
+  val custodyCases: Int,
 ) {
   companion object {
     fun from(staffMember: StaffMember, practitionerWorkload: TeamOverview, caseCount: Int): Practitioner {
       return Practitioner(
-        staffMember.code, staffMember.name,
+        staffMember.code,
+        staffMember.name,
         staffMember.email.takeUnless { email -> email.isNullOrBlank() },
         staffMember.getGrade(),
         calculateCapacity(practitionerWorkload.totalPoints, practitionerWorkload.availablePoints),
         caseCount,
         practitionerWorkload.totalCommunityCases,
-        practitionerWorkload.totalCustodyCases
+        practitionerWorkload.totalCustodyCases,
       )
     }
   }

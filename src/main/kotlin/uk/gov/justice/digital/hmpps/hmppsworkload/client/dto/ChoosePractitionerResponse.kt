@@ -10,27 +10,27 @@ data class ChoosePractitionerResponse @JsonCreator constructor(
   val name: Name,
   val probationStatus: ProbationStatus,
   val communityPersonManager: CommunityPersonManager?,
-  val teams: Map<String, List<StaffMember>>
+  val teams: Map<String, List<StaffMember>>,
 )
 
 data class Name constructor(
   val forename: String,
   val middleName: String?,
-  val surname: String
+  val surname: String,
 ) {
   fun getCombinedName() = "$forename ${middleName?.takeUnless { it.isBlank() }?.let{ "$middleName " } ?: ""}$surname"
 }
 
 data class ProbationStatus constructor(
   val status: String,
-  val description: String
+  val description: String,
 )
 
 data class CommunityPersonManager constructor(
   val code: String,
   val name: Name,
   val grade: String?,
-  val teamCode: String
+  val teamCode: String,
 ) {
   val isUnallocated: Boolean = code.endsWith("U")
 }

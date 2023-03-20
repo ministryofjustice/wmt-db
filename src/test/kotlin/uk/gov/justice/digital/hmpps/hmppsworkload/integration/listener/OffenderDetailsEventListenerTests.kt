@@ -24,8 +24,8 @@ class OffenderDetailsEventListenerTests : IntegrationTestBase() {
 
     hmppsOffenderSnsClient.publish(
       PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("OFFENDER_DETAILS_CHANGED"))
-      )
+        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("OFFENDER_DETAILS_CHANGED")),
+      ),
     )
 
     await untilCallTo {

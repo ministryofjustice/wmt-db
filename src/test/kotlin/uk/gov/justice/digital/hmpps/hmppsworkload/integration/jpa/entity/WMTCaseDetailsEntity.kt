@@ -42,5 +42,5 @@ data class WMTCaseDetailsEntity(
   val caseType: CaseType,
 
   @Column
-  val teamCode: String
+  val teamCode: String,
 )
