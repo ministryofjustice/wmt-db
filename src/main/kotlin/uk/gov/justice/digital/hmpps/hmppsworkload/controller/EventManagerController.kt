@@ -88,11 +88,16 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
   @Operation(summary = "Get allocated event count by logged in user")
   @ApiResponses(
     value = [
-      ApiResponse(responseCode = "200", description = "OK")
-    ]
+      ApiResponse(responseCode = "200", description = "OK"),
+    ],
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/allocation/events/me/count")
-  suspend fun getAllocationCountByLoggedInUser(@RequestParam(required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) since: ZonedDateTime, authentication: Authentication): CaseCount =
+  suspend fun getAllocationCountByLoggedInUser(
+    @RequestParam(required = true)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    since: ZonedDateTime,
+    authentication: Authentication,
+  ): CaseCount =
     getEventManager.countAllocationsBy(since, authentication.name)
 }

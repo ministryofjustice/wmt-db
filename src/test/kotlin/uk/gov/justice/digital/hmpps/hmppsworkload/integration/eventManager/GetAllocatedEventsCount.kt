@@ -14,6 +14,7 @@ import java.time.temporal.ChronoUnit
 class GetAllocatedEventsCount : IntegrationTestBase() {
 
   private val loggedInUser = "SOME_USER"
+
   @Test
   fun `can get count of all allocated events by logged in user`() {
     val storedEventManager = eventManagerRepository.save(
@@ -23,15 +24,15 @@ class GetAllocatedEventsCount : IntegrationTestBase() {
         teamCode = "T1",
         createdBy = loggedInUser,
         isActive = true,
-        eventNumber = 2
-      )
+        eventNumber = 2,
+      ),
     )
 
     caseDetailsRepository.save(CaseDetailsEntity(crn = storedEventManager.crn, tier = Tier.B2, type = CaseType.COMMUNITY, "", ""))
 
     webTestClient.get()
       .uri(
-        "/allocation/events/me/count?since=${thirtyDaysInPast()}"
+        "/allocation/events/me/count?since=${thirtyDaysInPast()}",
       )
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_READ", loggedInUser))
@@ -53,8 +54,8 @@ class GetAllocatedEventsCount : IntegrationTestBase() {
         teamCode = "T1",
         createdBy = loggedInUser,
         isActive = true,
-        eventNumber = 2
-      )
+        eventNumber = 2,
+      ),
     )
     oldEventManager.createdDate = ZonedDateTime.now().minusDays(60)
     eventManagerRepository.save(oldEventManager)
@@ -63,7 +64,7 @@ class GetAllocatedEventsCount : IntegrationTestBase() {
 
     webTestClient.get()
       .uri(
-        "/allocation/events/me/count?since=${thirtyDaysInPast()}"
+        "/allocation/events/me/count?since=${thirtyDaysInPast()}",
       )
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_READ", loggedInUser))
@@ -85,13 +86,13 @@ class GetAllocatedEventsCount : IntegrationTestBase() {
         teamCode = "T1",
         createdBy = loggedInUser,
         isActive = false,
-        eventNumber = 2
-      )
+        eventNumber = 2,
+      ),
     )
 
     webTestClient.get()
       .uri(
-        "/allocation/events/me/count?since=${thirtyDaysInPast()}"
+        "/allocation/events/me/count?since=${thirtyDaysInPast()}",
       )
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_READ", loggedInUser))
@@ -106,6 +107,6 @@ class GetAllocatedEventsCount : IntegrationTestBase() {
 
   private fun thirtyDaysInPast(): String? =
     ZonedDateTime.now().minusDays(30).truncatedTo(ChronoUnit.DAYS).withZoneSameInstant(ZoneOffset.UTC).format(
-      DateTimeFormatter.ISO_OFFSET_DATE_TIME
+      DateTimeFormatter.ISO_OFFSET_DATE_TIME,
     )
 }
