@@ -41,6 +41,6 @@ data class PersonManagerEntity(
   var createdDate: ZonedDateTime? = null,
 
   @Column
-  var isActive: Boolean
+  var isActive: Boolean,
 
 )

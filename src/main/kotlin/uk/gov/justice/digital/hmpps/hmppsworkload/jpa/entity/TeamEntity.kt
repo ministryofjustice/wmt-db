@@ -26,10 +26,10 @@ import javax.persistence.Table
         ColumnResult(name = "available_points"),
         ColumnResult(name = "total_points"),
         ColumnResult(name = "key"),
-        ColumnResult(name = "team_code")
-      ]
-    )
-  ]
+        ColumnResult(name = "team_code"),
+      ],
+    ),
+  ],
 )
 @NamedNativeQuery(
   name = "TeamEntity.findAllByTeamCodes",
@@ -47,7 +47,7 @@ import javax.persistence.Table
         ON wr.id = wpc.workload_report_id
     JOIN app.offender_manager AS om
         ON om.id = wo.offender_manager_id
-    WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS NULL AND t.code in ?1"""
+    WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS NULL AND t.code in ?1""",
 )
 @SqlResultSetMapping(
   name = "WorkloadCaseResult",
@@ -58,10 +58,10 @@ import javax.persistence.Table
         ColumnResult(name = "total_cases", type = Int::class),
         ColumnResult(name = "available_points", type = Int::class),
         ColumnResult(name = "total_points", type = Int::class),
-        ColumnResult(name = "team_code")
-      ]
-    )
-  ]
+        ColumnResult(name = "team_code"),
+      ],
+    ),
+  ],
 )
 @NamedNativeQuery(
   name = "TeamEntity.findWorkloadCountCaseByCode",
@@ -71,7 +71,7 @@ import javax.persistence.Table
     FROM app.ldu_case_overview AS wo
     JOIN app.team AS t
         ON wo.link_id = t.id
-    WHERE t.code IN ?1"""
+    WHERE t.code IN ?1""",
 )
 @Entity
 @Table(name = "team", schema = "app")

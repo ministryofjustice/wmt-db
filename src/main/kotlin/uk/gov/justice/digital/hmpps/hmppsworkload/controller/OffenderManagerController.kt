@@ -26,15 +26,15 @@ import javax.persistence.EntityNotFoundException
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 class OffenderManagerController(
   private val getOffenderManagerService: GetOffenderManagerService,
-  private val saveWorkloadService: DefaultSaveWorkloadService
+  private val saveWorkloadService: DefaultSaveWorkloadService,
 ) {
 
   @Operation(summary = "Retrieves capacity and potential capacity if case were to be allocated")
   @ApiResponses(
     value = [
       ApiResponse(responseCode = "200", description = "OK"),
-      ApiResponse(responseCode = "404", description = "Result Not Found")
-    ]
+      ApiResponse(responseCode = "404", description = "Result Not Found"),
+    ],
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/team/{teamCode}/offenderManager/{staffCode}/impact/person/{crn}")
@@ -46,8 +46,8 @@ class OffenderManagerController(
   @ApiResponses(
     value = [
       ApiResponse(responseCode = "200", description = "OK"),
-      ApiResponse(responseCode = "404", description = "Result Not Found")
-    ]
+      ApiResponse(responseCode = "404", description = "Result Not Found"),
+    ],
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/team/{teamCode}/offenderManagers/{offenderManagerCode}")
@@ -61,8 +61,8 @@ class OffenderManagerController(
   @ApiResponses(
     value = [
       ApiResponse(responseCode = "200", description = "OK"),
-      ApiResponse(responseCode = "404", description = "Result Not Found")
-    ]
+      ApiResponse(responseCode = "404", description = "Result Not Found"),
+    ],
   )
   @PreAuthorize("hasRole('ROLE_MANAGE_A_WORKFORCE_ALLOCATE')")
   @PostMapping("/team/{teamCode}/offenderManager/{staffCode}/case")
@@ -70,7 +70,7 @@ class OffenderManagerController(
     @PathVariable(required = true) teamCode: String,
     @PathVariable(required = true) staffCode: String,
     @RequestBody allocateCase: AllocateCase,
-    authentication: Authentication
+    authentication: Authentication,
   ): CaseAllocated {
     return saveWorkloadService.saveWorkload(StaffIdentifier(staffCode, teamCode), allocateCase, authentication.name)
   }
@@ -79,8 +79,8 @@ class OffenderManagerController(
   @ApiResponses(
     value = [
       ApiResponse(responseCode = "200", description = "OK"),
-      ApiResponse(responseCode = "404", description = "Result Not Found")
-    ]
+      ApiResponse(responseCode = "404", description = "Result Not Found"),
+    ],
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/team/{teamCode}/offenderManagers/{offenderManagerCode}/cases")

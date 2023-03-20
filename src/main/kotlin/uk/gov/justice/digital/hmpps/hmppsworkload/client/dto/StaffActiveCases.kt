@@ -13,5 +13,5 @@ data class StaffActiveCases @JsonCreator constructor(
 data class ActiveCase(
   val crn: String,
   val name: Name,
-  val type: String
+  val type: String,
 )

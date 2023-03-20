@@ -18,7 +18,6 @@ class GetContactsFromWMT : IntegrationTestBase() {
 
   @Test
   fun `must return all contacts performed when not the person manager and in a different team`() {
-
     wmtcmsRepository.save(WMTCMSEntity(staffCode = staffIdentifier.staffCode, staffTeamCode = staffIdentifier.teamCode, personManagerStaffCode = "OTHERSTAFFCODE", personManagerTeamCode = "TM2", contactTypeCode = contactTypeCode))
 
     val results = wmtGetContacts.findContactsOutsideCaseload(staffIdentifier)
@@ -30,7 +29,6 @@ class GetContactsFromWMT : IntegrationTestBase() {
 
   @Test
   fun `must return all contacts performed when not the person manager and in the same team`() {
-
     wmtcmsRepository.save(WMTCMSEntity(staffCode = staffIdentifier.staffCode, staffTeamCode = staffIdentifier.teamCode, personManagerStaffCode = "OTHERSTAFFCODE", personManagerTeamCode = staffIdentifier.teamCode, contactTypeCode = contactTypeCode))
 
     val results = wmtGetContacts.findContactsOutsideCaseload(staffIdentifier)
@@ -42,7 +40,6 @@ class GetContactsFromWMT : IntegrationTestBase() {
 
   @Test
   fun `must return empty list when no cms entries exist`() {
-
     val results = wmtGetContacts.findContactsOutsideCaseload(staffIdentifier)
 
     Assertions.assertTrue(results.isEmpty())
@@ -50,7 +47,6 @@ class GetContactsFromWMT : IntegrationTestBase() {
 
   @Test
   fun `must not return contacts if its the same person performing the contact and is the person manager`() {
-
     wmtcmsRepository.save(WMTCMSEntity(staffCode = staffIdentifier.staffCode, staffTeamCode = staffIdentifier.teamCode, personManagerStaffCode = staffIdentifier.staffCode, personManagerTeamCode = staffIdentifier.teamCode, contactTypeCode = contactTypeCode))
 
     val results = wmtGetContacts.findContactsOutsideCaseload(staffIdentifier)
@@ -60,7 +56,6 @@ class GetContactsFromWMT : IntegrationTestBase() {
 
   @Test
   fun `must return contacts performed by other people than the person manager and outside the team`() {
-
     wmtcmsRepository.save(WMTCMSEntity(personManagerStaffCode = staffIdentifier.staffCode, personManagerTeamCode = staffIdentifier.teamCode, staffCode = "OTHERSTAFFCODE", staffTeamCode = "TM2", contactTypeCode = contactTypeCode))
 
     val results = wmtGetContacts.findContactsInCaseloadPerformedByOthers(staffIdentifier)
@@ -72,7 +67,6 @@ class GetContactsFromWMT : IntegrationTestBase() {
 
   @Test
   fun `must return contacts performed by other people than the person manager and in the same team`() {
-
     wmtcmsRepository.save(WMTCMSEntity(personManagerStaffCode = staffIdentifier.staffCode, personManagerTeamCode = staffIdentifier.teamCode, staffCode = "OTHERSTAFFCODE", staffTeamCode = staffIdentifier.teamCode, contactTypeCode = contactTypeCode))
 
     val results = wmtGetContacts.findContactsInCaseloadPerformedByOthers(staffIdentifier)
@@ -84,7 +78,6 @@ class GetContactsFromWMT : IntegrationTestBase() {
 
   @Test
   fun `must return empty list when no cms entries exist and getting contacts in caseload performed by others`() {
-
     val results = wmtGetContacts.findContactsInCaseloadPerformedByOthers(staffIdentifier)
 
     Assertions.assertTrue(results.isEmpty())
@@ -92,7 +85,6 @@ class GetContactsFromWMT : IntegrationTestBase() {
 
   @Test
   fun `must not return contacts in caseload performed by others if its the same person performing the contact and is the person manager`() {
-
     wmtcmsRepository.save(WMTCMSEntity(staffCode = staffIdentifier.staffCode, staffTeamCode = staffIdentifier.teamCode, personManagerStaffCode = staffIdentifier.staffCode, personManagerTeamCode = staffIdentifier.teamCode, contactTypeCode = contactTypeCode))
 
     val results = wmtGetContacts.findContactsInCaseloadPerformedByOthers(staffIdentifier)

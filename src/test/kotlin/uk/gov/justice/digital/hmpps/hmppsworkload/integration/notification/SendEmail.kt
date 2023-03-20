@@ -24,7 +24,6 @@ class SendEmail : IntegrationTestBase() {
 
   @Test
   fun `sends an email when ROSH cannot be retrieved`() = runBlocking(Context.of(HttpHeaders.AUTHORIZATION, "token").asCoroutineContext()) {
-
     val crn = "X123456"
     val allocateCase = AllocateCase(crn, sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
     val allocationDetails = getAllocationDetails(crn)
@@ -34,7 +33,7 @@ class SendEmail : IntegrationTestBase() {
     caseDetailsRepository.save(CaseDetailsEntity(crn, B3, COMMUNITY, "Jane", "Doe"))
     val emailSendResponse = notificationService.notifyAllocation(
       allocationDetails,
-      allocateCase
+      allocateCase,
     )
     assessRisksNeedsApi.verifyRiskSummaryCalled(crn, 2)
     assessRisksNeedsApi.verifyRiskPredictorCalled(crn, 1)
@@ -43,7 +42,6 @@ class SendEmail : IntegrationTestBase() {
 
   @Test
   fun `sends an email when risk predictor cannot be retrieved`() = runBlocking(Context.of(HttpHeaders.AUTHORIZATION, "token").asCoroutineContext()) {
-
     val crn = "X123456"
     val allocateCase = AllocateCase(crn, sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
     val allocationDetails = getAllocationDetails(crn)
@@ -52,7 +50,7 @@ class SendEmail : IntegrationTestBase() {
     caseDetailsRepository.save(CaseDetailsEntity(crn, B3, COMMUNITY, "Jane", "Doe"))
     val emailSendResponse = notificationService.notifyAllocation(
       allocationDetails,
-      allocateCase
+      allocateCase,
     )
     assessRisksNeedsApi.verifyRiskSummaryCalled(crn, 1)
     assessRisksNeedsApi.verifyRiskPredictorCalled(crn, 2)

@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.client.dto
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 
 data class AllocationDetailsRequest(
-  val cases: List<AllocationDetailCase>
+  val cases: List<AllocationDetailCase>,
 ) {
   companion object {
     fun from(eventManagers: List<EventManagerEntity>): AllocationDetailsRequest =
@@ -13,5 +13,5 @@ data class AllocationDetailsRequest(
 
 data class AllocationDetailCase(
   val crn: String,
-  val staffCode: String
+  val staffCode: String,
 )

@@ -109,7 +109,7 @@ class ExtractPlacedEventListenerTest : IntegrationTestBase() {
     Assertions.assertAll(
       { Assertions.assertEquals(wmtStaff.offenderManager.code, actualWorkloadCalcEntity?.staffCode) },
       { Assertions.assertEquals(wmtStaff.team.code, actualWorkloadCalcEntity?.teamCode) },
-      { Assertions.assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity?.calculatedDate?.dayOfMonth) }
+      { Assertions.assertEquals(LocalDateTime.now().dayOfMonth, actualWorkloadCalcEntity?.calculatedDate?.dayOfMonth) },
     )
   }
 
@@ -122,8 +122,8 @@ class ExtractPlacedEventListenerTest : IntegrationTestBase() {
         effectiveFrom = ZonedDateTime.now().minusDays(1),
         effectiveTo = ZonedDateTime.now().plusDays(1),
         status = ReductionStatus.SCHEDULED,
-        reductionReasonId = reductionReason.id!!
-      )
+        reductionReasonId = reductionReason.id!!,
+      ),
     )
     hmppsExtractPlacedClient.sendMessage(SendMessageRequest(hmppsExtractPlacedQueue.queueUrl, "{}"))
     noMessagesOnExtractPlacedQueue()
@@ -135,10 +135,10 @@ class ExtractPlacedEventListenerTest : IntegrationTestBase() {
       objectMapper.writeValueAsString(
         ReductionsAuditData(
           savedReduction.workloadOwner.offenderManager.code,
-          savedReduction.id!!
-        )
+          savedReduction.id!!,
+        ),
       ),
-      auditMessages.details
+      auditMessages.details,
     )
     Assertions.assertEquals("system_user", auditMessages.who)
     Assertions.assertEquals("REDUCTION_STARTED", auditMessages.what)

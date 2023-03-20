@@ -9,7 +9,7 @@ fun numberOfMessagesCurrentlyOnQueue(client: AmazonSQS, queueUrl: String, count:
   await untilCallTo {
     getNumberOfMessagesCurrentlyOnQueue(
       client,
-      queueUrl
+      queueUrl,
     )
   } matches { it == count }
 }

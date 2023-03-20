@@ -17,7 +17,7 @@ import javax.persistence.Table
 @Entity
 @TypeDefs(
   TypeDef(name = "json", typeClass = JsonStringType::class),
-  TypeDef(name = "jsonb", typeClass = JsonBinaryType::class)
+  TypeDef(name = "jsonb", typeClass = JsonBinaryType::class),
 )
 @Table(name = "workload_calculation")
 data class WorkloadCalculationEntity(

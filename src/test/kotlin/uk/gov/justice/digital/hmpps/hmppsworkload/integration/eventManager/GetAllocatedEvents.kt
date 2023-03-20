@@ -16,6 +16,7 @@ import java.time.temporal.ChronoUnit
 class GetAllocatedEvents : IntegrationTestBase() {
 
   private val loggedInUser = "SOME_USER"
+
   @Test
   fun `can get all allocated events by logged in user`() {
     val storedEventManager = eventManagerRepository.save(
@@ -25,8 +26,8 @@ class GetAllocatedEvents : IntegrationTestBase() {
         teamCode = "T1",
         createdBy = loggedInUser,
         isActive = true,
-        eventNumber = 2
-      )
+        eventNumber = 2,
+      ),
     )
 
     val caseDetails = caseDetailsRepository.save(CaseDetailsEntity(crn = storedEventManager.crn, tier = Tier.B2, type = CaseType.COMMUNITY, "", ""))
@@ -35,7 +36,7 @@ class GetAllocatedEvents : IntegrationTestBase() {
 
     webTestClient.get()
       .uri(
-        "/allocation/events/me?since=${thirtyDaysInPast()}"
+        "/allocation/events/me?since=${thirtyDaysInPast()}",
       )
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_READ", loggedInUser))
@@ -67,8 +68,8 @@ class GetAllocatedEvents : IntegrationTestBase() {
         teamCode = "T1",
         createdBy = loggedInUser,
         isActive = true,
-        eventNumber = 2
-      )
+        eventNumber = 2,
+      ),
     )
     oldEventManager.createdDate = ZonedDateTime.now().minusDays(60)
     eventManagerRepository.save(oldEventManager)
@@ -79,7 +80,7 @@ class GetAllocatedEvents : IntegrationTestBase() {
 
     webTestClient.get()
       .uri(
-        "/allocation/events/me?since=${thirtyDaysInPast()}"
+        "/allocation/events/me?since=${thirtyDaysInPast()}",
       )
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_READ", loggedInUser))
@@ -101,13 +102,13 @@ class GetAllocatedEvents : IntegrationTestBase() {
         teamCode = "T1",
         createdBy = loggedInUser,
         isActive = false,
-        eventNumber = 2
-      )
+        eventNumber = 2,
+      ),
     )
 
     webTestClient.get()
       .uri(
-        "/allocation/events/me?since=${thirtyDaysInPast()}"
+        "/allocation/events/me?since=${thirtyDaysInPast()}",
       )
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_READ", loggedInUser))
@@ -129,8 +130,8 @@ class GetAllocatedEvents : IntegrationTestBase() {
         teamCode = "T1",
         createdBy = loggedInUser,
         isActive = true,
-        eventNumber = 2
-      )
+        eventNumber = 2,
+      ),
     )
 
     workforceAllocationsToDelius.allocationDetailsResponse(emptyList())
@@ -139,7 +140,7 @@ class GetAllocatedEvents : IntegrationTestBase() {
 
     webTestClient.get()
       .uri(
-        "/allocation/events/me?since=${thirtyDaysInPast()}"
+        "/allocation/events/me?since=${thirtyDaysInPast()}",
       )
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_READ", loggedInUser))
@@ -154,6 +155,6 @@ class GetAllocatedEvents : IntegrationTestBase() {
 
   private fun thirtyDaysInPast(): String? =
     ZonedDateTime.now().minusDays(30).truncatedTo(ChronoUnit.DAYS).withZoneSameInstant(ZoneOffset.UTC).format(
-      DateTimeFormatter.ISO_OFFSET_DATE_TIME
+      DateTimeFormatter.ISO_OFFSET_DATE_TIME,
     )
 }

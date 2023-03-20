@@ -8,5 +8,5 @@ data class TeamOverview(
   val availablePoints: BigInteger,
   val totalPoints: BigInteger,
   val staffCode: String,
-  val teamCode: String
+  val teamCode: String,
 )

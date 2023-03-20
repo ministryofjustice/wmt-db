@@ -6,5 +6,5 @@ data class Case @JsonCreator constructor(
   val tier: Tier,
   val type: CaseType,
   val isT2A: Boolean = false,
-  val crn: String
+  val crn: String,
 )

@@ -16,7 +16,7 @@ data class EventManagerDetails @JsonCreator constructor(
   @Schema(description = "Created date")
   val createdDate: ZonedDateTime,
   @Schema(description = "event Number")
-  val eventNumber: Int?
+  val eventNumber: Int?,
 ) {
   companion object {
     fun from(eventManagerEntity: EventManagerEntity): EventManagerDetails {

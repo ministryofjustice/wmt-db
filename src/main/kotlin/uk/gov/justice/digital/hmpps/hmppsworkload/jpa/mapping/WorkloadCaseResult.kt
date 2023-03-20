@@ -4,5 +4,5 @@ data class WorkloadCaseResult(
   val totalCases: Int,
   val availablePoints: Int,
   val totalPoints: Int,
-  val teamCode: String
+  val teamCode: String,
 )

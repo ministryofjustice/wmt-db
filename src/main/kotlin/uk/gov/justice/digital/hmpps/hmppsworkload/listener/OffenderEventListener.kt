@@ -12,7 +12,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.service.SaveCaseDetailsService
 @Component
 class OffenderEventListener(
   private val objectMapper: ObjectMapper,
-  private val saveCaseDetailsService: SaveCaseDetailsService
+  private val saveCaseDetailsService: SaveCaseDetailsService,
 ) {
 
   @JmsListener(destination = "hmppsoffenderqueue", containerFactory = "hmppsQueueContainerFactoryProxy")
@@ -30,7 +30,7 @@ class OffenderEventListener(
 }
 
 data class HmppsOffenderEvent(
-  val crn: String
+  val crn: String,
 )
 
 data class SQSMessage(

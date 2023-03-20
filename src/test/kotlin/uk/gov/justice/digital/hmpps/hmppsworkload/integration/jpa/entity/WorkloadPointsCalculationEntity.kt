@@ -69,5 +69,5 @@ data class WorkloadPointsCalculationEntity(
   val assessmentPoints: Int = 0,
 
   @Column
-  val lastUpdatedOn: LocalDateTime = LocalDateTime.now().with(LocalTime.of(9, 30))
+  val lastUpdatedOn: LocalDateTime = LocalDateTime.now().with(LocalTime.of(9, 30)),
 )

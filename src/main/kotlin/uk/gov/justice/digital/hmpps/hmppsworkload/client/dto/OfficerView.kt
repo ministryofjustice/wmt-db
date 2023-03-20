@@ -10,5 +10,5 @@ data class OfficerView @JsonCreator constructor(
   val email: String?,
   val casesDueToEndInNext4Weeks: BigInteger,
   val releasesWithinNext4Weeks: BigInteger,
-  val paroleReportsToCompleteInNext4Weeks: BigInteger
+  val paroleReportsToCompleteInNext4Weeks: BigInteger,
 ) : Grade(grade)

@@ -21,7 +21,7 @@ data class CreatedAllocationDetails(val cases: List<CreatedAllocationDetail>) {
             }
             detailsExist
           }
-          .map { CreatedAllocationDetail.from(eventManagerDetails[it.crn]!!, caseDetails[it.crn]!!, it) }
+          .map { CreatedAllocationDetail.from(eventManagerDetails[it.crn]!!, caseDetails[it.crn]!!, it) },
       )
     }
   }
@@ -32,7 +32,7 @@ data class CreatedAllocationDetail(
   val name: Name,
   val staff: StaffMember,
   val tier: Tier,
-  val allocatedOn: ZonedDateTime
+  val allocatedOn: ZonedDateTime,
 ) {
   companion object {
     fun from(allocationDetail: AllocationDetail, caseDetail: CaseDetailsEntity, eventManagerEntity: EventManagerEntity): CreatedAllocationDetail {

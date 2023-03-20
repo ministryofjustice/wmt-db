@@ -166,7 +166,6 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
 
   @Test
   fun `can get team overview of offender manager by team code when assigned to another staff member`() {
-
     val teamCode = "T1"
     val staffCode = "OM1"
     val crn = "CRN1"
@@ -243,6 +242,7 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
       .jsonPath("$.teams.$teamCode[?(@.code == '$firstOm')].email")
       .doesNotExist()
   }
+
   @Test
   fun `can get choose practitioner response when there is no community person manager`() {
     val teamCode = "T2"

@@ -15,7 +15,7 @@ data class OverviewOffenderManager(
   val code: String,
   val lastUpdatedOn: LocalDateTime?,
   val workloadOwnerId: Long,
-  val paroleReportsDue: BigInteger
+  val paroleReportsDue: BigInteger,
 ) {
   var capacity: BigDecimal = BigDecimal.ZERO
   var potentialCapacity: BigDecimal? = null

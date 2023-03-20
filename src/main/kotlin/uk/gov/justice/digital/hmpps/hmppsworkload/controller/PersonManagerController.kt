@@ -22,8 +22,8 @@ class PersonManagerController(private val getPersonManager: GetPersonManager) {
   @ApiResponses(
     value = [
       ApiResponse(responseCode = "200", description = "OK"),
-      ApiResponse(responseCode = "404", description = "Result Not Found")
-    ]
+      ApiResponse(responseCode = "404", description = "Result Not Found"),
+    ],
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("\${person.manager.getByIdPath}")

@@ -11,7 +11,7 @@ import javax.transaction.Transactional
 
 @Service
 class JpaBasedSaveRequirementManagerService(
-  private val requirementManagerRepository: RequirementManagerRepository
+  private val requirementManagerRepository: RequirementManagerRepository,
 ) : SaveRequirementManagerService {
 
   @Transactional
@@ -20,7 +20,7 @@ class JpaBasedSaveRequirementManagerService(
     deliusStaff: StaffMember,
     allocateCase: AllocateCase,
     loggedInUser: String,
-    requirements: List<Requirement>
+    requirements: List<Requirement>,
   ): List<SaveResult<RequirementManagerEntity>> {
     return requirements
       .map { requirement ->
@@ -41,7 +41,7 @@ class JpaBasedSaveRequirementManagerService(
     deliusStaff: StaffMember,
     teamCode: String,
     loggedInUser: String,
-    requirement: Requirement
+    requirement: Requirement,
   ): SaveResult<RequirementManagerEntity> {
     val requirementManagerEntity = RequirementManagerEntity(
       crn = allocateCase.crn,
@@ -50,7 +50,7 @@ class JpaBasedSaveRequirementManagerService(
       teamCode = teamCode,
       createdBy = loggedInUser,
       isActive = true,
-      eventNumber = allocateCase.eventNumber
+      eventNumber = allocateCase.eventNumber,
     )
     requirementManagerRepository.save(requirementManagerEntity)
     return SaveResult(requirementManagerEntity, true)

@@ -21,7 +21,7 @@ class SaveCaseDetailsService(
   private val workloadCalculationService: WorkloadCalculationService,
   private val getPersonManager: GetPersonManager,
   private val updateWorkloadService: UpdateWorkloadService,
-  private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient
+  private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient,
 ) {
 
   suspend fun saveByCrn(crn: String) {
@@ -35,7 +35,7 @@ class SaveCaseDetailsService(
   }
 
   private suspend fun savePerson(
-    personSummary: PersonSummary?
+    personSummary: PersonSummary?,
   ) {
     personSummary?.takeUnless { it.type == CaseType.UNKNOWN }?.type?.let { caseType ->
       hmppsTierApiClient.getTierByCrn(personSummary.crn)?.let {
@@ -46,7 +46,7 @@ class SaveCaseDetailsService(
         if (staff != null) {
           workloadCalculationService.saveWorkloadCalculation(
             StaffIdentifier(staff.staffCode, staff.teamCode),
-            staff.staffGrade
+            staff.staffGrade,
           )
         }
       }

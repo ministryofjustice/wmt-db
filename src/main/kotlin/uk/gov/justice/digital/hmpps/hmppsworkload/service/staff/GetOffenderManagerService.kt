@@ -31,7 +31,7 @@ class GetOffenderManagerService(
   private val caseDetailsRepository: CaseDetailsRepository,
   private val getWeeklyHours: GetWeeklyHours,
   private val getEventManager: JpaBasedGetEventManager,
-  private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient
+  private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient,
 ) {
 
   suspend fun getPotentialWorkload(staffIdentifier: StaffIdentifier, crn: String): OffenderManagerPotentialWorkload? {
@@ -43,7 +43,7 @@ class GetOffenderManagerService(
     overview.potentialCapacity = calculateCapacity(
       overview.totalPoints.minus(currentCaseImpact)
         .plus(caseCalculator.getPointsForCase(potentialCase)),
-      overview.availablePoints
+      overview.availablePoints,
     )
     return OffenderManagerPotentialWorkload.from(overview, impactResponse, potentialCase)
   }

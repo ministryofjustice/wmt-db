@@ -15,10 +15,12 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.service.GetCombinedCaseload
 class GetCaseloadTest : IntegrationTestBase() {
 
   private lateinit var getCaseLoad: GetCombinedCaseload
+
   @BeforeAll
   fun setup() {
     getCaseLoad = GetCombinedCaseload(offenderManagerRepository, personManagerRepository, caseDetailsRepository)
   }
+
   @Test
   fun `must not return list of cases if no realtime data exist`() {
     Assertions.assertEquals(0, getCaseLoad.getCases(StaffIdentifier("OM1", "T1")).size)
@@ -33,10 +35,12 @@ class GetCaseloadTest : IntegrationTestBase() {
 
     personManagerRepository.save(
       PersonManagerEntity(
-        crn = realtimeCase.crn, staffCode = staffCode,
-        teamCode = teamCode, createdBy = "createdBy",
-        isActive = true
-      )
+        crn = realtimeCase.crn,
+        staffCode = staffCode,
+        teamCode = teamCode,
+        createdBy = "createdBy",
+        isActive = true,
+      ),
     )
 
     caseDetailsRepository.save(CaseDetailsEntity(realtimeCase.crn, realtimeCase.tier, realtimeCase.type, "Jane", "Doe"))

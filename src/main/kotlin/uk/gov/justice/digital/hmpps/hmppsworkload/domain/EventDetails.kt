@@ -6,5 +6,5 @@ data class EventDetails constructor(
   val tier: Tier,
   val type: CaseType,
   val crn: String,
-  val allocatedOn: ZonedDateTime
+  val allocatedOn: ZonedDateTime,
 )

@@ -13,7 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.service.SaveCaseDetailsService
 @Component
 class TierCalculationEventListener(
   private val objectMapper: ObjectMapper,
-  private val saveCaseDetailsService: SaveCaseDetailsService
+  private val saveCaseDetailsService: SaveCaseDetailsService,
 ) {
 
   @JmsListener(destination = "tiercalcqueue", containerFactory = "hmppsQueueContainerFactoryProxy")

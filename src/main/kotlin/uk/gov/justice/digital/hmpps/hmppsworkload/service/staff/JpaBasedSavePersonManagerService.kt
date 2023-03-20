@@ -20,7 +20,7 @@ class JpaBasedSavePersonManagerService(
     teamCode: String,
     deliusStaff: StaffMember,
     loggedInUser: String,
-    crn: String
+    crn: String,
   ): SaveResult<PersonManagerEntity> =
     personManagerRepository.findFirstByCrnOrderByCreatedDateDesc(crn)?.let { personManager ->
       if (personManager.staffCode == deliusStaff.code && personManager.teamCode == teamCode) {
@@ -32,7 +32,7 @@ class JpaBasedSavePersonManagerService(
           personManagerRepository.save(personManager)
           workloadCalculationService.saveWorkloadCalculation(
             StaffIdentifier(currentPersonManager!!.staffCode, currentPersonManager.teamCode),
-            currentPersonManager.staffGrade
+            currentPersonManager.staffGrade,
           )
         }
       }
@@ -42,14 +42,14 @@ class JpaBasedSavePersonManagerService(
     deliusStaff: StaffMember,
     teamCode: String,
     loggedInUser: String,
-    crn: String
+    crn: String,
   ): SaveResult<PersonManagerEntity> {
     val personManagerEntity = PersonManagerEntity(
       crn = crn,
       staffCode = deliusStaff.code,
       teamCode = teamCode,
       createdBy = loggedInUser,
-      isActive = true
+      isActive = true,
     )
     personManagerRepository.save(personManagerEntity)
     workloadCalculationService.saveWorkloadCalculation(StaffIdentifier(deliusStaff.code, teamCode), deliusStaff.getGrade())

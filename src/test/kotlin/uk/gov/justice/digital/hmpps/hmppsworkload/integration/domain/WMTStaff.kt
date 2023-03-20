@@ -11,5 +11,5 @@ data class WMTStaff(
   val team: TeamEntity,
   val wmtWorkloadOwnerEntity: WMTWorkloadOwnerEntity,
   val workload: WMTWorkloadEntity,
-  val workloadPointsCalculation: WorkloadPointsCalculationEntity
+  val workloadPointsCalculation: WorkloadPointsCalculationEntity,
 )

@@ -17,9 +17,8 @@ class DefaultWorkloadCalculator : WorkloadCalculator {
     contactsPerformedByOthers: List<Contact>,
     contactTypeWeightings: Map<String, Int>,
     t2aWorkloadPoints: WorkloadPointsEntity,
-    workloadPoints: WorkloadPointsEntity
+    workloadPoints: WorkloadPointsEntity,
   ): BigInteger {
-
     val casePointTotal = calculateCaseTierPointsTotal(cases, t2aWorkloadPoints, workloadPoints)
     val courtReportTotal = calculateCourtReportPointsTotal(courtReports, workloadPoints)
     val contactPerformedOutsideCaseloadTotal = sumContacts(contactsPerformedOutsideCaseload, contactTypeWeightings)

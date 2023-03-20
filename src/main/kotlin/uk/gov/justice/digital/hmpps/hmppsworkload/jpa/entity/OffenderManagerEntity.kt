@@ -27,10 +27,10 @@ import javax.persistence.Table
         ColumnResult(name = "key"),
         ColumnResult(name = "last_updated_on", type = LocalDateTime::class),
         ColumnResult(name = "workload_owner_id", type = Long::class),
-        ColumnResult(name = "paroms_due_next_30_days")
-      ]
-    )
-  ]
+        ColumnResult(name = "paroms_due_next_30_days"),
+      ],
+    ),
+  ],
 )
 @SqlResultSetMapping(
   name = "OffenderManagerCaseloadTotals",
@@ -56,9 +56,9 @@ import javax.persistence.Table
         ColumnResult(name = "d2"),
         ColumnResult(name = "d1"),
         ColumnResult(name = "d0"),
-      ]
-    )
-  ]
+      ],
+    ),
+  ],
 )
 @NamedNativeQuery(
   name = "OffenderManagerEntity.findByOverview",
@@ -76,7 +76,7 @@ import javax.persistence.Table
         ON wr.id = wpc.workload_report_id
     JOIN app.offender_manager AS om
         ON om.id = wo.offender_manager_id
-    WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS NULL AND t.code = ?1 AND om."key" = ?2"""
+    WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS NULL AND t.code = ?1 AND om."key" = ?2""",
 )
 @NamedNativeQuery(
   name = "OffenderManagerEntity.findByCaseloadTotals",
@@ -85,7 +85,7 @@ import javax.persistence.Table
   SELECT location, untiered, a3, a2, a1, a0, b3, b2, b1, b0, c3, c2, c1, c0, d3, d2, d1, d0
   FROM app.team_caseload_view
   WHERE link_id = ?1
-"""
+""",
 )
 @NamedNativeQuery(
   name = "OffenderManagerEntity.findCasesByTeamCodeAndStaffCode",
@@ -104,7 +104,7 @@ import javax.persistence.Table
     JOIN app.workload_report AS wr
         ON w.workload_report_id = wr.id
     WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS null and c.row_type = 'N' and t.code = ?2 and om."key" = ?1
-"""
+""",
 )
 @NamedNativeQuery(
   name = "OffenderManagerEntity.findCaseByTeamCodeAndStaffCodeAndCrn",
@@ -123,7 +123,7 @@ import javax.persistence.Table
     JOIN app.workload_report AS wr
         ON w.workload_report_id = wr.id
     WHERE wr.effective_from IS NOT NULL AND wr.effective_to IS null and c.row_type = 'N' and t.code = ?1 and om."key" = ?2 and c.case_ref_no = ?3
-"""
+""",
 )
 @Entity
 @Table(name = "offender_manager", schema = "app")
@@ -143,5 +143,5 @@ data class OffenderManagerEntity(
   val surname: String,
 
   @Column
-  val typeId: Long
+  val typeId: Long,
 )

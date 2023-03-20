@@ -26,6 +26,7 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
     val wmtTier = if (tier != null) setupWmtCaseCategoryTier(tier) else setupWmtUntiered()
     return tiersRepository.save(TiersEntity(workload = workload, caseType = CaseType.CUSTODY, tierCategory = wmtTier, totalFilteredCases = total))
   }
+
   @Test
   fun `can get overview for an offender manager`() {
     val teamCode = "T1"
@@ -39,22 +40,28 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
     val reductionCategory = reductionCategoryRepository.save(ReductionCategoryEntity())
     val reductionReason = reductionReasonRepository.save(ReductionReasonEntity(reductionCategoryEntity = reductionCategory))
     val reduction = ReductionEntity(
-      workloadOwner = wmtStaff.wmtWorkloadOwnerEntity, hours = BigDecimal.valueOf(5),
+      workloadOwner = wmtStaff.wmtWorkloadOwnerEntity,
+      hours = BigDecimal.valueOf(5),
       effectiveFrom = LocalDate.now().minusDays(2).atStartOfDay(
-        ZoneId.systemDefault()
+        ZoneId.systemDefault(),
       ),
-      effectiveTo = LocalDate.now().plusDays(2).atStartOfDay(ZoneId.systemDefault()), status = ReductionStatus.ACTIVE, reductionReasonId = reductionReason.id!!
+      effectiveTo = LocalDate.now().plusDays(2).atStartOfDay(ZoneId.systemDefault()),
+      status = ReductionStatus.ACTIVE,
+      reductionReasonId = reductionReason.id!!,
     )
     reductionsRepository.save(reduction)
 
     reductionsRepository.save(
       ReductionEntity(
-        workloadOwner = wmtStaff.wmtWorkloadOwnerEntity, hours = BigDecimal.valueOf(5),
+        workloadOwner = wmtStaff.wmtWorkloadOwnerEntity,
+        hours = BigDecimal.valueOf(5),
         effectiveFrom = LocalDate.now().minusDays(2).atStartOfDay(
-          ZoneId.systemDefault()
+          ZoneId.systemDefault(),
         ),
-        effectiveTo = LocalDate.now().plusDays(2).atStartOfDay(ZoneId.systemDefault()), status = ReductionStatus.DELETED, reductionReasonId = reductionReason.id!!
-      )
+        effectiveTo = LocalDate.now().plusDays(2).atStartOfDay(ZoneId.systemDefault()),
+        status = ReductionStatus.DELETED,
+        reductionReasonId = reductionReason.id!!,
+      ),
     )
 
     val aTierTotal = setupWmtTierTotal(Tier.A2, wmtStaff.workload, 6)
@@ -99,14 +106,14 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
       .jsonPath("$.lastUpdatedOn")
       .isEqualTo(
         wmtStaff.workloadPointsCalculation.lastUpdatedOn.format(
-          DateTimeFormatter.ISO_LOCAL_DATE_TIME
-        )
+          DateTimeFormatter.ISO_LOCAL_DATE_TIME,
+        ),
       )
       .jsonPath("$.nextReductionChange")
       .isEqualTo(
         reduction.effectiveTo.withZoneSameInstant(ZoneOffset.UTC).format(
-          DateTimeFormatter.ISO_OFFSET_DATE_TIME
-        )
+          DateTimeFormatter.ISO_OFFSET_DATE_TIME,
+        ),
       )
       .jsonPath("$.caseTotals.a")
       .isEqualTo(aTierTotal.totalFilteredCases)
@@ -235,8 +242,8 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
         teamCode = teamCode,
         createdBy = "USER1",
         isActive = true,
-        eventNumber = 1
-      )
+        eventNumber = 1,
+      ),
     )
     val storedEventManager = eventManagerRepository.findByIdOrNull(eventManager.id!!)!!
     val caseDetails = caseDetailsRepository.save(CaseDetailsEntity(storedEventManager.crn, Tier.C3, CaseType.COMMUNITY, "Jane", "Doe"))
@@ -252,8 +259,8 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
       .jsonPath("$.lastAllocatedEvent.allocatedOn")
       .isEqualTo(
         storedEventManager.createdDate!!.withZoneSameInstant(ZoneOffset.UTC).format(
-          DateTimeFormatter.ISO_OFFSET_DATE_TIME
-        )
+          DateTimeFormatter.ISO_OFFSET_DATE_TIME,
+        ),
       )
       .jsonPath("$.lastAllocatedEvent.tier")
       .isEqualTo(caseDetails.tier.name)

@@ -34,7 +34,7 @@ class WorkloadCalculatorTests {
       emptyList(),
       emptyMap(),
       t2aWorkloadPoints,
-      workloadPoints
+      workloadPoints,
     )
     val t2aExpectedWorkloadPoints = t2aWorkloadPoints.communityTierPoints.B2Points.multiply(numberOfT2aCases.toBigInteger())
     val casesExpectedWorkloadPoints = workloadPoints.custodyTierPoints.C1Points.multiply(numberOfCases.toBigInteger())
@@ -59,7 +59,7 @@ class WorkloadCalculatorTests {
       emptyList(),
       emptyMap(),
       t2aWorkloadPoints,
-      workloadPoints
+      workloadPoints,
     )
 
     val expectedStandardCourtReportPoints = standardCourtReportWeighting.multiply(numberOfStandardCourtReports.toBigInteger())
@@ -88,7 +88,7 @@ class WorkloadCalculatorTests {
       emptyList(),
       contactReasonWeightings,
       t2aWorkloadPoints,
-      workloadPoints
+      workloadPoints,
     )
 
     val expectedContactOnePointsTotal = contactReasonWeightings["CONTACT1"]!! * numberOfContactOneContacts
@@ -113,7 +113,7 @@ class WorkloadCalculatorTests {
       emptyList(),
       contactReasonWeightings,
       t2aWorkloadPoints,
-      workloadPoints
+      workloadPoints,
     )
 
     Assertions.assertEquals(BigInteger.ZERO, result)
@@ -121,7 +121,6 @@ class WorkloadCalculatorTests {
 
   @Test
   fun `contacts which occur within case management by others must be negative`() {
-
     val contactReasonWeightings = mapOf("CONTACT1" to 10, "CONTACT2" to 2)
 
     val t2aWorkloadPoints = mockWorkloadPoints(isT2A = true)
@@ -136,7 +135,7 @@ class WorkloadCalculatorTests {
       contacts,
       contactReasonWeightings,
       t2aWorkloadPoints,
-      workloadPoints
+      workloadPoints,
     )
 
     Assertions.assertEquals(BigInteger.valueOf(12).negate(), result)
@@ -152,7 +151,7 @@ class WorkloadCalculatorTests {
     paroleReportWeighting: Int = 0,
     paroleEnabled: Boolean = true,
     licenseARMAssessmentWeighting: BigInteger = BigInteger.ZERO,
-    communityARMAssessmentWeighting: BigInteger = BigInteger.ZERO
+    communityARMAssessmentWeighting: BigInteger = BigInteger.ZERO,
   ): WorkloadPointsEntity {
     val workloadPoints = WorkloadPointsEntity(
       null,
@@ -172,7 +171,7 @@ class WorkloadCalculatorTests {
       paroleReportWeighting,
       paroleEnabled,
       licenseARMAssessmentWeighting,
-      communityARMAssessmentWeighting
+      communityARMAssessmentWeighting,
     )
 
     return workloadPoints

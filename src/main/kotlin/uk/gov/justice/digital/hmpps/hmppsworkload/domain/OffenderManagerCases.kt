@@ -33,7 +33,7 @@ data class OffenderManagerActiveCase(
   @Schema(description = "name")
   val name: Name,
   @Schema(description = "type")
-  val type: String
+  val type: String,
 ) {
   companion object {
     fun from(activeCase: ActiveCase, caseDetails: CaseDetailsEntity): OffenderManagerActiveCase {

@@ -9,7 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.service.reduction.GetReduction
 @Service
 class RequestStaffCalculationService(
   private val getReductionService: GetReductionService,
-  private val sqsSuccessPublisher: SqsSuccessPublisher
+  private val sqsSuccessPublisher: SqsSuccessPublisher,
 ) {
 
   fun requestStaffCalculation(workloadOwner: WMTWorkloadOwnerEntity) {

@@ -26,7 +26,6 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
 
   @Test
   fun `calculate WorkloadCalculation empty workload`() {
-
     val staffCode = "STAFF1"
     val teamCode = "TM1"
     val staffGrade = "PO"
@@ -61,7 +60,7 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
 
     Assertions.assertAll(
       { assertEquals(standardDeliveryReportCount, workloadCalculationResult?.breakdownData?.standardDeliveryReportCount) },
-      { assertEquals(fastDeliveryReportCount, workloadCalculationResult?.breakdownData?.fastDeliveryReportCount) }
+      { assertEquals(fastDeliveryReportCount, workloadCalculationResult?.breakdownData?.fastDeliveryReportCount) },
     )
   }
 
@@ -88,7 +87,7 @@ internal class WorkloadCalculationServiceTest : IntegrationTestBase() {
 
     Assertions.assertAll(
       { assertEquals(1, workloadCalculationResult?.breakdownData?.contactsPerformedByOthersCount?.get(contactTypeCode)) },
-      { assertEquals(1, workloadCalculationResult?.breakdownData?.contactsPerformedOutsideCaseloadCount?.get(contactTypeCode)) }
+      { assertEquals(1, workloadCalculationResult?.breakdownData?.contactsPerformedOutsideCaseloadCount?.get(contactTypeCode)) },
     )
   }
 
