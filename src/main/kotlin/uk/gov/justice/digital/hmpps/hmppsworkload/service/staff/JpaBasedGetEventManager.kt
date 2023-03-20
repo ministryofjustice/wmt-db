@@ -4,6 +4,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToDeliusApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.CompleteDetails
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseCount
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CreatedAllocationDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.EventDetails
@@ -43,5 +44,11 @@ class JpaBasedGetEventManager(
     val allocatedEventManagerDetails = allocatedEventManagers.takeUnless { it.isEmpty() }?.let { workforceAllocationsToDeliusApiClient.allocationDetails(allocatedEventManagers).cases.associateBy { it.crn } } ?: emptyMap()
     val caseDetails = caseDetailsRepository.findAllById(allocatedEventManagers.map { it.crn }).associateBy { it.crn }
     return CreatedAllocationDetails.from(allocatedEventManagers, allocatedEventManagerDetails, caseDetails)
+  }
+
+  suspend fun countAllocationsBy(since: ZonedDateTime, name: String): CaseCount {
+    val allocatedEventManagers = eventManagerRepository.findByCreatedDateGreaterThanEqualAndCreatedByAndIsActiveTrue(since, name)
+    val caseDetails = caseDetailsRepository.findAllById(allocatedEventManagers.map { it.crn })
+    return CaseCount(caseDetails.count())
   }
 }
