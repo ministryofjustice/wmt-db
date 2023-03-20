@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.CompleteDetails
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseCount
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CreatedAllocationDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.EventManagerDetails
@@ -83,4 +84,20 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
     authentication: Authentication,
   ): CreatedAllocationDetails =
     getEventManager.findAllocationsBy(since, authentication.name)
+
+  @Operation(summary = "Get allocated event count by logged in user")
+  @ApiResponses(
+    value = [
+      ApiResponse(responseCode = "200", description = "OK"),
+    ],
+  )
+  @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
+  @GetMapping("/allocation/events/me/count")
+  suspend fun getAllocationCountByLoggedInUser(
+    @RequestParam(required = true)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    since: ZonedDateTime,
+    authentication: Authentication,
+  ): CaseCount =
+    getEventManager.countAllocationsBy(since, authentication.name)
 }
