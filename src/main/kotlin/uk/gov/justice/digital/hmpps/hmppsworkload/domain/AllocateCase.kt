@@ -8,6 +8,6 @@ data class AllocateCase @JsonCreator constructor(
   val emailTo: List<String>? = null,
   val sendEmailCopyToAllocatingOfficer: Boolean,
   val eventNumber: Int,
-  val evidenceContent: String? = null,
-  val evidenceContentSensitive: Boolean? = null,
+  val allocationJustificationNotes: String? = null,
+  val sensitiveNotes: Boolean? = null,
 )

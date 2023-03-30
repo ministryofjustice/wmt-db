@@ -55,11 +55,11 @@ class JpaBasedSaveEventManagerService(
   }
 
   private fun auditEventManagerAllocation(allocateCase: AllocateCase, loggedInUser: String, eventManagerEntity: EventManagerEntity) {
-    if (allocateCase.evidenceContent != null && allocateCase.evidenceContentSensitive != null) {
+    if (allocateCase.allocationJustificationNotes != null && allocateCase.sensitiveNotes != null) {
       eventManagerAuditRepository.save(
         EventManagerAuditEntity(
-          allocationJustificationNotes = allocateCase.evidenceContent,
-          sensitiveNotes = allocateCase.evidenceContentSensitive,
+          allocationJustificationNotes = allocateCase.allocationJustificationNotes,
+          sensitiveNotes = allocateCase.sensitiveNotes,
           createdBy = loggedInUser,
           eventManager = eventManagerEntity,
         ),
