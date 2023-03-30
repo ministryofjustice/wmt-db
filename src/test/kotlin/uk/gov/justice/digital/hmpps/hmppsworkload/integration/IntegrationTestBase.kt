@@ -50,6 +50,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.TeamEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WMTWorkloadOwnerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.AdjustmentReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.EventManagerAuditRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.EventManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.OffenderManagerRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.PersonManagerRepository
@@ -236,9 +237,13 @@ abstract class IntegrationTestBase {
   @Autowired
   protected lateinit var workloadPointsRepository: WorkloadPointsRepository
 
+  @Autowired
+  protected lateinit var eventManagerAuditRepository: EventManagerAuditRepository
+
   @BeforeEach
   fun setupDependentServices() {
     personManagerRepository.deleteAll()
+    eventManagerAuditRepository.deleteAll()
     eventManagerRepository.deleteAll()
     requirementManagerRepository.deleteAll()
     caseDetailsRepository.deleteAll()
@@ -266,6 +271,7 @@ abstract class IntegrationTestBase {
   @AfterAll
   fun tearDownServer() {
     personManagerRepository.deleteAll()
+    eventManagerAuditRepository.deleteAll()
     eventManagerRepository.deleteAll()
     requirementManagerRepository.deleteAll()
     wmtCourtReportsRepository.deleteAll()

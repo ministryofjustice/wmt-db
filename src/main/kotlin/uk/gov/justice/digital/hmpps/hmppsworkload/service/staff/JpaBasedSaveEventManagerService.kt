@@ -4,13 +4,16 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffMember
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.SaveResult
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerAuditEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.EventManagerAuditRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.EventManagerRepository
 import javax.transaction.Transactional
 
 @Service
 class JpaBasedSaveEventManagerService(
   private val eventManagerRepository: EventManagerRepository,
+  private val eventManagerAuditRepository: EventManagerAuditRepository,
 ) : SaveEventManagerService {
 
   @Transactional
@@ -47,6 +50,20 @@ class JpaBasedSaveEventManagerService(
       eventNumber = allocateCase.eventNumber,
     )
     eventManagerRepository.save(eventManagerEntity)
+    auditEventManagerAllocation(allocateCase, loggedInUser, eventManagerEntity)
     return SaveResult(eventManagerEntity, true)
+  }
+
+  private fun auditEventManagerAllocation(allocateCase: AllocateCase, loggedInUser: String, eventManagerEntity: EventManagerEntity) {
+    if (allocateCase.allocationJustificationNotes != null && allocateCase.sensitiveNotes != null) {
+      eventManagerAuditRepository.save(
+        EventManagerAuditEntity(
+          allocationJustificationNotes = allocateCase.allocationJustificationNotes,
+          sensitiveNotes = allocateCase.sensitiveNotes,
+          createdBy = loggedInUser,
+          eventManager = eventManagerEntity,
+        ),
+      )
+    }
   }
 }
