@@ -602,11 +602,11 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `must audit event manager allocation when evidence supplied`() {
-    val evidenceContent = "Some evidence"
-    val evidenceSensitive = false
+    val allocationJustificationNotes = "Some evidence"
+    val sensitiveNotes = false
     val response = webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
-      .bodyValue(allocateCase(crn, eventNumber, true, evidenceContent, evidenceSensitive))
+      .bodyValue(allocateCase(crn, eventNumber, true, allocationJustificationNotes, sensitiveNotes))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
         it.contentType = MediaType.APPLICATION_JSON
@@ -622,7 +622,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     val eventManagerAudit = eventManagerAuditRepository.findByEventManager(eventManager!!)
 
     Assertions.assertEquals(1, eventManagerAudit.size)
-    Assertions.assertEquals(evidenceContent, eventManagerAudit[0].justificationNotes)
-    Assertions.assertEquals(evidenceSensitive, eventManagerAudit[0].sensitiveNotes)
+    Assertions.assertEquals(allocationJustificationNotes, eventManagerAudit[0].allocationJustificationNotes)
+    Assertions.assertEquals(sensitiveNotes, eventManagerAudit[0].sensitiveNotes)
   }
 }

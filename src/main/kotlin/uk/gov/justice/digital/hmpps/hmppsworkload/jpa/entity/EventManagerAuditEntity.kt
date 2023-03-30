@@ -23,7 +23,7 @@ data class EventManagerAuditEntity(
   val id: Long? = null,
 
   @Column
-  val justificationNotes: String,
+  val allocationJustificationNotes: String,
 
   @Column
   val sensitiveNotes: Boolean,
