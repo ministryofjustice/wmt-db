@@ -52,14 +52,14 @@ class NotificationService(
     return emailTo.map { email -> addRecipientTo400Response(email) { notificationClient.sendEmail(allocationTemplateId, email, parameters, null) } }
   }
 
-  class NotificationInvalidSenderException(emailRecipient: String) : Exception("Unable to deliver to recipient $emailRecipient")
+  class NotificationInvalidSenderException(emailRecipient: String, cause: Throwable) : Exception("Unable to deliver to recipient $emailRecipient", cause)
 
   private fun addRecipientTo400Response(emailRecipient: String, wrappedApiCall: () -> SendEmailResponse): SendEmailResponse {
     try {
       return wrappedApiCall.invoke()
     } catch (notificationException: NotificationClientException) {
       if (notificationException.httpResult == 400) {
-        throw NotificationInvalidSenderException(emailRecipient)
+        throw NotificationInvalidSenderException(emailRecipient, notificationException)
       }
       throw notificationException
     }
