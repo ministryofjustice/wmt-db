@@ -8,9 +8,10 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseCount
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CreatedAllocationDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.EventDetails
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.EventManagerDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.EventManagerAuditRepository
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.EventManagerRepository
 import java.time.ZonedDateTime
 import java.util.UUID
@@ -20,8 +21,12 @@ class JpaBasedGetEventManager(
   private val eventManagerRepository: EventManagerRepository,
   private val caseDetailsRepository: CaseDetailsRepository,
   private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient,
+  private val eventManagerAuditRepository: EventManagerAuditRepository,
 ) {
-  fun findById(id: UUID): EventManagerEntity? = eventManagerRepository.findByUuid(id)
+  fun findById(id: UUID): EventManagerDetails? = eventManagerRepository.findByUuid(id)?.let { eventManagerEntity ->
+    val eventManagerAudit = eventManagerAuditRepository.findFirstByEventManagerOrderByCreatedDateDesc(eventManagerEntity)
+    EventManagerDetails.from(eventManagerEntity, eventManagerAudit)
+  }
   fun findLatestByStaffAndTeam(staffIdentifier: StaffIdentifier): EventDetails? =
     eventManagerRepository.findFirstByStaffCodeAndTeamCodeAndIsActiveTrueOrderByCreatedDateDesc(staffIdentifier.staffCode, staffIdentifier.teamCode)?.let { eventManagerEntity ->
       caseDetailsRepository.findByIdOrNull(eventManagerEntity.crn)?.let { caseDetails ->

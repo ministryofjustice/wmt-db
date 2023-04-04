@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.domain
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import io.swagger.v3.oas.annotations.media.Schema
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerAuditEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import java.time.ZonedDateTime
 import java.util.UUID
@@ -17,10 +18,14 @@ data class EventManagerDetails @JsonCreator constructor(
   val createdDate: ZonedDateTime,
   @Schema(description = "event Number")
   val eventNumber: Int?,
+  @Schema(description = "Allocation Justification Notes")
+  val allocationJustificationNotes: String?,
+  @Schema(description = "Justification notes contain sensitive information")
+  val sensitiveNotes: Boolean?,
 ) {
   companion object {
-    fun from(eventManagerEntity: EventManagerEntity): EventManagerDetails {
-      return EventManagerDetails(eventManagerEntity.uuid, eventManagerEntity.staffCode, eventManagerEntity.teamCode, eventManagerEntity.createdDate!!, eventManagerEntity.eventNumber)
+    fun from(eventManagerEntity: EventManagerEntity, eventManagerAuditEntity: EventManagerAuditEntity?): EventManagerDetails {
+      return EventManagerDetails(eventManagerEntity.uuid, eventManagerEntity.staffCode, eventManagerEntity.teamCode, eventManagerEntity.createdDate!!, eventManagerEntity.eventNumber, eventManagerAuditEntity?.allocationJustificationNotes, eventManagerAuditEntity?.sensitiveNotes)
     }
   }
 }
