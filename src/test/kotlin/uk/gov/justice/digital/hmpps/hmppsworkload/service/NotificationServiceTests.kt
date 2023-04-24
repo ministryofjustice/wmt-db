@@ -42,7 +42,7 @@ class NotificationServiceTests {
     assessRisksNeedsApiClient,
     hmppsCaseDetailsRepo,
   )
-  private val allocateCase = AllocateCase("CRN1111", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
+  private val allocateCase = AllocateCase("CRN1111", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1, allocationJustificationNotes = "some notes", sensitiveNotes = false)
 
   @BeforeEach
   fun setup() {
@@ -291,7 +291,7 @@ class NotificationServiceTests {
   @Test
   fun `must add notes when they exist`() = runBlocking {
     val allocationDetails = getAllocationDetails(allocateCase.crn)
-    val allocateCase = AllocateCase("CRN1111", "Some Notes", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
+    val allocateCase = AllocateCase("CRN1111", "Some Notes", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1, allocationJustificationNotes = "some notes", sensitiveNotes = false)
 
     notificationService.notifyAllocation(allocationDetails, allocateCase)
     val parameters = slot<MutableMap<String, Any>>()
@@ -302,7 +302,7 @@ class NotificationServiceTests {
   @Test
   fun `must add allocating officer name`() = runBlocking {
     val allocationDetails = getAllocationDetails(allocateCase.crn)
-    val allocateCase = AllocateCase("CRN1111", "Some Notes", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1)
+    val allocateCase = AllocateCase("CRN1111", "Some Notes", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1, allocationJustificationNotes = "some notes", sensitiveNotes = false)
 
     notificationService.notifyAllocation(allocationDetails, allocateCase)
     val parameters = slot<MutableMap<String, Any>>()
@@ -325,7 +325,7 @@ class NotificationServiceTests {
     val allocationDetails = getAllocationDetails(allocateCase.crn)
     val firstEmail = "first@email.com"
     val secondEmail = "second@email.com"
-    val allocateCase = AllocateCase("CRN1111", "instructions", listOf(firstEmail, secondEmail), false, 1)
+    val allocateCase = AllocateCase("CRN1111", "instructions", listOf(firstEmail, secondEmail), false, 1, allocationJustificationNotes = "some notes", sensitiveNotes = false)
 
     notificationService.notifyAllocation(allocationDetails, allocateCase)
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, any(), isNull()) }
