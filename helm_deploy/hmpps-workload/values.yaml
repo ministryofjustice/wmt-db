@@ -64,11 +64,11 @@ generic-service:
       HMPPS_SQS_QUEUES_HMPPSOFFENDERQUEUE_DLQ_ACCESS_KEY_ID: "access_key_id"
       HMPPS_SQS_QUEUES_HMPPSOFFENDERQUEUE_DLQ_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_HMPPSOFFENDERQUEUE_DLQ_NAME: "sqs_queue_name"
-    hmpps-workload-tier-calc-sqs-instance-output:
+    sqs-person-on-probation-events-secret:
       HMPPS_SQS_QUEUES_TIERCALCQUEUE_QUEUE_ACCESS_KEY_ID: "access_key_id"
       HMPPS_SQS_QUEUES_TIERCALCQUEUE_QUEUE_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_TIERCALCQUEUE_QUEUE_NAME: "sqs_queue_name"
-    hmpps-workload-tier-calc-sqs-dl-instance-output:
+    sqs-person-on-probation-events-dl-secret:
       HMPPS_SQS_QUEUES_TIERCALCQUEUE_DLQ_ACCESS_KEY_ID: "access_key_id"
       HMPPS_SQS_QUEUES_TIERCALCQUEUE_DLQ_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_TIERCALCQUEUE_DLQ_NAME: "sqs_queue_name"
@@ -76,11 +76,11 @@ generic-service:
       HMPPS_SQS_QUEUES_HMPPSAUDITQUEUE_QUEUE_ACCESS_KEY_ID: "access_key_id"
       HMPPS_SQS_QUEUES_HMPPSAUDITQUEUE_QUEUE_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_HMPPSAUDITQUEUE_QUEUE_NAME: "sqs_queue_name"
-    sqs-workload-calculation-queue-secret:
+    sqs-staff-events-secret:
       HMPPS_SQS_QUEUES_WORKLOADCALCULATIONQUEUE_QUEUE_ACCESS_KEY_ID: "access_key_id"
       HMPPS_SQS_QUEUES_WORKLOADCALCULATIONQUEUE_QUEUE_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_WORKLOADCALCULATIONQUEUE_QUEUE_NAME: "sqs_queue_name"
-    sqs-workload-calculation-dlq-secret:
+    sqs-staff-events-dl-secret :
       HMPPS_SQS_QUEUES_WORKLOADCALCULATIONQUEUE_DLQ_ACCESS_KEY_ID: "access_key_id"
       HMPPS_SQS_QUEUES_WORKLOADCALCULATIONQUEUE_DLQ_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_WORKLOADCALCULATIONQUEUE_DLQ_NAME: "sqs_queue_name"
@@ -100,11 +100,11 @@ generic-service:
       HMPPS_SQS_QUEUES_HMPPSEXTRACTPLACEDQUEUE_DLQ_ACCESS_KEY_ID: "access_key_id"
       HMPPS_SQS_QUEUES_HMPPSEXTRACTPLACEDQUEUE_DLQ_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_HMPPSEXTRACTPLACEDQUEUE_DLQ_NAME: "sqs_queue_name"
-    hmpps-workload-prisoner-sqs-instance-output:
+    sqs-prisoner-events-secret:
       HMPPS_SQS_QUEUES_WORKLOADPRISONERQUEUE_QUEUE_ACCESS_KEY_ID: "access_key_id"
       HMPPS_SQS_QUEUES_WORKLOADPRISONERQUEUE_QUEUE_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_WORKLOADPRISONERQUEUE_QUEUE_NAME: "sqs_queue_name"
-    hmpps-workload-prisoner-sqs-dl-instance-output:
+    sqs-prisoner-events-dl-secret:
       HMPPS_SQS_QUEUES_WORKLOADPRISONERQUEUE_DLQ_ACCESS_KEY_ID: "access_key_id"
       HMPPS_SQS_QUEUES_WORKLOADPRISONERQUEUE_DLQ_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_WORKLOADPRISONERQUEUE_DLQ_NAME: "sqs_queue_name"
