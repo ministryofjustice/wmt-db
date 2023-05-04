@@ -475,7 +475,7 @@ abstract class IntegrationTestBase {
               .queueUrl(allocationCompleteUrl)
               .receiptHandle(it.receiptHandle())
               .build(),
-          )
+          ).get()
           val sqsMessage = objectMapper.readValue(it.body(), SQSMessage::class.java)
           val personAllocationMessageType = object : TypeReference<HmppsMessage<HmppsAllocationMessage>>() {}
           objectMapper.readValue(sqsMessage.Message, personAllocationMessageType)
