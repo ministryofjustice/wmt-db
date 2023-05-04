@@ -1,12 +1,12 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.listener
 
-import com.amazonaws.services.sns.model.MessageAttributeValue
-import com.amazonaws.services.sns.model.PublishRequest
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import software.amazon.awssdk.services.sns.model.MessageAttributeValue
+import software.amazon.awssdk.services.sns.model.PublishRequest
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
@@ -24,10 +24,10 @@ class TierCalculationEventListenerTest : IntegrationTestBase() {
     workforceAllocationsToDelius.personResponseByCrn(crn)
     hmppsTier.tierCalculationResponse(crn)
     hmppsDomainSnsClient.publish(
-      PublishRequest(hmppsDomainTopicArn, objectMapper.writeValueAsString(tierCalculationEvent(crn)))
-        .withMessageAttributes(
-          mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("TIER_CALCULATION_COMPLETE")),
-        ),
+      PublishRequest.builder().topicArn(hmppsDomainTopicArn).message(objectMapper.writeValueAsString(tierCalculationEvent(crn)))
+        .messageAttributes(
+          mapOf("eventType" to MessageAttributeValue.builder().dataType("String").stringValue("TIER_CALCULATION_COMPLETE").build()),
+        ).build(),
     )
 
     await untilCallTo {

@@ -1,12 +1,12 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.listener
 
-import com.amazonaws.services.sns.model.MessageAttributeValue
-import com.amazonaws.services.sns.model.PublishRequest
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import software.amazon.awssdk.services.sns.model.MessageAttributeValue
+import software.amazon.awssdk.services.sns.model.PublishRequest
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
@@ -23,9 +23,9 @@ class OffenderDetailsEventListenerTests : IntegrationTestBase() {
     hmppsTier.tierCalculationResponse(crn)
 
     hmppsOffenderSnsClient.publish(
-      PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("OFFENDER_DETAILS_CHANGED")),
-      ),
+      PublishRequest.builder().topicArn(hmppsOffenderTopicArn).message(jsonString(offenderEvent(crn))).messageAttributes(
+        mapOf("eventType" to MessageAttributeValue.builder().dataType("String").stringValue("OFFENDER_DETAILS_CHANGED").build()),
+      ).build(),
     )
 
     await untilCallTo {

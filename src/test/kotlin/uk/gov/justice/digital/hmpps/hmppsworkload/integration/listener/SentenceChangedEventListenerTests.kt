@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.listener
 
-import com.amazonaws.services.sns.model.MessageAttributeValue
-import com.amazonaws.services.sns.model.PublishRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
@@ -11,6 +9,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 import org.springframework.data.repository.findByIdOrNull
+import software.amazon.awssdk.services.sns.model.MessageAttributeValue
+import software.amazon.awssdk.services.sns.model.PublishRequest
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
@@ -31,11 +31,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     val crn = "J678910"
     workforceAllocationsToDelius.personResponseByCrn(crn, caseType = CaseType.UNKNOWN)
     hmppsTier.tierCalculationResponse(crn)
-    hmppsOffenderSnsClient.publish(
-      PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED")),
-      ),
-    )
+    placeSentenceChangedEventOnOffenderTopic(crn)
 
     noMessagesOnOffenderEventsQueue()
     noMessagesOnOffenderEventsDLQ()
@@ -44,16 +40,23 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     assertEquals(0, caseCount)
   }
 
+  private fun placeSentenceChangedEventOnOffenderTopic(crn: String) {
+    hmppsOffenderSnsClient.publish(
+      PublishRequest.builder().topicArn(hmppsOffenderTopicArn).message(jsonString(offenderEvent(crn)))
+        .messageAttributes(
+          mapOf(
+            "eventType" to MessageAttributeValue.builder().dataType("String").stringValue("SENTENCE_CHANGED").build(),
+          ),
+        ).build(),
+    )
+  }
+
   @Test
   fun `do not write case details if there is no tier`() {
     val crn = "J678910"
     workforceAllocationsToDelius.personResponseByCrn(crn)
     hmppsTier.tierCalculationNotFoundResponse(crn)
-    hmppsOffenderSnsClient.publish(
-      PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED")),
-      ),
-    )
+    placeSentenceChangedEventOnOffenderTopic(crn)
 
     noMessagesOnOffenderEventsQueue()
     noMessagesOnOffenderEventsDLQ()
@@ -72,11 +75,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     workforceAllocationsToDelius.personResponseByCrn(crn)
     personManagerRepository.save(PersonManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", isActive = true))
 
-    hmppsOffenderSnsClient.publish(
-      PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED")),
-      ),
-    )
+    placeSentenceChangedEventOnOffenderTopic(crn)
 
     await untilCallTo {
       caseDetailsRepository.count()
@@ -105,13 +104,8 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
 
     personManagerRepository.save(PersonManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", isActive = true))
 
-    val sentenceChangedEvent =
-      PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED")),
-      )
-
-    hmppsOffenderSnsClient.publish(sentenceChangedEvent)
-    hmppsOffenderSnsClient.publish(sentenceChangedEvent)
+    placeSentenceChangedEventOnOffenderTopic(crn)
+    placeSentenceChangedEventOnOffenderTopic(crn)
 
     noMessagesOnOffenderEventsQueue()
 
@@ -128,12 +122,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     val crn = "J678910"
     workforceAllocationsToDelius.personResponseByCrn(crn)
 
-    val sentenceChangedEvent =
-      PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED")),
-      )
-
-    hmppsOffenderSnsClient.publish(sentenceChangedEvent)
+    placeSentenceChangedEventOnOffenderTopic(crn)
 
     noMessagesOnOffenderEventsQueue()
     noMessagesOnOffenderEventsDLQ()
@@ -171,12 +160,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
 
     workforceAllocationsToDelius.personResponseByCrn(crn)
 
-    val sentenceChangedEvent =
-      PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED")),
-      )
-
-    hmppsOffenderSnsClient.publish(sentenceChangedEvent)
+    placeSentenceChangedEventOnOffenderTopic(crn)
 
     noMessagesOnOffenderEventsQueue()
     noMessagesOnOffenderEventsDLQ()
@@ -202,11 +186,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     personManagerRepository.save(PersonManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", isActive = true))
     caseDetailsRepository.save(caseDetailsEntity)
 
-    hmppsOffenderSnsClient.publish(
-      PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED")),
-      ),
-    )
+    placeSentenceChangedEventOnOffenderTopic(crn)
 
     noMessagesOnOffenderEventsQueue()
 
@@ -230,11 +210,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
     workforceAllocationsToDelius.officerViewResponse(staffCode)
     personManagerRepository.save(PersonManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", isActive = true))
 
-    hmppsOffenderSnsClient.publish(
-      PublishRequest(hmppsOffenderTopicArn, jsonString(offenderEvent(crn))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("SENTENCE_CHANGED")),
-      ),
-    )
+    placeSentenceChangedEventOnOffenderTopic(crn)
 
     noMessagesOnOffenderEventsQueue()
 

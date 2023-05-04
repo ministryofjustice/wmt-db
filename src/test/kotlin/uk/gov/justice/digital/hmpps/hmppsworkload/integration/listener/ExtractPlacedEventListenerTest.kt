@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.listener
 
-import com.amazonaws.services.sqs.model.SendMessageRequest
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
@@ -8,6 +7,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.data.repository.findByIdOrNull
+import software.amazon.awssdk.services.sqs.model.SendMessageRequest
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.domain.WMTStaff
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.jpa.entity.ReductionCategoryEntity
@@ -37,10 +37,16 @@ class ExtractPlacedEventListenerTest : IntegrationTestBase() {
 
   @Test
   fun `must listen to extract placed event`() {
-    hmppsExtractPlacedClient.sendMessage(SendMessageRequest(hmppsExtractPlacedQueue.queueUrl, "{}"))
+    placeMessageOnExtractQueue()
 
     noMessagesOnExtractPlacedQueue()
     noMessagesOnExtractPlacedDLQ()
+  }
+
+  private fun placeMessageOnExtractQueue() {
+    hmppsExtractPlacedClient.sendMessage(
+      SendMessageRequest.builder().queueUrl(hmppsExtractPlacedQueue.queueUrl).messageBody("{}").build(),
+    )
   }
 
   @Test
@@ -49,7 +55,7 @@ class ExtractPlacedEventListenerTest : IntegrationTestBase() {
     val activeReduction = reductionsRepository.save(ReductionEntity(workloadOwner = wmtStaff.wmtWorkloadOwnerEntity, hours = BigDecimal.valueOf(5), effectiveFrom = ZonedDateTime.now().minusDays(7), effectiveTo = ZonedDateTime.now().plusDays(7), status = ReductionStatus.ACTIVE, reductionReasonId = reductionReason.id!!))
     val deletedReductionInPast = reductionsRepository.save(ReductionEntity(workloadOwner = wmtStaff.wmtWorkloadOwnerEntity, hours = BigDecimal.valueOf(3.2), effectiveFrom = ZonedDateTime.now().minusDays(7), effectiveTo = ZonedDateTime.now().minusDays(1), status = ReductionStatus.DELETED, reductionReasonId = reductionReason.id!!))
 
-    hmppsExtractPlacedClient.sendMessage(SendMessageRequest(hmppsExtractPlacedQueue.queueUrl, "{}"))
+    placeMessageOnExtractQueue()
 
     noMessagesOnExtractPlacedQueue()
     Assertions.assertEquals(ReductionStatus.ARCHIVED, reductionsRepository.findByIdOrNull(activeReductionWhichIsNowArchived.id!!)?.status)
@@ -61,7 +67,7 @@ class ExtractPlacedEventListenerTest : IntegrationTestBase() {
   @Test
   fun `can update incorrect Scheduled reduction to be Active`() {
     val scheduledReductionWhichIsNowActive = reductionsRepository.save(ReductionEntity(workloadOwner = wmtStaff.wmtWorkloadOwnerEntity, hours = BigDecimal.valueOf(3.2), effectiveFrom = ZonedDateTime.now().minusDays(1), effectiveTo = ZonedDateTime.now().plusDays(1), status = ReductionStatus.SCHEDULED, reductionReasonId = reductionReason.id!!))
-    hmppsExtractPlacedClient.sendMessage(SendMessageRequest(hmppsExtractPlacedQueue.queueUrl, "{}"))
+    placeMessageOnExtractQueue()
     noMessagesOnExtractPlacedQueue()
     Assertions.assertEquals(ReductionStatus.ACTIVE, reductionsRepository.findByIdOrNull(scheduledReductionWhichIsNowActive.id!!)?.status)
   }
@@ -69,7 +75,7 @@ class ExtractPlacedEventListenerTest : IntegrationTestBase() {
   @Test
   fun `do nothing when reduction status is correct`() {
     val activeReduction = reductionsRepository.save(ReductionEntity(workloadOwner = wmtStaff.wmtWorkloadOwnerEntity, hours = BigDecimal.valueOf(3.2), effectiveFrom = ZonedDateTime.now().minusDays(1), effectiveTo = ZonedDateTime.now().plusDays(1), status = ReductionStatus.ACTIVE, reductionReasonId = reductionReason.id!!))
-    hmppsExtractPlacedClient.sendMessage(SendMessageRequest(hmppsExtractPlacedQueue.queueUrl, "{}"))
+    placeMessageOnExtractQueue()
     noMessagesOnExtractPlacedQueue()
     Assertions.assertEquals(ReductionStatus.ACTIVE, reductionsRepository.findByIdOrNull(activeReduction.id!!)?.status)
   }
@@ -77,7 +83,7 @@ class ExtractPlacedEventListenerTest : IntegrationTestBase() {
   @Test
   fun `can publish out of date reductions when updating reduction status`() {
     reductionsRepository.save(ReductionEntity(workloadOwner = wmtStaff.wmtWorkloadOwnerEntity, hours = BigDecimal.valueOf(3.2), effectiveFrom = ZonedDateTime.now().minusDays(1), effectiveTo = ZonedDateTime.now().plusDays(1), status = ReductionStatus.SCHEDULED, reductionReasonId = reductionReason.id!!))
-    hmppsExtractPlacedClient.sendMessage(SendMessageRequest(hmppsExtractPlacedQueue.queueUrl, "{}"))
+    placeMessageOnExtractQueue()
     noMessagesOnExtractPlacedQueue()
     await untilCallTo { verifyReductionsCompletedOnQueue() } matches { it == true }
   }
@@ -85,7 +91,7 @@ class ExtractPlacedEventListenerTest : IntegrationTestBase() {
   @Test
   fun `out of date reductions message contain required data`() {
     reductionsRepository.save(ReductionEntity(workloadOwner = wmtStaff.wmtWorkloadOwnerEntity, hours = BigDecimal.valueOf(3.2), effectiveFrom = ZonedDateTime.now().minusDays(1), effectiveTo = ZonedDateTime.now().plusDays(1), status = ReductionStatus.SCHEDULED, reductionReasonId = reductionReason.id!!))
-    hmppsExtractPlacedClient.sendMessage(SendMessageRequest(hmppsExtractPlacedQueue.queueUrl, "{}"))
+    placeMessageOnExtractQueue()
     noMessagesOnExtractPlacedQueue()
     await untilCallTo { verifyReductionsCompletedOnQueue() } matches { it == true }
 
@@ -97,7 +103,7 @@ class ExtractPlacedEventListenerTest : IntegrationTestBase() {
     reductionsRepository.save(ReductionEntity(workloadOwner = wmtStaff.wmtWorkloadOwnerEntity, hours = BigDecimal.valueOf(3.2), effectiveFrom = ZonedDateTime.now().minusDays(1), effectiveTo = ZonedDateTime.now().plusDays(1), status = ReductionStatus.SCHEDULED, reductionReasonId = reductionReason.id!!))
     reductionsRepository.save(ReductionEntity(workloadOwner = wmtStaff.wmtWorkloadOwnerEntity, hours = BigDecimal.valueOf(3.2), effectiveFrom = ZonedDateTime.now().minusDays(2), effectiveTo = ZonedDateTime.now().minusDays(1), status = ReductionStatus.ACTIVE, reductionReasonId = reductionReason.id!!))
 
-    hmppsExtractPlacedClient.sendMessage(SendMessageRequest(hmppsExtractPlacedQueue.queueUrl, "{}"))
+    placeMessageOnExtractQueue()
     noMessagesOnExtractPlacedQueue()
     noMessagesOnExtractPlacedDLQ()
     noMessagesOnWorkloadCalculationEventsQueue()
@@ -125,7 +131,7 @@ class ExtractPlacedEventListenerTest : IntegrationTestBase() {
         reductionReasonId = reductionReason.id!!,
       ),
     )
-    hmppsExtractPlacedClient.sendMessage(SendMessageRequest(hmppsExtractPlacedQueue.queueUrl, "{}"))
+    placeMessageOnExtractQueue()
     noMessagesOnExtractPlacedQueue()
     await untilCallTo { verifyReductionsCompletedOnQueue() } matches { it == true }
 

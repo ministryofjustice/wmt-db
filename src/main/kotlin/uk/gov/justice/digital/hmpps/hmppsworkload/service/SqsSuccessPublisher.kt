@@ -1,8 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
-import com.amazonaws.services.sns.model.MessageAttributeValue
-import com.amazonaws.services.sns.model.PublishRequest
-import com.amazonaws.services.sqs.model.SendMessageRequest
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -10,6 +7,9 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import org.springframework.web.util.UriComponentsBuilder
+import software.amazon.awssdk.services.sns.model.MessageAttributeValue
+import software.amazon.awssdk.services.sns.model.PublishRequest
+import software.amazon.awssdk.services.sqs.model.SendMessageRequest
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsAllocationMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.HmppsMessage
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
@@ -68,8 +68,12 @@ class SqsSuccessPublisher(
       PersonReference(listOf(PersonReferenceType("CRN", crn))),
     )
     domainTopic.snsClient.publish(
-      PublishRequest(domainTopic.arn, objectMapper.writeValueAsString(hmppsPersonEvent))
-        .withMessageAttributes(mapOf(EVENT_TYPE to MessageAttributeValue().withDataType(STRING).withStringValue(hmppsPersonEvent.eventType))),
+      PublishRequest.builder()
+        .topicArn(domainTopic.arn)
+        .message(objectMapper.writeValueAsString(hmppsPersonEvent))
+        .messageAttributes(
+          mapOf(EVENT_TYPE to MessageAttributeValue.builder().dataType(STRING).stringValue(hmppsPersonEvent.eventType).build()),
+        ).build(),
     ).also {
       log.info(LOG_TEMPLATE, hmppsPersonEvent.eventType, crn, allocationId)
     }
@@ -90,8 +94,12 @@ class SqsSuccessPublisher(
       PersonReference(listOf(PersonReferenceType("CRN", crn))),
     )
     domainTopic.snsClient.publish(
-      PublishRequest(domainTopic.arn, objectMapper.writeValueAsString(hmppsEventAllocatedEvent))
-        .withMessageAttributes(mapOf(EVENT_TYPE to MessageAttributeValue().withDataType(STRING).withStringValue(hmppsEventAllocatedEvent.eventType))),
+      PublishRequest.builder()
+        .topicArn(domainTopic.arn)
+        .message(objectMapper.writeValueAsString(hmppsEventAllocatedEvent))
+        .messageAttributes(
+          mapOf(EVENT_TYPE to MessageAttributeValue.builder().dataType(STRING).stringValue(hmppsEventAllocatedEvent.eventType).build()),
+        ).build(),
     ).also {
       log.info(LOG_TEMPLATE, hmppsEventAllocatedEvent.eventType, crn, allocationId)
     }
@@ -110,20 +118,26 @@ class SqsSuccessPublisher(
       PersonReference(listOf(PersonReferenceType("CRN", crn))),
     )
     domainTopic.snsClient.publish(
-      PublishRequest(domainTopic.arn, objectMapper.writeValueAsString(hmppsRequirementAllocatedEvent))
-        .withMessageAttributes(mapOf(EVENT_TYPE to MessageAttributeValue().withDataType(STRING).withStringValue(hmppsRequirementAllocatedEvent.eventType))),
+      PublishRequest.builder()
+        .topicArn(domainTopic.arn)
+        .message(objectMapper.writeValueAsString(hmppsRequirementAllocatedEvent))
+        .messageAttributes(
+          mapOf(EVENT_TYPE to MessageAttributeValue.builder().dataType(STRING).stringValue(hmppsRequirementAllocatedEvent.eventType).build()),
+        ).build(),
     ).also {
       log.info(LOG_TEMPLATE, hmppsRequirementAllocatedEvent.eventType, crn, allocationId)
     }
   }
 
   fun outOfDateReductionsProcessed() {
-    val sendMessage = SendMessageRequest(
-      hmppsReductionsCompletedQueue.queueUrl,
-      getReductionChangeMessage(),
-    ).withMessageAttributes(
-      mapOf("eventType" to com.amazonaws.services.sqs.model.MessageAttributeValue().withDataType("String").withStringValue("OUT_OF_DATE_REDUCTIONS")),
-    )
+    val sendMessage =
+      SendMessageRequest.builder()
+        .queueUrl(hmppsReductionsCompletedQueue.queueUrl)
+        .messageBody(getReductionChangeMessage())
+        .messageAttributes(
+          mapOf(EVENT_TYPE to software.amazon.awssdk.services.sqs.model.MessageAttributeValue.builder().dataType(STRING).stringValue("OUT_OF_DATE_REDUCTIONS").build()),
+        ).build()
+
     log.info("publishing event type OUT_OF_DATE_REDUCTIONS")
     hmppsReductionsCompletedQueue.sqsClient.sendMessage(sendMessage)
   }
@@ -140,12 +154,15 @@ class SqsSuccessPublisher(
       requirementIds,
     )
 
-    val sendMessage = SendMessageRequest(
-      hmppsAuditQueue.queueUrl,
-      objectMapper.writeValueAsString(
-        AuditMessage(operationId = UUID.randomUUID().toString(), who = loggedInUser, details = objectMapper.writeValueAsString(auditData)),
-      ),
-    )
+    val sendMessage = SendMessageRequest.builder()
+      .queueUrl(hmppsAuditQueue.queueUrl)
+      .messageBody(
+        objectMapper.writeValueAsString(
+          AuditMessage(operationId = UUID.randomUUID().toString(), who = loggedInUser, details = objectMapper.writeValueAsString(auditData)),
+        ),
+      )
+      .build()
+
     hmppsAuditQueue.sqsClient.sendMessage(sendMessage)
   }
   fun auditReduction(reductionEntity: ReductionEntity, reductionStatus: String) {
@@ -154,12 +171,14 @@ class SqsSuccessPublisher(
       reductionEntity.id!!,
     )
 
-    val sendMessage = SendMessageRequest(
-      hmppsAuditQueue.queueUrl,
-      objectMapper.writeValueAsString(
-        AuditMessage(operationId = UUID.randomUUID().toString(), who = "system_user", details = objectMapper.writeValueAsString(reductionsAuditData), what = reductionStatus),
-      ),
-    )
+    val sendMessage = SendMessageRequest.builder()
+      .queueUrl(hmppsAuditQueue.queueUrl)
+      .messageBody(
+        objectMapper.writeValueAsString(
+          AuditMessage(operationId = UUID.randomUUID().toString(), who = "system_user", details = objectMapper.writeValueAsString(reductionsAuditData), what = reductionStatus),
+        ),
+      )
+      .build()
     hmppsAuditQueue.sqsClient.sendMessage(sendMessage)
   }
   fun staffAvailableHoursChange(staffCode: String, teamCode: String, availableHours: BigDecimal) {
@@ -175,8 +194,15 @@ class SqsSuccessPublisher(
       PersonReference(listOf(PersonReferenceType("staffCode", staffCode), PersonReferenceType("teamCode", teamCode))),
     )
     domainTopic.snsClient.publish(
-      PublishRequest(domainTopic.arn, objectMapper.writeValueAsString(staffAvailableHoursChangeMessage))
-        .withMessageAttributes(mapOf(EVENT_TYPE to MessageAttributeValue().withDataType(STRING).withStringValue(staffAvailableHoursChangeMessage.eventType))),
+      PublishRequest.builder()
+        .topicArn(domainTopic.arn)
+        .message(objectMapper.writeValueAsString(staffAvailableHoursChangeMessage))
+        .messageAttributes(
+          mapOf(
+            EVENT_TYPE to MessageAttributeValue.builder().dataType(STRING).stringValue(staffAvailableHoursChangeMessage.eventType).build(),
+          ),
+        )
+        .build(),
     ).also {
       log.info("staff available hours changed message for {} in team {}", staffCode, teamCode)
     }

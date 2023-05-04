@@ -1,21 +1,17 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity
 
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType
-import com.vladmihalcea.hibernate.type.json.JsonStringType
+import com.vladmihalcea.hibernate.type.json.JsonType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import org.hibernate.annotations.Type
 import java.math.BigInteger
 import java.time.ZonedDateTime
 
 @Entity
-@TypeDefs(
-  TypeDef(name = "json", typeClass = JsonStringType::class),
-  TypeDef(name = "jsonb", typeClass = JsonBinaryType::class),
-)
 @Table(name = "workload_calculation")
 data class WorkloadCalculationEntity(
   @Id
@@ -38,7 +34,7 @@ data class WorkloadCalculationEntity(
   @Column
   val teamCode: String,
 
-  @Type(type = "jsonb")
+  @Type(JsonType::class)
   @Column(columnDefinition = "jsonb")
   val breakdownData: BreakdownDataEntity,
 
