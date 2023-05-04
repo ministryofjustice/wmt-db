@@ -1,11 +1,11 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.listener
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.awspring.cloud.sqs.annotation.SqsListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.future
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.jms.annotation.JmsListener
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToDeliusApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
@@ -20,7 +20,7 @@ class WorkloadCalculationEventListener(
   @Qualifier("workforceAllocationsToDeliusApiClient") private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient,
 ) {
 
-  @JmsListener(destination = "workloadcalculationqueue", containerFactory = "hmppsQueueContainerFactoryProxy")
+  @SqsListener("workloadcalculationqueue", factory = "hmppsQueueContainerFactoryProxy")
   fun processMessage(rawMessage: String) {
     val workloadCalculationEvent = getWorkloadCalculationEvent(rawMessage)
     val availableHours = workloadCalculationEvent.additionalInformation.availableHours

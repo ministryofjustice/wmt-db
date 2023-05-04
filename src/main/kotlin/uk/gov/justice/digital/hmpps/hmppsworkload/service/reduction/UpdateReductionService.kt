@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service.reduction
 
+import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.OutOfDateReductions
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.ReductionStatus
@@ -8,7 +9,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.ReductionsRepos
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.SqsSuccessPublisher
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.staff.RequestStaffCalculationService
 import java.time.ZonedDateTime
-import javax.transaction.Transactional
 
 @Service
 class UpdateReductionService(

@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.8.6"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.1.3"
   kotlin("plugin.spring") version "1.8.21"
   kotlin("plugin.jpa") version "1.8.21"
   id("io.gitlab.arturbosch.detekt").version("1.22.0")
@@ -22,13 +22,16 @@ allOpen {
   annotations("javax.persistence.Entity")
 }
 
+repositories {
+  maven { url = uri("https://repo.spring.io/milestone") }
+  mavenCentral()
+}
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:1.2.0")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:2.0.0")
 
-  implementation("org.springdoc:springdoc-openapi-webflux-ui:1.7.0")
-  implementation("org.springdoc:springdoc-openapi-kotlin:1.7.0")
+  implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.2")
 
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
@@ -44,13 +47,14 @@ dependencies {
   agentDeps("com.microsoft.azure:applicationinsights-agent:3.4.12")
 
   implementation("uk.gov.service.notify:notifications-java-client:3.19.1-RELEASE")
-  implementation("com.vladmihalcea:hibernate-types-52:2.21.1")
+  implementation("com.vladmihalcea:hibernate-types-60:2.21.1")
 
   runtimeOnly("com.zaxxer:HikariCP")
   runtimeOnly("org.flywaydb:flyway-core")
   runtimeOnly("org.postgresql:postgresql:42.6.0")
 
-  testImplementation("io.jsonwebtoken:jjwt:0.9.1")
+  testImplementation("io.jsonwebtoken:jjwt-impl:0.11.5")
+  testImplementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
   testImplementation("org.mock-server:mockserver-netty:5.15.0")
   testImplementation("org.awaitility:awaitility-kotlin:4.2.0")
   testImplementation("io.mockk:mockk:1.13.5")
@@ -76,9 +80,6 @@ tasks {
 
 tasks.named<JavaExec>("bootRun") {
   systemProperty("spring.profiles.active", "dev,docker")
-}
-repositories {
-  mavenCentral()
 }
 
 detekt {

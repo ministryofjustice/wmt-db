@@ -1,18 +1,18 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity
 
+import jakarta.persistence.Column
+import jakarta.persistence.ColumnResult
+import jakarta.persistence.ConstructorResult
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.NamedNativeQuery
+import jakarta.persistence.SqlResultSetMapping
+import jakarta.persistence.Table
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerCaseloadTotals
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OverviewOffenderManager
 import java.time.LocalDateTime
-import javax.persistence.Column
-import javax.persistence.ColumnResult
-import javax.persistence.ConstructorResult
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
-import javax.persistence.NamedNativeQuery
-import javax.persistence.SqlResultSetMapping
-import javax.persistence.Table
 
 @SqlResultSetMapping(
   name = "OffenderManagerOverviewResult",

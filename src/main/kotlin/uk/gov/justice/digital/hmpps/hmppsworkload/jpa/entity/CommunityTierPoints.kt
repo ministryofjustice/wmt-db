@@ -1,9 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity
 
+import jakarta.persistence.Column
+import jakarta.persistence.Embeddable
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import java.math.BigInteger
-import javax.persistence.Column
-import javax.persistence.Embeddable
 
 @Embeddable
 data class CommunityTierPoints(
