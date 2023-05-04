@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -246,7 +245,7 @@ abstract class IntegrationTestBase {
   protected lateinit var eventManagerAuditRepository: EventManagerAuditRepository
 
   @BeforeEach
-  fun setupDependentServices() = runBlocking {
+  fun setupDependentServices() {
     personManagerRepository.deleteAll()
     eventManagerAuditRepository.deleteAll()
     eventManagerRepository.deleteAll()
@@ -256,21 +255,23 @@ abstract class IntegrationTestBase {
     wmtcmsRepository.deleteAll()
     reductionsRepository.deleteAll()
     adjustmentReasonRepository.deleteAll()
-    allocationCompleteSqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsAllocationCompleteQueue.queueUrl).build())
-    allocationCompleteSqsDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsAllocationCompleteQueue.dlqUrl!!).build())
-    hmppsOffenderSqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsOffenderQueue.queueUrl).build())
-    hmppsOffenderSqsDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsOffenderQueue.dlqUrl!!).build())
-    workloadCalculationSqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(workloadCalculationQueue.queueUrl).build())
-    workloadCalculationSqsDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(workloadCalculationQueue.dlqUrl!!).build())
-    workloadPrisonerSqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(workloadPrisonerQueue.queueUrl).build())
-    workloadPrisonerSqsDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(workloadPrisonerQueue.dlqUrl!!).build())
-    hmppsExtractPlacedClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsExtractPlacedQueue.queueUrl).build())
-    hmppsExtractPlacedDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsExtractPlacedQueue.dlqUrl!!).build())
-    hmppsReductionsCompletedClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsReductionsCompletedQueue.queueUrl).build())
-    hmppsAuditQueueClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsAuditQueue.queueUrl).build())
+    allocationCompleteSqsClient.purgeQueue(
+      PurgeQueueRequest.builder().queueUrl(hmppsAllocationCompleteQueue.queueUrl).build(),
+    ).get()
+    allocationCompleteSqsDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsAllocationCompleteQueue.dlqUrl!!).build()).get()
+    hmppsOffenderSqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsOffenderQueue.queueUrl).build()).get()
+    hmppsOffenderSqsDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsOffenderQueue.dlqUrl!!).build()).get()
+    workloadCalculationSqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(workloadCalculationQueue.queueUrl).build()).get()
+    workloadCalculationSqsDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(workloadCalculationQueue.dlqUrl!!).build()).get()
+    workloadPrisonerSqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(workloadPrisonerQueue.queueUrl).build()).get()
+    workloadPrisonerSqsDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(workloadPrisonerQueue.dlqUrl!!).build()).get()
+    hmppsExtractPlacedClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsExtractPlacedQueue.queueUrl).build()).get()
+    hmppsExtractPlacedDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsExtractPlacedQueue.dlqUrl!!).build()).get()
+    hmppsReductionsCompletedClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsReductionsCompletedQueue.queueUrl).build()).get()
+    hmppsAuditQueueClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsAuditQueue.queueUrl).build()).get()
 
-    tierCalculationSqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(tierCalculationQueue.queueUrl).build())
-    tierCalculationSqsDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(tierCalculationQueue.dlqUrl!!).build())
+    tierCalculationSqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(tierCalculationQueue.queueUrl).build()).get()
+    tierCalculationSqsDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(tierCalculationQueue.dlqUrl!!).build()).get()
 
     workloadCalculationRepository.deleteAll()
     clearWMT()

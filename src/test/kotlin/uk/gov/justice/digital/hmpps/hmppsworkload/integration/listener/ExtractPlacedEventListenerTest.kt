@@ -46,7 +46,7 @@ class ExtractPlacedEventListenerTest : IntegrationTestBase() {
   private fun placeMessageOnExtractQueue() {
     hmppsExtractPlacedClient.sendMessage(
       SendMessageRequest.builder().queueUrl(hmppsExtractPlacedQueue.queueUrl).messageBody("{}").build(),
-    )
+    ).get()
   }
 
   @Test

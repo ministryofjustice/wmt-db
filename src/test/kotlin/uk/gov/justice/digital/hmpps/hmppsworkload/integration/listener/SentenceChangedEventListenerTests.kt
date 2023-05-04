@@ -48,7 +48,7 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
             "eventType" to MessageAttributeValue.builder().dataType("String").stringValue("SENTENCE_CHANGED").build(),
           ),
         ).build(),
-    )
+    ).get()
   }
 
   @Test
