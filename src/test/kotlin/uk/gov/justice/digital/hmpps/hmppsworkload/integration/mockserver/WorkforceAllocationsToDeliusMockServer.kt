@@ -190,7 +190,7 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
   }
 
   fun allocationDetailsResponse(allocationDetails: List<AllocationDetailIntegration>) {
-    val request = HttpRequest.request().withPath("/allocation/details").withMethod(HttpMethod.POST.name)
+    val request = HttpRequest.request().withPath("/allocation/details").withMethod(HttpMethod.POST.name())
 
     workforceAllocationsToDelius.`when`(request, Times.exactly(1)).respond(
       HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.allocationDetailsResponse(allocationDetails)),

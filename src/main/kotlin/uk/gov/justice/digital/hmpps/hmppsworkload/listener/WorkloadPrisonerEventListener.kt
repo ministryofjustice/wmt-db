@@ -1,10 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.listener
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.awspring.cloud.sqs.annotation.SqsListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.future
-import org.springframework.jms.annotation.JmsListener
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.SaveCaseDetailsService
@@ -15,7 +15,7 @@ class WorkloadPrisonerEventListener(
   private val saveCaseDetailsService: SaveCaseDetailsService,
 ) {
 
-  @JmsListener(destination = "workloadprisonerqueue", containerFactory = "hmppsQueueContainerFactoryProxy")
+  @SqsListener("workloadprisonerqueue", factory = "hmppsQueueContainerFactoryProxy")
   fun processMessage(rawMessage: String) {
     val nomsNumber = getNomsNumber(rawMessage)
     CoroutineScope(Dispatchers.Default).future {

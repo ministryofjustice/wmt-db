@@ -1,9 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.listener
 
-import com.amazonaws.services.sns.model.MessageAttributeValue
-import com.amazonaws.services.sns.model.PublishRequest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import software.amazon.awssdk.services.sns.model.MessageAttributeValue
+import software.amazon.awssdk.services.sns.model.PublishRequest
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
@@ -36,11 +36,7 @@ class WorkloadPrisonerListenerTests : IntegrationTestBase() {
 
     personManagerRepository.save(PersonManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, createdBy = "createdby", isActive = true))
 
-    hmppsDomainSnsClient.publish(
-      PublishRequest(hmppsDomainTopicArn, jsonString(prisonerEvent(nomsNumber))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("prison-offender-events.prisoner.released")),
-      ),
-    )
+    placePrisonerReleasedMessageOnDomainTopic(nomsNumber)
 
     noMessagesOnWorkloadPrisonerQueue()
     noMessagesOnWorkloadPrisonerDLQ()
@@ -56,16 +52,24 @@ class WorkloadPrisonerListenerTests : IntegrationTestBase() {
     )
   }
 
+  private fun placePrisonerReleasedMessageOnDomainTopic(nomsNumber: String) {
+    hmppsDomainSnsClient.publish(
+      PublishRequest.builder().topicArn(hmppsDomainTopicArn).message(jsonString(prisonerEvent(nomsNumber)))
+        .messageAttributes(
+          mapOf(
+            "eventType" to MessageAttributeValue.builder().dataType("String")
+              .stringValue("prison-offender-events.prisoner.released").build(),
+          ),
+        ).build(),
+    )
+  }
+
   @Test
   fun `process prisoner who is unknown to workload`() {
     val crn = "J678910"
     val nomsNumber = "X1111XX"
     workforceAllocationsToDelius.personResponseByNoms(nomsNumber, crn)
-    hmppsDomainSnsClient.publish(
-      PublishRequest(hmppsDomainTopicArn, jsonString(prisonerEvent(nomsNumber))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("prison-offender-events.prisoner.released")),
-      ),
-    )
+    placePrisonerReleasedMessageOnDomainTopic(nomsNumber)
 
     noMessagesOnWorkloadPrisonerQueue()
     noMessagesOnWorkloadPrisonerDLQ()
@@ -75,11 +79,7 @@ class WorkloadPrisonerListenerTests : IntegrationTestBase() {
   fun `process prisoner not in Delius yet`() {
     val nomsNumber = "X1111XX"
     workforceAllocationsToDelius.notFoundPersonResourceResponse(nomsNumber, "NOMS")
-    hmppsDomainSnsClient.publish(
-      PublishRequest(hmppsDomainTopicArn, jsonString(prisonerEvent(nomsNumber))).withMessageAttributes(
-        mapOf("eventType" to MessageAttributeValue().withDataType("String").withStringValue("prison-offender-events.prisoner.released")),
-      ),
-    )
+    placePrisonerReleasedMessageOnDomainTopic(nomsNumber)
 
     noMessagesOnWorkloadPrisonerQueue()
     noMessagesOnWorkloadPrisonerDLQ()
