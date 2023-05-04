@@ -22,10 +22,6 @@ allOpen {
   annotations("javax.persistence.Entity")
 }
 
-repositories {
-  maven { url = uri("https://repo.spring.io/milestone") }
-  mavenCentral()
-}
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -61,6 +57,9 @@ dependencies {
   testImplementation("com.ninja-squad:springmockk:4.0.2")
 
   testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+}
+repositories {
+  mavenCentral()
 }
 
 java {
