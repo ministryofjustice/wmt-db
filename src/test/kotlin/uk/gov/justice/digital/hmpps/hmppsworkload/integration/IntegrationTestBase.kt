@@ -10,14 +10,13 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
-import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest
+import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
@@ -126,9 +125,10 @@ abstract class IntegrationTestBase {
   @Autowired
   protected lateinit var workloadCalculationRepository: WorkloadCalculationRepository
 
-  @Qualifier("hmppsallocationcompletequeue-sqs-client")
-  @Autowired
-  lateinit var allocationCompleteClient: SqsAsyncClient
+  private val hmppsAllocationCompleteQueue by lazy {
+    hmppsQueueService.findByQueueId("hmppsallocationcompletequeue")
+      ?: throw MissingQueueException("HmppsQueue hmppsallocationcompletequeue not found")
+  }
 
   protected val allocationCompleteUrl by lazy {
     hmppsQueueService.findByQueueId("hmppsallocationcompletequeue")?.queueUrl
@@ -146,6 +146,11 @@ abstract class IntegrationTestBase {
   private val offenderEventTopic by lazy {
     hmppsQueueService.findByTopicId("hmppsoffendertopic")
       ?: throw MissingQueueException("HmppsTopic hmppsoffendertopic not found")
+  }
+
+  private val tierCalculationQueue by lazy {
+    hmppsQueueService.findByQueueId("tiercalcqueue")
+      ?: throw MissingQueueException("HmppsQueue tiercalcqueue not found")
   }
 
   private val hmppsAuditQueue by lazy {
@@ -170,6 +175,9 @@ abstract class IntegrationTestBase {
       ?: throw MissingQueueException("HmppsQueue  workloadprisonerqueue not found")
   }
 
+  private val allocationCompleteSqsClient by lazy { hmppsAllocationCompleteQueue.sqsClient }
+  private val allocationCompleteSqsDlqClient by lazy { hmppsAllocationCompleteQueue.sqsDlqClient }
+
   private val hmppsOffenderSqsDlqClient by lazy { hmppsOffenderQueue.sqsDlqClient }
   protected val hmppsOffenderSqsClient by lazy { hmppsOffenderQueue.sqsClient }
 
@@ -178,6 +186,9 @@ abstract class IntegrationTestBase {
 
   protected val hmppsDomainSnsClient by lazy { domainEventsTopic.snsClient }
   protected val hmppsDomainTopicArn by lazy { domainEventsTopic.arn }
+
+  private val tierCalculationSqsDlqClient by lazy { tierCalculationQueue.sqsDlqClient }
+  protected val tierCalculationSqsClient by lazy { tierCalculationQueue.sqsClient }
 
   private val workloadCalculationSqsDlqClient by lazy { workloadCalculationQueue.sqsDlqClient }
   protected val workloadCalculationSqsClient by lazy { workloadCalculationQueue.sqsClient }
@@ -245,20 +256,21 @@ abstract class IntegrationTestBase {
     wmtcmsRepository.deleteAll()
     reductionsRepository.deleteAll()
     adjustmentReasonRepository.deleteAll()
-    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("hmpps_allocation_complete_event_queue")!!)
-    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("hmpps_allocation_complete_event_dlq")!!)
-    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("hmpps_offender_event_queue")!!)
-    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("hmpps_offender_event_dlq")!!)
-    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("tier_calc_event_queue")!!)
-    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("tier_calc_event_dlq")!!)
-    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("workload_calculation_event_queue")!!)
-    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("workload_calculation_event_dlq")!!)
-    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("workload_prisoner_queue")!!)
-    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("workload_prisoner_dlq")!!)
-    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("hmpps_reductions_completed_queue")!!)
-    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("hmpps_extract_placed_queue")!!)
-    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("hmpps_extract_placed_dlq")!!)
-    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("hmpps_workload_audit_queue")!!)
+    allocationCompleteSqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsAllocationCompleteQueue.queueUrl).build())
+    allocationCompleteSqsDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsAllocationCompleteQueue.dlqUrl!!).build())
+    hmppsOffenderSqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsOffenderQueue.queueUrl).build())
+    hmppsOffenderSqsDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsOffenderQueue.dlqUrl!!).build())
+    workloadCalculationSqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(workloadCalculationQueue.queueUrl).build())
+    workloadCalculationSqsDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(workloadCalculationQueue.dlqUrl!!).build())
+    workloadPrisonerSqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(workloadPrisonerQueue.queueUrl).build())
+    workloadPrisonerSqsDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(workloadPrisonerQueue.dlqUrl!!).build())
+    hmppsExtractPlacedClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsExtractPlacedQueue.queueUrl).build())
+    hmppsExtractPlacedDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsExtractPlacedQueue.dlqUrl!!).build())
+    hmppsReductionsCompletedClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsReductionsCompletedQueue.queueUrl).build())
+    hmppsAuditQueueClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsAuditQueue.queueUrl).build())
+
+    tierCalculationSqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(tierCalculationQueue.queueUrl).build())
+    tierCalculationSqsDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(tierCalculationQueue.dlqUrl!!).build())
 
     workloadCalculationRepository.deleteAll()
     clearWMT()
@@ -434,7 +446,7 @@ abstract class IntegrationTestBase {
   protected fun jsonString(any: Any) = objectMapper.writeValueAsString(any) as String
 
   protected fun expectWorkloadAllocationCompleteMessages(crn: String): Map<String, HmppsMessage<HmppsAllocationMessage>> {
-    numberOfMessagesCurrentlyOnQueue(allocationCompleteClient, allocationCompleteUrl, 3)
+    numberOfMessagesCurrentlyOnQueue(allocationCompleteSqsClient, allocationCompleteUrl, 3)
     val changeEvents = getAllAllocationMessages()
     changeEvents.forEach { changeEvent ->
       Assertions.assertEquals(crn, changeEvent.personReference.identifiers.first { it.type == "CRN" }.value)
@@ -453,11 +465,11 @@ abstract class IntegrationTestBase {
 
   private fun getAllAllocationMessages(): List<HmppsMessage<HmppsAllocationMessage>> {
     val messages = ArrayList<HmppsMessage<HmppsAllocationMessage>>()
-    while (getNumberOfMessagesCurrentlyOnQueue(allocationCompleteClient, allocationCompleteUrl) != 0) {
-      val message = allocationCompleteClient.receiveMessage(ReceiveMessageRequest.builder().queueUrl(allocationCompleteUrl).build())
+    while (getNumberOfMessagesCurrentlyOnQueue(allocationCompleteSqsClient, allocationCompleteUrl) != 0) {
+      val message = allocationCompleteSqsClient.receiveMessage(ReceiveMessageRequest.builder().queueUrl(allocationCompleteUrl).build())
       messages.addAll(
         message.get().messages().map {
-          allocationCompleteClient.deleteMessage(
+          allocationCompleteSqsClient.deleteMessage(
             DeleteMessageRequest.builder()
               .queueUrl(allocationCompleteUrl)
               .receiptHandle(it.receiptHandle())

@@ -14,6 +14,7 @@ import jakarta.persistence.SqlResultSetMapping
 import jakarta.persistence.Table
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.TeamOverview
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.WorkloadCaseResult
+import java.math.BigInteger
 
 @SqlResultSetMapping(
   name = "TeamOverviewResult",
@@ -21,12 +22,12 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.WorkloadCaseResult
     ConstructorResult(
       targetClass = TeamOverview::class,
       columns = [
-        ColumnResult(name = "total_community_cases", type = Int::class),
-        ColumnResult(name = "total_filtered_custody_cases", type = Int::class),
-        ColumnResult(name = "available_points"),
-        ColumnResult(name = "total_points"),
-        ColumnResult(name = "key"),
-        ColumnResult(name = "team_code"),
+        ColumnResult(name = "totalCommunityCases", type = Int::class),
+        ColumnResult(name = "totalCustodyCases", type = Int::class),
+        ColumnResult(name = "availablePoints", type = BigInteger::class),
+        ColumnResult(name = "totalPoints", type = BigInteger::class),
+        ColumnResult(name = "staffCode"),
+        ColumnResult(name = "teamCode"),
       ],
     ),
   ],
@@ -35,7 +36,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.WorkloadCaseResult
   name = "TeamEntity.findAllByTeamCodes",
   resultSetMapping = "TeamOverviewResult",
   query = """SELECT
-    (w.total_filtered_community_cases + w.total_filtered_license_cases) as total_community_cases, w.total_filtered_custody_cases , wpc.available_points AS available_points, wpc.total_points AS total_points, om."key", t.code as team_code
+    (w.total_filtered_community_cases + w.total_filtered_license_cases) as totalCommunityCases, w.total_filtered_custody_cases as totalCustodyCases , wpc.available_points AS availablePoints, wpc.total_points AS totalPoints, om."key" as staffCode, t.code as teamCode
     FROM app.workload_owner AS wo
     JOIN app.team AS t
         ON wo.team_id = t.id
