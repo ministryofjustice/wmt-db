@@ -8,8 +8,8 @@ import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 data class OverviewOffenderManager(
-  val totalCommunityCases: Int,
-  val totalCustodyCases: Int,
+  val totalCommunityCases: Long,
+  val totalCustodyCases: Long,
   val availablePoints: BigInteger,
   val totalPoints: BigInteger,
   val code: String,

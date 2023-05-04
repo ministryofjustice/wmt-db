@@ -23,7 +23,7 @@ data class OffenderManagerOverview @JsonCreator constructor(
   @Schema(description = "Offender Manager e-mail address", example = "example.user@test.justice.gov.uk")
   val email: String?,
   @Schema(description = "Probation Practitioner total cases", example = "25")
-  val totalCases: Int,
+  val totalCases: Long,
   @Schema(description = "Probation Practitioner Contracted hours per week", example = "37")
   val weeklyHours: BigDecimal,
   @Schema(description = "Probation Practitioner total Reduction hours per week", example = "10")

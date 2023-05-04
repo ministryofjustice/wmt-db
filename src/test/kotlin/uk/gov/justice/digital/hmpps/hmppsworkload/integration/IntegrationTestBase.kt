@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -234,7 +235,7 @@ abstract class IntegrationTestBase {
   protected lateinit var eventManagerAuditRepository: EventManagerAuditRepository
 
   @BeforeEach
-  fun setupDependentServices() {
+  fun setupDependentServices() = runBlocking {
     personManagerRepository.deleteAll()
     eventManagerAuditRepository.deleteAll()
     eventManagerRepository.deleteAll()
@@ -244,20 +245,20 @@ abstract class IntegrationTestBase {
     wmtcmsRepository.deleteAll()
     reductionsRepository.deleteAll()
     adjustmentReasonRepository.deleteAll()
-    hmppsQueueService.findQueueToPurge("hmpps_allocation_complete_event_queue")
-    hmppsQueueService.findQueueToPurge("hmpps_allocation_complete_event_dlq")
-    hmppsQueueService.findQueueToPurge("hmpps_offender_event_queue")
-    hmppsQueueService.findQueueToPurge("hmpps_offender_event_dlq")
-    hmppsQueueService.findQueueToPurge("tier_calc_event_queue")
-    hmppsQueueService.findQueueToPurge("tier_calc_event_dlq")
-    hmppsQueueService.findQueueToPurge("workload_calculation_event_queue")
-    hmppsQueueService.findQueueToPurge("workload_calculation_event_dlq")
-    hmppsQueueService.findQueueToPurge("workload_prisoner_queue")
-    hmppsQueueService.findQueueToPurge("workload_prisoner_dlq")
-    hmppsQueueService.findQueueToPurge("hmpps_reductions_completed_queue")
-    hmppsQueueService.findQueueToPurge("hmpps_extract_placed_queue")
-    hmppsQueueService.findQueueToPurge("hmpps_extract_placed_dlq")
-    hmppsQueueService.findQueueToPurge("hmpps_workload_audit_queue")
+    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("hmpps_allocation_complete_event_queue")!!)
+    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("hmpps_allocation_complete_event_dlq")!!)
+    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("hmpps_offender_event_queue")!!)
+    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("hmpps_offender_event_dlq")!!)
+    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("tier_calc_event_queue")!!)
+    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("tier_calc_event_dlq")!!)
+    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("workload_calculation_event_queue")!!)
+    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("workload_calculation_event_dlq")!!)
+    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("workload_prisoner_queue")!!)
+    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("workload_prisoner_dlq")!!)
+    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("hmpps_reductions_completed_queue")!!)
+    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("hmpps_extract_placed_queue")!!)
+    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("hmpps_extract_placed_dlq")!!)
+    hmppsQueueService.purgeQueue(hmppsQueueService.findQueueToPurge("hmpps_workload_audit_queue")!!)
 
     workloadCalculationRepository.deleteAll()
     clearWMT()

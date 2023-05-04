@@ -12,6 +12,7 @@ import jakarta.persistence.SqlResultSetMapping
 import jakarta.persistence.Table
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OffenderManagerCaseloadTotals
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.OverviewOffenderManager
+import java.math.BigInteger
 import java.time.LocalDateTime
 
 @SqlResultSetMapping(
@@ -20,14 +21,14 @@ import java.time.LocalDateTime
     ConstructorResult(
       targetClass = OverviewOffenderManager::class,
       columns = [
-        ColumnResult(name = "total_community_cases", type = Int::class),
-        ColumnResult(name = "total_filtered_custody_cases", type = Int::class),
-        ColumnResult(name = "available_points"),
-        ColumnResult(name = "total_points"),
-        ColumnResult(name = "key"),
-        ColumnResult(name = "last_updated_on", type = LocalDateTime::class),
-        ColumnResult(name = "workload_owner_id", type = Long::class),
-        ColumnResult(name = "paroms_due_next_30_days"),
+        ColumnResult(name = "totalCommunityCases", type = Long::class),
+        ColumnResult(name = "totalCustodyCases", type = Long::class),
+        ColumnResult(name = "availablePoints", type = BigInteger::class),
+        ColumnResult(name = "totalPoints", type = BigInteger::class),
+        ColumnResult(name = "code"),
+        ColumnResult(name = "lastUpdatedOn", type = LocalDateTime::class),
+        ColumnResult(name = "workloadOwnerId", type = Long::class),
+        ColumnResult(name = "paroleReportsDue", type = BigInteger::class),
       ],
     ),
   ],
@@ -64,7 +65,7 @@ import java.time.LocalDateTime
   name = "OffenderManagerEntity.findByOverview",
   resultSetMapping = "OffenderManagerOverviewResult",
   query = """SELECT
-    (w.total_filtered_community_cases + w.total_filtered_license_cases) as total_community_cases, w.total_filtered_custody_cases , wpc.available_points AS available_points, wpc.total_points AS total_points, om."key", wpc.last_updated_on, wo.id as workload_owner_id, w.paroms_due_next_30_days
+    (w.total_filtered_community_cases + w.total_filtered_license_cases) as totalCommunityCases, w.total_filtered_custody_cases as totalCustodyCases , wpc.available_points AS availablePoints, wpc.total_points AS totalPoints, om."key" as code, wpc.last_updated_on as lastUpdatedOn, wo.id as workloadOwnerId, w.paroms_due_next_30_days as paroleReportsDue
     FROM app.workload_owner AS wo
     JOIN app.team AS t
         ON wo.team_id = t.id
