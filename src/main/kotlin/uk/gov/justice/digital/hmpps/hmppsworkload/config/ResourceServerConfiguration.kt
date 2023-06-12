@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
 import org.springframework.security.config.web.server.ServerHttpSecurity
+import org.springframework.security.config.web.server.invoke
 import org.springframework.security.web.server.SecurityWebFilterChain
 
 @Configuration
@@ -12,11 +13,12 @@ import org.springframework.security.web.server.SecurityWebFilterChain
 @EnableReactiveMethodSecurity(useAuthorizationManager = false)
 class ResourceServerConfiguration {
   @Bean
-  fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
-    return http
-      .csrf { it.disable() }
-      .authorizeExchange {
-        it.pathMatchers(
+  fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain =
+    http {
+      // Can't have CSRF protection as requires session
+      csrf { disable() }
+      authorizeExchange {
+        listOf(
           "/webjars/**",
           "/favicon.ico",
           "/health/**",
@@ -25,10 +27,9 @@ class ResourceServerConfiguration {
           "/swagger-ui/**",
           "/swagger-ui.html",
           "/queue-admin/retry-all-dlqs",
-        ).permitAll().anyExchange().authenticated()
+        ).forEach { authorize(it, permitAll) }
+        authorize(anyExchange, authenticated)
       }
-      .oauth2ResourceServer {
-        it.jwt().jwtAuthenticationConverter(AuthAwareTokenConverter())
-      }.build()
-  }
+      oauth2ResourceServer { jwt { jwtAuthenticationConverter = AuthAwareTokenConverter() } }
+    }
 }
