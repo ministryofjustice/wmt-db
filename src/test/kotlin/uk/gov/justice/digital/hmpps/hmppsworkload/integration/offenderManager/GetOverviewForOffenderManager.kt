@@ -22,7 +22,7 @@ import java.time.format.DateTimeFormatter
 
 class GetOverviewForOffenderManager : IntegrationTestBase() {
 
-  private fun setupWmtTierTotal(tier: Tier?, workload: WMTWorkloadEntity, total: Int): TiersEntity {
+  private fun setupWmtTierTotal(tier: Tier?, workload: WMTWorkloadEntity, total: Int = 6): TiersEntity {
     val wmtTier = if (tier != null) setupWmtCaseCategoryTier(tier) else setupWmtUntiered()
     return tiersRepository.save(TiersEntity(workload = workload, caseType = CaseType.CUSTODY, tierCategory = wmtTier, totalFilteredCases = total))
   }
@@ -60,15 +60,15 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
         ),
         effectiveTo = LocalDate.now().plusDays(2).atStartOfDay(ZoneId.systemDefault()),
         status = ReductionStatus.DELETED,
-        reductionReasonId = reductionReason.id!!,
+        reductionReasonId = reductionReason.id,
       ),
     )
 
-    val aTierTotal = setupWmtTierTotal(Tier.A2, wmtStaff.workload, 6)
-    val bTierTotal = setupWmtTierTotal(Tier.B2, wmtStaff.workload, 6)
-    val cTierTotal = setupWmtTierTotal(Tier.C2, wmtStaff.workload, 6)
-    val dTierTotal = setupWmtTierTotal(Tier.D2, wmtStaff.workload, 6)
-    val untieredTotal = setupWmtTierTotal(null, wmtStaff.workload, 6)
+    val aTierTotal = setupWmtTierTotal(Tier.A2, wmtStaff.workload)
+    val bTierTotal = setupWmtTierTotal(Tier.B2, wmtStaff.workload)
+    val cTierTotal = setupWmtTierTotal(Tier.C2, wmtStaff.workload)
+    val dTierTotal = setupWmtTierTotal(Tier.D2, wmtStaff.workload)
+    val untieredTotal = setupWmtTierTotal(null, wmtStaff.workload)
 
     webTestClient.get()
       .uri("/team/$teamCode/offenderManagers/$offenderManagerCode")
