@@ -17,7 +17,7 @@ import java.math.BigInteger
 import java.time.ZonedDateTime
 
 class WorkloadCalculatorTests {
-  private val workloadCalculator = DefaultWorkloadCalculator()
+  private val workloadCalculator = WorkloadCalculator()
 
   @Test
   fun `must sum all cases depending on their tier, category and whether they are T2A or not`() {
@@ -28,13 +28,15 @@ class WorkloadCalculatorTests {
     val t2aCases = (1..numberOfT2aCases).map { Case(Tier.B2, CaseType.COMMUNITY, true, "CRNCOM$it") }
     val cases = (1..numberOfCases).map { Case(Tier.C1, CaseType.CUSTODY, false, "CRNCUST$it") }
     val result = workloadCalculator.getWorkloadPoints(
-      t2aCases + cases,
-      emptyList(),
-      emptyList(),
-      emptyList(),
-      emptyMap(),
-      t2aWorkloadPoints,
-      workloadPoints,
+      WorkloadPointsElements(
+        t2aCases + cases,
+        emptyList(),
+        emptyList(),
+        emptyList(),
+        emptyMap(),
+        t2aWorkloadPoints,
+        workloadPoints,
+      ),
     )
     val t2aExpectedWorkloadPoints = t2aWorkloadPoints.communityTierPoints.B2Points.multiply(numberOfT2aCases.toBigInteger())
     val casesExpectedWorkloadPoints = workloadPoints.custodyTierPoints.C1Points.multiply(numberOfCases.toBigInteger())
@@ -53,13 +55,15 @@ class WorkloadCalculatorTests {
     val fastCourtReports = (1..numberOfFastCourtReports).map { CourtReport(CourtReportType.FAST) }
 
     val result = workloadCalculator.getWorkloadPoints(
-      emptyList(),
-      standardCourtReports + fastCourtReports,
-      emptyList(),
-      emptyList(),
-      emptyMap(),
-      t2aWorkloadPoints,
-      workloadPoints,
+      WorkloadPointsElements(
+        emptyList(),
+        standardCourtReports + fastCourtReports,
+        emptyList(),
+        emptyList(),
+        emptyMap(),
+        t2aWorkloadPoints,
+        workloadPoints,
+      ),
     )
 
     val expectedStandardCourtReportPoints = standardCourtReportWeighting.multiply(numberOfStandardCourtReports.toBigInteger())
@@ -82,13 +86,15 @@ class WorkloadCalculatorTests {
     val contactTwoContacts = (1..numberOfContactTwoContacts).map { Contact("CONTACT2") }
 
     val result = workloadCalculator.getWorkloadPoints(
-      emptyList(),
-      emptyList(),
-      contactOneContacts + contactTwoContacts,
-      emptyList(),
-      contactReasonWeightings,
-      t2aWorkloadPoints,
-      workloadPoints,
+      WorkloadPointsElements(
+        emptyList(),
+        emptyList(),
+        contactOneContacts + contactTwoContacts,
+        emptyList(),
+        contactReasonWeightings,
+        t2aWorkloadPoints,
+        workloadPoints,
+      ),
     )
 
     val expectedContactOnePointsTotal = contactReasonWeightings["CONTACT1"]!! * numberOfContactOneContacts
@@ -107,13 +113,15 @@ class WorkloadCalculatorTests {
     val unknownContacts = (1..5).map { Contact("ANUNKNOWNCONTACTTYPE") }
 
     val result = workloadCalculator.getWorkloadPoints(
-      emptyList(),
-      emptyList(),
-      unknownContacts,
-      emptyList(),
-      contactReasonWeightings,
-      t2aWorkloadPoints,
-      workloadPoints,
+      WorkloadPointsElements(
+        emptyList(),
+        emptyList(),
+        unknownContacts,
+        emptyList(),
+        contactReasonWeightings,
+        t2aWorkloadPoints,
+        workloadPoints,
+      ),
     )
 
     Assertions.assertEquals(BigInteger.ZERO, result)
@@ -129,13 +137,15 @@ class WorkloadCalculatorTests {
     val contacts = listOf(Contact("CONTACT1"), Contact("CONTACT2"))
 
     val result = workloadCalculator.getWorkloadPoints(
-      emptyList(),
-      emptyList(),
-      emptyList(),
-      contacts,
-      contactReasonWeightings,
-      t2aWorkloadPoints,
-      workloadPoints,
+      WorkloadPointsElements(
+        emptyList(),
+        emptyList(),
+        emptyList(),
+        contacts,
+        contactReasonWeightings,
+        t2aWorkloadPoints,
+        workloadPoints,
+      ),
     )
 
     Assertions.assertEquals(BigInteger.valueOf(12).negate(), result)

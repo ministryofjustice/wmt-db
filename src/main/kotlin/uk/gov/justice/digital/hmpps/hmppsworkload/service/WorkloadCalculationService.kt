@@ -52,48 +52,39 @@ class WorkloadCalculationService(
     val workloadCalculationsElements = getWorkloadCalculationElements(staffIdentifier)
 
     return WorkloadCalculationEntity(
-      availablePoints = calculateAvailablePoints(workloadCalculationsElements.workloadPointsWeighting.getDefaultPointsAvailable(staffGrade), workloadCalculationsElements.workloadPointsWeighting.getDefaultContractedHours(staffGrade), availableHours),
+      availablePoints = calculateAvailablePoints(
+        workloadCalculationsElements.workloadPointsElements.workloadPointsWeighting.getDefaultPointsAvailable(staffGrade),
+        workloadCalculationsElements.workloadPointsElements.workloadPointsWeighting.getDefaultContractedHours(staffGrade),
+        availableHours,
+      ),
       workloadPoints = workloadCalculationsElements.workloadPoints,
       staffCode = staffIdentifier.staffCode,
       teamCode = staffIdentifier.teamCode,
       breakdownData = BreakdownDataEntity(
-        getCourtReportCounts(workloadCalculationsElements.courtReports, CourtReportType.STANDARD),
-        getCourtReportCounts(workloadCalculationsElements.courtReports, CourtReportType.FAST),
-        getContactTypeCodeCounts(workloadCalculationsElements.contactsPerformedOutsideCaseload),
-        getContactTypeCodeCounts(workloadCalculationsElements.contactsPerformedByOthers),
-        workloadCalculationsElements.contactTypeWeightings,
-        workloadCalculationsElements.cases.size,
+        getCourtReportCounts(workloadCalculationsElements.workloadPointsElements.courtReports, CourtReportType.STANDARD),
+        getCourtReportCounts(workloadCalculationsElements.workloadPointsElements.courtReports, CourtReportType.FAST),
+        getContactTypeCodeCounts(workloadCalculationsElements.workloadPointsElements.contactsPerformedOutsideCaseload),
+        getContactTypeCodeCounts(workloadCalculationsElements.workloadPointsElements.contactsPerformedByOthers),
+        workloadCalculationsElements.workloadPointsElements.contactTypeWeightings,
+        workloadCalculationsElements.workloadPointsElements.cases.size,
         availableHours,
       ),
     )
   }
 
   private fun getWorkloadCalculationElements(staffIdentifier: StaffIdentifier): WorkloadCalculationElements {
-    val cases = getCaseLoad.getCases(staffIdentifier)
-    val courtReports = getCourtReports.getCourtReports(staffIdentifier)
-    val contactsPerformedOutsideCaseload = getContacts.findContactsOutsideCaseload(staffIdentifier)
-    val contactsPerformedByOthers = getContacts.findContactsInCaseloadPerformedByOthers(staffIdentifier)
-    val contactTypeWeightings = getContactTypeWeightings.findAll()
-    val t2aWorkloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(true)
-    val workloadPointsWeighting = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
-    val workloadPoints = workloadCalculator.getWorkloadPoints(
-      cases,
-      courtReports,
-      contactsPerformedOutsideCaseload,
-      contactsPerformedByOthers,
-      contactTypeWeightings,
-      t2aWorkloadPoints,
-      workloadPointsWeighting,
+    val workloadPointsElements = WorkloadPointsElements(
+      getCaseLoad.getCases(staffIdentifier),
+      getCourtReports.getCourtReports(staffIdentifier),
+      getContacts.findContactsOutsideCaseload(staffIdentifier),
+      getContacts.findContactsInCaseloadPerformedByOthers(staffIdentifier),
+      getContactTypeWeightings.findAll(),
+      workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(true),
+      workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false),
     )
     return WorkloadCalculationElements(
-      cases,
-      courtReports,
-      contactsPerformedOutsideCaseload,
-      contactsPerformedByOthers,
-      contactTypeWeightings,
-      t2aWorkloadPoints,
-      workloadPointsWeighting,
-      workloadPoints,
+      workloadPointsElements,
+      workloadCalculator.getWorkloadPoints(workloadPointsElements),
     )
   }
   private fun getCourtReportCounts(courtReports: List<CourtReport>, type: CourtReportType): Int =
@@ -104,6 +95,11 @@ class WorkloadCalculationService(
 }
 
 data class WorkloadCalculationElements(
+  val workloadPointsElements: WorkloadPointsElements,
+  val workloadPoints: BigInteger,
+)
+
+data class WorkloadPointsElements(
   val cases: List<Case>,
   val courtReports: List<CourtReport>,
   val contactsPerformedOutsideCaseload: List<Contact>,
@@ -111,5 +107,4 @@ data class WorkloadCalculationElements(
   val contactTypeWeightings: Map<String, Int>,
   val t2aWorkloadPoints: WorkloadPointsEntity,
   val workloadPointsWeighting: WorkloadPointsEntity,
-  val workloadPoints: BigInteger,
 )
