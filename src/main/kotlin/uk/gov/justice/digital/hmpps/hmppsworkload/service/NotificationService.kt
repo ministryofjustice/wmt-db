@@ -78,7 +78,7 @@ class NotificationService(
 
   private fun getConvictionParameters(allocationDemandDetails: AllocationDemandDetails): Map<String, Any> = mapOf(
     "court_name" to allocationDemandDetails.court.name,
-    "sentence_date" to allocationDemandDetails.court.appearanceDate.format(DateUtils.notifyDateFormat),
+    "sentence_date" to allocationDemandDetails.sentence.date.format(DateUtils.notifyDateFormat),
     "offences" to mapOffences(allocationDemandDetails.offences),
     "order" to "${allocationDemandDetails.sentence.description} (${allocationDemandDetails.sentence.length})",
   )
