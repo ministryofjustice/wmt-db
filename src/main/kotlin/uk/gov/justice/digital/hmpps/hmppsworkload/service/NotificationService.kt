@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -22,6 +23,7 @@ import uk.gov.service.notify.NotificationClientException
 import uk.gov.service.notify.SendEmailResponse
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 
 const val SCORE_UNAVAILABLE = "Score Unavailable"
@@ -34,6 +36,7 @@ class NotificationService(
   private val assessRisksNeedsApiClient: AssessRisksNeedsApiClient,
   private val caseDetailsRepository: CaseDetailsRepository,
 ) {
+  private val log = LoggerFactory.getLogger(this::class.java)
 
   suspend fun notifyAllocation(allocationDemandDetails: AllocationDemandDetails, allocateCase: AllocateCase): List<SendEmailResponse> {
     val notifyData = getNotifyData(allocateCase.crn)
@@ -76,12 +79,16 @@ class NotificationService(
     "notes" to allocateCase.instructions,
   )
 
-  private fun getConvictionParameters(allocationDemandDetails: AllocationDemandDetails): Map<String, Any> = mapOf(
-    "court_name" to allocationDemandDetails.court.name,
-    "sentence_date" to allocationDemandDetails.sentence.date.format(DateUtils.notifyDateFormat),
-    "offences" to mapOffences(allocationDemandDetails.offences),
-    "order" to "${allocationDemandDetails.sentence.description} (${allocationDemandDetails.sentence.length})",
-  )
+  private fun getConvictionParameters(allocationDemandDetails: AllocationDemandDetails): Map<String, Any> {
+    val sentenceDate = allocationDemandDetails.sentence.date.withZoneSameInstant(ZoneId.systemDefault()).format(DateUtils.notifyDateFormat)
+    log.info("Sentence date: {}", sentenceDate)
+    return mapOf(
+      "court_name" to allocationDemandDetails.court.name,
+      "sentence_date" to sentenceDate,
+      "offences" to mapOffences(allocationDemandDetails.offences),
+      "order" to "${allocationDemandDetails.sentence.description} (${allocationDemandDetails.sentence.length})",
+    )
+  }
 
   private fun getRiskParameters(riskSummary: RiskSummary?, riskPredictors: List<RiskPredictor>, assessment: RiskOGRS?): Map<String, Any> {
     val latestRiskPredictor =
