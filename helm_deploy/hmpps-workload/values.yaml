@@ -119,6 +119,9 @@ generic-service:
     cloudplatform-live1-3: "35.177.252.54/32"
     global-protect: "35.176.93.186/32"
 
+  serviceAccountName: hmpps-workload
+
 generic-prometheus-alerts:
   targetApplication: hmpps-workload
   alertSeverity: hmpps-tier
+
