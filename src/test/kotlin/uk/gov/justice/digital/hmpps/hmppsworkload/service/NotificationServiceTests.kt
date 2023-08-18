@@ -23,12 +23,14 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.getAllocationDetai
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.emailResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.utils.DateUtils
 import uk.gov.service.notify.NotificationClientApi
 import uk.gov.service.notify.SendEmailResponse
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 class NotificationServiceTests {
@@ -43,6 +45,25 @@ class NotificationServiceTests {
     hmppsCaseDetailsRepo,
   )
   private val allocateCase = AllocateCase("CRN1111", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1, allocationJustificationNotes = "some notes", sensitiveNotes = false)
+  private val parameters = mapOf(
+    "officer_name" to "Staff Member",
+    "induction_statement" to "no initial appointment needed",
+    "requirements" to emptyList<Requirement>(),
+    "rosh" to "Score Unavailable",
+    "rsrLevel" to "Score Unavailable",
+    "rsrPercentage" to "N/A",
+    "ogrsLevel" to "Score Unavailable",
+    "ogrsPercentage" to "N/A",
+    "court_name" to "Court Name",
+    "sentence_date" to "7 October 2022",
+    "offences" to emptyList<OffenceDetails>(),
+    "order" to "CUSTODY (6 Months)",
+    "case_name" to "Jonathon Jones",
+    "crn" to "CRN1111",
+    "notes" to "",
+    "allocatingOfficerName" to "Allocating Member",
+    "allocatingOfficerGrade" to "SPO",
+  )
 
   @BeforeEach
   fun setup() {
@@ -97,9 +118,11 @@ class NotificationServiceTests {
     val allocationDetails = getAllocationDetails(allocateCase.crn)
 
     notificationService.notifyAllocation(allocationDetails, allocateCase)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), isNull()) }
-    Assertions.assertEquals(allocationDetails.court.appearanceDate.format(DateTimeFormatter.ofPattern("d MMMM yyyy")), parameters.captured["sentence_date"])
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, parameters, isNull()) }
+    Assertions.assertEquals(
+      allocationDetails.sentence.date.withZoneSameInstant(ZoneId.systemDefault()).format(DateUtils.notifyDateFormat),
+      parameters["sentence_date"],
+    )
   }
 
   @Test

@@ -10,6 +10,8 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskOGRS
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.SentenceDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffMember
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
 import java.time.ZonedDateTime
 
 fun getAllocationDetails(
@@ -49,7 +51,7 @@ fun getAllocationDetails(
   ogrs,
   SentenceDetails(
     "CUSTODY",
-    ZonedDateTime.now(),
+    ZonedDateTime.of(LocalDate.of(2022, 10, 7), LocalTime.MIDNIGHT, ZoneId.systemDefault()),
     "6 Months",
   ),
   Court(
