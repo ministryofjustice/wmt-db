@@ -34,6 +34,7 @@ generic-service:
     APPLICATIONINSIGHTS_CONNECTION_STRING: "InstrumentationKey=$(APPINSIGHTS_INSTRUMENTATIONKEY)"
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.json
     INGRESS_URL: *ingressHost
+    HMPPS_SQS_USE_WEB_TOKEN: "true"
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:
@@ -53,62 +54,33 @@ generic-service:
       DATABASE_ENDPOINT: "rds_instance_endpoint"
       DATABASE_NAME: "database_name"
     hmpps-domain-events-topic:
-      HMPPS_SQS_TOPICS_HMPPSDOMAINTOPIC_ACCESS_KEY_ID: "access_key_id"
-      HMPPS_SQS_TOPICS_HMPPSDOMAINTOPIC_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_TOPICS_HMPPSDOMAINTOPIC_ARN: "topic_arn"
     hmpps-workload-offender-events-sqs-instance-output:
-      HMPPS_SQS_QUEUES_HMPPSOFFENDERQUEUE_QUEUE_ACCESS_KEY_ID: "access_key_id"
-      HMPPS_SQS_QUEUES_HMPPSOFFENDERQUEUE_QUEUE_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_HMPPSOFFENDERQUEUE_QUEUE_NAME: "sqs_queue_name"
     hmpps-workload-offender-events-sqs-dl-instance-output:
-      HMPPS_SQS_QUEUES_HMPPSOFFENDERQUEUE_DLQ_ACCESS_KEY_ID: "access_key_id"
-      HMPPS_SQS_QUEUES_HMPPSOFFENDERQUEUE_DLQ_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_HMPPSOFFENDERQUEUE_DLQ_NAME: "sqs_queue_name"
     sqs-person-on-probation-events-secret:
-      HMPPS_SQS_QUEUES_TIERCALCQUEUE_QUEUE_ACCESS_KEY_ID: "access_key_id"
-      HMPPS_SQS_QUEUES_TIERCALCQUEUE_QUEUE_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_TIERCALCQUEUE_QUEUE_NAME: "sqs_queue_name"
     sqs-person-on-probation-events-dl-secret:
-      HMPPS_SQS_QUEUES_TIERCALCQUEUE_DLQ_ACCESS_KEY_ID: "access_key_id"
-      HMPPS_SQS_QUEUES_TIERCALCQUEUE_DLQ_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_TIERCALCQUEUE_DLQ_NAME: "sqs_queue_name"
     sqs-hmpps-audit-secret:
-      HMPPS_SQS_QUEUES_HMPPSAUDITQUEUE_QUEUE_ACCESS_KEY_ID: "access_key_id"
-      HMPPS_SQS_QUEUES_HMPPSAUDITQUEUE_QUEUE_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_HMPPSAUDITQUEUE_QUEUE_NAME: "sqs_queue_name"
     sqs-staff-events-secret:
-      HMPPS_SQS_QUEUES_WORKLOADCALCULATIONQUEUE_QUEUE_ACCESS_KEY_ID: "access_key_id"
-      HMPPS_SQS_QUEUES_WORKLOADCALCULATIONQUEUE_QUEUE_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_WORKLOADCALCULATIONQUEUE_QUEUE_NAME: "sqs_queue_name"
     sqs-staff-events-dl-secret :
-      HMPPS_SQS_QUEUES_WORKLOADCALCULATIONQUEUE_DLQ_ACCESS_KEY_ID: "access_key_id"
-      HMPPS_SQS_QUEUES_WORKLOADCALCULATIONQUEUE_DLQ_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_WORKLOADCALCULATIONQUEUE_DLQ_NAME: "sqs_queue_name"
     hmpps-reductions-completed-sqs-instance-output:
-      HMPPS_SQS_QUEUES_HMPPSREDUCTIONSCOMPLETEDQUEUE_QUEUE_ACCESS_KEY_ID: "access_key_id"
-      HMPPS_SQS_QUEUES_HMPPSREDUCTIONSCOMPLETEDQUEUE_QUEUE_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_HMPPSREDUCTIONSCOMPLETEDQUEUE_QUEUE_NAME: "sqs_queue_name"
     hmpps-reductions-completed-sqs-dl-instance-output:
-      HMPPS_SQS_QUEUES_HMPPSREDUCTIONSCOMPLETEDQUEUE_DLQ_ACCESS_KEY_ID: "access_key_id"
-      HMPPS_SQS_QUEUES_HMPPSREDUCTIONSCOMPLETEDQUEUE_DLQ_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_HMPPSREDUCTIONSCOMPLETEDQUEUE_DLQ_NAME: "sqs_queue_name"
     hmpps-extract-placed-sqs-instance-output:
-      HMPPS_SQS_QUEUES_HMPPSEXTRACTPLACEDQUEUE_QUEUE_ACCESS_KEY_ID: "access_key_id"
-      HMPPS_SQS_QUEUES_HMPPSEXTRACTPLACEDQUEUE_QUEUE_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_HMPPSEXTRACTPLACEDQUEUE_QUEUE_NAME: "sqs_queue_name"
     hmpps-extract-placed-sqs-dl-instance-output:
-      HMPPS_SQS_QUEUES_HMPPSEXTRACTPLACEDQUEUE_DLQ_ACCESS_KEY_ID: "access_key_id"
-      HMPPS_SQS_QUEUES_HMPPSEXTRACTPLACEDQUEUE_DLQ_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_HMPPSEXTRACTPLACEDQUEUE_DLQ_NAME: "sqs_queue_name"
     sqs-prisoner-events-secret:
-      HMPPS_SQS_QUEUES_WORKLOADPRISONERQUEUE_QUEUE_ACCESS_KEY_ID: "access_key_id"
-      HMPPS_SQS_QUEUES_WORKLOADPRISONERQUEUE_QUEUE_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_WORKLOADPRISONERQUEUE_QUEUE_NAME: "sqs_queue_name"
     sqs-prisoner-events-dl-secret:
-      HMPPS_SQS_QUEUES_WORKLOADPRISONERQUEUE_DLQ_ACCESS_KEY_ID: "access_key_id"
-      HMPPS_SQS_QUEUES_WORKLOADPRISONERQUEUE_DLQ_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_WORKLOADPRISONERQUEUE_DLQ_NAME: "sqs_queue_name"
-
 
   allowlist:
     office: "217.33.148.210/32"
