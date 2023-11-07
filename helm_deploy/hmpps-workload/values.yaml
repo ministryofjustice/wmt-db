@@ -94,7 +94,7 @@ generic-service:
     cymulate-2: "52.208.202.111/32"
     cymulate-3: "52.49.144.209/32"
 
-  serviceAccountName: hmpps-workload
+  serviceAccountName: "hmpps-workload"
 
 generic-prometheus-alerts:
   targetApplication: hmpps-workload
