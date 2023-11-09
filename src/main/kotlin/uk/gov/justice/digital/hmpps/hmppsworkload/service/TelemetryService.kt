@@ -39,6 +39,7 @@ class TelemetryService(@Autowired private val telemetryClient: TelemetryClient) 
       mapOf(
         CRN to eventManagerEntity.crn,
         TEAM_CODE to eventManagerEntity.teamCode,
+        "allocatedTeamCode" to eventManagerEntity.teamCode, // temporary field while improving metrics from hmpps-allocations
         STAFF_CODE to eventManagerEntity.staffCode,
         EVENT_NUMBER to eventManagerEntity.eventNumber.toString(10),
       ),
