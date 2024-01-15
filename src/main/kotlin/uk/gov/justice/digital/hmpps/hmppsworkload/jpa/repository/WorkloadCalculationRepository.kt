@@ -6,6 +6,8 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.WorkloadCalculation
 
 @Repository
 interface WorkloadCalculationRepository : CrudRepository<WorkloadCalculationEntity, Long> {
-  fun findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(staffCode: String, teamCode: String):
-    WorkloadCalculationEntity?
+  fun findFirstByStaffCodeAndTeamCodeOrderByCalculatedDate(
+    staffCode: String,
+    teamCode: String,
+  ): WorkloadCalculationEntity?
 }
