@@ -21,6 +21,7 @@ generic-service:
     delius-prod-3: 35.177.47.45/32
 
 generic-prometheus-alerts:
+  alertSeverity: hmpps-workload-prod-alerts
   rdsAlertsDatabases:
     cloud-platform-78407cd5fbd86ed5: "Workload live"
   sqsOldestAlertQueueNames:
@@ -42,3 +43,4 @@ generic-prometheus-alerts:
   sqsAlertsTotalMessagesThreshold: 1
   runbookUrl: https://dsdmoj.atlassian.net/wiki/spaces/MaS/pages/3533964702/WMT+Run+book
   ingress5xxErrorWindowMinutes: 4
+
