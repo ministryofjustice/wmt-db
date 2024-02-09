@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.AssessRisksNeedsApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.AllocationDemandDetails
@@ -15,7 +14,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskSummary
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffMember
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
-import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.CaseDetailsRepository
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.utils.DateUtils
 import uk.gov.justice.digital.hmpps.hmppsworkload.utils.capitalize
 import uk.gov.service.notify.NotificationClientApi
@@ -33,14 +32,12 @@ private const val NOT_APPLICABLE = "N/A"
 class NotificationService(
   private val notificationClient: NotificationClientApi,
   @Value("\${application.notify.allocation.template}") private val allocationTemplateId: String,
-  private val assessRisksNeedsApiClient: AssessRisksNeedsApiClient,
-  private val caseDetailsRepository: CaseDetailsRepository,
+  private val assessRisksNeedsApiClient: AssessRisksNeedsApiClient
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
-  suspend fun notifyAllocation(allocationDemandDetails: AllocationDemandDetails, allocateCase: AllocateCase): List<SendEmailResponse> {
+  suspend fun notifyAllocation(allocationDemandDetails: AllocationDemandDetails, allocateCase: AllocateCase, caseDetails: CaseDetailsEntity): List<SendEmailResponse> {
     val notifyData = getNotifyData(allocateCase.crn)
-    val caseDetails = caseDetailsRepository.findByIdOrNull(allocateCase.crn)!!
     val parameters = mapOf(
       "officer_name" to allocationDemandDetails.staff.name.getCombinedName(),
       "induction_statement" to mapInductionAppointment(allocationDemandDetails.initialAppointment, caseDetails.type),
