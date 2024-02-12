@@ -35,7 +35,7 @@ class SendEmail : IntegrationTestBase() {
     val emailSendResponse = notificationService.notifyAllocation(
       allocationDetails,
       allocateCase,
-      caseDetailsEntity
+      caseDetailsEntity,
     )
     assessRisksNeedsApi.verifyRiskSummaryCalled(crn, 2)
     assessRisksNeedsApi.verifyRiskPredictorCalled(crn, 1)
@@ -55,7 +55,7 @@ class SendEmail : IntegrationTestBase() {
     val emailSendResponse = notificationService.notifyAllocation(
       allocationDetails,
       allocateCase,
-      caseDetailsEntity
+      caseDetailsEntity,
     )
     assessRisksNeedsApi.verifyRiskSummaryCalled(crn, 1)
     assessRisksNeedsApi.verifyRiskPredictorCalled(crn, 2)

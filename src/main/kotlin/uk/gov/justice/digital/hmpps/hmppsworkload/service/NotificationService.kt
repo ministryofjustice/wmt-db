@@ -32,7 +32,7 @@ private const val NOT_APPLICABLE = "N/A"
 class NotificationService(
   private val notificationClient: NotificationClientApi,
   @Value("\${application.notify.allocation.template}") private val allocationTemplateId: String,
-  private val assessRisksNeedsApiClient: AssessRisksNeedsApiClient
+  private val assessRisksNeedsApiClient: AssessRisksNeedsApiClient,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 

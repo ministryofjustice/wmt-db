@@ -38,7 +38,7 @@ class NotificationServiceTests {
   private val notificationService = NotificationService(
     notificationClient,
     templateId,
-    assessRisksNeedsApiClient
+    assessRisksNeedsApiClient,
   )
   private val allocateCase = AllocateCase("CRN1111", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1, allocationJustificationNotes = "some notes", sensitiveNotes = false)
   private val parameters = mapOf(
