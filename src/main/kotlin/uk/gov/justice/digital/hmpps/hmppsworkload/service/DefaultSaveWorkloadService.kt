@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseAllocated
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.SaveResult
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
+import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.PersonManagerEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.RequirementManagerEntity
@@ -33,26 +34,28 @@ class DefaultSaveWorkloadService(
     allocateCase: AllocateCase,
     loggedInUser: String,
   ): CaseAllocated {
+    val caseDetails: CaseDetailsEntity = caseDetailsRepository.findByIdOrNull(allocateCase.crn)!!
     val allocationData = workforceAllocationsToDeliusApiClient.allocationDetails(allocateCase.crn, allocateCase.eventNumber, allocatedStaffId.staffCode, loggedInUser)
     val personManagerSaveResult = savePersonManagerService.savePersonManager(
       allocatedStaffId.teamCode,
       allocationData.staff,
       loggedInUser,
       allocateCase.crn,
-    ).also { afterPersonManagerSaved(it, allocationData.staff) }
-    val eventManagerSaveResult = saveEventManagerService.saveEventManager(allocatedStaffId.teamCode, allocationData.staff, allocateCase, loggedInUser).also { afterEventManagerSaved(it) }
-    val requirementManagerSaveResults = saveRequirementManagerService.saveRequirementManagers(allocatedStaffId.teamCode, allocationData.staff, allocateCase, loggedInUser, allocationData.activeRequirements).also { afterRequirementManagersSaved(it) }
+    ).also { afterPersonManagerSaved(it, allocationData.staff, caseDetails) }
+    val eventManagerSaveResult = saveEventManagerService.saveEventManager(allocatedStaffId.teamCode, allocationData.staff, allocateCase, loggedInUser)
+      .also { afterEventManagerSaved(it, caseDetails) }
+    val requirementManagerSaveResults = saveRequirementManagerService.saveRequirementManagers(allocatedStaffId.teamCode, allocationData.staff, allocateCase, loggedInUser, allocationData.activeRequirements)
+      .also { afterRequirementManagersSaved(it, caseDetails) }
     if (personManagerSaveResult.hasChanged || eventManagerSaveResult.hasChanged || requirementManagerSaveResults.any { it.hasChanged }) {
-      notificationService.notifyAllocation(allocationData, allocateCase)
+      notificationService.notifyAllocation(allocationData, allocateCase, caseDetails)
       sqsSuccessPublisher.auditAllocation(allocateCase.crn, allocateCase.eventNumber, loggedInUser, allocationData.activeRequirements.map { it.id })
     }
     return CaseAllocated(personManagerSaveResult.entity.uuid, eventManagerSaveResult.entity.uuid, requirementManagerSaveResults.map { it.entity.uuid })
   }
 
-  private fun afterPersonManagerSaved(personManagerSaveResult: SaveResult<PersonManagerEntity>, deliusStaff: StaffMember) {
+  private fun afterPersonManagerSaved(personManagerSaveResult: SaveResult<PersonManagerEntity>, deliusStaff: StaffMember, caseDetails: CaseDetailsEntity) {
     if (personManagerSaveResult.hasChanged) {
-      telemetryService.trackPersonManagerAllocated(personManagerSaveResult.entity)
-      val caseDetails = caseDetailsRepository.findByIdOrNull(personManagerSaveResult.entity.crn)
+      telemetryService.trackPersonManagerAllocated(personManagerSaveResult.entity, caseDetails)
       telemetryService.trackStaffGradeToTierAllocated(caseDetails, deliusStaff, personManagerSaveResult.entity.teamCode)
       sqsSuccessPublisher.updatePerson(
         personManagerSaveResult.entity.crn,
@@ -62,16 +65,16 @@ class DefaultSaveWorkloadService(
     }
   }
 
-  private fun afterEventManagerSaved(eventManagerSaveResult: SaveResult<EventManagerEntity>) {
+  private fun afterEventManagerSaved(eventManagerSaveResult: SaveResult<EventManagerEntity>, caseDetails: CaseDetailsEntity) {
     if (eventManagerSaveResult.hasChanged) {
-      telemetryService.trackEventManagerAllocated(eventManagerSaveResult.entity)
+      telemetryService.trackEventManagerAllocated(eventManagerSaveResult.entity, caseDetails)
       sqsSuccessPublisher.updateEvent(eventManagerSaveResult.entity.crn, eventManagerSaveResult.entity.uuid, eventManagerSaveResult.entity.createdDate!!)
     }
   }
 
-  private fun afterRequirementManagersSaved(requirementManagerSaveResults: List<SaveResult<RequirementManagerEntity>>) {
+  private fun afterRequirementManagersSaved(requirementManagerSaveResults: List<SaveResult<RequirementManagerEntity>>, caseDetails: CaseDetailsEntity) {
     requirementManagerSaveResults.filter { it.hasChanged }.forEach { saveResult ->
-      telemetryService.trackRequirementManagerAllocated(saveResult.entity)
+      telemetryService.trackRequirementManagerAllocated(saveResult.entity, caseDetails)
       sqsSuccessPublisher.updateRequirement(saveResult.entity.crn, saveResult.entity.uuid, saveResult.entity.createdDate!!)
     }
   }

@@ -12,6 +12,8 @@ import java.time.LocalDateTime
 
 private const val CRN = "crn"
 
+private const val CASE_TYPE = "caseType"
+
 private const val TEAM_CODE = "teamCode"
 
 private const val STAFF_CODE = "staffCode"
@@ -21,11 +23,12 @@ private const val EVENT_NUMBER = "eventNumber"
 @Component
 class TelemetryService(@Autowired private val telemetryClient: TelemetryClient) {
 
-  fun trackPersonManagerAllocated(personManagerEntity: PersonManagerEntity) {
+  fun trackPersonManagerAllocated(personManagerEntity: PersonManagerEntity, caseDetails: CaseDetailsEntity) {
     trackEvent(
       TelemetryEventType.PERSON_MANAGER_ALLOCATED,
       mapOf(
         CRN to personManagerEntity.crn,
+        CASE_TYPE to caseDetails.type.name,
         TEAM_CODE to personManagerEntity.teamCode,
         STAFF_CODE to personManagerEntity.staffCode,
         "wmtPeriod" to getWmtPeriod(LocalDateTime.now()),
@@ -33,11 +36,12 @@ class TelemetryService(@Autowired private val telemetryClient: TelemetryClient) 
     )
   }
 
-  fun trackEventManagerAllocated(eventManagerEntity: EventManagerEntity) {
+  fun trackEventManagerAllocated(eventManagerEntity: EventManagerEntity, caseDetails: CaseDetailsEntity) {
     trackEvent(
       TelemetryEventType.EVENT_MANAGER_ALLOCATED,
       mapOf(
         CRN to eventManagerEntity.crn,
+        CASE_TYPE to caseDetails.type.name,
         TEAM_CODE to eventManagerEntity.teamCode,
         // allocatedTeamCode is a temporary field while improving metrics from hmpps-allocations
         "allocatedTeamCode" to eventManagerEntity.teamCode,
@@ -47,11 +51,12 @@ class TelemetryService(@Autowired private val telemetryClient: TelemetryClient) 
     )
   }
 
-  fun trackRequirementManagerAllocated(requirementManagerEntity: RequirementManagerEntity) {
+  fun trackRequirementManagerAllocated(requirementManagerEntity: RequirementManagerEntity, caseDetails: CaseDetailsEntity) {
     trackEvent(
       TelemetryEventType.REQUIREMENT_MANAGER_ALLOCATED,
       mapOf(
         CRN to requirementManagerEntity.crn,
+        CASE_TYPE to caseDetails.type.name,
         TEAM_CODE to requirementManagerEntity.teamCode,
         STAFF_CODE to requirementManagerEntity.staffCode,
         EVENT_NUMBER to requirementManagerEntity.eventNumber.toString(10),

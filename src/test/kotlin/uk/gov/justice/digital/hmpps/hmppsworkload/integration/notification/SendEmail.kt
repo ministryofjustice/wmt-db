@@ -27,13 +27,15 @@ class SendEmail : IntegrationTestBase() {
     val crn = "X123456"
     val allocateCase = AllocateCase(crn, sendEmailCopyToAllocatingOfficer = false, eventNumber = 1, allocationJustificationNotes = "some notes", sensitiveNotes = false)
     val allocationDetails = getAllocationDetails(crn)
+    val caseDetailsEntity = CaseDetailsEntity(crn, B3, COMMUNITY, "Jane", "Doe")
 
     assessRisksNeedsApi.riskSummaryErrorResponse(crn)
     assessRisksNeedsApi.riskPredictorResponse(crn)
-    caseDetailsRepository.save(CaseDetailsEntity(crn, B3, COMMUNITY, "Jane", "Doe"))
+    caseDetailsRepository.save(caseDetailsEntity)
     val emailSendResponse = notificationService.notifyAllocation(
       allocationDetails,
       allocateCase,
+      caseDetailsEntity,
     )
     assessRisksNeedsApi.verifyRiskSummaryCalled(crn, 2)
     assessRisksNeedsApi.verifyRiskPredictorCalled(crn, 1)
@@ -45,12 +47,15 @@ class SendEmail : IntegrationTestBase() {
     val crn = "X123456"
     val allocateCase = AllocateCase(crn, sendEmailCopyToAllocatingOfficer = false, eventNumber = 1, allocationJustificationNotes = "some notes", sensitiveNotes = false)
     val allocationDetails = getAllocationDetails(crn)
+    val caseDetailsEntity = CaseDetailsEntity(crn, B3, COMMUNITY, "Jane", "Doe")
+
     assessRisksNeedsApi.riskSummaryResponse(crn)
     assessRisksNeedsApi.riskPredictorErrorResponse(crn)
-    caseDetailsRepository.save(CaseDetailsEntity(crn, B3, COMMUNITY, "Jane", "Doe"))
+    caseDetailsRepository.save(caseDetailsEntity)
     val emailSendResponse = notificationService.notifyAllocation(
       allocationDetails,
       allocateCase,
+      caseDetailsEntity,
     )
     assessRisksNeedsApi.verifyRiskSummaryCalled(crn, 1)
     assessRisksNeedsApi.verifyRiskPredictorCalled(crn, 2)

@@ -115,6 +115,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
           "crn" to crn,
           "teamCode" to teamCode,
           "staffCode" to staffCode,
+          "caseType" to CaseType.CUSTODY.name,
           "wmtPeriod" to getWmtPeriod(LocalDateTime.now()),
         ),
         null,
@@ -393,6 +394,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can send email when selecting a second person to receive email`() {
+    caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.COMMUNITY, "Jane", "Doe"))
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
       .bodyValue(allocateCase(crn, eventNumber))
@@ -435,6 +437,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
         mapOf(
           "crn" to crn,
           "teamCode" to teamCode,
+          "caseType" to CaseType.COMMUNITY.name,
           "staffCode" to staffCode,
           "wmtPeriod" to getWmtPeriod(LocalDateTime.now()),
         ),
