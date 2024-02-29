@@ -33,9 +33,9 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.1")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.4")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.3")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.7.3")
 
   // go to open telemetry, when upgrading to spring boot 3 these can be removed
   implementation("io.opentelemetry:opentelemetry-api:1.34.1")
