@@ -45,7 +45,6 @@ class TeamService(
       }
 
       return caseDetailsRepository.findByIdOrNull(crn)?.let {
-
         PractitionerWorkload.from(
           choosePractitionerResponse,
           it.tier,
