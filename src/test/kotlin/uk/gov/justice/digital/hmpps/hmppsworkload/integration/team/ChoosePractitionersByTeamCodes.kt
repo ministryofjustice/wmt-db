@@ -141,8 +141,8 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
       .exchange()
       .expectStatus()
       .isNotFound
-
   }
+
   @Test
   fun `can filter officers by grade`() {
     val teamCode = "T1"
