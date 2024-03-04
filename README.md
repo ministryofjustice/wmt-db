@@ -10,7 +10,7 @@ This is the HMPPS Workload service. This is used to serve workload information a
 To run locally use docker to create a Postgres instance with the following command:
 
 ```shell
-docker compose up -d
+docker-compose up -d
 ```
 
 Then execute the command 
@@ -22,7 +22,7 @@ Then execute the command
 
 These tests are defaults from the template, and the app only serves to run the flyway scripts. This allows you to test that the scripts work locally against postgresql in docker
 ```shell
-docker compose up -d
+docker-compose up -d
 ./gradlew clean check
 ```
 
