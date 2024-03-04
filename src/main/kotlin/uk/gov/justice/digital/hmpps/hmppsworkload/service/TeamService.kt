@@ -38,15 +38,20 @@ class TeamService(
           .filter { grades == null || grades.contains(it.getGrade()) }
           .map {
             val teamStaffId = teamStaffId(team.key, it.code)
-            val practitionerWorkload = practitionerWorkloads[teamStaffId] ?: getTeamOverviewForOffenderManagerWithoutWorkload(it.code, it.getGrade(), team.key)
+            val practitionerWorkload = practitionerWorkloads[teamStaffId]
+              ?: getTeamOverviewForOffenderManagerWithoutWorkload(it.code, it.getGrade(), team.key)
             Practitioner.from(it, practitionerWorkload, practitionerCaseCounts.getOrDefault(teamStaffId, 0))
           }
       }
-      PractitionerWorkload.from(
-        choosePractitionerResponse,
-        caseDetailsRepository.findByIdOrNull(crn)!!.tier,
-        enrichedTeams,
-      )
+
+      return caseDetailsRepository.findByIdOrNull(crn)?.let {
+
+        PractitionerWorkload.from(
+          choosePractitionerResponse,
+          it.tier,
+          enrichedTeams,
+        )
+      }
     }
   }
 
