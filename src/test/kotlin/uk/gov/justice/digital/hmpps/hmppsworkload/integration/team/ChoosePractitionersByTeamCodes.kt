@@ -110,6 +110,40 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
   }
 
   @Test
+  fun `throws 404 when crn not in repository`() {
+    val teamCode = "T1"
+    val teamCode2 = "T2"
+    val crn = "NOTFOUND"
+
+    workforceAllocationsToDelius.choosePractitionerByTeamCodesResponse(listOf(teamCode, teamCode2), crn)
+    val firstWmtStaff = setupCurrentWmtStaff("OM1", teamCode)
+    val secondWmtStaff = setupCurrentWmtStaff("OM2", teamCode2)
+
+    val firstOm = firstWmtStaff.offenderManager.code
+    val secondOm = secondWmtStaff.offenderManager.code
+    val noWorkloadStaffCode = "NOWORKLOAD1"
+
+    val storedPersonManager = PersonManagerEntity(crn = "CRN5", staffCode = firstOm, teamCode = teamCode, createdBy = "USER1", isActive = true)
+    personManagerRepository.save(storedPersonManager)
+
+    val movedPersonManager = PersonManagerEntity(crn = "CRN3", staffCode = firstOm, teamCode = teamCode, createdBy = "USER1", createdDate = ZonedDateTime.now().minusDays(5L), isActive = false)
+    personManagerRepository.save(movedPersonManager)
+
+    val newPersonManager = PersonManagerEntity(crn = "CRN3", staffCode = secondOm, teamCode = teamCode2, createdBy = "USER2", createdDate = ZonedDateTime.now().minusDays(2L), isActive = true)
+    personManagerRepository.save(newPersonManager)
+
+    val personManagerWithNoWorkload = PersonManagerEntity(crn = "CRN4", staffCode = noWorkloadStaffCode, teamCode = "T1", createdBy = "USER2", createdDate = ZonedDateTime.now().minusDays(2L), isActive = true)
+    personManagerRepository.save(personManagerWithNoWorkload)
+
+    webTestClient.get()
+      .uri("/team/choose-practitioner?crn=$crn&teamCodes=$teamCode,$teamCode2")
+      .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT")) }
+      .exchange()
+      .expectStatus()
+      .isNotFound
+  }
+
+  @Test
   fun `can filter officers by grade`() {
     val teamCode = "T1"
     val teamCode2 = "T2"
