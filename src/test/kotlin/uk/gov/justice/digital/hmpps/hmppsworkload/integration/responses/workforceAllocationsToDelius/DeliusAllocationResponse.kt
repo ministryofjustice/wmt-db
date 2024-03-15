@@ -51,6 +51,19 @@ fun deliusAllocationResponse(crn: String, staffCode: String, allocateToEmail: St
         "mainCategory":"Rehabilitation Activity Requirement (RAR)",
         "subCategory":"Rehabilitation Activity Requirement (RAR)",
         "length":"20 Days",
-        "id":645234212}]
+        "id":645234212,
+         "manager": {
+             "code": "red",
+             "name": {
+               "forename": "Jess",
+               "middleName": "",
+               "surname": "wilkins"
+             },
+             "teamCode": "Mercedes",
+             "grade": "Pass",
+             "allocated": true
+         },
+         "isUnpaidWork": true
+       }]
   }
 """.trimIndent()

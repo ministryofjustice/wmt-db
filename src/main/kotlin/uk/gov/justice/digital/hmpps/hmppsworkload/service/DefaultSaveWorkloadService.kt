@@ -44,7 +44,7 @@ class DefaultSaveWorkloadService(
     ).also { afterPersonManagerSaved(it, allocationData.staff, caseDetails) }
     val eventManagerSaveResult = saveEventManagerService.saveEventManager(allocatedStaffId.teamCode, allocationData.staff, allocateCase, loggedInUser)
       .also { afterEventManagerSaved(it, caseDetails) }
-    val requirementManagerSaveResults = saveRequirementManagerService.saveRequirementManagers(allocatedStaffId.teamCode, allocationData.staff, allocateCase, loggedInUser, allocationData.activeRequirements)
+    val requirementManagerSaveResults = saveRequirementManagerService.saveRequirementManagers(allocatedStaffId.teamCode, allocationData.staff, allocateCase, loggedInUser, allocationData.activeRequirements.filter { it.manager.allocated })
       .also { afterRequirementManagersSaved(it, caseDetails) }
     if (personManagerSaveResult.hasChanged || eventManagerSaveResult.hasChanged || requirementManagerSaveResults.any { it.hasChanged }) {
       notificationService.notifyAllocation(allocationData, allocateCase, caseDetails)
