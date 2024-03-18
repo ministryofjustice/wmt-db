@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius
 
-fun deliusAllocationResponse(crn: String, staffCode: String, allocateToEmail: String) = """
+fun deliusAllocationRequirementsResponse(crn: String, staffCode: String, allocateToEmail: String) = """
   {
     "crn": "$crn",
     "name": {
@@ -81,7 +81,44 @@ fun deliusAllocationResponse(crn: String, staffCode: String, allocateToEmail: St
              "grade": "Pass",
              "allocated": true
          },
+         "isUnpaidWork": false
+       },
+       {
+        "mainCategory":"Rehabilitation Activity Requirement (RAR)",
+        "subCategory":"Rehabilitation Activity Requirement (RAR)",
+        "length":"20 Days",
+        "id":645234221,
+         "manager": {
+             "code": "red",
+             "name": {
+               "forename": "Jess",
+               "middleName": "",
+               "surname": "wilkins"
+             },
+             "teamCode": "Mercedes",
+             "grade": "Pass",
+             "allocated": true
+         },
          "isUnpaidWork": true
-       }]
+       },
+       {
+        "mainCategory":"Rehabilitation Activity Requirement (RAR)",
+        "subCategory":"Rehabilitation Activity Requirement (RAR)",
+        "length":"20 Days",
+        "id":645234222,
+         "manager": {
+             "code": "red",
+             "name": {
+               "forename": "Jess",
+               "middleName": "",
+               "surname": "wilkins"
+             },
+             "teamCode": "Mercedes",
+             "grade": "Pass",
+             "allocated": false
+         },
+         "isUnpaidWork": false
+       }
+   ]
   }
 """.trimIndent()
