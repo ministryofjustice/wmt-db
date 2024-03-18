@@ -58,12 +58,6 @@ data class Manager(
   val code: String,
   val teamCode: String,
   val grade: String,
-  val name: ManagerName,
+  val name: Name,
   val allocated: Boolean,
-)
-
-data class ManagerName(
-  val forename: String,
-  val middleName: String,
-  val surname: String,
 )

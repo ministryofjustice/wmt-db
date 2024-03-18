@@ -11,7 +11,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.AssessRisksNeedsApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Manager
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ManagerName
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Name
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenceDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Requirement
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskOGRS
@@ -190,7 +190,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must add requirements`() = runBlocking {
-    val name = ManagerName(
+    val name = Name(
       "fed",
       "E",
       "flintstomne",
@@ -220,7 +220,7 @@ class NotificationServiceTests {
 
   @Test
   fun `must add requirements without length`() = runBlocking {
-    val name = ManagerName(
+    val name = Name(
       "fed",
       "E",
       "flintstomne",

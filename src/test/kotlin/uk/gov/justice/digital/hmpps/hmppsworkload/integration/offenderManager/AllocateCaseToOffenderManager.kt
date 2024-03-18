@@ -54,7 +54,9 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   private val teamCode = "T1"
   private val eventNumber = 1
   private val requirementId = BigInteger.valueOf(645234212L)
+  private val allocatedRequiredmentId = BigInteger.valueOf(645234215L)
   private val unallocatedRequirementIds = listOf(BigInteger.valueOf(645234212L), BigInteger.valueOf(645234222L))
+  private val allocatedRequirementIds = listOf(BigInteger.valueOf(645234215L), BigInteger.valueOf(645234221L))
   private val allocatingOfficerUsername = "SOME_USER"
 
   @BeforeEach
@@ -390,6 +392,8 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
     await untilCallTo { verifyAuditMessageOnQueue() } matches { it == true }
     val auditData = AuditData(crn, eventNumber, listOf(requirementId))
+    // verify that the already allocated requirements have not been reallocated
+    Assertions.assertFalse(auditData.requirementIds.contains(allocatedRequiredmentId))
     Assertions.assertEquals(objectMapper.writeValueAsString(auditData), getAuditMessages().details)
   }
 
@@ -411,6 +415,8 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     await untilCallTo { verifyAuditMessageOnQueue() } matches { it == true }
     val auditData = AuditData(crn, eventNumber, unallocatedRequirementIds)
     Assertions.assertEquals(objectMapper.writeValueAsString(auditData), getAuditMessages().details)
+    // verify that the already allocated requirements have not been reallocated
+    allocatedRequirementIds.forEach { Assertions.assertFalse(auditData.requirementIds.contains(it)) }
   }
 
   @Test
