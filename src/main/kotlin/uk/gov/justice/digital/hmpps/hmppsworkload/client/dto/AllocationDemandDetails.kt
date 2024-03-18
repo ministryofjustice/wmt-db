@@ -50,4 +50,14 @@ data class Requirement(
   val subCategory: String,
   val length: String,
   val id: BigInteger,
+  val manager: Manager,
+  val isUnpaidWork: Boolean,
+)
+
+data class Manager(
+  val code: String,
+  val teamCode: String,
+  val grade: String,
+  val name: Name,
+  val allocated: Boolean,
 )

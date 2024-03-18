@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.AssessRisksNeedsApiClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Manager
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Name
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OffenceDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Requirement
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskOGRS
@@ -188,11 +190,25 @@ class NotificationServiceTests {
 
   @Test
   fun `must add requirements`() = runBlocking {
+    val name = Name(
+      "fed",
+      "E",
+      "flintstomne",
+    )
+    val manager = Manager(
+      "fred",
+      "liverpool",
+      "top",
+      name,
+      true,
+    )
     val requirement = Requirement(
       "Main Category",
       "Sub Category",
       "1 Year",
       BigInteger.ONE,
+      manager,
+      true,
     )
     val allocationDetails = getAllocationDetails(allocateCase.crn, activeRequirements = listOf(requirement))
 
@@ -204,11 +220,25 @@ class NotificationServiceTests {
 
   @Test
   fun `must add requirements without length`() = runBlocking {
+    val name = Name(
+      "fed",
+      "E",
+      "flintstomne",
+    )
+    val manager = Manager(
+      "fred",
+      "liverpool",
+      "top",
+      name,
+      true,
+    )
     val requirement = Requirement(
       "Main Category",
       "Sub Category",
       "",
       BigInteger.ONE,
+      manager,
+      true,
     )
     val allocationDetails = getAllocationDetails(allocateCase.crn, activeRequirements = listOf(requirement))
 

@@ -54,6 +54,9 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   private val teamCode = "T1"
   private val eventNumber = 1
   private val requirementId = BigInteger.valueOf(645234212L)
+  private val allocatedRequiredmentId = BigInteger.valueOf(645234215L)
+  private val unallocatedRequirementIds = listOf(BigInteger.valueOf(645234212L), BigInteger.valueOf(645234222L))
+  private val allocatedRequirementIds = listOf(BigInteger.valueOf(645234215L), BigInteger.valueOf(645234221L))
   private val allocatingOfficerUsername = "SOME_USER"
 
   @BeforeEach
@@ -375,7 +378,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
   }
 
   @Test
-  fun `audit data contain required fields`() {
+  fun `audit data contain required fields and only unallocated requirement`() {
     webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
       .bodyValue(allocateCase(crn, eventNumber))
@@ -389,7 +392,29 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
     await untilCallTo { verifyAuditMessageOnQueue() } matches { it == true }
     val auditData = AuditData(crn, eventNumber, listOf(requirementId))
+    Assertions.assertFalse(auditData.requirementIds.contains(allocatedRequiredmentId))
     Assertions.assertEquals(objectMapper.writeValueAsString(auditData), getAuditMessages().details)
+  }
+
+  @Test
+  fun `audit data contain required fields and all unallocated requirements`() {
+    workforceAllocationsToDelius.reset()
+    workforceAllocationsToDelius.allocationRequirementResponse(crn, eventNumber, staffCode, allocatingOfficerUsername)
+    webTestClient.post()
+      .uri("/team/$teamCode/offenderManager/$staffCode/case")
+      .bodyValue(allocateCase(crn, eventNumber))
+      .headers {
+        it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
+        it.contentType = MediaType.APPLICATION_JSON
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+
+    await untilCallTo { verifyAuditMessageOnQueue() } matches { it == true }
+    val auditData = AuditData(crn, eventNumber, unallocatedRequirementIds)
+    Assertions.assertEquals(objectMapper.writeValueAsString(auditData), getAuditMessages().details)
+    allocatedRequirementIds.forEach { Assertions.assertFalse(auditData.requirementIds.contains(it)) }
   }
 
   @Test
