@@ -60,7 +60,6 @@ fun deliusAllocationResponse(crn: String, staffCode: String, allocateToEmail: St
                "surname": "wilkins"
              },
              "teamCode": "Mercedes",
-             "grade": "Pass",
              "allocated": false
          },
          "isUnpaidWork": false
