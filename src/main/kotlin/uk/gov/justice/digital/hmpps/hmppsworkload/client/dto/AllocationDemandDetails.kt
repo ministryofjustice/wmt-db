@@ -57,7 +57,7 @@ data class Requirement(
 data class Manager(
   val code: String,
   val teamCode: String,
-  val grade: String,
+  val grade: String?,
   val name: Name,
   val allocated: Boolean,
 )
