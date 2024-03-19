@@ -96,7 +96,6 @@ fun deliusAllocationRequirementsResponse(crn: String, staffCode: String, allocat
                "surname": "wilkins"
              },
              "teamCode": "Mercedes",
-             "grade": "Pass",
              "allocated": true
          },
          "isUnpaidWork": true
@@ -114,7 +113,6 @@ fun deliusAllocationRequirementsResponse(crn: String, staffCode: String, allocat
                "surname": "wilkins"
              },
              "teamCode": "Mercedes",
-             "grade": "Pass",
              "allocated": false
          },
          "isUnpaidWork": false
