@@ -1,3 +1,5 @@
+
+DROP VIEW app.ldu_caseload_view;
 CREATE OR REPLACE VIEW app.ldu_caseload_view
 AS SELECT t.ldu_id AS id,
           t.id AS link_id,
@@ -320,7 +322,7 @@ AS SELECT t.ldu_id AS id,
 
 
 -- app.national_caseload_view source
-
+DROP VIEW app.national_caseload_view;
 CREATE OR REPLACE VIEW app.national_caseload_view
 AS SELECT r.id AS link_id,
           r.description AS name,
@@ -640,7 +642,7 @@ AS SELECT r.id AS link_id,
 
 
 -- app.region_caseload_view source
-
+DROP VIEW app.region_caseload_view;
 CREATE OR REPLACE VIEW app.region_caseload_view
 AS SELECT l.region_id AS id,
           l.id AS link_id,
