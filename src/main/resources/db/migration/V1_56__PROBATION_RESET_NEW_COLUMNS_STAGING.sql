@@ -66,7 +66,7 @@ ALTER TABLE staging.wmt_extract_filtered ADD COLUMN commtierc2_s VARCHAR NULL;
 ALTER TABLE staging.wmt_extract_filtered ADD COLUMN commtierc3_s VARCHAR NULL;
 ALTER TABLE staging.wmt_extract_filtered ADD COLUMN commtierd0_s VARCHAR NULL;
 ALTER TABLE staging.wmt_extract_filtered ADD COLUMN commtierd1_s VARCHAR NULL;
-ALTER TABLE staging.mt_extract_filtered ADD COLUMN commtierd2_s VARCHAR NULL;
+ALTER TABLE staging.wmt_extract_filtered ADD COLUMN commtierd2_s VARCHAR NULL;
 ALTER TABLE staging.wmt_extract_filtered ADD COLUMN commtierd3_s VARCHAR NULL;
 
 ALTER TABLE staging.wmt_extract_filtered ADD COLUMN licencetiera0_s VARCHAR NULL;
