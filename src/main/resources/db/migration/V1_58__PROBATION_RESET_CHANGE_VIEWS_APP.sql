@@ -967,7 +967,7 @@ AS SELECT l.region_id AS id,
 
 
 -- app.team_caseload_view source
-
+DROP VIEW app.team_caseload_view;
 CREATE OR REPLACE VIEW app.team_caseload_view
 AS SELECT wo.team_id AS id,
           wo.id AS link_id,
