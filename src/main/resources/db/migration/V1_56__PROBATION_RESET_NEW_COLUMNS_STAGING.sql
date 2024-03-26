@@ -120,7 +120,7 @@ ALTER TABLE staging.t2a ADD COLUMN commtierc3_s VARCHAR NULL;
 ALTER TABLE staging.t2a ADD COLUMN commtierd0_s VARCHAR NULL;
 ALTER TABLE staging.t2a ADD COLUMN commtierd1_s VARCHAR NULL;
 ALTER TABLE staging.t2a ADD COLUMN commtierd2_s VARCHAR NULL;
-ALTER TABLE staging.2a ADD COLUMN commtierd3_s VARCHAR NULL;
+ALTER TABLE staging.t2a ADD COLUMN commtierd3_s VARCHAR NULL;
 
 ALTER TABLE staging.t2a ADD COLUMN licencetiera0_s VARCHAR NULL;
 ALTER TABLE staging.t2a ADD COLUMN licencetiera1_s VARCHAR NULL;
