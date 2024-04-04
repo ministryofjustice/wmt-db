@@ -1,0 +1,52 @@
+/* workload_points set default values */
+
+ALTER TABLE app.workload_points ALTER COLUMN comm_tier_1_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN comm_tier_2_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN comm_tier_3_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN comm_tier_4_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN comm_tier_5_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN comm_tier_6_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN comm_tier_7_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN comm_tier_8_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN comm_tier_9_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN comm_tier_10_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN comm_tier_11_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN comm_tier_12_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN comm_tier_13_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN comm_tier_14_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN comm_tier_15_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN comm_tier_16_s SET DEFAULT 0;
+
+ALTER TABLE app.workload_points ALTER COLUMN cust_tier_1_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN cust_tier_2_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN cust_tier_3_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN cust_tier_4_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN cust_tier_5_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN cust_tier_6_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN cust_tier_7_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN cust_tier_8_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN cust_tier_9_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN cust_tier_10_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN cust_tier_11_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN cust_tier_12_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN cust_tier_13_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN cust_tier_14_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN cust_tier_15_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN cust_tier_16_s SET DEFAULT 0;
+
+ALTER TABLE app.workload_points ALTER COLUMN lic_tier_1_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN lic_tier_2_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN lic_tier_3_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN lic_tier_4_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN lic_tier_5_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN lic_tier_6_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN lic_tier_7_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN lic_tier_8_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN lic_tier_9_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN lic_tier_10_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN lic_tier_11_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN lic_tier_12_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN lic_tier_13_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN lic_tier_14_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN lic_tier_15_s SET DEFAULT 0;
+ALTER TABLE app.workload_points ALTER COLUMN lic_tier_16_s SET DEFAULT 0;
