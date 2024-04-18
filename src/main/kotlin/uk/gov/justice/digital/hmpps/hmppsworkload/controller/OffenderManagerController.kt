@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.persistence.EntityNotFoundException
+import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
@@ -72,6 +73,7 @@ class OffenderManagerController(
     @RequestBody allocateCase: AllocateCase,
     authentication: Authentication,
   ): CaseAllocated {
+    log.info("Allocating case for crn ${allocateCase.crn} to staffCode $staffCode in teamCode $teamCode")
     return saveWorkloadService.saveWorkload(StaffIdentifier(staffCode, teamCode), allocateCase, authentication.name)
   }
 
@@ -86,4 +88,8 @@ class OffenderManagerController(
   @GetMapping("/team/{teamCode}/offenderManagers/{offenderManagerCode}/cases")
   suspend fun getCases(@PathVariable(required = true) teamCode: String, @PathVariable(required = true) offenderManagerCode: String): OffenderManagerCases =
     getOffenderManagerService.getCases(StaffIdentifier(offenderManagerCode, teamCode)) ?: throw EntityNotFoundException("Team $teamCode and offender manager $offenderManagerCode combination not found")
+
+  companion object {
+    private val log = LoggerFactory.getLogger(this::class.java)
+  }
 }

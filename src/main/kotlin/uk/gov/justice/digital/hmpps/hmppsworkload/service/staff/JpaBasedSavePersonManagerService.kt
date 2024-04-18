@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service.staff
 
 import jakarta.transaction.Transactional
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffMember
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.SaveResult
@@ -54,5 +55,9 @@ class JpaBasedSavePersonManagerService(
     personManagerRepository.save(personManagerEntity)
     workloadCalculationService.saveWorkloadCalculation(StaffIdentifier(deliusStaff.code, teamCode), deliusStaff.getGrade())
     return SaveResult(personManagerEntity, true)
+  }
+
+  companion object {
+    private val log = LoggerFactory.getLogger(this::class.java)
   }
 }
