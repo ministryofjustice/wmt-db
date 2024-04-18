@@ -6,6 +6,7 @@ import io.awspring.cloud.sqs.annotation.SqsListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.future
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.SaveCaseDetailsService
 
@@ -18,6 +19,7 @@ class OffenderEventListener(
   @SqsListener("hmppsoffenderqueue", factory = "hmppsQueueContainerFactoryProxy")
   fun processMessage(rawMessage: String) {
     val (crn) = getCase(rawMessage)
+    log.info("Processing message on offender queue for crn $crn")
     CoroutineScope(Dispatchers.Default).future {
       saveCaseDetailsService.saveByCrn(crn)
     }.get()
@@ -26,6 +28,10 @@ class OffenderEventListener(
   private fun getCase(rawMessage: String): HmppsOffenderEvent {
     val (message) = objectMapper.readValue(rawMessage, SQSMessage::class.java)
     return objectMapper.readValue(message, HmppsOffenderEvent::class.java)
+  }
+
+  companion object {
+    private val log = LoggerFactory.getLogger(this::class.java)
   }
 }
 
@@ -36,3 +42,5 @@ data class HmppsOffenderEvent(
 data class SQSMessage(
   @JsonProperty("Message") val message: String,
 )
+
+
