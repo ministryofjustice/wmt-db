@@ -55,4 +55,4 @@ generic-prometheus-alerts:
   businessHoursOnly: true
   
 env_details:
-  production_env: false
+  production_env: true
