@@ -44,3 +44,6 @@ generic-prometheus-alerts:
   runbookUrl: https://dsdmoj.atlassian.net/wiki/spaces/MaS/pages/3533964702/WMT+Run+book
   ingress5xxErrorWindowMinutes: 4
 
+env_details:
+  production_env: true
+  
