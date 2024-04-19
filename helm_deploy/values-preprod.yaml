@@ -56,3 +56,4 @@ generic-prometheus-alerts:
   
 env_details:
   production_env: true
+

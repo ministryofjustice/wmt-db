@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -37,12 +38,14 @@ class SaveCaseDetailsService(
   private suspend fun savePerson(
     personSummary: PersonSummary?,
   ) {
+    log.info("Entered savePerson() for personSummary: $personSummary")
     personSummary?.takeUnless { it.type == CaseType.UNKNOWN }?.type?.let { caseType ->
       hmppsTierApiClient.getTierByCrn(personSummary.crn)?.let {
         val tier = Tier.valueOf(it)
         val caseDetails = CaseDetailsEntity(personSummary.crn, tier, caseType, personSummary.name.forename, personSummary.name.surname)
         caseDetailsRepository.save(caseDetails)
         val staff: PersonManager? = getPersonManager.findLatestByCrn(personSummary.crn)
+        log.info("PersonManager in savePerson() = $staff")
         if (staff != null) {
           workloadCalculationService.saveWorkloadCalculation(
             StaffIdentifier(staff.staffCode, staff.teamCode),
@@ -51,10 +54,16 @@ class SaveCaseDetailsService(
         }
       }
     } ?: personSummary?.crn?.let { crn ->
+      log.info("CaseType unknown")
       caseDetailsRepository.findByIdOrNull(crn)?.let {
+        log.info("Deleting caseDetails for crn $crn")
         caseDetailsRepository.delete(it)
         updateWorkloadService.setWorkloadInactive(crn)
       }
     }
+  }
+
+  companion object {
+    private val log = LoggerFactory.getLogger(this::class.java)
   }
 }
