@@ -43,7 +43,7 @@ dependencies {
   agentDeps("com.microsoft.azure:applicationinsights-agent:3.5.1")
 
   implementation("uk.gov.service.notify:notifications-java-client:5.0.1-RELEASE")
-  implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.7.3")
+  implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.7.4")
 
   runtimeOnly("com.zaxxer:HikariCP")
   runtimeOnly("org.flywaydb:flyway-core")
