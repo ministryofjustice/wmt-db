@@ -45,5 +45,5 @@ generic-prometheus-alerts:
   ingress5xxErrorWindowMinutes: 4
 
 env_details:
-  production_env: true
+  refresh_env: false
   

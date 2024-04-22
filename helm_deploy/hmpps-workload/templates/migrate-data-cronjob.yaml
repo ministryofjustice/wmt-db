@@ -1,4 +1,4 @@
-{{- if .Values.env_details.production_env -}}
+{{- if .Values.env_details.refresh_env -}}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -72,7 +72,7 @@ spec:
             runAsUser: 999
           containers:
             - name: dbrefresh
-              image: "postgres:14"
+              image: "postgres:15"
               command:
                 - /bin/entrypoint.sh
               volumeMounts:
