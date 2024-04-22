@@ -43,7 +43,7 @@ dependencies {
   agentDeps("com.microsoft.azure:applicationinsights-agent:3.5.1")
 
   implementation("uk.gov.service.notify:notifications-java-client:5.0.1-RELEASE")
-  implementation("com.vladmihalcea:hibernate-types-60:2.21.1")
+  implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.7.3")
 
   runtimeOnly("com.zaxxer:HikariCP")
   runtimeOnly("org.flywaydb:flyway-core")
@@ -63,13 +63,13 @@ repositories {
 }
 
 java {
-  toolchain.languageVersion.set(JavaLanguageVersion.of(18))
+  toolchain.languageVersion.set(JavaLanguageVersion.of(19))
 }
 
 tasks {
   withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
-      jvmTarget = "18"
+      jvmTarget = "19"
     }
   }
   getByName("check") {
@@ -89,7 +89,7 @@ detekt {
 configurations.matching { it.name == "detekt" }.all {
   resolutionStrategy.eachDependency {
     if (requested.group == "org.jetbrains.kotlin") {
-      useVersion("1.9.21")
+      useVersion("1.9.23")
     }
   }
 }
