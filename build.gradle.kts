@@ -62,14 +62,20 @@ repositories {
   mavenCentral()
 }
 
-java {
-  toolchain.languageVersion.set(JavaLanguageVersion.of(19))
-}
-
 tasks {
   withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
-      jvmTarget = "19"
+      jvmTarget = "21"
+    }
+  }
+  compileKotlin {
+    kotlinOptions {
+      jvmTarget = JavaVersion.VERSION_21.toString()
+    }
+  }
+  compileTestKotlin {
+    kotlinOptions {
+      jvmTarget = JavaVersion.VERSION_21.toString()
     }
   }
   getByName("check") {
