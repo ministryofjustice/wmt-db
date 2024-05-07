@@ -38,7 +38,7 @@ class SaveCaseDetailsService(
   private suspend fun savePerson(
     personSummary: PersonSummary?,
   ) {
-    log.info("Entered savePerson() for personSummary: $personSummary")
+    log.info("Entered savePerson() for crn: ${personSummary?.crn} with case type: ${personSummary?.type}")
     personSummary?.takeUnless { it.type == CaseType.UNKNOWN }?.type?.let { caseType ->
       hmppsTierApiClient.getTierByCrn(personSummary.crn)?.let {
         val tier = Tier.valueOf(it)
@@ -54,7 +54,7 @@ class SaveCaseDetailsService(
         }
       }
     } ?: personSummary?.crn?.let { crn ->
-      log.info("CaseType unknown")
+      log.info("CaseType UNKNOWN for crn: $crn")
       caseDetailsRepository.findByIdOrNull(crn)?.let {
         log.info("Deleting caseDetails for crn $crn")
         caseDetailsRepository.delete(it)
