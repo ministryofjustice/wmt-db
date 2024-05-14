@@ -5,6 +5,7 @@ import io.awspring.cloud.sqs.annotation.SqsListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.future
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.SaveCaseDetailsService
@@ -24,9 +25,14 @@ class WorkloadPrisonerEventListener(
   }
 
   private fun getNomsNumber(rawMessage: String): String {
-    val (message) = objectMapper.readValue(rawMessage, SQSMessage::class.java)
-    val event = objectMapper.readValue(message, WorkloadPrisonerEvent::class.java)
+    val message = objectMapper.readValue(rawMessage, SQSMessage::class.java)
+    val event = objectMapper.readValue(message.message, WorkloadPrisonerEvent::class.java)
+    log.info("Received message from workloadprisonerqueue with messageId :{}", message?.messageId)
     return event.personReference.identifiers.find { it.type == "NOMS" }!!.value
+  }
+
+  companion object {
+    private val log = LoggerFactory.getLogger(this::class.java)
   }
 }
 

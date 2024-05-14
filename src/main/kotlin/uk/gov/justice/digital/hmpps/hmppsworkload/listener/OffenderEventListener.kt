@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.listener
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.awspring.cloud.sqs.annotation.SqsListener
@@ -26,8 +27,9 @@ class OffenderEventListener(
   }
 
   private fun getCase(rawMessage: String): HmppsOffenderEvent {
-    val (message) = objectMapper.readValue(rawMessage, SQSMessage::class.java)
-    return objectMapper.readValue(message, HmppsOffenderEvent::class.java)
+    val message = objectMapper.readValue(rawMessage, SQSMessage::class.java)
+    log.info("Received message from hmppsoffenderqueue with messageId:{}", message?.messageId)
+    return objectMapper.readValue(message.message, HmppsOffenderEvent::class.java)
   }
 
   companion object {
@@ -39,6 +41,8 @@ data class HmppsOffenderEvent(
   val crn: String,
 )
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class SQSMessage(
-  @JsonProperty("Message") val message: String,
+  @JsonProperty("Message") val message: String?,
+  @JsonProperty("MessageId") val messageId: String?,
 )
