@@ -9,11 +9,13 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.SaveCaseDetailsService
+import uk.gov.justice.hmpps.sqs.HmppsQueueService
 
 @Component
 class WorkloadPrisonerEventListener(
   private val objectMapper: ObjectMapper,
   private val saveCaseDetailsService: SaveCaseDetailsService,
+  private val hmppsQueueService: HmppsQueueService,
 ) {
 
   @SqsListener("workloadprisonerqueue", factory = "hmppsQueueContainerFactoryProxy")
@@ -26,8 +28,9 @@ class WorkloadPrisonerEventListener(
 
   private fun getNomsNumber(rawMessage: String): String {
     val message = objectMapper.readValue(rawMessage, SQSMessage::class.java)
+    val queueId = hmppsQueueService.findByQueueName("workloadprisonerqueue")?.id
     val event = objectMapper.readValue(message.message, WorkloadPrisonerEvent::class.java)
-    log.info("Received message from workloadprisonerqueue with messageId :{}", message?.messageId)
+    log.info("Received message from {} with messageId :{}", queueId, message?.messageId)
     return event.personReference.identifiers.find { it.type == "NOMS" }!!.value
   }
 

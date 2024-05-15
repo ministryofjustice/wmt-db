@@ -12,12 +12,14 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToD
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.StaffIdentifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.event.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.WorkloadCalculationService
+import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import java.math.BigDecimal
 
 @Component
 class WorkloadCalculationEventListener(
   private val objectMapper: ObjectMapper,
   private val workloadCalculationService: WorkloadCalculationService,
+  private val hmppsQueueService: HmppsQueueService,
   @Qualifier("workforceAllocationsToDeliusApiClient") private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient,
 ) {
 
@@ -37,7 +39,8 @@ class WorkloadCalculationEventListener(
 
   private fun getWorkloadCalculationEvent(rawMessage: String): WorkloadCalculationEvent {
     val message = objectMapper.readValue(rawMessage, SQSMessage::class.java)
-    log.info("Received message from workloadcalculationqueue with messageId:{}", message?.messageId)
+    val queueId = hmppsQueueService.findByQueueName("workloadcalculationqueue")?.id
+    log.info("Received message from {} with messageId:{}", queueId, message?.messageId)
     return objectMapper.readValue(message.message, WorkloadCalculationEvent::class.java)
   }
 

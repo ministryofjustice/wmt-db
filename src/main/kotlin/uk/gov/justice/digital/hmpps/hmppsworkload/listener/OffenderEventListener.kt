@@ -10,11 +10,13 @@ import kotlinx.coroutines.future.future
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.SaveCaseDetailsService
+import uk.gov.justice.hmpps.sqs.HmppsQueueService
 
 @Component
 class OffenderEventListener(
   private val objectMapper: ObjectMapper,
   private val saveCaseDetailsService: SaveCaseDetailsService,
+  private val hmppsQueueService: HmppsQueueService,
 ) {
 
   @SqsListener("hmppsoffenderqueue", factory = "hmppsQueueContainerFactoryProxy")
@@ -28,7 +30,8 @@ class OffenderEventListener(
 
   private fun getCase(rawMessage: String): HmppsOffenderEvent {
     val message = objectMapper.readValue(rawMessage, SQSMessage::class.java)
-    log.info("Received message from hmppsoffenderqueue with messageId:{}", message?.messageId)
+    val queueId = hmppsQueueService.findByQueueName("hmppsoffenderqueue")?.id
+    log.info("Received message from {} with messageId:{}", queueId, message?.messageId)
     return objectMapper.readValue(message.message, HmppsOffenderEvent::class.java)
   }
 
