@@ -36,10 +36,10 @@ class WorkloadCalculationEventListener(
   }
 
   private fun getWorkloadCalculationEvent(rawMessage: String): WorkloadCalculationEvent {
-    val message = objectMapper.readValue(rawMessage, SQSMessage::class.java)
+    val (message, messageId) = objectMapper.readValue(rawMessage, SQSMessage::class.java)
     val queueName = System.getenv("HMPPS_SQS_QUEUES_WORKLOADCALCULATIONQUEUE_QUEUE_NAME") ?: "Queue name not found"
-    log.info("Received message from {} with messageId:{}", queueName, message?.messageId)
-    return objectMapper.readValue(message.message, WorkloadCalculationEvent::class.java)
+    log.info("Received message from {$queueName} with messageId:{$messageId}")
+    return objectMapper.readValue(message, WorkloadCalculationEvent::class.java)
   }
 
   companion object {
