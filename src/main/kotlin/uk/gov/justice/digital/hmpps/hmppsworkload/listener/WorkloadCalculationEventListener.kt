@@ -5,6 +5,7 @@ import io.awspring.cloud.sqs.annotation.SqsListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.future
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToDeliusApiClient
@@ -35,8 +36,14 @@ class WorkloadCalculationEventListener(
   }
 
   private fun getWorkloadCalculationEvent(rawMessage: String): WorkloadCalculationEvent {
-    val (message) = objectMapper.readValue(rawMessage, SQSMessage::class.java)
+    val (message, messageId) = objectMapper.readValue(rawMessage, SQSMessage::class.java)
+    val queueName = System.getenv("HMPPS_SQS_QUEUES_WORKLOADCALCULATIONQUEUE_QUEUE_NAME") ?: "Queue name not found"
+    log.info("Received message from $queueName with messageId:$messageId")
     return objectMapper.readValue(message, WorkloadCalculationEvent::class.java)
+  }
+
+  companion object {
+    private val log = LoggerFactory.getLogger(this::class.java)
   }
 }
 
