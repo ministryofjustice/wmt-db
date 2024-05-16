@@ -8,20 +8,18 @@ import kotlinx.coroutines.future.future
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.reduction.UpdateReductionService
-import uk.gov.justice.hmpps.sqs.HmppsQueueService
 
 @Component
 class ExtractPlacedEventListener(
   private val objectMapper: ObjectMapper,
   private val updateReductionService: UpdateReductionService,
-  private val hmppsQueueService: HmppsQueueService,
 ) {
 
   @SqsListener("hmppsextractplacedqueue", factory = "hmppsQueueContainerFactoryProxy")
   fun processMessage(rawMessage: String) {
     val messageId = objectMapper.readValue(rawMessage, SQSMessage::class.java)?.messageId
-    val queueId = hmppsQueueService.findByQueueName("hmppsextractplacedqueue")?.id
-    log.info("Received message from {} with messageId:{}", queueId, messageId)
+    val queueName = System.getenv("HMPPS_SQS_QUEUES_HMPPSEXTRACTPLACEDQUEUE_QUEUE_NAME") ?: "Queue name not found"
+    log.info("Received message from {} with messageId:{}", queueName, messageId)
     CoroutineScope(Dispatchers.Default).future {
       updateReductionService.updateOutOfDateReductionStatus()
     }.get()
