@@ -28,7 +28,7 @@ class TierCalculationEventListener(
   private fun readMessage(wrapper: String?): CalculationEventData {
     val (message, messageId) = objectMapper.readValue(wrapper, SQSMessage::class.java)
     val queueName = System.getenv("HMPPS_SQS_QUEUES_TIERCALCQUEUE_QUEUE_NAME") ?: "Queue name not found"
-    log.info("Received message from {$queueName} with messageId:{$messageId}")
+    log.info("Received message from $queueName with messageId:$messageId")
     return objectMapper.readValue(message, CalculationEventData::class.java)
   }
 

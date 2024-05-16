@@ -28,7 +28,7 @@ class WorkloadPrisonerEventListener(
     val (message, messageId) = objectMapper.readValue(rawMessage, SQSMessage::class.java)
     val queueName = System.getenv("HMPPS_SQS_QUEUES_WORKLOADPRISONERQUEUE_QUEUE_NAME") ?: "Queue name not found"
     val event = objectMapper.readValue(message, WorkloadPrisonerEvent::class.java)
-    log.info("Received message from {$queueName} with messageId :{$messageId}")
+    log.info("Received message from $queueName with messageId :$messageId")
     return event.personReference.identifiers.find { it.type == "NOMS" }!!.value
   }
 

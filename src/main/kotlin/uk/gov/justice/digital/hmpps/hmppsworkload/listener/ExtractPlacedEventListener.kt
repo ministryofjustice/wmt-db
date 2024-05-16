@@ -19,7 +19,7 @@ class ExtractPlacedEventListener(
   fun processMessage(rawMessage: String) {
     val (message, messageId) = objectMapper.readValue(rawMessage, SQSMessage::class.java)
     val queueName = System.getenv("HMPPS_SQS_QUEUES_HMPPSEXTRACTPLACEDQUEUE_QUEUE_NAME") ?: "Queue name not found"
-    log.info("Received message from {$queueName} with messageId:{$message}", queueName, messageId)
+    log.info("Received message from $queueName with messageId:$message", queueName, messageId)
     CoroutineScope(Dispatchers.Default).future {
       updateReductionService.updateOutOfDateReductionStatus()
     }.get()

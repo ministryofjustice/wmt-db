@@ -29,7 +29,7 @@ class OffenderEventListener(
   private fun getCase(rawMessage: String): HmppsOffenderEvent {
     val (message, messageId) = objectMapper.readValue(rawMessage, SQSMessage::class.java)
     val queueName = System.getenv("HMPPS_SQS_QUEUES_HMPPSOFFENDERQUEUE_QUEUE_NAME") ?: "Queue name not found"
-    log.info("Received message from {$queueName} with messageId:{$messageId}")
+    log.info("Received message from $queueName with messageId:$messageId")
     return objectMapper.readValue(message, HmppsOffenderEvent::class.java)
   }
 
