@@ -42,7 +42,7 @@ class DefaultSaveWorkloadService(
       loggedInUser,
       allocateCase.crn,
     ).also { afterPersonManagerSaved(it, allocationData.staff, caseDetails) }
-    val eventManagerSaveResult = saveEventManagerService.saveEventManager(allocatedStaffId.teamCode, allocationData.staff, allocateCase, loggedInUser)
+    val eventManagerSaveResult = saveEventManagerService.saveEventManager(allocatedStaffId.teamCode, allocationData.staff, allocateCase, loggedInUser, allocationData.allocatingStaff.code, allocationData.allocatingStaff.name.getCombinedName(), "")
       .also { afterEventManagerSaved(it, caseDetails) }
     val unallocatedRequirements = allocationData.activeRequirements.filter { !it.manager.allocated }
     val requirementManagerSaveResults = saveRequirementManagerService.saveRequirementManagers(allocatedStaffId.teamCode, allocationData.staff, allocateCase, loggedInUser, unallocatedRequirements)

@@ -31,6 +31,9 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
         createdBy = "createdBy",
         isActive = true,
         eventNumber = 1,
+        spoStaffId = "SP2",
+        spoName = "Fred flintstone",
+        spoTeamCode = "Earth",
       ),
     )
     val eventManagerEntity = eventManagerRepository.findByIdOrNull(savedEntity.id!!)!!
@@ -54,6 +57,9 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
         createdBy = "createdBy",
         isActive = true,
         eventNumber = 1,
+        spoStaffId = "SP2",
+        spoName = "Fred flintstone",
+        spoTeamCode = "Earth",
       ),
     )
 
@@ -73,6 +79,9 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
         createdBy = "createdBy",
         isActive = true,
         eventNumber = 1,
+        spoStaffId = "SP2",
+        spoName = "Fred flintstone",
+        spoTeamCode = "Earth",
       ),
     )
 
@@ -86,6 +95,9 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
         createdBy = "createdBy",
         isActive = true,
         eventNumber = 1,
+        spoStaffId = "SP2",
+        spoName = "Fred flintstone",
+        spoTeamCode = "Earth",
       ),
     )
     val latestEventManagerEntity = eventManagerRepository.findByIdOrNull(savedEntity.id!!)!!
@@ -111,6 +123,9 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
         createdBy = "createdBy",
         isActive = false,
         eventNumber = 1,
+        spoStaffId = "SP2",
+        spoName = "Fred flintstone",
+        spoTeamCode = "Earth",
       ),
     )
     val eventManagerEntity = eventManagerRepository.findByIdOrNull(savedEntity.id!!)!!
@@ -125,6 +140,9 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
         createdBy = "createdBy",
         isActive = true,
         eventNumber = 1,
+        spoStaffId = "SP2",
+        spoName = "Fred flintstone",
+        spoTeamCode = "Earth",
       ),
     )
 

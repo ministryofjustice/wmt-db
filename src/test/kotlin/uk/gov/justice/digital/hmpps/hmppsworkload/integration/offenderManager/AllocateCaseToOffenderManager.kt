@@ -186,6 +186,9 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       createdBy = "USER1",
       isActive = true,
       eventNumber = eventNumber,
+      spoStaffId = "SP2",
+      spoName = "Fred flintstone",
+      spoTeamCode = "Earth",
     )
     eventManagerRepository.save(storedEventManager)
     val storedRequirementManager = RequirementManagerEntity(
@@ -231,6 +234,9 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
         createdBy = "USER1",
         isActive = true,
         eventNumber = eventNumber,
+        spoStaffId = "SP2",
+        spoName = "Fred flintstone",
+        spoTeamCode = "Earth",
       ),
     )
 
