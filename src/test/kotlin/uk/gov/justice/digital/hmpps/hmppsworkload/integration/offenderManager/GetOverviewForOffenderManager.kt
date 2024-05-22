@@ -245,7 +245,6 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
         eventNumber = 1,
         spoStaffId = "SP2",
         spoName = "Fred flintstone",
-        spoTeamCode = "Earth",
       ),
     )
     val storedEventManager = eventManagerRepository.findByIdOrNull(eventManager.id!!)!!

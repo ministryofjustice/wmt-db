@@ -29,7 +29,6 @@ class GetAllocatedEvents : IntegrationTestBase() {
         eventNumber = 2,
         spoStaffId = "SP2",
         spoName = "Fred flintstone",
-        spoTeamCode = "Earth",
       ),
     )
 
@@ -74,7 +73,6 @@ class GetAllocatedEvents : IntegrationTestBase() {
         eventNumber = 2,
         spoStaffId = "SP2",
         spoName = "Fred flintstone",
-        spoTeamCode = "Earth",
       ),
     )
     oldEventManager.createdDate = ZonedDateTime.now().minusDays(60)
@@ -111,7 +109,6 @@ class GetAllocatedEvents : IntegrationTestBase() {
         eventNumber = 2,
         spoStaffId = "SP2",
         spoName = "Fred flintstone",
-        spoTeamCode = "Earth",
       ),
     )
 
@@ -142,7 +139,6 @@ class GetAllocatedEvents : IntegrationTestBase() {
         eventNumber = 2,
         spoStaffId = "SP2",
         spoName = "Fred flintstone",
-        spoTeamCode = "Earth",
       ),
     )
 

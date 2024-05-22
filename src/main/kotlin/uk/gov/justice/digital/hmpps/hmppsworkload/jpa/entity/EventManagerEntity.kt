@@ -51,7 +51,4 @@ data class EventManagerEntity(
 
   @Column
   var spoName: String?,
-
-  @Column
-  val spoTeamCode: String?,
 )

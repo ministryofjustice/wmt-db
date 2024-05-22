@@ -20,7 +20,6 @@ class GetLatestEventManagerByEventNumberTest : IntegrationTestBase() {
       eventNumber = 2,
       spoStaffId = "SP2",
       spoName = "Fred flintstone",
-      spoTeamCode = "Earth",
     )
     eventManagerRepository.save(storedEventManager)
 

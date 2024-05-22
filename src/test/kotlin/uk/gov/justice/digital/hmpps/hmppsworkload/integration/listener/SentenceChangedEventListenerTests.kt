@@ -146,7 +146,6 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
         eventNumber = 1,
         spoStaffId = "SP2",
         spoName = "Fred flintstone",
-        spoTeamCode = "Earth",
       ),
     )
     val requirementManagerEntity = requirementManagerRepository.save(
