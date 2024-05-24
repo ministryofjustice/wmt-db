@@ -21,21 +21,21 @@ class JpaBasedSaveEventManagerService(
    * if the case has an event manager check if the new event manager is the same otherwise make the older event manager
    * inactive and save the new event manager.
    */
-  override fun saveEventManager(teamCode: String, deliusStaff: StaffMember, allocateCase: AllocateCase, loggedInUser: String, spoStaffId: String, spoName: String): SaveResult<EventManagerEntity> = eventManagerRepository.findFirstByCrnAndEventNumberOrderByCreatedDateDesc(allocateCase.crn, allocateCase.eventNumber)?.let { eventManager ->
+  override fun saveEventManager(teamCode: String, deliusStaff: StaffMember, allocateCase: AllocateCase, loggedInUser: String, spoStaffCode: String, spoName: String): SaveResult<EventManagerEntity> = eventManagerRepository.findFirstByCrnAndEventNumberOrderByCreatedDateDesc(allocateCase.crn, allocateCase.eventNumber)?.let { eventManager ->
     if (eventManager.staffCode == deliusStaff.code && eventManager.teamCode == teamCode) {
       return SaveResult(eventManager, false)
     }
     eventManager.isActive = false
     eventManagerRepository.save(eventManager)
-    saveEventManagerEntity(allocateCase, deliusStaff, teamCode, loggedInUser, spoStaffId, spoName)
-  } ?: saveEventManagerEntity(allocateCase, deliusStaff, teamCode, loggedInUser, spoStaffId, spoName)
+    saveEventManagerEntity(allocateCase, deliusStaff, teamCode, loggedInUser, spoStaffCode, spoName)
+  } ?: saveEventManagerEntity(allocateCase, deliusStaff, teamCode, loggedInUser, spoStaffCode, spoName)
 
   private fun saveEventManagerEntity(
     allocateCase: AllocateCase,
     deliusStaff: StaffMember,
     teamCode: String,
     loggedInUser: String,
-    spoStaffId: String?,
+    spoStaffCode: String?,
     spoName: String?,
   ): SaveResult<EventManagerEntity> {
     val eventManagerEntity = EventManagerEntity(
@@ -45,7 +45,7 @@ class JpaBasedSaveEventManagerService(
       createdBy = loggedInUser,
       isActive = true,
       eventNumber = allocateCase.eventNumber,
-      spoStaffId = spoStaffId,
+      spoStaffCode = spoStaffCode,
       spoName = spoName,
     )
     eventManagerRepository.save(eventManagerEntity)

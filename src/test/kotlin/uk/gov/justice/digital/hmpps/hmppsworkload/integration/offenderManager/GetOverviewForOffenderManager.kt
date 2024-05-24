@@ -243,7 +243,7 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
         createdBy = "USER1",
         isActive = true,
         eventNumber = 1,
-        spoStaffId = "SP2",
+        spoStaffCode = "SP2",
         spoName = "Fred flintstone",
       ),
     )
