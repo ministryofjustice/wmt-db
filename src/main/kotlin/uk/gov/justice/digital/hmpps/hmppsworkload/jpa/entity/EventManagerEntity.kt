@@ -45,4 +45,10 @@ data class EventManagerEntity(
 
   @Column
   var eventNumber: Int,
+
+  @Column
+  var spoStaffId: String?,
+
+  @Column
+  var spoName: String?,
 )

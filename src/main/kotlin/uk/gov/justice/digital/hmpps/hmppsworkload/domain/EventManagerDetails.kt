@@ -22,10 +22,14 @@ data class EventManagerDetails @JsonCreator constructor(
   val allocationJustificationNotes: String?,
   @Schema(description = "Justification notes contain sensitive information")
   val sensitiveNotes: Boolean?,
+  @Schema(description = "SPO Staff Code")
+  val spoStaffId: String?,
+  @Schema(description = "SPO Name")
+  val spoName: String?,
 ) {
   companion object {
     fun from(eventManagerEntity: EventManagerEntity, eventManagerAuditEntity: EventManagerAuditEntity?): EventManagerDetails {
-      return EventManagerDetails(eventManagerEntity.uuid, eventManagerEntity.staffCode, eventManagerEntity.teamCode, eventManagerEntity.createdDate!!, eventManagerEntity.eventNumber, eventManagerAuditEntity?.allocationJustificationNotes, eventManagerAuditEntity?.sensitiveNotes)
+      return EventManagerDetails(eventManagerEntity.uuid, eventManagerEntity.staffCode, eventManagerEntity.teamCode, eventManagerEntity.createdDate!!, eventManagerEntity.eventNumber, eventManagerAuditEntity?.allocationJustificationNotes, eventManagerAuditEntity?.sensitiveNotes, eventManagerEntity.spoStaffId, eventManagerEntity.spoName)
     }
   }
 }

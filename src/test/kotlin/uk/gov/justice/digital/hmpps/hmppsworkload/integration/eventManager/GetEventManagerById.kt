@@ -10,7 +10,7 @@ class GetEventManagerById : IntegrationTestBase() {
 
   @Test
   fun `can get event manager by Id`() {
-    val storedEventManager = EventManagerEntity(crn = "CRN1", staffCode = "OM1", teamCode = "T1", createdBy = "USER1", eventNumber = 1, isActive = true)
+    val storedEventManager = EventManagerEntity(crn = "CRN1", staffCode = "OM1", teamCode = "T1", createdBy = "USER1", eventNumber = 1, isActive = true, spoName = "Fred Flintstone", spoStaffId = "SP2")
     eventManagerRepository.save(storedEventManager)
 
     webTestClient.get()
@@ -26,8 +26,10 @@ class GetEventManagerById : IntegrationTestBase() {
       .isEqualTo(storedEventManager.uuid.toString())
       .jsonPath("$.staffCode")
       .isEqualTo(storedEventManager.staffCode)
-      .jsonPath("$.teamCode")
-      .isEqualTo(storedEventManager.teamCode)
+      .jsonPath("$.spoName")
+      .isEqualTo(storedEventManager.spoName)
+      .jsonPath("$.spoStaffId")
+      .isEqualTo(storedEventManager.spoStaffId)
       .jsonPath("$.createdDate")
       .exists()
       .jsonPath("$.eventNumber")
@@ -40,7 +42,7 @@ class GetEventManagerById : IntegrationTestBase() {
 
   @Test
   fun `must return justification notes when recorded`() {
-    val storedEventManager = EventManagerEntity(crn = "CRN1", staffCode = "OM1", teamCode = "T1", createdBy = "USER1", eventNumber = 1, isActive = true)
+    val storedEventManager = EventManagerEntity(crn = "CRN1", staffCode = "OM1", teamCode = "T1", createdBy = "USER1", eventNumber = 1, isActive = true, spoName = "Fred Flintstone", spoStaffId = "SP2")
     eventManagerRepository.save(storedEventManager)
 
     val eventManagerAudit = eventManagerAuditRepository.save(EventManagerAuditEntity(allocationJustificationNotes = "Justification notes", sensitiveNotes = true, createdBy = storedEventManager.createdBy, eventManager = storedEventManager))

@@ -144,6 +144,8 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
         createdBy = "USER1",
         isActive = true,
         eventNumber = 1,
+        spoStaffId = "SP2",
+        spoName = "Fred flintstone",
       ),
     )
     val requirementManagerEntity = requirementManagerRepository.save(

@@ -27,6 +27,8 @@ class GetAllocatedEvents : IntegrationTestBase() {
         createdBy = loggedInUser,
         isActive = true,
         eventNumber = 2,
+        spoStaffId = "SP2",
+        spoName = "Fred flintstone",
       ),
     )
 
@@ -69,6 +71,8 @@ class GetAllocatedEvents : IntegrationTestBase() {
         createdBy = loggedInUser,
         isActive = true,
         eventNumber = 2,
+        spoStaffId = "SP2",
+        spoName = "Fred flintstone",
       ),
     )
     oldEventManager.createdDate = ZonedDateTime.now().minusDays(60)
@@ -103,6 +107,8 @@ class GetAllocatedEvents : IntegrationTestBase() {
         createdBy = loggedInUser,
         isActive = false,
         eventNumber = 2,
+        spoStaffId = "SP2",
+        spoName = "Fred flintstone",
       ),
     )
 
@@ -131,6 +137,8 @@ class GetAllocatedEvents : IntegrationTestBase() {
         createdBy = loggedInUser,
         isActive = true,
         eventNumber = 2,
+        spoStaffId = "SP2",
+        spoName = "Fred flintstone",
       ),
     )
 

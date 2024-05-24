@@ -16,6 +16,8 @@ class GetEventManagerAllocationComplete : IntegrationTestBase() {
       createdBy = "USER1",
       isActive = true,
       eventNumber = 2,
+      spoStaffId = "SP2",
+      spoName = "Fred flintstone",
     )
     eventManagerRepository.save(storedEventManager)
 
