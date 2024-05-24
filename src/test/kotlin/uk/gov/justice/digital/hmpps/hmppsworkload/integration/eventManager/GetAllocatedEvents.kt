@@ -27,7 +27,7 @@ class GetAllocatedEvents : IntegrationTestBase() {
         createdBy = loggedInUser,
         isActive = true,
         eventNumber = 2,
-        spoStaffId = "SP2",
+        spoStaffCode = "SP2",
         spoName = "Fred flintstone",
       ),
     )
@@ -71,7 +71,7 @@ class GetAllocatedEvents : IntegrationTestBase() {
         createdBy = loggedInUser,
         isActive = true,
         eventNumber = 2,
-        spoStaffId = "SP2",
+        spoStaffCode = "SP2",
         spoName = "Fred flintstone",
       ),
     )
@@ -107,7 +107,7 @@ class GetAllocatedEvents : IntegrationTestBase() {
         createdBy = loggedInUser,
         isActive = false,
         eventNumber = 2,
-        spoStaffId = "SP2",
+        spoStaffCode = "SP2",
         spoName = "Fred flintstone",
       ),
     )
@@ -137,7 +137,7 @@ class GetAllocatedEvents : IntegrationTestBase() {
         createdBy = loggedInUser,
         isActive = true,
         eventNumber = 2,
-        spoStaffId = "SP2",
+        spoStaffCode = "SP2",
         spoName = "Fred flintstone",
       ),
     )

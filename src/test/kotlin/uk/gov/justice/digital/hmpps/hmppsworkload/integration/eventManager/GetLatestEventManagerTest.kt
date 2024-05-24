@@ -31,7 +31,7 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
         createdBy = "createdBy",
         isActive = true,
         eventNumber = 1,
-        spoStaffId = "SP2",
+        spoStaffCode = "SP2",
         spoName = "Fred flintstone",
       ),
     )
@@ -56,7 +56,7 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
         createdBy = "createdBy",
         isActive = true,
         eventNumber = 1,
-        spoStaffId = "SP2",
+        spoStaffCode = "SP2",
         spoName = "Fred flintstone",
       ),
     )
@@ -77,7 +77,7 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
         createdBy = "createdBy",
         isActive = true,
         eventNumber = 1,
-        spoStaffId = "SP2",
+        spoStaffCode = "SP2",
         spoName = "Fred flintstone",
       ),
     )
@@ -92,7 +92,7 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
         createdBy = "createdBy",
         isActive = true,
         eventNumber = 1,
-        spoStaffId = "SP2",
+        spoStaffCode = "SP2",
         spoName = "Fred flintstone",
       ),
     )
@@ -119,7 +119,7 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
         createdBy = "createdBy",
         isActive = false,
         eventNumber = 1,
-        spoStaffId = "SP2",
+        spoStaffCode = "SP2",
         spoName = "Fred flintstone",
       ),
     )
@@ -135,7 +135,7 @@ class GetLatestEventManagerTest : IntegrationTestBase() {
         createdBy = "createdBy",
         isActive = true,
         eventNumber = 1,
-        spoStaffId = "SP2",
+        spoStaffCode = "SP2",
         spoName = "Fred flintstone",
       ),
     )

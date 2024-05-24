@@ -186,7 +186,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       createdBy = "USER1",
       isActive = true,
       eventNumber = eventNumber,
-      spoStaffId = "SP2",
+      spoStaffCode = "SP2",
       spoName = "Fred flintstone",
     )
     eventManagerRepository.save(storedEventManager)
@@ -233,7 +233,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
         createdBy = "USER1",
         isActive = true,
         eventNumber = eventNumber,
-        spoStaffId = "SP2",
+        spoStaffCode = "SP2",
         spoName = "Fred flintstone",
       ),
     )

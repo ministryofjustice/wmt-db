@@ -1,0 +1,1 @@
+ALTER TABLE EVENT_MANAGER RENAME COLUMN spo_staff_id TO spo_staff_code;
