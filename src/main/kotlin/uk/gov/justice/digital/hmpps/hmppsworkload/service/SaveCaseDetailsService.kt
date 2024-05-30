@@ -45,7 +45,7 @@ class SaveCaseDetailsService(
         val caseDetails = CaseDetailsEntity(personSummary.crn, tier, caseType, personSummary.name.forename, personSummary.name.surname)
         caseDetailsRepository.save(caseDetails)
         val staff: PersonManager? = getPersonManager.findLatestByCrn(personSummary.crn)
-        log.info("PersonManager in savePerson() = $staff")
+        log.info("PersonManager in savePerson() = $staff for crn ${personSummary.crn}")
         if (staff != null) {
           workloadCalculationService.saveWorkloadCalculation(
             StaffIdentifier(staff.staffCode, staff.teamCode),
