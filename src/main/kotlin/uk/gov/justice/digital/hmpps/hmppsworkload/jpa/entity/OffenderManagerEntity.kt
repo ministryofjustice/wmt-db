@@ -57,6 +57,22 @@ import java.time.LocalDateTime
         ColumnResult(name = "d2"),
         ColumnResult(name = "d1"),
         ColumnResult(name = "d0"),
+        ColumnResult(name = "a3_s"),
+        ColumnResult(name = "a2_s"),
+        ColumnResult(name = "a1_s"),
+        ColumnResult(name = "a0_s"),
+        ColumnResult(name = "b3_s"),
+        ColumnResult(name = "b2_s"),
+        ColumnResult(name = "b1_s"),
+        ColumnResult(name = "b0_s"),
+        ColumnResult(name = "c3_s"),
+        ColumnResult(name = "c2_s"),
+        ColumnResult(name = "c1_s"),
+        ColumnResult(name = "c0_s"),
+        ColumnResult(name = "d3_s"),
+        ColumnResult(name = "d2_s"),
+        ColumnResult(name = "d1_s"),
+        ColumnResult(name = "d0_s"),
       ],
     ),
   ],
@@ -83,7 +99,7 @@ import java.time.LocalDateTime
   name = "OffenderManagerEntity.findByCaseloadTotals",
   resultSetMapping = "OffenderManagerCaseloadTotals",
   query = """
-  SELECT location, untiered, a3, a2, a1, a0, b3, b2, b1, b0, c3, c2, c1, c0, d3, d2, d1, d0
+  SELECT location, untiered, a3, a2, a1, a0, b3, b2, b1, b0, c3, c2, c1, c0, d3, d2, d1, d0, a3_s, a2_s, a1_s, a0_s, b3_s, b2_s, b1_s, b0_s, c3_s, c2_s, c1_s, c0_s, d3_s, d2_s, d1_s, d0_s
   FROM app.team_caseload_view
   WHERE link_id = ?1
 """,

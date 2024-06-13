@@ -36,7 +36,7 @@ data class OffenderManagerCaseloadTotals(
   val D3S: BigDecimal,
   val D2S: BigDecimal,
   val D1S: BigDecimal,
-  val D0S: BigDecimal
+  val D0S: BigDecimal,
 ) {
   fun getATotal(): BigDecimal {
     return A3.add(A2).add(A1).add(A0)
