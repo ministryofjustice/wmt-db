@@ -22,7 +22,7 @@ data class OverviewOffenderManager(
   var nextReductionChange: ZonedDateTime? = null
   var reductionHours: BigDecimal = BigDecimal.ZERO
   var contractedHours: BigDecimal = BigDecimal.ZERO
-  var tierCaseTotals: TierCaseTotals = TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)
+  var tierCaseTotals: TierCaseTotals = TierCaseTotals(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)
   var lastAllocatedEvent: EventDetails? = null
   var hasWorkload = false
 }

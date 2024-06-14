@@ -68,6 +68,10 @@ class GetOverviewForOffenderManager : IntegrationTestBase() {
     val bTierTotal = setupWmtTierTotal(Tier.B2, wmtStaff.workload)
     val cTierTotal = setupWmtTierTotal(Tier.C2, wmtStaff.workload)
     val dTierTotal = setupWmtTierTotal(Tier.D2, wmtStaff.workload)
+    val aSTierTotal = setupWmtTierTotal(Tier.A2S, wmtStaff.workload)
+    val bSTierTotal = setupWmtTierTotal(Tier.B2S, wmtStaff.workload)
+    val cSTierTotal = setupWmtTierTotal(Tier.C2S, wmtStaff.workload)
+    val dSTierTotal = setupWmtTierTotal(Tier.D2S, wmtStaff.workload)
     val untieredTotal = setupWmtTierTotal(null, wmtStaff.workload)
 
     webTestClient.get()
