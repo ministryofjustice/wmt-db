@@ -41,11 +41,9 @@ data class OffenderManagerCaseloadTotals(
   fun getATotal(): BigDecimal {
     return A3.add(A2).add(A1).add(A0)
   }
-
   fun getBTotal(): BigDecimal {
     return B3.add(B2).add(B1).add(B0)
   }
-
   fun getCTotal(): BigDecimal {
     return C3.add(C2).add(C1).add(C0)
   }
