@@ -21,22 +21,22 @@ data class OffenderManagerCaseloadTotals(
   val D2: BigDecimal,
   val D1: BigDecimal,
   val D0: BigDecimal,
-  val A3S: BigDecimal,
-  val A2S: BigDecimal,
-  val A1S: BigDecimal,
-  val A0S: BigDecimal,
-  val B3S: BigDecimal,
-  val B2S: BigDecimal,
-  val B1S: BigDecimal,
-  val B0S: BigDecimal,
-  val C3S: BigDecimal,
-  val C2S: BigDecimal,
-  val C1S: BigDecimal,
-  val C0S: BigDecimal,
-  val D3S: BigDecimal,
-  val D2S: BigDecimal,
-  val D1S: BigDecimal,
-  val D0S: BigDecimal,
+  val A3_S: BigDecimal,
+  val A2_S: BigDecimal,
+  val A1_S: BigDecimal,
+  val A0_S: BigDecimal,
+  val B3_S: BigDecimal,
+  val B2_S: BigDecimal,
+  val B1_S: BigDecimal,
+  val B0_S: BigDecimal,
+  val C3_S: BigDecimal,
+  val C2_S: BigDecimal,
+  val C1_S: BigDecimal,
+  val C0_S: BigDecimal,
+  val D3_S: BigDecimal,
+  val D2_S: BigDecimal,
+  val D1_S: BigDecimal,
+  val D0_S: BigDecimal,
 ) {
   fun getATotal(): BigDecimal {
     return A3.add(A2).add(A1).add(A0)
@@ -53,15 +53,15 @@ data class OffenderManagerCaseloadTotals(
     return D3.add(D2).add(D1).add(D0)
   }
   fun getASTotal(): BigDecimal {
-    return A3S.add(A2S).add(A1S).add(A0S)
+    return A3_S.add(A2_S).add(A1_S).add(A0_S)
   }
   fun getBSTotal(): BigDecimal {
-    return B3S.add(B2S).add(B1S).add(B0S)
+    return B3_S.add(B2_S).add(B1_S).add(B0_S)
   }
   fun getCSTotal(): BigDecimal {
-    return C3S.add(C2S).add(C1S).add(C0S)
+    return C3_S.add(C2_S).add(C1_S).add(C0_S)
   }
   fun getDSTotal(): BigDecimal {
-    return D3S.add(D2S).add(D1S).add(D0S)
+    return D3_S.add(D2_S).add(D1_S).add(D0_S)
   }
 }

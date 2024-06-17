@@ -99,7 +99,7 @@ import java.time.LocalDateTime
   name = "OffenderManagerEntity.findByCaseloadTotals",
   resultSetMapping = "OffenderManagerCaseloadTotals",
   query = """
-  SELECT location, untiered, a3, a2, a1, a0, b3, b2, b1, b0, c3, c2, c1, c0, d3, d2, d1, d0, a3_s as a3s, a2_s as a2s, a1_s as a1s, a0_s as a0s, b3_s as b3s, b2_s as b2s, b1_s as b1s, b0_s as b0s, c3_s as c3s, c2_s as c2s, c1_s as c1s, c0_s as c0s, d3_s as d3s, d2_s as d2s, d1_s as d1s, d0_s as d0s
+  SELECT location, untiered, a3, a2, a1, a0, b3, b2, b1, b0, c3, c2, c1, c0, d3, d2, d1, d0, a3_s, a2_s, a1_s, a0_s, b3_s, b2_s, b1_s, b0_s, c3_s, c2_s, c1_s, c0_s, d3_s, d2_s, d1_s, d0_s
   FROM app.team_caseload_view
   WHERE link_id = ?1
 """,
