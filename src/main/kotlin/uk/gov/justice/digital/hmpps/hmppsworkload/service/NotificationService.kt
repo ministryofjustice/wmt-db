@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
+import io.opentelemetry.api.trace.Span
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -24,9 +25,13 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
+import java.util.*
+import kotlin.collections.HashSet
 
 const val SCORE_UNAVAILABLE = "Score Unavailable"
 private const val NOT_APPLICABLE = "N/A"
+private const val EMAIL_REFERENCE_ID = "referenceId"
+private const val CRN = "crn"
 
 @Service
 class NotificationService(
@@ -37,6 +42,9 @@ class NotificationService(
   private val log = LoggerFactory.getLogger(this::class.java)
 
   suspend fun notifyAllocation(allocationDemandDetails: AllocationDemandDetails, allocateCase: AllocateCase, caseDetails: CaseDetailsEntity): List<SendEmailResponse> {
+    val emailReferenceId = UUID.randomUUID().toString()
+    Span.current().setAttribute(EMAIL_REFERENCE_ID, emailReferenceId)
+    Span.current().setAttribute(CRN, caseDetails.crn)
     val notifyData = getNotifyData(allocateCase.crn)
     val parameters = mapOf(
       "officer_name" to allocationDemandDetails.staff.name.getCombinedName(),
@@ -49,7 +57,8 @@ class NotificationService(
     val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
     emailTo.add(allocationDemandDetails.staff.email!!)
     if (allocateCase.sendEmailCopyToAllocatingOfficer) emailTo.add(allocationDemandDetails.allocatingStaff.email)
-    return emailTo.map { email -> addRecipientTo400Response(email) { notificationClient.sendEmail(allocationTemplateId, email, parameters, null) } }
+    log.info("Email request sent to Notify for crn: ${caseDetails.crn} with reference ID: $emailReferenceId")
+    return emailTo.map { email -> addRecipientTo400Response(email) { notificationClient.sendEmail(allocationTemplateId, email, parameters, emailReferenceId) } }
   }
 
   class NotificationInvalidSenderException(emailRecipient: String, cause: Throwable) : Exception("Unable to deliver to recipient $emailRecipient", cause)
