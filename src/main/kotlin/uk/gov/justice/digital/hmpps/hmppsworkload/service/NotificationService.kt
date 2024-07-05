@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
-import io.opentelemetry.api.trace.Span
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Value
