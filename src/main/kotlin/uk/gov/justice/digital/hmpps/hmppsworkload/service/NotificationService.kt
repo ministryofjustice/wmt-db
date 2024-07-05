@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
-import io.opentelemetry.api.trace.Span
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.AssessRisksNeedsApiClient
@@ -30,7 +30,7 @@ import kotlin.collections.HashSet
 
 const val SCORE_UNAVAILABLE = "Score Unavailable"
 private const val NOT_APPLICABLE = "N/A"
-private const val EMAIL_REFERENCE_ID = "referenceId"
+private const val REFERENCE_ID = "referenceId"
 private const val CRN = "crn"
 
 @Service
@@ -43,8 +43,6 @@ class NotificationService(
 
   suspend fun notifyAllocation(allocationDemandDetails: AllocationDemandDetails, allocateCase: AllocateCase, caseDetails: CaseDetailsEntity): List<SendEmailResponse> {
     val emailReferenceId = UUID.randomUUID().toString()
-    Span.current().setAttribute(EMAIL_REFERENCE_ID, emailReferenceId)
-    Span.current().setAttribute(CRN, caseDetails.crn)
     val notifyData = getNotifyData(allocateCase.crn)
     val parameters = mapOf(
       "officer_name" to allocationDemandDetails.staff.name.getCombinedName(),
@@ -57,7 +55,11 @@ class NotificationService(
     val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
     emailTo.add(allocationDemandDetails.staff.email!!)
     if (allocateCase.sendEmailCopyToAllocatingOfficer) emailTo.add(allocationDemandDetails.allocatingStaff.email)
+    MDC.put(REFERENCE_ID, emailReferenceId)
+    MDC.put(CRN, caseDetails.crn)
     log.info("Email request sent to Notify for crn: ${caseDetails.crn} with reference ID: $emailReferenceId")
+    MDC.remove(REFERENCE_ID)
+    MDC.remove(CRN)
     return emailTo.map { email -> addRecipientTo400Response(email) { notificationClient.sendEmail(allocationTemplateId, email, parameters, emailReferenceId) } }
   }
 
