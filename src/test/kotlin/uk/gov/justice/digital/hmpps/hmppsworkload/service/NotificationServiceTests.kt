@@ -249,6 +249,36 @@ class NotificationServiceTests {
   }
 
   @Test
+  fun `must add requirement with null subcategory`() = runBlocking {
+    val name = Name(
+      "fed",
+      "E",
+      "flintstomne",
+    )
+    val manager = Manager(
+      "fred",
+      "liverpool",
+      "top",
+      name,
+      true,
+    )
+    val requirement = Requirement(
+      "Main Category",
+      null,
+      "",
+      BigInteger.ONE,
+      manager,
+      true,
+    )
+    val allocationDetails = getAllocationDetails(allocateCase.crn, activeRequirements = listOf(requirement))
+
+    notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
+    val parameters = slot<MutableMap<String, Any>>()
+    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
+    Assertions.assertEquals(listOf("${requirement.mainCategory}: ${requirement.mainCategory}"), parameters.captured["requirements"])
+  }
+
+  @Test
   fun `must add rosh capitalized when it exists`() = runBlocking {
     val allocationDetails = getAllocationDetails(allocateCase.crn)
     coEvery { assessRisksNeedsApiClient.getRiskSummary(allocateCase.crn) } returns RiskSummary("HIGH")
