@@ -47,7 +47,7 @@ data class Court(
 
 data class Requirement(
   val mainCategory: String,
-  val subCategory: String,
+  val subCategory: String?,
   val length: String,
   val id: BigInteger,
   val manager: Manager,

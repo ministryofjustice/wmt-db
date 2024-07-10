@@ -136,7 +136,7 @@ class NotificationService(
     .map { offence -> offence.mainCategory }
 
   private fun mapRequirements(requirements: List<Requirement>): List<String> = requirements
-    .map { requirement -> "${requirement.mainCategory}: ${requirement.subCategory} ${requirement.length}".trimEnd() }
+    .map { requirement -> "${requirement.mainCategory}: ${requirement.subCategory ?: requirement.mainCategory} ${requirement.length}".trimEnd() }
 
   private suspend fun getNotifyData(crn: String): NotifyData {
     return NotifyData(assessRisksNeedsApiClient.getRiskSummary(crn), assessRisksNeedsApiClient.getRiskPredictors(crn))
