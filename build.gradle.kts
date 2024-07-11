@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.6"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.1"
   kotlin("plugin.spring") version "2.0.0"
   kotlin("plugin.jpa") version "2.0.0"
   id("io.gitlab.arturbosch.detekt").version("1.23.6")
@@ -32,6 +32,9 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+  testImplementation("org.springframework.boot:spring-boot-starter-test")
+  testImplementation("org.springframework.boot:spring-boot-starter-webflux")
+  testImplementation("org.springframework.boot:spring-boot-starter-web")
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.1")
@@ -46,7 +49,8 @@ dependencies {
   implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.8.1")
 
   runtimeOnly("com.zaxxer:HikariCP")
-  runtimeOnly("org.flywaydb:flyway-core")
+  implementation("org.flywaydb:flyway-core")
+  implementation("org.flywaydb:flyway-database-postgresql")
   runtimeOnly("org.postgresql:postgresql:42.7.3")
 
   testImplementation("io.jsonwebtoken:jjwt-impl:0.12.6")
