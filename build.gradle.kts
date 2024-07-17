@@ -57,7 +57,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.6")
   testImplementation("org.mock-server:mockserver-netty:5.15.0")
   testImplementation("org.awaitility:awaitility-kotlin:4.2.1")
-  testImplementation("io.mockk:mockk:1.13.11")
+  testImplementation("io.mockk:mockk:1.13.12")
   testImplementation("com.ninja-squad:springmockk:4.0.2")
 
   testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
