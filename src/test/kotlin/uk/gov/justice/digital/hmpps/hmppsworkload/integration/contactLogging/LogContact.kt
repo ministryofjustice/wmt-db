@@ -7,7 +7,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBas
 
 class LogContact : IntegrationTestBase() {
 
-  val contactLoggingMessage = ContactLoggingMessage("X1234321", true, true)
+  val contactLoggingMessage = ContactLoggingMessage("X1234321", "N58RWE", true, true)
 
   @Test
   fun `will log valid data`() {
