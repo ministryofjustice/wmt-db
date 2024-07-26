@@ -43,19 +43,14 @@ class DefaultSaveWorkloadService(
     val eventManagerSaveResult = saveEvent(allocatedStaffId, allocationData, allocateCase, loggedInUser, caseDetails)
 
     val unallocatedRequirements = allocationData.activeRequirements.filter { !it.manager.allocated }
-    val requirementManagerSaveResults = updateRequirements(allocatedStaffId, allocationData, allocateCase, loggedInUser, unallocatedRequirements, caseDetails)
+    val requirementManagerSaveResults = saveRequirementManagerService.saveRequirementManagers(allocatedStaffId.teamCode, allocationData.staff, allocateCase, loggedInUser, unallocatedRequirements)
+      .also { afterRequirementManagersSaved(it, caseDetails)  }
 
     if (personManagerSaveResult.hasChanged || eventManagerSaveResult.hasChanged || requirementManagerSaveResults.any { it.hasChanged }) {
       notificationService.notifyAllocation(allocationData, allocateCase, caseDetails)
       sqsSuccessPublisher.auditAllocation(allocateCase.crn, allocateCase.eventNumber, loggedInUser, unallocatedRequirements.map { it.id })
     }
     return CaseAllocated(personManagerSaveResult.entity.uuid, eventManagerSaveResult.entity.uuid, requirementManagerSaveResults.map { it.entity.uuid })
-  }
-
-  private fun updateRequirements(allocatedStaffId: StaffIdentifier, allocationData: AllocationDemandDetails, allocateCase: AllocateCase, loggedInUser: String, unallocatedRequirements: List<Requirement>, caseDetails: CaseDetailsEntity): List<SaveResult<RequirementManagerEntity>> {
-    val requirementManagerSaveResults = saveRequirementManagerService.saveRequirementManagers(allocatedStaffId.teamCode, allocationData.staff, allocateCase, loggedInUser, unallocatedRequirements)
-      .also { afterRequirementManagersSaved(it, caseDetails) }
-    return requirementManagerSaveResults
   }
 
   private fun saveEvent(allocatedStaffId: StaffIdentifier, allocationData: AllocationDemandDetails, allocateCase: AllocateCase, loggedInUser: String, caseDetails: CaseDetailsEntity): SaveResult<EventManagerEntity> {
