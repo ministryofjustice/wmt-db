@@ -10,7 +10,7 @@ data class AllocateCase @JsonCreator constructor(
   val eventNumber: Int,
   val allocationJustificationNotes: String?,
   val sensitiveNotes: Boolean?,
-  val spoOversightNotes: String,
+  val spoOversightNotes: String?,
   val sensitiveOversightNotes: Boolean?,
 )
 
