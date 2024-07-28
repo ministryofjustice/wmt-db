@@ -4,7 +4,6 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToDeliusApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.AllocationDemandDetails
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Requirement
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffMember
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseAllocated
@@ -44,7 +43,7 @@ class DefaultSaveWorkloadService(
 
     val unallocatedRequirements = allocationData.activeRequirements.filter { !it.manager.allocated }
     val requirementManagerSaveResults = saveRequirementManagerService.saveRequirementManagers(allocatedStaffId.teamCode, allocationData.staff, allocateCase, loggedInUser, unallocatedRequirements)
-      .also { afterRequirementManagersSaved(it, caseDetails)  }
+      .also { afterRequirementManagersSaved(it, caseDetails) }
 
     if (personManagerSaveResult.hasChanged || eventManagerSaveResult.hasChanged || requirementManagerSaveResults.any { it.hasChanged }) {
       notificationService.notifyAllocation(allocationData, allocateCase, caseDetails)
@@ -65,7 +64,7 @@ class DefaultSaveWorkloadService(
       allocationData.staff,
       loggedInUser,
       allocateCase.crn,
-      ).also { afterPersonManagerSaved(it, allocationData.staff, caseDetails) }
+    ).also { afterPersonManagerSaved(it, allocationData.staff, caseDetails) }
     return personManagerSaveResult
   }
 
