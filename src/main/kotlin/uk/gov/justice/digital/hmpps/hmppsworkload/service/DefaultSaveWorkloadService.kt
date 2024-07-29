@@ -38,8 +38,8 @@ class DefaultSaveWorkloadService(
     val caseDetails: CaseDetailsEntity = caseDetailsRepository.findByIdOrNull(allocateCase.crn)!!
     val allocationData = workforceAllocationsToDeliusApiClient.allocationDetails(allocateCase.crn, allocateCase.eventNumber, allocatedStaffId.staffCode, loggedInUser)
 
-    val personManagerSaveResult = savePerson(allocatedStaffId, allocationData, loggedInUser, allocateCase, caseDetails)
-    val eventManagerSaveResult = saveEvent(allocatedStaffId, allocationData, allocateCase, loggedInUser, caseDetails)
+    val personManagerSaveResult = savePersonManager(allocatedStaffId, allocationData, loggedInUser, allocateCase, caseDetails)
+    val eventManagerSaveResult = saveEventManager(allocatedStaffId, allocationData, allocateCase, loggedInUser, caseDetails)
 
     val unallocatedRequirements = allocationData.activeRequirements.filter { !it.manager.allocated }
     val requirementManagerSaveResults = saveRequirementManagerService.saveRequirementManagers(allocatedStaffId.teamCode, allocationData.staff, allocateCase, loggedInUser, unallocatedRequirements)
@@ -52,13 +52,13 @@ class DefaultSaveWorkloadService(
     return CaseAllocated(personManagerSaveResult.entity.uuid, eventManagerSaveResult.entity.uuid, requirementManagerSaveResults.map { it.entity.uuid })
   }
 
-  private fun saveEvent(allocatedStaffId: StaffIdentifier, allocationData: AllocationDemandDetails, allocateCase: AllocateCase, loggedInUser: String, caseDetails: CaseDetailsEntity): SaveResult<EventManagerEntity> {
+  private fun saveEventManager(allocatedStaffId: StaffIdentifier, allocationData: AllocationDemandDetails, allocateCase: AllocateCase, loggedInUser: String, caseDetails: CaseDetailsEntity): SaveResult<EventManagerEntity> {
     val eventManagerSaveResult = saveEventManagerService.saveEventManager(allocatedStaffId.teamCode, allocationData.staff, allocateCase, loggedInUser, allocationData.allocatingStaff.code, allocationData.allocatingStaff.name.getCombinedName())
       .also { afterEventManagerSaved(it, caseDetails) }
     return eventManagerSaveResult
   }
 
-  private suspend fun savePerson(allocatedStaffId: StaffIdentifier, allocationData: AllocationDemandDetails, loggedInUser: String, allocateCase: AllocateCase, caseDetails: CaseDetailsEntity): SaveResult<PersonManagerEntity> {
+  private suspend fun savePersonManager(allocatedStaffId: StaffIdentifier, allocationData: AllocationDemandDetails, loggedInUser: String, allocateCase: AllocateCase, caseDetails: CaseDetailsEntity): SaveResult<PersonManagerEntity> {
     val personManagerSaveResult = savePersonManagerService.savePersonManager(
       allocatedStaffId.teamCode,
       allocationData.staff,
