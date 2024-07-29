@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToDeliusApiClient
-import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.AllocationDemandDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffMember
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseAllocated
@@ -37,35 +36,22 @@ class DefaultSaveWorkloadService(
   ): CaseAllocated {
     val caseDetails: CaseDetailsEntity = caseDetailsRepository.findByIdOrNull(allocateCase.crn)!!
     val allocationData = workforceAllocationsToDeliusApiClient.allocationDetails(allocateCase.crn, allocateCase.eventNumber, allocatedStaffId.staffCode, loggedInUser)
-
-    val personManagerSaveResult = savePerson(allocatedStaffId, allocationData, loggedInUser, allocateCase, caseDetails)
-    val eventManagerSaveResult = saveEvent(allocatedStaffId, allocationData, allocateCase, loggedInUser, caseDetails)
-
-    val unallocatedRequirements = allocationData.activeRequirements.filter { !it.manager.allocated }
-    val requirementManagerSaveResults = saveRequirementManagerService.saveRequirementManagers(allocatedStaffId.teamCode, allocationData.staff, allocateCase, loggedInUser, unallocatedRequirements)
-      .also { afterRequirementManagersSaved(it, caseDetails) }
-
-    if (personManagerSaveResult.hasChanged || eventManagerSaveResult.hasChanged || requirementManagerSaveResults.any { it.hasChanged }) {
-      notificationService.notifyAllocation(allocationData, allocateCase, caseDetails)
-      sqsSuccessPublisher.auditAllocation(allocateCase.crn, allocateCase.eventNumber, loggedInUser, unallocatedRequirements.map { it.id })
-    }
-    return CaseAllocated(personManagerSaveResult.entity.uuid, eventManagerSaveResult.entity.uuid, requirementManagerSaveResults.map { it.entity.uuid })
-  }
-
-  private fun saveEvent(allocatedStaffId: StaffIdentifier, allocationData: AllocationDemandDetails, allocateCase: AllocateCase, loggedInUser: String, caseDetails: CaseDetailsEntity): SaveResult<EventManagerEntity> {
-    val eventManagerSaveResult = saveEventManagerService.saveEventManager(allocatedStaffId.teamCode, allocationData.staff, allocateCase, loggedInUser, allocationData.allocatingStaff.code, allocationData.allocatingStaff.name.getCombinedName())
-      .also { afterEventManagerSaved(it, caseDetails) }
-    return eventManagerSaveResult
-  }
-
-  private suspend fun savePerson(allocatedStaffId: StaffIdentifier, allocationData: AllocationDemandDetails, loggedInUser: String, allocateCase: AllocateCase, caseDetails: CaseDetailsEntity): SaveResult<PersonManagerEntity> {
     val personManagerSaveResult = savePersonManagerService.savePersonManager(
       allocatedStaffId.teamCode,
       allocationData.staff,
       loggedInUser,
       allocateCase.crn,
     ).also { afterPersonManagerSaved(it, allocationData.staff, caseDetails) }
-    return personManagerSaveResult
+    val eventManagerSaveResult = saveEventManagerService.saveEventManager(allocatedStaffId.teamCode, allocationData.staff, allocateCase, loggedInUser, allocationData.allocatingStaff.code, allocationData.allocatingStaff.name.getCombinedName())
+      .also { afterEventManagerSaved(it, caseDetails) }
+    val unallocatedRequirements = allocationData.activeRequirements.filter { !it.manager.allocated }
+    val requirementManagerSaveResults = saveRequirementManagerService.saveRequirementManagers(allocatedStaffId.teamCode, allocationData.staff, allocateCase, loggedInUser, unallocatedRequirements)
+      .also { afterRequirementManagersSaved(it, caseDetails) }
+    if (personManagerSaveResult.hasChanged || eventManagerSaveResult.hasChanged || requirementManagerSaveResults.any { it.hasChanged }) {
+      notificationService.notifyAllocation(allocationData, allocateCase, caseDetails)
+      sqsSuccessPublisher.auditAllocation(allocateCase.crn, allocateCase.eventNumber, loggedInUser, unallocatedRequirements.map { it.id })
+    }
+    return CaseAllocated(personManagerSaveResult.entity.uuid, eventManagerSaveResult.entity.uuid, requirementManagerSaveResults.map { it.entity.uuid })
   }
 
   private fun afterPersonManagerSaved(personManagerSaveResult: SaveResult<PersonManagerEntity>, deliusStaff: StaffMember, caseDetails: CaseDetailsEntity) {
