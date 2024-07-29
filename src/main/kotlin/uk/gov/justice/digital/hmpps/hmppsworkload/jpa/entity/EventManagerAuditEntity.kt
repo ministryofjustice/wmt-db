@@ -23,10 +23,16 @@ data class EventManagerAuditEntity(
   val id: Long? = null,
 
   @Column
-  val allocationJustificationNotes: String,
+  val spoOversightNotes: String?,
 
   @Column
-  val sensitiveNotes: Boolean,
+  val sensitiveOversightNotes: Boolean?,
+
+  @Column
+  val allocationJustificationNotes: String?,
+
+  @Column
+  val sensitiveNotes: Boolean?,
 
   @Column
   val createdBy: String,
