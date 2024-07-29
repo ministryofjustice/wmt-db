@@ -24,6 +24,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.AssessR
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.TierApiExtension.Companion.hmppsTier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.WorkforceAllocationsToDeliusExtension.Companion.workforceAllocationsToDelius
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.request.allocateCase
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.request.allocateOldCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.emailResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
@@ -638,7 +639,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     val sensitiveNotes = false
     val response = webTestClient.post()
       .uri("/team/$teamCode/offenderManager/$staffCode/case")
-      .bodyValue(allocateCase(crn, eventNumber, true, allocationJustificationNotes, sensitiveNotes))
+      .bodyValue(allocateOldCase(crn, eventNumber, true, allocationJustificationNotes, sensitiveNotes))
       .headers {
         it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
         it.contentType = MediaType.APPLICATION_JSON
@@ -656,5 +657,31 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     Assertions.assertEquals(1, eventManagerAudit.size)
     Assertions.assertEquals(allocationJustificationNotes, eventManagerAudit[0].allocationJustificationNotes)
     Assertions.assertEquals(sensitiveNotes, eventManagerAudit[0].sensitiveNotes)
+  }
+
+  @Test
+  fun `must audit event manager allocation when oversight supplied`() {
+    val spoOversightNotes = "my spo notes"
+    val sensitiveNotes = false
+    val response = webTestClient.post()
+      .uri("/team/$teamCode/offenderManager/$staffCode/case")
+      .bodyValue(allocateCase(crn, eventNumber, true, spoOversightNotes, sensitiveNotes))
+      .headers {
+        it.authToken(roles = listOf("ROLE_MANAGE_A_WORKFORCE_ALLOCATE"))
+        it.contentType = MediaType.APPLICATION_JSON
+      }
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody(CaseAllocated::class.java)
+      .returnResult()
+      .responseBody
+
+    val eventManager = eventManagerRepository.findByUuid(response.eventManagerId)
+    val eventManagerAudit = eventManagerAuditRepository.findByEventManager(eventManager!!)
+
+    Assertions.assertEquals(1, eventManagerAudit.size)
+    Assertions.assertEquals(spoOversightNotes, eventManagerAudit[0].spoOversightNotes)
+    Assertions.assertEquals(sensitiveNotes, eventManagerAudit[0].sensitiveOversightNotes)
   }
 }
