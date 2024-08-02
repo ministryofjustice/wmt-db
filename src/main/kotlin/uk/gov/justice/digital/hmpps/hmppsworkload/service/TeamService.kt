@@ -17,6 +17,8 @@ import java.math.BigInteger
 import java.time.LocalDate
 import java.time.ZoneId
 
+private const val CASE_COUNT_PERIOD_DAYS = 30L
+
 @Service
 class TeamService(
   private val teamRepository: TeamRepository,
@@ -28,7 +30,7 @@ class TeamService(
   suspend fun getPractitioners(teamCodes: List<String>, crn: String, grades: List<String>?): PractitionerWorkload? {
     return workforceAllocationsToDeliusApiClient.choosePractitioners(crn, teamCodes)?.let { choosePractitionerResponse ->
       val practitionerWorkloads = teamRepository.findAllByTeamCodes(teamCodes).associateBy { teamStaffId(it.teamCode, it.staffCode) }
-      val caseCountAfter = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).minusDays(7L)
+      val caseCountAfter = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).minusDays(CASE_COUNT_PERIOD_DAYS)
       val practitionerCaseCounts = personManagerRepository.findByTeamCodeInAndCreatedDateGreaterThanEqualAndIsActiveIsTrue(teamCodes, caseCountAfter)
         .groupBy { teamStaffId(it.teamCode, it.staffCode) }
         .mapValues { countEntry -> countEntry.value.size }
