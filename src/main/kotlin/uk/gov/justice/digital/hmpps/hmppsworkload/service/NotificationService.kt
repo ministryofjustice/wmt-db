@@ -84,7 +84,7 @@ class NotificationService(
   private fun getPersonOnProbationParameters(name: String, allocateCase: AllocateCase): Map<String, Any> = mapOf(
     "case_name" to name,
     "crn" to allocateCase.crn,
-    "notes" to allocateCase.instructions,
+    "notes" to allocateCase.allocationJustificationNotes.toString()
   )
 
   private fun getConvictionParameters(allocationDemandDetails: AllocationDemandDetails): Map<String, Any> {
