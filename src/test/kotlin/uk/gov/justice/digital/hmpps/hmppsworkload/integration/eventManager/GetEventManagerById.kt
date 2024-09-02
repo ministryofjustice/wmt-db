@@ -45,7 +45,7 @@ class GetEventManagerById : IntegrationTestBase() {
     val storedEventManager = EventManagerEntity(crn = "CRN1", staffCode = "OM1", teamCode = "T1", createdBy = "USER1", eventNumber = 1, isActive = true, spoName = "Fred Flintstone", spoStaffCode = "SP2")
     eventManagerRepository.save(storedEventManager)
 
-    val eventManagerAudit = eventManagerAuditRepository.save(EventManagerAuditEntity(allocationJustificationNotes = "Justification notes", sensitiveNotes = true, createdBy = storedEventManager.createdBy, eventManager = storedEventManager))
+    val eventManagerAudit = eventManagerAuditRepository.save(EventManagerAuditEntity(allocationJustificationNotes = "Justification notes", sensitiveNotes = true, createdBy = storedEventManager.createdBy, spoOversightNotes = "spo oversight notes", sensitiveOversightNotes = true, eventManager = storedEventManager))
 
     webTestClient.get()
       .uri("/allocation/event/${storedEventManager.uuid}")

@@ -18,6 +18,10 @@ data class EventManagerDetails @JsonCreator constructor(
   val createdDate: ZonedDateTime,
   @Schema(description = "event Number")
   val eventNumber: Int?,
+  @Schema(description = "SPO Oversight Notes")
+  val spoOversightNotes: String?,
+  @Schema(description = "SPO Oversight notes contain sensitive information")
+  val sensitiveOversightNotes: Boolean?,
   @Schema(description = "Allocation Justification Notes")
   val allocationJustificationNotes: String?,
   @Schema(description = "Justification notes contain sensitive information")
@@ -29,7 +33,7 @@ data class EventManagerDetails @JsonCreator constructor(
 ) {
   companion object {
     fun from(eventManagerEntity: EventManagerEntity, eventManagerAuditEntity: EventManagerAuditEntity?): EventManagerDetails {
-      return EventManagerDetails(eventManagerEntity.uuid, eventManagerEntity.staffCode, eventManagerEntity.teamCode, eventManagerEntity.createdDate!!, eventManagerEntity.eventNumber, eventManagerAuditEntity?.allocationJustificationNotes, eventManagerAuditEntity?.sensitiveNotes, eventManagerEntity.spoStaffCode, eventManagerEntity.spoName)
+      return EventManagerDetails(eventManagerEntity.uuid, eventManagerEntity.staffCode, eventManagerEntity.teamCode, eventManagerEntity.createdDate!!, eventManagerEntity.eventNumber, eventManagerAuditEntity?.spoOversightNotes, eventManagerAuditEntity?.sensitiveOversightNotes, eventManagerAuditEntity?.allocationJustificationNotes, eventManagerAuditEntity?.sensitiveNotes, eventManagerEntity.spoStaffCode, eventManagerEntity.spoName)
     }
   }
 }

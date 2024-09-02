@@ -42,7 +42,7 @@ class NotificationServiceTests {
     templateId,
     assessRisksNeedsApiClient,
   )
-  private val allocateCase = AllocateCase("CRN1111", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1, allocationJustificationNotes = "some notes", sensitiveNotes = false)
+  private val allocateCase = AllocateCase("CRN1111", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1, allocationJustificationNotes = "Some Notes", sensitiveNotes = false, spoOversightNotes = "spo notes", sensitiveOversightNotes = null)
   private val parameters = mapOf(
     "officer_name" to "Staff Member",
     "induction_statement" to "no initial appointment needed",
@@ -58,7 +58,7 @@ class NotificationServiceTests {
     "order" to "CUSTODY (6 Months)",
     "case_name" to "Jonathon Jones",
     "crn" to "CRN1111",
-    "notes" to "",
+    "notes" to "Some Notes",
     "allocatingOfficerName" to "Allocating Member",
     "allocatingOfficerGrade" to "SPO",
   )
@@ -371,7 +371,7 @@ class NotificationServiceTests {
   @Test
   fun `must add notes when they exist`() = runBlocking {
     val allocationDetails = getAllocationDetails(allocateCase.crn)
-    val allocateCase = AllocateCase("CRN1111", "Some Notes", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1, allocationJustificationNotes = "some notes", sensitiveNotes = false)
+    val allocateCase = AllocateCase("CRN1111", "Some Notes", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1, allocationJustificationNotes = "Some Notes", sensitiveNotes = false, spoOversightNotes = "spo notes", sensitiveOversightNotes = null)
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
     val parameters = slot<MutableMap<String, Any>>()
@@ -382,7 +382,7 @@ class NotificationServiceTests {
   @Test
   fun `must add allocating officer name`() = runBlocking {
     val allocationDetails = getAllocationDetails(allocateCase.crn)
-    val allocateCase = AllocateCase("CRN1111", "Some Notes", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1, allocationJustificationNotes = "some notes", sensitiveNotes = false)
+    val allocateCase = AllocateCase("CRN1111", "Some Notes", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1, allocationJustificationNotes = "some notes", sensitiveNotes = false, spoOversightNotes = "spo notes", sensitiveOversightNotes = null)
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
     val parameters = slot<MutableMap<String, Any>>()
@@ -405,7 +405,7 @@ class NotificationServiceTests {
     val allocationDetails = getAllocationDetails(allocateCase.crn)
     val firstEmail = "first@email.com"
     val secondEmail = "second@email.com"
-    val allocateCase = AllocateCase("CRN1111", "instructions", listOf(firstEmail, secondEmail), false, 1, allocationJustificationNotes = "some notes", sensitiveNotes = false)
+    val allocateCase = AllocateCase("CRN1111", "instructions", listOf(firstEmail, secondEmail), false, 1, allocationJustificationNotes = "some notes", sensitiveNotes = false, spoOversightNotes = "spo notes", sensitiveOversightNotes = null)
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
     verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, any(), any()) }
