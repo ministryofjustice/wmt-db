@@ -6,7 +6,7 @@ management.endpoint:
   info.cache.time-to-live: 0
 spring:
   datasource:
-    url: "jdbc:postgresql://${database.endpoint:localhost:5432}/${database.name:postgres}?sslmode=prefer"
+    url: "jdbc:postgresql://${database.endpoint:localhost:5432}/${database.name:postgres}"
   flyway:
     locations: classpath:db/migration, classpath:db/data
     mixed: true
