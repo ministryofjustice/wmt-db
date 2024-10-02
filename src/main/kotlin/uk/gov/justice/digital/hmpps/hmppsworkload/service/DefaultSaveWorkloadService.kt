@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
+import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToDeliusApiClient
@@ -47,8 +48,10 @@ class DefaultSaveWorkloadService(
 
     if (personManagerSaveResult.hasChanged || eventManagerSaveResult.hasChanged || requirementManagerSaveResults.any { it.hasChanged }) {
       notificationService.notifyAllocation(allocationData, allocateCase, caseDetails)
+      log.info("Allocation notified for case: ${caseDetails.crn}, conviction number: ${allocateCase.eventNumber}, to: ${allocationData.staff}, from: ${allocationData.allocatingStaff}")
       sqsSuccessPublisher.auditAllocation(allocateCase.crn, allocateCase.eventNumber, loggedInUser, unallocatedRequirements.map { it.id })
     }
+    log.info("Case allocated: ${caseDetails.crn}, by ${allocationData.allocatingStaff}")
     return CaseAllocated(personManagerSaveResult.entity.uuid, eventManagerSaveResult.entity.uuid, requirementManagerSaveResults.map { it.entity.uuid })
   }
 
@@ -92,5 +95,8 @@ class DefaultSaveWorkloadService(
       telemetryService.trackRequirementManagerAllocated(saveResult.entity, caseDetails)
       sqsSuccessPublisher.updateRequirement(saveResult.entity.crn, saveResult.entity.uuid, saveResult.entity.createdDate!!)
     }
+  }
+  companion object {
+    private val log = LoggerFactory.getLogger(this::class.java)
   }
 }
