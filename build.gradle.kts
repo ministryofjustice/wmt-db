@@ -68,20 +68,23 @@ repositories {
 
 tasks {
   withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-      jvmTarget = "21"
+    compilerOptions {
+      jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
     }
   }
+
   compileKotlin {
-    kotlinOptions {
-      jvmTarget = JavaVersion.VERSION_21.toString()
+    compilerOptions {
+      jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
     }
   }
+
   compileTestKotlin {
-    kotlinOptions {
-      jvmTarget = JavaVersion.VERSION_21.toString()
+    compilerOptions {
+      jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
     }
   }
+
   getByName("check") {
     dependsOn(":ktlintCheck", "detekt")
   }
