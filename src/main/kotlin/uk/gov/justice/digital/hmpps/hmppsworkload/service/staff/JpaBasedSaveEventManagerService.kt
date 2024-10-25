@@ -30,6 +30,7 @@ class JpaBasedSaveEventManagerService(
     saveEventManagerEntity(allocateCase, deliusStaff, teamCode, loggedInUser, spoStaffCode, spoName)
   } ?: saveEventManagerEntity(allocateCase, deliusStaff, teamCode, loggedInUser, spoStaffCode, spoName)
 
+  @Suppress("LongParameterList")
   private fun saveEventManagerEntity(
     allocateCase: AllocateCase,
     deliusStaff: StaffMember,

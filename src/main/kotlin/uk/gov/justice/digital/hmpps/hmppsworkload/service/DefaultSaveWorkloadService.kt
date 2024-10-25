@@ -46,7 +46,7 @@ class DefaultSaveWorkloadService(
       .also { afterRequirementManagersSaved(it, caseDetails) }
 
     if (personManagerSaveResult.hasChanged || eventManagerSaveResult.hasChanged || requirementManagerSaveResults.any { it.hasChanged }) {
-      notificationService.notifyAllocation(allocationData, allocateCase, caseDetails, allocateCase.laoCase)
+      notificationService.notifyAllocation(allocationData, allocateCase, caseDetails)
       log.info("Allocation notified for case: ${caseDetails.crn}, conviction number: ${allocateCase.eventNumber}, to: ${allocationData.staff.code}, from: ${allocationData.allocatingStaff.code}")
       sqsSuccessPublisher.auditAllocation(allocateCase.crn, allocateCase.eventNumber, loggedInUser, unallocatedRequirements.map { it.id })
     }

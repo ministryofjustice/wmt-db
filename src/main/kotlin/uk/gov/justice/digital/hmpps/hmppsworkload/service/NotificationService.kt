@@ -42,10 +42,11 @@ class NotificationService(
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
-  @Suppress("LongParameterList")
-  suspend fun notifyAllocation(allocationDemandDetails: AllocationDemandDetails, allocateCase: AllocateCase, caseDetails: CaseDetailsEntity, laoCase: Boolean): List<SendEmailResponse> {
+  @Suppress("LongParameterList", "LongMethod")
+  suspend fun notifyAllocation(allocationDemandDetails: AllocationDemandDetails, allocateCase: AllocateCase, caseDetails: CaseDetailsEntity): List<SendEmailResponse> {
     val emailReferenceId = UUID.randomUUID().toString()
     val notifyData = getNotifyData(allocateCase.crn)
+    val laoCase = allocateCase.laoCase
     if (!laoCase) {
       val parameters = mapOf(
         "officer_name" to allocationDemandDetails.staff.name.getCombinedName(),
