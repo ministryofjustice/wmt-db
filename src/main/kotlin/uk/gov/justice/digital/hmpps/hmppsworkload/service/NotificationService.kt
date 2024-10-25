@@ -37,7 +37,7 @@ private const val CRN = "crn"
 class NotificationService(
   private val notificationClient: NotificationClientApi,
   @Value("\${application.notify.allocation.template}") private val allocationTemplateId: String,
-  @Value("\${application.notify.allocation.laoTemplate") private val allocationTemplateLAOId: String,
+  @Value("\${application.notify.allocation.laoTemplate}") private val allocationTemplateLAOId: String,
   private val assessRisksNeedsApiClient: AssessRisksNeedsApiClient,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
