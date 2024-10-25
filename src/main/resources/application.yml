@@ -71,7 +71,7 @@ application:
   notify:
     allocation:
       template: 5db23c80-9cb6-4b8e-a0f6-56061e50a9ef
-      laoTemplate: to-be-completed
+      laoTemplate: 7c66c608-fbe4-4dac-a040-a7c15b61d3ba
 person:
   manager:
     getByIdPath: /allocation/person/{id}
