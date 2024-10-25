@@ -38,7 +38,6 @@ class DefaultSaveWorkloadService(
   ): CaseAllocated {
     val caseDetails: CaseDetailsEntity = caseDetailsRepository.findByIdOrNull(allocateCase.crn)!!
     val allocationData = workforceAllocationsToDeliusApiClient.allocationDetails(allocateCase.crn, allocateCase.eventNumber, allocatedStaffId.staffCode, loggedInUser)
-
     val personManagerSaveResult = savePersonManager(allocatedStaffId, allocationData, loggedInUser, allocateCase, caseDetails)
     val eventManagerSaveResult = saveEventManager(allocatedStaffId, allocationData, allocateCase, loggedInUser, caseDetails)
 
@@ -47,7 +46,7 @@ class DefaultSaveWorkloadService(
       .also { afterRequirementManagersSaved(it, caseDetails) }
 
     if (personManagerSaveResult.hasChanged || eventManagerSaveResult.hasChanged || requirementManagerSaveResults.any { it.hasChanged }) {
-      notificationService.notifyAllocation(allocationData, allocateCase, caseDetails)
+      notificationService.notifyAllocation(allocationData, allocateCase, caseDetails, allocateCase.laoCase)
       log.info("Allocation notified for case: ${caseDetails.crn}, conviction number: ${allocateCase.eventNumber}, to: ${allocationData.staff.code}, from: ${allocationData.allocatingStaff.code}")
       sqsSuccessPublisher.auditAllocation(allocateCase.crn, allocateCase.eventNumber, loggedInUser, unallocatedRequirements.map { it.id })
     }

@@ -37,30 +37,47 @@ private const val CRN = "crn"
 class NotificationService(
   private val notificationClient: NotificationClientApi,
   @Value("\${application.notify.allocation.template}") private val allocationTemplateId: String,
+  @Value("new-template-id") private val allocationTemplateLAOId: String,
   private val assessRisksNeedsApiClient: AssessRisksNeedsApiClient,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
-  suspend fun notifyAllocation(allocationDemandDetails: AllocationDemandDetails, allocateCase: AllocateCase, caseDetails: CaseDetailsEntity): List<SendEmailResponse> {
+  @Suppress("LongParameterList")
+  suspend fun notifyAllocation(allocationDemandDetails: AllocationDemandDetails, allocateCase: AllocateCase, caseDetails: CaseDetailsEntity, laoCase: Boolean): List<SendEmailResponse> {
     val emailReferenceId = UUID.randomUUID().toString()
     val notifyData = getNotifyData(allocateCase.crn)
-    val parameters = mapOf(
-      "officer_name" to allocationDemandDetails.staff.name.getCombinedName(),
-      "induction_statement" to mapInductionAppointment(allocationDemandDetails.initialAppointment, caseDetails.type),
-      "requirements" to mapRequirements(allocationDemandDetails.activeRequirements),
-    ).plus(getRiskParameters(notifyData.riskSummary, notifyData.riskPredictors, allocationDemandDetails.ogrs))
-      .plus(getConvictionParameters(allocationDemandDetails))
-      .plus(getPersonOnProbationParameters(allocationDemandDetails.name.getCombinedName(), allocateCase))
-      .plus(getLoggedInUserParameters(allocationDemandDetails.allocatingStaff))
-    val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
-    emailTo.add(allocationDemandDetails.staff.email!!)
-    if (allocateCase.sendEmailCopyToAllocatingOfficer) emailTo.add(allocationDemandDetails.allocatingStaff.email)
-    MDC.put(REFERENCE_ID, emailReferenceId)
-    MDC.put(CRN, caseDetails.crn)
-    log.info("Email request sent to Notify for crn: ${caseDetails.crn} with reference ID: $emailReferenceId")
-    MDC.remove(REFERENCE_ID)
-    MDC.remove(CRN)
-    return emailTo.map { email -> addRecipientTo400Response(email) { notificationClient.sendEmail(allocationTemplateId, email, parameters, emailReferenceId) } }
+    if (!laoCase) {
+      val parameters = mapOf(
+        "officer_name" to allocationDemandDetails.staff.name.getCombinedName(),
+        "induction_statement" to mapInductionAppointment(allocationDemandDetails.initialAppointment, caseDetails.type),
+        "requirements" to mapRequirements(allocationDemandDetails.activeRequirements),
+      ).plus(getRiskParameters(notifyData.riskSummary, notifyData.riskPredictors, allocationDemandDetails.ogrs))
+        .plus(getConvictionParameters(allocationDemandDetails))
+        .plus(getPersonOnProbationParameters(allocationDemandDetails.name.getCombinedName(), allocateCase))
+        .plus(getLoggedInUserParameters(allocationDemandDetails.allocatingStaff))
+      val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
+      emailTo.add(allocationDemandDetails.staff.email!!)
+      if (allocateCase.sendEmailCopyToAllocatingOfficer) emailTo.add(allocationDemandDetails.allocatingStaff.email)
+      MDC.put(REFERENCE_ID, emailReferenceId)
+      MDC.put(CRN, caseDetails.crn)
+      log.info("Email request sent to Notify for crn: ${caseDetails.crn} with reference ID: $emailReferenceId")
+      MDC.remove(REFERENCE_ID)
+      MDC.remove(CRN)
+      return emailTo.map { email -> addRecipientTo400Response(email) { notificationClient.sendEmail(allocationTemplateId, email, parameters, emailReferenceId) } }
+    } else {
+      val parameters = mapOf(
+        "officer_name" to allocationDemandDetails.staff.name.getCombinedName(),
+      ).plus(getLoggedInUserParameters(allocationDemandDetails.allocatingStaff))
+      val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
+      emailTo.add(allocationDemandDetails.staff.email!!)
+      if (allocateCase.sendEmailCopyToAllocatingOfficer) emailTo.add(allocationDemandDetails.allocatingStaff.email)
+      MDC.put(REFERENCE_ID, emailReferenceId)
+      MDC.put(CRN, caseDetails.crn)
+      log.info("Email request sent to Notify for crn: ${caseDetails.crn} with reference ID: $emailReferenceId")
+      MDC.remove(REFERENCE_ID)
+      MDC.remove(CRN)
+      return emailTo.map { email -> addRecipientTo400Response(email) { notificationClient.sendEmail(allocationTemplateLAOId, email, parameters, emailReferenceId) } }
+    }
   }
 
   class NotificationInvalidSenderException(emailRecipient: String, cause: Throwable) : Exception("Unable to deliver to recipient $emailRecipient", cause)
