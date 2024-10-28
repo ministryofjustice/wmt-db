@@ -69,7 +69,7 @@ class NotificationService(
       val parameters = mapOf(
         "officer_name" to allocationDemandDetails.staff.name.getCombinedName(),
       ).plus(getLoggedInUserParameters(allocationDemandDetails.allocatingStaff))
-        .plus("crn" to allocationDemandDetails.crn)
+        .plus(CRN to allocationDemandDetails.crn)
       val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
       emailTo.add(allocationDemandDetails.staff.email!!)
       if (allocateCase.sendEmailCopyToAllocatingOfficer) emailTo.add(allocationDemandDetails.allocatingStaff.email)
