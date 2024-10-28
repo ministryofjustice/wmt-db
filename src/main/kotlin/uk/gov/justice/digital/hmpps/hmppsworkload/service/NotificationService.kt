@@ -47,7 +47,7 @@ class NotificationService(
     val emailReferenceId = UUID.randomUUID().toString()
     val notifyData = getNotifyData(allocateCase.crn)
     val parameters: Map<String, Any>
-    val templateId:String
+    val templateId: String
     if (allocateCase.laoCase) {
       templateId = allocationTemplateLAOId
       parameters = mapOf(
