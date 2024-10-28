@@ -12,4 +12,5 @@ data class AllocateCase @JsonCreator constructor(
   val sensitiveNotes: Boolean?,
   val spoOversightNotes: String?,
   val sensitiveOversightNotes: Boolean?,
+  val laoCase: Boolean,
 )

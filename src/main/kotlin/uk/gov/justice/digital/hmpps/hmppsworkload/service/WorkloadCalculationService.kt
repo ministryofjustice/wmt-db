@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.service.reduction.GetReduction
 import java.math.BigDecimal
 import java.math.BigInteger
 
+@Suppress("LongParameterList")
 @Service
 class WorkloadCalculationService(
   private val workloadCalculator: WorkloadCalculator,
