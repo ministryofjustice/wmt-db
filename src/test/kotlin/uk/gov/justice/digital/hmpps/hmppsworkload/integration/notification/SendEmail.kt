@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration.notification
 import kotlinx.coroutines.reactor.asCoroutineContext
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
@@ -16,7 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.getAllocationDetai
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.AssessRisksNeedsApiExtension.Companion.assessRisksNeedsApi
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.NotificationService
-import java.util.UUID
+import java.util.*
 
 class SendEmail : IntegrationTestBase() {
 
@@ -43,7 +42,6 @@ class SendEmail : IntegrationTestBase() {
     assertEquals(UUID.fromString("5db23c80-9cb6-4b8e-a0f6-56061e50a9ef"), emailSendResponse.first().templateId)
   }
 
-  @Disabled
   @Test
   fun `sends an lao email when ROSH cannot be retrieved for lao case`() = runBlocking(Context.of(HttpHeaders.AUTHORIZATION, "token").asCoroutineContext()) {
     val crn = "X123456"
@@ -61,7 +59,7 @@ class SendEmail : IntegrationTestBase() {
     )
     assessRisksNeedsApi.verifyRiskSummaryCalled(crn, 2)
     assessRisksNeedsApi.verifyRiskPredictorCalled(crn, 1)
-    assertEquals(UUID.fromString("7c66c608-fbe4-4dac-a040-a7c15b61d3ba"), emailSendResponse.first().templateId)
+    assertEquals(UUID.fromString("fc55e1ce-47d6-479c-ac80-3ac77c9fe609"), emailSendResponse.first().templateId)
   }
 
   @Test
@@ -84,7 +82,6 @@ class SendEmail : IntegrationTestBase() {
     assertEquals(UUID.fromString("5db23c80-9cb6-4b8e-a0f6-56061e50a9ef"), emailSendResponse.first().templateId)
   }
 
-  @Disabled
   @Test
   fun `sends an lao email when risk predictor cannot be retrieved for lao case`() = runBlocking(Context.of(HttpHeaders.AUTHORIZATION, "token").asCoroutineContext()) {
     val crn = "X123456"
@@ -102,6 +99,6 @@ class SendEmail : IntegrationTestBase() {
     )
     assessRisksNeedsApi.verifyRiskSummaryCalled(crn, 1)
     assessRisksNeedsApi.verifyRiskPredictorCalled(crn, 2)
-    assertEquals(UUID.fromString("7c66c608-fbe4-4dac-a040-a7c15b61d3ba"), emailSendResponse.first().templateId)
+    assertEquals(UUID.fromString("fc55e1ce-47d6-479c-ac80-3ac77c9fe609"), emailSendResponse.first().templateId)
   }
 }
