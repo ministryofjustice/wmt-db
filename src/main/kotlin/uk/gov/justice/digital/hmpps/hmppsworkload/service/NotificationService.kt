@@ -47,12 +47,15 @@ class NotificationService(
     val emailReferenceId = UUID.randomUUID().toString()
     val notifyData = getNotifyData(allocateCase.crn)
     val parameters: Map<String, Any>
+    val templateId:String
     if (allocateCase.laoCase) {
+      templateId = allocationTemplateLAOId
       parameters = mapOf(
         "officer_name" to allocationDemandDetails.staff.name.getCombinedName(),
       ).plus(getLoggedInUserParameters(allocationDemandDetails.allocatingStaff))
         .plus(CRN to allocationDemandDetails.crn)
     } else {
+      templateId = allocationTemplateId
       parameters = mapOf(
         "officer_name" to allocationDemandDetails.staff.name.getCombinedName(),
         "induction_statement" to mapInductionAppointment(allocationDemandDetails.initialAppointment, caseDetails.type),
@@ -70,7 +73,7 @@ class NotificationService(
     log.info("Email request sent to Notify for crn: ${caseDetails.crn} with reference ID: $emailReferenceId")
     MDC.remove(REFERENCE_ID)
     MDC.remove(CRN)
-    return emailTo.map { email -> addRecipientTo400Response(email) { notificationClient.sendEmail(allocationTemplateLAOId, email, parameters, emailReferenceId) } }
+    return emailTo.map { email -> addRecipientTo400Response(email) { notificationClient.sendEmail(templateId, email, parameters, emailReferenceId) } }
   }
 
   class NotificationInvalidSenderException(emailRecipient: String, cause: Throwable) : Exception("Unable to deliver to recipient $emailRecipient", cause)
