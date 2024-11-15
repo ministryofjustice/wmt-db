@@ -16,7 +16,7 @@ class AssessRisksNeedsApiClient(@Qualifier("assessRiskNeedsApiWebClient") privat
   suspend fun getRiskSummary(crn: String): RiskSummary? {
     return webClient
       .get()
-      .uri("/risks/crn/$crn/summary")
+      .uri("/risks/crn/{crn}/summary", crn)
       .retrieve()
       .bodyToMono(RiskSummary::class.java)
       .retry(1)
@@ -29,7 +29,7 @@ class AssessRisksNeedsApiClient(@Qualifier("assessRiskNeedsApiWebClient") privat
     val responseType = object : ParameterizedTypeReference<List<RiskPredictor>>() {}
     return webClient
       .get()
-      .uri("/risks/crn/$crn/predictors/rsr/history")
+      .uri("/risks/crn/{crn}/predictors/rsr/history", crn)
       .retrieve()
       .bodyToMono(responseType)
       .retry(1)
