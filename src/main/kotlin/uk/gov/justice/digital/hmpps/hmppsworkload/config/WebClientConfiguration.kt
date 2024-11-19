@@ -19,7 +19,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToD
 class WebClientConfiguration(
   @Value("\${hmpps-tier.endpoint.url}") private val hmppsTierApiRootUri: String,
   @Value("\${workforce-allocations-to-delius.endpoint.url}") private val workforceAllocationsToDeliusApiRootUri: String,
-  @Value("\${assess-risks-needs.endpoint.url") private val assessRisksNeedsApiRootUri: String,
+  @Value("\${assess-risks-needs.endpoint.url}") private val assessRisksNeedsApiRootUri: String,
 ) {
 
   @Bean
@@ -41,7 +41,7 @@ class WebClientConfiguration(
     @Qualifier(value = "authorizedClientManagerAppScope") authorizedClientManager: ReactiveOAuth2AuthorizedClientManager,
     builder: WebClient.Builder,
   ): WebClient {
-    return getOAuthWebClient(authorizedClientManager, builder, assessRisksNeedsApiRootUri, "assess-risks-and-needs-api")
+    return getOAuthWebClient(authorizedClientManager, builder, assessRisksNeedsApiRootUri, "assess-risks-needs-api")
   }
 
   @Bean
