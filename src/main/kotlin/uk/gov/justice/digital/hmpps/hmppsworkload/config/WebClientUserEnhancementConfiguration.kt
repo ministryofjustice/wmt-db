@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
-import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import org.springframework.security.core.context.SecurityContext
@@ -21,10 +20,9 @@ import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.ClientRequest
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction
 import org.springframework.web.reactive.function.client.WebClient
-import reactor.netty.http.client.HttpClient
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.AssessRisksNeedsApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.HmppsTierApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToDeliusApiClient
-import java.time.Duration
 
 @Configuration
 class WebClientUserEnhancementConfiguration(
@@ -39,6 +37,19 @@ class WebClientUserEnhancementConfiguration(
     builder: WebClient.Builder,
   ): WebClient {
     return getOAuthWebClient(authorizedClientManagerUserEnhanced(clientRegistrationRepository, builder), builder, hmppsTierApiRootUri, "hmpps-tier-api")
+  }
+
+  @Bean
+  fun assessRisksNeedsApiClientUserEnhancedAppScope(
+    clientRegistrationRepository: ReactiveClientRegistrationRepository,
+    builder: WebClient.Builder,
+  ): WebClient {
+    return getOAuthWebClient(authorizedClientManagerUserEnhanced(clientRegistrationRepository, builder), builder, assessRisksNeedsApiRootUri, "assess-risks-needs-api")
+  }
+
+  @Bean
+  fun assessRisksNeedsClientUserEnhanced(@Qualifier("hmppsTierWebClientUserEnhancedAppScope") webClient: WebClient): AssessRisksNeedsApiClient {
+    return AssessRisksNeedsApiClient(webClient)
   }
 
   @Primary
@@ -90,15 +101,15 @@ class WebClientUserEnhancementConfiguration(
       .build()
   }
 
-  @Bean
-  fun assessRiskNeedsApiWebClient(builder: WebClient.Builder): WebClient {
-    val httpClient: HttpClient = HttpClient.create()
-      .responseTimeout(Duration.ofSeconds(2))
-    return builder.baseUrl(assessRisksNeedsApiRootUri)
-      .filter(AuthTokenFilterFunction())
-      .clientConnector(ReactorClientHttpConnector(httpClient))
-      .build()
-  }
+//  @Bean
+//  fun assessRiskNeedsApiWebClient(builder: WebClient.Builder): WebClient {
+//    val httpClient: HttpClient = HttpClient.create()
+//      .responseTimeout(Duration.ofSeconds(2))
+//    return builder.baseUrl(assessRisksNeedsApiRootUri)
+//      .filter(AuthTokenFilterFunction())
+//      .clientConnector(ReactorClientHttpConnector(httpClient))
+//      .build()
+//  }
 
   @Bean
   fun workforceAllocationsToDeliusApiWebClientUserEnhancedAppScope(

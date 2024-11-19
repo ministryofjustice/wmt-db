@@ -11,7 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskPredictor
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskSummary
 
 @Component
-class AssessRisksNeedsApiClient(@Qualifier("assessRiskNeedsApiWebClient") private val webClient: WebClient) {
+class AssessRisksNeedsApiClient(@Qualifier("assessRisksNeedsClientUserEnhanced") private val webClient: WebClient) {
 
   suspend fun getRiskSummary(crn: String): RiskSummary? {
     return webClient
