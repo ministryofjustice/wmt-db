@@ -40,15 +40,18 @@ class WebClientUserEnhancementConfiguration(
   }
 
   @Bean
-  fun assessRisksNeedsApiClientUserEnhancedAppScope(
+  @Qualifier("assessRisksNeedsClientUserEnhancedAppScope")
+  fun assessRisksNeedsClientUserEnhancedAppScope(
     clientRegistrationRepository: ReactiveClientRegistrationRepository,
     builder: WebClient.Builder,
   ): WebClient {
     return getOAuthWebClient(authorizedClientManagerUserEnhanced(clientRegistrationRepository, builder), builder, assessRisksNeedsApiRootUri, "assess-risks-needs-api")
   }
 
+  @Primary
   @Bean
-  fun assessRisksNeedsClientUserEnhanced(@Qualifier("hmppsTierWebClientUserEnhancedAppScope") webClient: WebClient): AssessRisksNeedsApiClient {
+  @Qualifier("assessRisksNeedsClientUserEnhanced")
+  fun assessRisksNeedsClientUserEnhanced(@Qualifier("assessRisksNeedsClientUserEnhancedAppScope") webClient: WebClient): AssessRisksNeedsApiClient {
     return AssessRisksNeedsApiClient(webClient)
   }
 

@@ -9,6 +9,7 @@ import org.mockserver.matchers.Times
 import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
 import org.mockserver.model.MediaType
+import org.mockserver.verify.VerificationTimes
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.TierApiExtension.Companion.hmppsTier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.notFoundTierResponse
 
@@ -45,6 +46,14 @@ class TierMockServer : ClientAndServer(MOCKSERVER_PORT) {
     val request = HttpRequest.request().withPath("/crn/$crn/tier")
     hmppsTier.`when`(request, Times.exactly(1)).respond(
       HttpResponse.notFoundResponse().withContentType(MediaType.APPLICATION_JSON).withBody(notFoundTierResponse()),
+    )
+  }
+
+  fun verifyTierCalled(crn: String, times: Int) {
+    TierApiExtension.hmppsTier.verify(
+      HttpRequest.request()
+        .withPath("/crn/$crn/tier"),
+      VerificationTimes.exactly(times),
     )
   }
 }
