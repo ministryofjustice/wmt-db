@@ -16,6 +16,9 @@ import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClient
 import org.springframework.security.oauth2.client.endpoint.WebClientReactiveClientCredentialsTokenResponseClient
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction
+import org.springframework.security.oauth2.core.OAuth2AccessToken
+import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.ClientRequest
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction
@@ -30,6 +33,11 @@ class WebClientUserEnhancementConfiguration(
   @Value("\${assess-risks-needs.endpoint.url}") private val assessRisksNeedsApiRootUri: String,
   @Value("\${workforce-allocations-to-delius.endpoint.url}") private val workforceAllocationsToDeliusApiRootUri: String,
 ) {
+  private fun assessRisksNeedsWebClient(builder: WebClient.Builder, uri: String): WebClient {
+    return builder.baseUrl(assessRisksNeedsApiRootUri)
+      .filter(withAuth())
+      .build()
+  }
 
   @Bean
   fun hmppsTierWebClientUserEnhancedAppScope(
@@ -42,13 +50,11 @@ class WebClientUserEnhancementConfiguration(
   @Bean
   @Qualifier("assessRisksNeedsClientUserEnhancedAppScope")
   fun assessRisksNeedsClientUserEnhancedAppScope(
-    clientRegistrationRepository: ReactiveClientRegistrationRepository,
     builder: WebClient.Builder,
   ): WebClient {
-    return getOAuthWebClient(authorizedClientManagerUserEnhanced(clientRegistrationRepository, builder), builder, assessRisksNeedsApiRootUri, "assess-risks-needs-api")
+    return assessRisksNeedsWebClient(builder, assessRisksNeedsApiRootUri)
   }
 
-  @Primary
   @Bean
   @Qualifier("assessRisksNeedsClientUserEnhanced")
   fun assessRisksNeedsClientUserEnhanced(@Qualifier("assessRisksNeedsClientUserEnhancedAppScope") webClient: WebClient): AssessRisksNeedsApiClient {
@@ -125,5 +131,25 @@ class WebClientUserEnhancementConfiguration(
   @Bean
   fun workforceAllocationsToDeliusApiClientUserEnhanced(@Qualifier("workforceAllocationsToDeliusApiWebClientUserEnhancedAppScope") webClient: WebClient): WorkforceAllocationsToDeliusApiClient {
     return WorkforceAllocationsToDeliusApiClient(webClient)
+  }
+
+  private fun withAuth(): ExchangeFilterFunction {
+    return ExchangeFilterFunction.ofRequestProcessor { request ->
+      ReactiveSecurityContextHolder.getContext()
+        .map { securityContext ->
+          val authentication = securityContext.authentication
+          val token = when (authentication) {
+            is BearerTokenAuthentication -> authentication.token.tokenValue
+            is OAuth2AccessToken -> authentication.tokenValue
+            is JwtAuthenticationToken -> authentication.token.tokenValue
+            else -> null
+          }
+          token?.let {
+            ClientRequest.from(request)
+              .header("Authorization", "Bearer $it")
+              .build()
+          } ?: request
+        }
+    }
   }
 }

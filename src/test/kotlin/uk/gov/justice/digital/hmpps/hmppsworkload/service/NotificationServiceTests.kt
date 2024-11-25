@@ -1,16 +1,15 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
+import com.ninjasquad.springmockk.MockkBean
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
-import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Qualifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.AssessRisksNeedsApiClient
@@ -37,12 +36,11 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-@Disabled
 class NotificationServiceTests {
   private val notificationClient = mockk<NotificationClientApi>()
 
-  @MockK
-  @Qualifier("assessRisksNeedsClientUserEnhancedAppScope")
+  @MockkBean
+  @Qualifier("assessRisksNeedsClientUserEnhanced")
   private lateinit var assessRisksNeedsApiClient: AssessRisksNeedsApiClient
   private val templateId = "templateId"
   private var notificationService = NotificationService(
