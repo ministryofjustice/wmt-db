@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
-import com.ninjasquad.springmockk.MockkBean
-import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -11,7 +9,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Qualifier
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.AssessRisksNeedsApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Manager
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Name
@@ -38,10 +35,7 @@ import java.time.format.DateTimeFormatter
 
 class NotificationServiceTests {
   private val notificationClient = mockk<NotificationClientApi>()
-
-  @MockkBean
-  @Qualifier("assessRisksNeedsClientUserEnhanced")
-  private lateinit var assessRisksNeedsApiClient: AssessRisksNeedsApiClient
+  private val assessRisksNeedsApiClient = mockk<AssessRisksNeedsApiClient>()
   private val templateId = "templateId"
   private var notificationService = NotificationService(
     notificationClient,
@@ -73,12 +67,6 @@ class NotificationServiceTests {
 
   @BeforeEach
   fun setup() {
-    MockKAnnotations.init(this)
-    notificationService = NotificationService(
-      notificationClient,
-      templateId,
-      assessRisksNeedsApiClient,
-    )
     coEvery { assessRisksNeedsApiClient.getRiskSummary(any()) } returns null
     coEvery { assessRisksNeedsApiClient.getRiskPredictors(any()) } returns emptyList()
     every { notificationClient.sendEmail(any(), any(), any(), any()) } returns SendEmailResponse(emailResponse())
