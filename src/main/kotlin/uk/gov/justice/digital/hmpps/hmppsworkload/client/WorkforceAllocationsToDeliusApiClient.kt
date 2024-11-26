@@ -25,9 +25,10 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
 
   suspend fun choosePractitioners(crn: String, teamCodes: List<String>): ChoosePractitionerResponse? {
+    val teams = teamCodes.joinToString(separator = ",")
     return webClient
       .get()
-      .uri("/allocation-demand/choose-practitioner?crn=$crn&teamCode=${teamCodes.joinToString(separator = ",")}")
+      .uri("/allocation-demand/choose-practitioner?crn={crn}&teamCode={teams}", crn, teams)
       .awaitExchangeOrNull { response ->
         when (response.statusCode()) {
           HttpStatus.OK -> response.awaitBody()
@@ -60,27 +61,27 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
   private suspend fun getPerson(identifier: String, identifierType: String, responseHandler: suspend (ClientResponse) -> PersonSummary?): PersonSummary? {
     return webClient
       .get()
-      .uri("/person/$identifier?type=$identifierType")
+      .uri("/person/{identifier}?type={identifierType}", identifier, identifierType)
       .awaitExchangeOrNull(responseHandler)
   }
 
   suspend fun getOfficerView(staffCode: String): OfficerView {
     return webClient
       .get()
-      .uri("/staff/$staffCode/officer-view")
+      .uri("/staff/{staffCode}/officer-view", staffCode)
       .retrieve()
       .awaitBody()
   }
 
   suspend fun impact(crn: String, staffCode: String): ImpactResponse = webClient
     .get()
-    .uri("/allocation-demand/impact?crn=$crn&staff=$staffCode")
+    .uri("/allocation-demand/impact?crn={crn}&staff={staffCode}", crn, staffCode)
     .retrieve()
     .awaitBody()
 
   suspend fun allocationCompleteDetails(crn: String, eventNumber: String, staffCode: String): CompleteDetails = webClient
     .get()
-    .uri("/allocation-completed/details?crn=$crn&eventNumber=$eventNumber&staffCode=$staffCode")
+    .uri("/allocation-completed/details?crn={crn}&eventNumber={eventNumber}&staffCode={staffCode}", crn, eventNumber, staffCode)
     .retrieve()
     .awaitBody()
 
@@ -88,7 +89,7 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
     val requestType = object : ParameterizedTypeReference<Collection<String>>() {}
     return webClient
       .post()
-      .uri("/staff/$staffCode/active-cases")
+      .uri("/staff/{staffCode}/active-cases", staffCode)
       .body(Mono.just(crns), requestType)
       .retrieve()
       .awaitBody()
@@ -97,7 +98,7 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
   suspend fun allocationDetails(crn: String, eventNumber: Int, staffCode: String, loggedInUser: String): AllocationDemandDetails =
     webClient
       .get()
-      .uri("/allocation-demand/$crn/$eventNumber/allocation?staff=$staffCode&allocatingStaffUsername=$loggedInUser")
+      .uri("/allocation-demand/{crn}/{eventNumber}/allocation?staff={staffCode}&allocatingStaffUsername={loggedInUser}", crn, eventNumber, staffCode, loggedInUser)
       .retrieve()
       .awaitBody()
 

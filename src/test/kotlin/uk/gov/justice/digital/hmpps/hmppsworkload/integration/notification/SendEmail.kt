@@ -27,7 +27,7 @@ class SendEmail : IntegrationTestBase() {
   @Test
   fun `sends an email when ROSH cannot be retrieved`() = runBlocking(Context.of(HttpHeaders.AUTHORIZATION, "token").asCoroutineContext()) {
     val crn = "X123456"
-    val allocateCase = AllocateCase(crn, sendEmailCopyToAllocatingOfficer = false, eventNumber = 1, allocationJustificationNotes = "some notes", sensitiveNotes = false, spoOversightNotes = "spo notes", sensitiveOversightNotes = null)
+    val allocateCase = AllocateCase(crn, sendEmailCopyToAllocatingOfficer = false, eventNumber = 1, allocationJustificationNotes = "some notes", sensitiveNotes = false, spoOversightNotes = "spo notes", sensitiveOversightNotes = null, laoCase = false)
     val allocationDetails = getAllocationDetails(crn)
     val caseDetailsEntity = CaseDetailsEntity(crn, B3, COMMUNITY, "Jane", "Doe")
 
@@ -45,9 +45,29 @@ class SendEmail : IntegrationTestBase() {
   }
 
   @Test
+  fun `sends an lao email when ROSH cannot be retrieved for lao case`() = runBlocking(Context.of(HttpHeaders.AUTHORIZATION, "token").asCoroutineContext()) {
+    val crn = "X123456"
+    val allocateCase = AllocateCase(crn, sendEmailCopyToAllocatingOfficer = false, eventNumber = 1, allocationJustificationNotes = "some notes", sensitiveNotes = false, spoOversightNotes = "spo notes", sensitiveOversightNotes = null, laoCase = true)
+    val allocationDetails = getAllocationDetails(crn)
+    val caseDetailsEntity = CaseDetailsEntity(crn, B3, COMMUNITY, "Jane", "Doe")
+
+    assessRisksNeedsApi.riskSummaryErrorResponse(crn)
+    assessRisksNeedsApi.riskPredictorResponse(crn)
+    caseDetailsRepository.save(caseDetailsEntity)
+    val emailSendResponse = notificationService.notifyAllocation(
+      allocationDetails,
+      allocateCase,
+      caseDetailsEntity,
+    )
+    assessRisksNeedsApi.verifyRiskSummaryCalled(crn, 2)
+    assessRisksNeedsApi.verifyRiskPredictorCalled(crn, 1)
+    assertEquals(UUID.fromString("fc55e1ce-47d6-479c-ac80-3ac77c9fe609"), emailSendResponse.first().templateId)
+  }
+
+  @Test
   fun `sends an email when risk predictor cannot be retrieved`() = runBlocking(Context.of(HttpHeaders.AUTHORIZATION, "token").asCoroutineContext()) {
     val crn = "X123456"
-    val allocateCase = AllocateCase(crn, sendEmailCopyToAllocatingOfficer = false, eventNumber = 1, allocationJustificationNotes = "some notes", sensitiveNotes = false, spoOversightNotes = "spo notes", sensitiveOversightNotes = null)
+    val allocateCase = AllocateCase(crn, sendEmailCopyToAllocatingOfficer = false, eventNumber = 1, allocationJustificationNotes = "some notes", sensitiveNotes = false, spoOversightNotes = "spo notes", sensitiveOversightNotes = null, laoCase = false)
     val allocationDetails = getAllocationDetails(crn)
     val caseDetailsEntity = CaseDetailsEntity(crn, B3, COMMUNITY, "Jane", "Doe")
 
@@ -62,5 +82,25 @@ class SendEmail : IntegrationTestBase() {
     assessRisksNeedsApi.verifyRiskSummaryCalled(crn, 1)
     assessRisksNeedsApi.verifyRiskPredictorCalled(crn, 2)
     assertEquals(UUID.fromString("5db23c80-9cb6-4b8e-a0f6-56061e50a9ef"), emailSendResponse.first().templateId)
+  }
+
+  @Test
+  fun `sends an lao email when risk predictor cannot be retrieved for lao case`() = runBlocking(Context.of(HttpHeaders.AUTHORIZATION, "token").asCoroutineContext()) {
+    val crn = "X123456"
+    val allocateCase = AllocateCase(crn, sendEmailCopyToAllocatingOfficer = false, eventNumber = 1, allocationJustificationNotes = "some notes", sensitiveNotes = false, spoOversightNotes = "spo notes", sensitiveOversightNotes = null, laoCase = true)
+    val allocationDetails = getAllocationDetails(crn)
+    val caseDetailsEntity = CaseDetailsEntity(crn, B3, COMMUNITY, "Jane", "Doe")
+
+    assessRisksNeedsApi.riskSummaryResponse(crn)
+    assessRisksNeedsApi.riskPredictorErrorResponse(crn)
+    caseDetailsRepository.save(caseDetailsEntity)
+    val emailSendResponse = notificationService.notifyAllocation(
+      allocationDetails,
+      allocateCase,
+      caseDetailsEntity,
+    )
+    assessRisksNeedsApi.verifyRiskSummaryCalled(crn, 1)
+    assessRisksNeedsApi.verifyRiskPredictorCalled(crn, 2)
+    assertEquals(UUID.fromString("fc55e1ce-47d6-479c-ac80-3ac77c9fe609"), emailSendResponse.first().templateId)
   }
 }

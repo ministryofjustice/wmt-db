@@ -38,7 +38,6 @@ class DefaultSaveWorkloadService(
   ): CaseAllocated {
     val caseDetails: CaseDetailsEntity = caseDetailsRepository.findByIdOrNull(allocateCase.crn)!!
     val allocationData = workforceAllocationsToDeliusApiClient.allocationDetails(allocateCase.crn, allocateCase.eventNumber, allocatedStaffId.staffCode, loggedInUser)
-
     val personManagerSaveResult = savePersonManager(allocatedStaffId, allocationData, loggedInUser, allocateCase, caseDetails)
     val eventManagerSaveResult = saveEventManager(allocatedStaffId, allocationData, allocateCase, loggedInUser, caseDetails)
 
