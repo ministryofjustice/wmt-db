@@ -41,7 +41,7 @@ class AssessRisksNeedsMockServer : ClientAndServer(MOCKSERVER_PORT) {
 
   fun riskPredictorResponse(crn: String) {
     val request = HttpRequest.request().withPath("/risks/crn/$crn/predictors/rsr/history")
-    // .withHeader("Authorization")
+      .withHeader("Authorization")
     AssessRisksNeedsApiExtension.assessRisksNeedsApi.`when`(request, Times.exactly(1)).respond(
       HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(successfulRiskPredictorResponse()),
     )
@@ -49,7 +49,7 @@ class AssessRisksNeedsMockServer : ClientAndServer(MOCKSERVER_PORT) {
 
   fun riskPredictorErrorResponse(crn: String) {
     val request = HttpRequest.request().withPath("/risks/crn/$crn/predictors/rsr/history")
-    // .withHeader("Authorization")
+      .withHeader("Authorization")
     AssessRisksNeedsApiExtension.assessRisksNeedsApi.`when`(request, Times.exactly(1)).respond(
       HttpResponse.response().withStatusCode(HttpStatusCode.INTERNAL_SERVER_ERROR_500.code()).withContentType(
         MediaType.APPLICATION_JSON,
@@ -68,7 +68,7 @@ class AssessRisksNeedsMockServer : ClientAndServer(MOCKSERVER_PORT) {
 
   fun riskSummaryResponse(crn: String) {
     val request = HttpRequest.request().withPath("/risks/crn/$crn/summary")
-    // .withHeader("Authorization")
+      .withHeader("Authorization")
     AssessRisksNeedsApiExtension.assessRisksNeedsApi.`when`(request, Times.exactly(2)).respond(
       HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(successfulRiskSummaryResponse()),
     )
@@ -76,7 +76,7 @@ class AssessRisksNeedsMockServer : ClientAndServer(MOCKSERVER_PORT) {
 
   fun riskSummaryErrorResponse(crn: String) {
     val request = HttpRequest.request().withPath("/risks/crn/$crn/summary")
-    // .withHeader("Authorization")
+      .withHeader("Authorization")
     AssessRisksNeedsApiExtension.assessRisksNeedsApi.`when`(request, Times.exactly(2)).respond(
       HttpResponse.response().withStatusCode(HttpStatusCode.INTERNAL_SERVER_ERROR_500.code()).withContentType(
         MediaType.APPLICATION_JSON,
@@ -87,8 +87,8 @@ class AssessRisksNeedsMockServer : ClientAndServer(MOCKSERVER_PORT) {
   fun verifyRiskSummaryCalled(crn: String, times: Int) {
     AssessRisksNeedsApiExtension.assessRisksNeedsApi.verify(
       HttpRequest.request()
-        .withPath("/risks/crn/$crn/summary"),
-      // .withHeader("Authorization"),
+        .withPath("/risks/crn/$crn/summary")
+        .withHeader("Authorization"),
       VerificationTimes.exactly(times),
     )
   }

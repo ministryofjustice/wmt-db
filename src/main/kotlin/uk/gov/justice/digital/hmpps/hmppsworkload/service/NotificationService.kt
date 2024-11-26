@@ -142,9 +142,6 @@ class NotificationService(
   private suspend fun getNotifyData(crn: String): NotifyData {
     val riskSummary = assessRisksNeedsApiClient.getRiskSummary(crn)
     val riskPredictors = assessRisksNeedsApiClient.getRiskPredictors(crn)
-    log.info("Risk summary: $riskSummary")
-    log.info("Risk predictors: $riskPredictors")
-
     return NotifyData(riskSummary, riskPredictors)
   }
 }

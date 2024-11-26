@@ -110,16 +110,6 @@ class WebClientUserEnhancementConfiguration(
       .build()
   }
 
-//  @Bean
-//  fun assessRiskNeedsApiWebClient(builder: WebClient.Builder): WebClient {
-//    val httpClient: HttpClient = HttpClient.create()
-//      .responseTimeout(Duration.ofSeconds(2))
-//    return builder.baseUrl(assessRisksNeedsApiRootUri)
-//      .filter(AuthTokenFilterFunction())
-//      .clientConnector(ReactorClientHttpConnector(httpClient))
-//      .build()
-//  }
-
   @Bean
   fun workforceAllocationsToDeliusApiWebClientUserEnhancedAppScope(
     clientRegistrationRepository: ReactiveClientRegistrationRepository,

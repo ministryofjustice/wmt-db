@@ -18,12 +18,12 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.NotificationService
 import java.util.*
 
+@Disabled
 class SendEmail : IntegrationTestBase() {
 
   @Autowired
   lateinit var notificationService: NotificationService
 
-  @Disabled
   @Test
   fun `sends an email when ROSH cannot be retrieved`() = runBlocking(Context.of(HttpHeaders.AUTHORIZATION, "token").asCoroutineContext()) {
     val crn = "X123456"
@@ -44,7 +44,6 @@ class SendEmail : IntegrationTestBase() {
     assertEquals(UUID.fromString("5db23c80-9cb6-4b8e-a0f6-56061e50a9ef"), emailSendResponse.first().templateId)
   }
 
-  @Disabled
   @Test
   fun `sends an email when risk predictor cannot be retrieved`() = runBlocking(Context.of(HttpHeaders.AUTHORIZATION, "token").asCoroutineContext()) {
     val crn = "X123456"
