@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.AssessRisksNeedsApiClient
@@ -38,7 +39,7 @@ class NotificationService(
   private val notificationClient: NotificationClientApi,
   @Value("\${application.notify.allocation.template}") private val allocationTemplateId: String,
   @Value("\${application.notify.allocation.laoTemplate}") private val allocationTemplateLAOId: String,
-  private val assessRisksNeedsApiClient: AssessRisksNeedsApiClient,
+  @Qualifier("assessRisksNeedsClientUserEnhanced") private val assessRisksNeedsApiClient: AssessRisksNeedsApiClient,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -152,7 +153,9 @@ class NotificationService(
     .map { requirement -> "${requirement.mainCategory}: ${requirement.subCategory ?: requirement.mainCategory} ${requirement.length}".trimEnd() }
 
   private suspend fun getNotifyData(crn: String): NotifyData {
-    return NotifyData(assessRisksNeedsApiClient.getRiskSummary(crn), assessRisksNeedsApiClient.getRiskPredictors(crn))
+    val riskSummary = assessRisksNeedsApiClient.getRiskSummary(crn)
+    val riskPredictors = assessRisksNeedsApiClient.getRiskPredictors(crn)
+    return NotifyData(riskSummary, riskPredictors)
   }
 }
 

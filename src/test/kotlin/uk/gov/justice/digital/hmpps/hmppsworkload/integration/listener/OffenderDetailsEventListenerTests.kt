@@ -34,6 +34,7 @@ class OffenderDetailsEventListenerTests : IntegrationTestBase() {
 
     val caseDetail = caseDetailsRepository.findAll().first()
 
+    hmppsTier.verifyTierCalled(crn, 1)
     Assertions.assertEquals(crn, caseDetail.crn)
     Assertions.assertEquals(CaseType.CUSTODY, caseDetail.type)
     Assertions.assertEquals(Tier.B3, caseDetail.tier)
