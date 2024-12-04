@@ -44,8 +44,8 @@ class JpaBasedGetEventManager(
     workforceAllocationsToDeliusApiClient.allocationCompleteDetails(crn, eventNumber.toString(), eventManagerEntity.staffCode)
   }
 
-  suspend fun findAllocationsBy(since: ZonedDateTime, name: String): CreatedAllocationDetails {
-    val allocatedEventManagers = eventManagerRepository.findByCreatedDateGreaterThanEqualAndCreatedByAndIsActiveTrue(since, name)
+  suspend fun findAllocationsByTeam(since: ZonedDateTime, teams: List<String>): CreatedAllocationDetails {
+    val allocatedEventManagers = eventManagerRepository.findByCreatedDateGreaterThanEqualAndTeamCodeInAndIsActiveTrue(since, teams)
     val allocatedEventManagerDetails = allocatedEventManagers.takeUnless { it.isEmpty() }?.let { workforceAllocationsToDeliusApiClient.allocationDetails(allocatedEventManagers).cases.associateBy { it.crn } } ?: emptyMap()
     val caseDetails = caseDetailsRepository.findAllById(allocatedEventManagers.map { it.crn }).associateBy { it.crn }
     return CreatedAllocationDetails.from(allocatedEventManagers, allocatedEventManagerDetails, caseDetails)
