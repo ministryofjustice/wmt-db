@@ -77,14 +77,14 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
     ],
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
-  @GetMapping("/allocation/events/me/count")
+  @PostMapping("/allocation/events/teams/count")
   suspend fun getAllocationCountByLoggedInUser(
     @RequestParam(required = true)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     since: ZonedDateTime,
-    authentication: Authentication,
+    @RequestBody teams: List<String>,
   ): CaseCount =
-    getEventManager.countAllocationsBy(since, authentication.name)
+    getEventManager.countAllocationsBy(since, teams)
 
   @Operation(summary = "Get allocated events created by logged in user's selected teams")
   @ApiResponses(

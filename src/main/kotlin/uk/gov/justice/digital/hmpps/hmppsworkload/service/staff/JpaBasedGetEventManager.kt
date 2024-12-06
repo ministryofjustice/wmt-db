@@ -51,8 +51,8 @@ class JpaBasedGetEventManager(
     return CreatedAllocationDetails.from(allocatedEventManagers, allocatedEventManagerDetails, caseDetails)
   }
 
-  suspend fun countAllocationsBy(since: ZonedDateTime, name: String): CaseCount {
-    val allocatedEventManagers = eventManagerRepository.findByCreatedDateGreaterThanEqualAndCreatedByAndIsActiveTrue(since, name)
+  suspend fun countAllocationsBy(since: ZonedDateTime, teams: List<String>): CaseCount {
+    val allocatedEventManagers = eventManagerRepository.findByCreatedDateGreaterThanEqualAndTeamCodeInAndIsActiveTrue(since, teams)
     val caseDetails = caseDetailsRepository.findAllById(allocatedEventManagers.map { it.crn })
     return CaseCount(caseDetails.count())
   }
