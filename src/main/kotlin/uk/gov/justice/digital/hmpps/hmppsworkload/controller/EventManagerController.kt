@@ -70,7 +70,7 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
   ): CompleteDetails =
     getEventManager.findCompleteDetailsByCrnAndEventNumber(crn, eventNumber) ?: throw EntityNotFoundException("Complete details of event manager not found for crn $crn eventNumber $eventNumber")
 
-  @Operation(summary = "Get allocated event count by logged in user")
+  @Operation(summary = "Get allocated event count by logged in user's teams")
   @ApiResponses(
     value = [
       ApiResponse(responseCode = "200", description = "OK"),
@@ -78,7 +78,7 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @PostMapping("/allocation/events/teams/count")
-  suspend fun getAllocationCountByLoggedInUser(
+  suspend fun getAllocationCountByLoggedInUsersTeam(
     @RequestParam(required = true)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     since: ZonedDateTime,
