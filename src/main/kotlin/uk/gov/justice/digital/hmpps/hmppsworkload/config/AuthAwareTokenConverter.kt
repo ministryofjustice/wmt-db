@@ -19,11 +19,21 @@ class AuthAwareTokenConverter : Converter<Jwt, Mono<AbstractAuthenticationToken>
     return Mono.just(AuthAwareAuthenticationToken(jwt, principal, authorities))
   }
 
-  private fun findPrincipal(claims: Map<String, Any?>): String {
+  private fun findPrincipal(claims: Map<String, Any?>): Principal {
     return if (claims.containsKey("user_name")) {
-      claims["user_name"] as String
+      Principal(
+        claims["user_name"] as String,
+        claims["user_id"] as String,
+        claims["name"] as String,
+        claims["auth_source"] as String,
+        false,
+      )
     } else {
-      claims["client_id"] as String
+      Principal(
+        userName = claims["sub"] as String,
+        userId = claims["client_id"] as String,
+        isClientGrantType = true,
+      )
     }
   }
 
@@ -40,10 +50,18 @@ class AuthAwareTokenConverter : Converter<Jwt, Mono<AbstractAuthenticationToken>
 
 class AuthAwareAuthenticationToken(
   jwt: Jwt,
-  private val aPrincipal: String,
+  private val aPrincipal: Principal,
   authorities: Collection<GrantedAuthority>,
 ) : JwtAuthenticationToken(jwt, authorities) {
   override fun getPrincipal(): Any {
     return aPrincipal
   }
 }
+
+class Principal(
+  val userName: String,
+  val userId: String? = null,
+  val name: String? = null,
+  val authSource: String? = null,
+  val isClientGrantType: Boolean = false,
+)

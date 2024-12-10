@@ -46,6 +46,11 @@ spring:
             client-id: ${oauth.client.id}
             client-secret: ${oauth.client.secret}
             authorization-grant-type: client_credentials
+          assess-risks-needs-api:
+            provider: hmpps-auth
+            client-id: ${oauth.client.id}
+            client-secret: ${oauth.client.secret}
+            authorization-grant-type: client_credentials
           workforce-allocations-to-delius-api:
             provider: hmpps-auth
             client-id: ${oauth.client.id}
@@ -71,6 +76,7 @@ application:
   notify:
     allocation:
       template: 5db23c80-9cb6-4b8e-a0f6-56061e50a9ef
+      laoTemplate: fc55e1ce-47d6-479c-ac80-3ac77c9fe609
 person:
   manager:
     getByIdPath: /allocation/person/{id}

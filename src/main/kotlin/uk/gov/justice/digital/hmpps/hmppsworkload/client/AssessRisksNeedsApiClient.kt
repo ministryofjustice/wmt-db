@@ -11,12 +11,12 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskPredictor
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskSummary
 
 @Component
-class AssessRisksNeedsApiClient(@Qualifier("assessRiskNeedsApiWebClient") private val webClient: WebClient) {
+class AssessRisksNeedsApiClient(@Qualifier("assessRisksNeedsClientUserEnhancedAppScope") private val webClient: WebClient) {
 
   suspend fun getRiskSummary(crn: String): RiskSummary? {
     return webClient
       .get()
-      .uri("/risks/crn/$crn/summary")
+      .uri("/risks/crn/{crn}/summary", crn)
       .retrieve()
       .bodyToMono(RiskSummary::class.java)
       .retry(1)
@@ -29,7 +29,7 @@ class AssessRisksNeedsApiClient(@Qualifier("assessRiskNeedsApiWebClient") privat
     val responseType = object : ParameterizedTypeReference<List<RiskPredictor>>() {}
     return webClient
       .get()
-      .uri("/risks/crn/$crn/predictors/rsr/history")
+      .uri("/risks/crn/{crn}/predictors/rsr/history", crn)
       .retrieve()
       .bodyToMono(responseType)
       .retry(1)

@@ -19,6 +19,9 @@ cmake-build-debug/
 out/
 *.iml
 
+#Mac
+.DS_Store
+
 # mpeltonen/sbt-idea plugin
 .idea_modules/
 

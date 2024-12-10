@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.AssessRisksNeedsApiClient
@@ -37,21 +38,34 @@ private const val CRN = "crn"
 class NotificationService(
   private val notificationClient: NotificationClientApi,
   @Value("\${application.notify.allocation.template}") private val allocationTemplateId: String,
-  private val assessRisksNeedsApiClient: AssessRisksNeedsApiClient,
+  @Value("\${application.notify.allocation.laoTemplate}") private val allocationTemplateLAOId: String,
+  @Qualifier("assessRisksNeedsClientUserEnhanced") private val assessRisksNeedsApiClient: AssessRisksNeedsApiClient,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
+  @Suppress("LongParameterList", "LongMethod")
   suspend fun notifyAllocation(allocationDemandDetails: AllocationDemandDetails, allocateCase: AllocateCase, caseDetails: CaseDetailsEntity): List<SendEmailResponse> {
     val emailReferenceId = UUID.randomUUID().toString()
     val notifyData = getNotifyData(allocateCase.crn)
-    val parameters = mapOf(
-      "officer_name" to allocationDemandDetails.staff.name.getCombinedName(),
-      "induction_statement" to mapInductionAppointment(allocationDemandDetails.initialAppointment, caseDetails.type),
-      "requirements" to mapRequirements(allocationDemandDetails.activeRequirements),
-    ).plus(getRiskParameters(notifyData.riskSummary, notifyData.riskPredictors, allocationDemandDetails.ogrs))
-      .plus(getConvictionParameters(allocationDemandDetails))
-      .plus(getPersonOnProbationParameters(allocationDemandDetails.name.getCombinedName(), allocateCase))
-      .plus(getLoggedInUserParameters(allocationDemandDetails.allocatingStaff))
+    val parameters: Map<String, Any>
+    val templateId: String
+    if (allocateCase.laoCase) {
+      templateId = allocationTemplateLAOId
+      parameters = mapOf(
+        "officer_name" to allocationDemandDetails.staff.name.getCombinedName(),
+      ).plus(getLoggedInUserParameters(allocationDemandDetails.allocatingStaff))
+        .plus(CRN to allocationDemandDetails.crn)
+    } else {
+      templateId = allocationTemplateId
+      parameters = mapOf(
+        "officer_name" to allocationDemandDetails.staff.name.getCombinedName(),
+        "induction_statement" to mapInductionAppointment(allocationDemandDetails.initialAppointment, caseDetails.type),
+        "requirements" to mapRequirements(allocationDemandDetails.activeRequirements),
+      ).plus(getRiskParameters(notifyData.riskSummary, notifyData.riskPredictors, allocationDemandDetails.ogrs))
+        .plus(getConvictionParameters(allocationDemandDetails))
+        .plus(getPersonOnProbationParameters(allocationDemandDetails.name.getCombinedName(), allocateCase))
+        .plus(getLoggedInUserParameters(allocationDemandDetails.allocatingStaff))
+    }
     val emailTo = HashSet(allocateCase.emailTo ?: emptySet())
     emailTo.add(allocationDemandDetails.staff.email!!)
     if (allocateCase.sendEmailCopyToAllocatingOfficer) emailTo.add(allocationDemandDetails.allocatingStaff.email)
@@ -60,7 +74,7 @@ class NotificationService(
     log.info("Email request sent to Notify for crn: ${caseDetails.crn} with reference ID: $emailReferenceId")
     MDC.remove(REFERENCE_ID)
     MDC.remove(CRN)
-    return emailTo.map { email -> addRecipientTo400Response(email) { notificationClient.sendEmail(allocationTemplateId, email, parameters, emailReferenceId) } }
+    return emailTo.map { email -> addRecipientTo400Response(email) { notificationClient.sendEmail(templateId, email, parameters, emailReferenceId) } }
   }
 
   class NotificationInvalidSenderException(emailRecipient: String, cause: Throwable) : Exception("Unable to deliver to recipient $emailRecipient", cause)
@@ -139,7 +153,9 @@ class NotificationService(
     .map { requirement -> "${requirement.mainCategory}: ${requirement.subCategory ?: requirement.mainCategory} ${requirement.length}".trimEnd() }
 
   private suspend fun getNotifyData(crn: String): NotifyData {
-    return NotifyData(assessRisksNeedsApiClient.getRiskSummary(crn), assessRisksNeedsApiClient.getRiskPredictors(crn))
+    val riskSummary = assessRisksNeedsApiClient.getRiskSummary(crn)
+    val riskPredictors = assessRisksNeedsApiClient.getRiskPredictors(crn)
+    return NotifyData(riskSummary, riskPredictors)
   }
 }
 

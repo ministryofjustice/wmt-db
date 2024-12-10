@@ -12,7 +12,7 @@ class HmppsTierApiClient(private val webClient: WebClient) {
 
   suspend fun getTierByCrn(crn: String): String? = webClient
     .get()
-    .uri("/crn/$crn/tier")
+    .uri("/crn/{crn}/tier", crn)
     .awaitExchangeOrNull { response ->
       when (response.statusCode()) {
         HttpStatus.OK -> response.awaitBody<TierDto>().tierScore
