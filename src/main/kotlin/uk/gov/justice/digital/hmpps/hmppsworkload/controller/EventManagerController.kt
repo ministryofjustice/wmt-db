@@ -102,5 +102,4 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
     getEventManager.findAllocationsByTeam(since, teams.teams)
 
   data class TeamsRequest(val teams: List<String>)
-
 }
