@@ -81,9 +81,9 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
     @RequestParam(required = true)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     since: ZonedDateTime,
-    @RequestBody teams: List<String>,
+    @RequestBody teams: TeamsRequest,
   ): CaseCount =
-    getEventManager.countAllocationsBy(since, teams)
+    getEventManager.countAllocationsBy(since, teams.teams)
 
   @Operation(summary = "Get allocated events created by logged in user's selected teams")
   @ApiResponses(
@@ -97,7 +97,10 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
     @RequestParam(required = true)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     since: ZonedDateTime,
-    @RequestBody teams: List<String>,
+    @RequestBody teams: TeamsRequest,
   ): CreatedAllocationDetails =
-    getEventManager.findAllocationsByTeam(since, teams)
+    getEventManager.findAllocationsByTeam(since, teams.teams)
+
+  data class TeamsRequest(val teams: List<String>)
+
 }
