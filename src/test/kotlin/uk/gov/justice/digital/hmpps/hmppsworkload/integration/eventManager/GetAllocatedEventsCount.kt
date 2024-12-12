@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.eventManager
 
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.hmppsworkload.controller.EventManagerController
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
@@ -14,7 +15,7 @@ import java.time.temporal.ChronoUnit
 class GetAllocatedEventsCount : IntegrationTestBase() {
 
   private val loggedInUser = "SOME_USER"
-  val teams = listOf("T1")
+  val teams = EventManagerController.TeamsRequest(listOf("T1"))
 
   @Test
   fun `can get count of all allocated events by logged in user`() {
