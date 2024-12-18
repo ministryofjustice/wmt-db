@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.eventManager
 
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.hmppsworkload.controller.EventManagerController
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
@@ -14,6 +15,7 @@ import java.time.temporal.ChronoUnit
 class GetAllocatedEventsCount : IntegrationTestBase() {
 
   private val loggedInUser = "SOME_USER"
+  val teams = EventManagerController.TeamsRequest(listOf("T1"))
 
   @Test
   fun `can get count of all allocated events by logged in user`() {
@@ -32,13 +34,14 @@ class GetAllocatedEventsCount : IntegrationTestBase() {
 
     caseDetailsRepository.save(CaseDetailsEntity(crn = storedEventManager.crn, tier = Tier.B2, type = CaseType.COMMUNITY, "", ""))
 
-    webTestClient.get()
+    webTestClient.post()
       .uri(
-        "/allocation/events/me/count?since=${thirtyDaysInPast()}",
+        "/allocation/events/teams/count?since=${thirtyDaysInPast()}",
       )
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_READ", loggedInUser))
       }
+      .bodyValue(teams)
       .exchange()
       .expectStatus()
       .isOk
@@ -66,13 +69,14 @@ class GetAllocatedEventsCount : IntegrationTestBase() {
 
     caseDetailsRepository.save(CaseDetailsEntity(crn = oldEventManager.crn, tier = Tier.B2, type = CaseType.COMMUNITY, "", ""))
 
-    webTestClient.get()
+    webTestClient.post()
       .uri(
-        "/allocation/events/me/count?since=${thirtyDaysInPast()}",
+        "/allocation/events/teams/count?since=${thirtyDaysInPast()}",
       )
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_READ", loggedInUser))
       }
+      .bodyValue(teams)
       .exchange()
       .expectStatus()
       .isOk
@@ -96,13 +100,14 @@ class GetAllocatedEventsCount : IntegrationTestBase() {
       ),
     )
 
-    webTestClient.get()
+    webTestClient.post()
       .uri(
-        "/allocation/events/me/count?since=${thirtyDaysInPast()}",
+        "/allocation/events/teams/count?since=${thirtyDaysInPast()}",
       )
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_READ", loggedInUser))
       }
+      .bodyValue(teams)
       .exchange()
       .expectStatus()
       .isOk

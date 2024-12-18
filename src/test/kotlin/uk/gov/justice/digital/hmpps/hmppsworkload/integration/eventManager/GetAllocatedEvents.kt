@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.eventManager
 
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.hmppsworkload.controller.EventManagerController
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.IntegrationTestBase
@@ -16,6 +17,7 @@ import java.time.temporal.ChronoUnit
 class GetAllocatedEvents : IntegrationTestBase() {
 
   private val loggedInUser = "SOME_USER"
+  private val teams = EventManagerController.TeamsRequest(listOf("T1"))
 
   @Test
   fun `can get all allocated events by logged in user`() {
@@ -36,13 +38,14 @@ class GetAllocatedEvents : IntegrationTestBase() {
 
     workforceAllocationsToDelius.allocationDetailsResponse(listOf(AllocationDetailIntegration(storedEventManager.crn, storedEventManager.staffCode)))
 
-    webTestClient.get()
+    webTestClient.post()
       .uri(
-        "/allocation/events/me?since=${thirtyDaysInPast()}",
+        "/allocation/events/teams?since=${thirtyDaysInPast()}",
       )
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_READ", loggedInUser))
       }
+      .bodyValue(teams)
       .exchange()
       .expectStatus()
       .isOk
@@ -82,13 +85,14 @@ class GetAllocatedEvents : IntegrationTestBase() {
 
     workforceAllocationsToDelius.allocationDetailsResponse(listOf(AllocationDetailIntegration(oldEventManager.crn, oldEventManager.staffCode)))
 
-    webTestClient.get()
+    webTestClient.post()
       .uri(
-        "/allocation/events/me?since=${thirtyDaysInPast()}",
+        "/allocation/events/teams?since=${thirtyDaysInPast()}",
       )
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_READ", loggedInUser))
       }
+      .bodyValue(teams)
       .exchange()
       .expectStatus()
       .isOk
@@ -112,13 +116,14 @@ class GetAllocatedEvents : IntegrationTestBase() {
       ),
     )
 
-    webTestClient.get()
+    webTestClient.post()
       .uri(
-        "/allocation/events/me?since=${thirtyDaysInPast()}",
+        "/allocation/events/teams?since=${thirtyDaysInPast()}",
       )
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_READ", loggedInUser))
       }
+      .bodyValue(teams)
       .exchange()
       .expectStatus()
       .isOk
@@ -146,13 +151,14 @@ class GetAllocatedEvents : IntegrationTestBase() {
 
     caseDetailsRepository.save(CaseDetailsEntity(crn = noDeliusDetailsEventManager.crn, tier = Tier.B2, type = CaseType.COMMUNITY, "", ""))
 
-    webTestClient.get()
+    webTestClient.post()
       .uri(
-        "/allocation/events/me?since=${thirtyDaysInPast()}",
+        "/allocation/events/teams?since=${thirtyDaysInPast()}",
       )
       .headers {
         it.authToken(roles = listOf("ROLE_WORKLOAD_READ", loggedInUser))
       }
+      .bodyValue(teams)
       .exchange()
       .expectStatus()
       .isOk
