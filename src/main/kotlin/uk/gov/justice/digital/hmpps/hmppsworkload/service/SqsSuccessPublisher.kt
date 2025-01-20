@@ -131,13 +131,14 @@ class SqsSuccessPublisher(
     }
   }
 
-  fun sendNotification(notificationEmail: NotificationEmail) {
+  suspend fun sendNotification(notificationEmail: NotificationEmail): NotificationMessageResponse {
     val sendMessage = SendMessageRequest.builder()
       .queueUrl(hmppsQueueService.findByQueueId("hmppsnotificationqueue")?.queueUrl)
       .messageBody(objectMapper.writeValueAsString(notificationEmail))
       .build()
     hmppsQueueService.findByQueueId("hmppsnotificationqueue")?.sqsClient?.sendMessage(sendMessage)
     log.info(LOG_TEMPLATE_NOTIFICATION, notificationEmail.emailTo, notificationEmail.emailReferenceId)
+    return NotificationMessageResponse(notificationEmail.emailTemplate, notificationEmail.emailReferenceId, notificationEmail.emailTo)
   }
 
   fun outOfDateReductionsProcessed() {

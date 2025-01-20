@@ -45,7 +45,7 @@ class NotificationService(
   private val log = LoggerFactory.getLogger(this::class.java)
 
   @Suppress("LongParameterList", "LongMethod")
-  suspend fun notifyAllocation(allocationDemandDetails: AllocationDemandDetails, allocateCase: AllocateCase, caseDetails: CaseDetailsEntity): List<NotificationMessageResponse> {
+  suspend fun notifyAllocation(allocationDemandDetails: AllocationDemandDetails, allocateCase: AllocateCase, caseDetails: CaseDetailsEntity): NotificationMessageResponse {
     val emailReferenceId = UUID.randomUUID().toString()
     val notifyData = getNotifyData(allocateCase.crn)
     val parameters: Map<String, Any>
@@ -75,7 +75,7 @@ class NotificationService(
     log.info("Email request sent to Notify for crn: ${caseDetails.crn} with reference ID: $emailReferenceId")
     MDC.remove(REFERENCE_ID)
     MDC.remove(CRN)
-    sqsSuccessPublisher.sendNotification(
+    return sqsSuccessPublisher.sendNotification(
       NotificationEmail(
         emailTo = emailTo,
         emailTemplate = templateId,
@@ -83,7 +83,6 @@ class NotificationService(
         emailParameters = parameters,
       ),
     )
-    return emailTo.map { email -> NotificationMessageResponse(templateId, emailReferenceId, email) }
   }
 
   class NotificationInvalidSenderException(emailRecipient: String, cause: Throwable) : Exception("Unable to deliver to recipient $emailRecipient", cause)
@@ -171,7 +170,7 @@ class NotificationService(
 data class NotificationMessageResponse(
   val templateId: String,
   val referenceId: String,
-  val email: String,
+  val email: Set<String>,
 )
 
 data class NotifyData(
