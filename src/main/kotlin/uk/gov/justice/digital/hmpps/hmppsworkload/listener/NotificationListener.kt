@@ -24,7 +24,7 @@ class NotificationListener(
     log.info("Processing message on notification queue")
     val notification = getNotification(rawMessage)
     notification.emailTo.map { email ->
-      addRecipientTo400Response(email) {
+      handleError(email) {
         notificationClient.sendEmail(
           email,
           notification.emailTemplate,
@@ -35,14 +35,23 @@ class NotificationListener(
     }
   }
 
-  private fun addRecipientTo400Response(emailRecipient: String, wrappedApiCall: () -> SendEmailResponse): SendEmailResponse {
-    try {
-      return wrappedApiCall.invoke()
-    } catch (notificationException: NotificationClientException) {
-      if (notificationException.httpResult == 400) {
-        throw NotificationInvalidSenderException(emailRecipient, notificationException)
+  private fun handleError(emailRecipient: String, wrappedApiCall: () -> SendEmailResponse): SendEmailResponse {
+    var attempt = 0
+    val maxRetries = 3
+    while (true) {
+      try {
+        return wrappedApiCall.invoke()
+      } catch (notificationException: NotificationClientException) {
+        if (notificationException.httpResult == 500 && attempt < maxRetries) {
+          attempt++
+          log.warn("Retrying notify send for {} ", notificationException.message)
+          continue
+        }
+        if (notificationException.httpResult == 400) {
+          throw NotificationInvalidSenderException(emailRecipient, notificationException)
+        }
+        throw notificationException
       }
-      throw notificationException
     }
   }
 
