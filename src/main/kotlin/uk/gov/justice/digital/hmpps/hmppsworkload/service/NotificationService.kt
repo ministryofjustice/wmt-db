@@ -40,11 +40,12 @@ class NotificationService(
   @Value("\${application.notify.allocation.template}") private val allocationTemplateId: String,
   @Value("\${application.notify.allocation.laoTemplate}") private val allocationTemplateLAOId: String,
   @Qualifier("assessRisksNeedsClientUserEnhanced") private val assessRisksNeedsApiClient: AssessRisksNeedsApiClient,
+  private val sqsSuccessPublisher: SqsSuccessPublisher,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
   @Suppress("LongParameterList", "LongMethod")
-  suspend fun notifyAllocation(allocationDemandDetails: AllocationDemandDetails, allocateCase: AllocateCase, caseDetails: CaseDetailsEntity): List<SendEmailResponse> {
+  suspend fun notifyAllocation(allocationDemandDetails: AllocationDemandDetails, allocateCase: AllocateCase, caseDetails: CaseDetailsEntity): List<NotificationMessageResponse> {
     val emailReferenceId = UUID.randomUUID().toString()
     val notifyData = getNotifyData(allocateCase.crn)
     val parameters: Map<String, Any>
@@ -74,7 +75,15 @@ class NotificationService(
     log.info("Email request sent to Notify for crn: ${caseDetails.crn} with reference ID: $emailReferenceId")
     MDC.remove(REFERENCE_ID)
     MDC.remove(CRN)
-    return emailTo.map { email -> addRecipientTo400Response(email) { notificationClient.sendEmail(templateId, email, parameters, emailReferenceId) } }
+    sqsSuccessPublisher.sendNotification(
+      NotificationEmail(
+        emailTo = emailTo,
+        emailTemplate = templateId,
+        emailReferenceId = emailReferenceId,
+        emailParameters = parameters,
+      ),
+    )
+    return emailTo.map { email -> NotificationMessageResponse(templateId, emailReferenceId, email) }
   }
 
   class NotificationInvalidSenderException(emailRecipient: String, cause: Throwable) : Exception("Unable to deliver to recipient $emailRecipient", cause)
@@ -159,7 +168,20 @@ class NotificationService(
   }
 }
 
+data class NotificationMessageResponse(
+  val templateId: String,
+  val referenceId: String,
+  val email: String,
+)
+
 data class NotifyData(
   val riskSummary: RiskSummary?,
   val riskPredictors: List<RiskPredictor>,
+)
+
+data class NotificationEmail(
+  val emailTo: Set<String>,
+  val emailTemplate: String,
+  val emailReferenceId: String,
+  val emailParameters: Map<String, Any>,
 )

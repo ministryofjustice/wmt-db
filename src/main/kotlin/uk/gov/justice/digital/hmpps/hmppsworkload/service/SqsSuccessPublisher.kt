@@ -32,6 +32,8 @@ private const val STRING = "String"
 
 private const val LOG_TEMPLATE = "Published event {} to topic for CRN {} and id {}"
 
+private const val LOG_TEMPLATE_NOTIFICATION = "Published notification event to topic for email: {} and reference id: {}"
+
 @Service
 @ConditionalOnProperty("hmpps.sqs.topics.hmppsdomaintopic.arn")
 class SqsSuccessPublisher(
@@ -127,6 +129,15 @@ class SqsSuccessPublisher(
     ).also {
       log.info(LOG_TEMPLATE, hmppsRequirementAllocatedEvent.eventType, crn, allocationId)
     }
+  }
+
+  fun sendNotification(notificationEmail: NotificationEmail) {
+    val sendMessage = SendMessageRequest.builder()
+      .queueUrl(hmppsQueueService.findByQueueId("hmppsnotificationqueue")?.queueUrl)
+      .messageBody(objectMapper.writeValueAsString(notificationEmail))
+      .build()
+    hmppsQueueService.findByQueueId("hmppsnotificationqueue")?.sqsClient?.sendMessage(sendMessage)
+    log.info(LOG_TEMPLATE_NOTIFICATION, notificationEmail.emailTo, notificationEmail.emailReferenceId)
   }
 
   fun outOfDateReductionsProcessed() {

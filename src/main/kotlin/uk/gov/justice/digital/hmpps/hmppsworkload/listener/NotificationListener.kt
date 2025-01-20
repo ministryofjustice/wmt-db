@@ -1,0 +1,53 @@
+package uk.gov.justice.digital.hmpps.hmppsworkload.listener
+
+import com.fasterxml.jackson.databind.ObjectMapper
+import io.awspring.cloud.sqs.annotation.SqsListener
+import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.NotificationEmail
+import uk.gov.justice.digital.hmpps.hmppsworkload.service.NotificationService.NotificationInvalidSenderException
+import uk.gov.service.notify.NotificationClientApi
+import uk.gov.service.notify.NotificationClientException
+import uk.gov.service.notify.SendEmailResponse
+
+@Component
+class NotificationListener(
+  private val notificationClient: NotificationClientApi,
+  private val objectMapper: ObjectMapper,
+) {
+  companion object {
+    private val log = LoggerFactory.getLogger(this::class.java)
+  }
+
+  @SqsListener("hmppsnotificationqueue", factory = "hmppsQueueContainerFactoryProxy")
+  fun processMessage(rawMessage: String) {
+    log.info("Processing message on notification queue")
+    val notification = getNotification(rawMessage)
+    notification.emailTo.map { email ->
+      addRecipientTo400Response(email) {
+        notificationClient.sendEmail(
+          email,
+          notification.emailTemplate,
+          notification.emailParameters,
+          notification.emailReferenceId,
+        )
+      }
+    }
+  }
+
+  private fun addRecipientTo400Response(emailRecipient: String, wrappedApiCall: () -> SendEmailResponse): SendEmailResponse {
+    try {
+      return wrappedApiCall.invoke()
+    } catch (notificationException: NotificationClientException) {
+      if (notificationException.httpResult == 400) {
+        throw NotificationInvalidSenderException(emailRecipient, notificationException)
+      }
+      throw notificationException
+    }
+  }
+
+  private fun getNotification(rawMessage: String): NotificationEmail {
+    val message = objectMapper.readValue(rawMessage, SQSMessage::class.java)
+    return objectMapper.readValue(message.message, NotificationEmail::class.java)
+  }
+}
