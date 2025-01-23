@@ -106,3 +106,7 @@ configurations.matching { it.name == "detekt" }.all {
     }
   }
 }
+
+  ktlint {
+    version.set("1.5.0")
+  }
