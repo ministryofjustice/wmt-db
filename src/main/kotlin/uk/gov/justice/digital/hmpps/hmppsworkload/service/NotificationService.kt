@@ -87,17 +87,6 @@ class NotificationService(
 
   class NotificationInvalidSenderException(emailRecipient: String, cause: Throwable) : Exception("Unable to deliver to recipient $emailRecipient", cause)
 
-  private fun addRecipientTo400Response(emailRecipient: String, wrappedApiCall: () -> SendEmailResponse): SendEmailResponse {
-    try {
-      return wrappedApiCall.invoke()
-    } catch (notificationException: NotificationClientException) {
-      if (notificationException.httpResult == 400) {
-        throw NotificationInvalidSenderException(emailRecipient, notificationException)
-      }
-      throw notificationException
-    }
-  }
-
   private fun getLoggedInUserParameters(loggedInUser: StaffMember): Map<String, Any> = mapOf(
     "allocatingOfficerName" to loggedInUser.name.getCombinedName(),
     "allocatingOfficerGrade" to loggedInUser.getGrade(),

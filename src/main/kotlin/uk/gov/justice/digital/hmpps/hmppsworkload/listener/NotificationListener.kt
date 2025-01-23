@@ -10,6 +10,8 @@ import uk.gov.service.notify.NotificationClientApi
 import uk.gov.service.notify.NotificationClientException
 import uk.gov.service.notify.SendEmailResponse
 
+private const val MAX_RETRIES = 3
+
 @Component
 class NotificationListener(
   private val notificationClient: NotificationClientApi,
@@ -37,12 +39,11 @@ class NotificationListener(
 
   private fun handleError(emailRecipient: String, wrappedApiCall: () -> SendEmailResponse): SendEmailResponse {
     var attempt = 0
-    val maxRetries = 3
     while (true) {
       try {
         return wrappedApiCall.invoke()
       } catch (notificationException: NotificationClientException) {
-        if (notificationException.httpResult == 500 && attempt < maxRetries) {
+        if (notificationException.httpResult == 500 && attempt < MAX_RETRIES) {
           attempt++
           log.warn("Retrying notify send for {} ", notificationException.message)
           continue

@@ -174,6 +174,11 @@ abstract class IntegrationTestBase {
       ?: throw MissingQueueException("HmppsQueue  workloadprisonerqueue not found")
   }
 
+  private val notificationQueue by lazy {
+    hmppsQueueService.findByQueueId("hmppsnotificationqueue")
+      ?: throw MissingQueueException("HmppsQueue  hmppsnotificationqueue not found")
+  }
+
   private val allocationCompleteSqsClient by lazy { hmppsAllocationCompleteQueue.sqsClient }
   private val allocationCompleteSqsDlqClient by lazy { hmppsAllocationCompleteQueue.sqsDlqClient }
 
@@ -201,6 +206,9 @@ abstract class IntegrationTestBase {
 
   private val workloadPrisonerSqsDlqClient by lazy { workloadPrisonerQueue.sqsDlqClient }
   protected val workloadPrisonerSqsClient by lazy { workloadPrisonerQueue.sqsClient }
+
+  private val notificationSqsClient by lazy { notificationQueue.sqsClient }
+  protected val notificationSqsDlqClient by lazy { notificationQueue.sqsDlqClient }
 
   @Autowired
   protected lateinit var hmppsQueueService: HmppsQueueService
@@ -269,7 +277,8 @@ abstract class IntegrationTestBase {
     hmppsExtractPlacedDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsExtractPlacedQueue.dlqUrl!!).build()).get()
     hmppsReductionsCompletedClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsReductionsCompletedQueue.queueUrl).build()).get()
     hmppsAuditQueueClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsAuditQueue.queueUrl).build()).get()
-
+    notificationSqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(notificationQueue.queueUrl).build()).get()
+    notificationSqsDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(notificationQueue.dlqUrl!!).build()).get()
     tierCalculationSqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(tierCalculationQueue.queueUrl).build()).get()
     tierCalculationSqsDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(tierCalculationQueue.dlqUrl!!).build()).get()
 
@@ -440,6 +449,10 @@ abstract class IntegrationTestBase {
 
   protected fun noMessagesOnExtractPlacedDLQ() {
     numberOfMessagesCurrentlyOnQueue(hmppsExtractPlacedDlqClient!!, hmppsExtractPlacedQueue.dlqUrl!!, 0)
+  }
+
+  protected fun noMessagesOnNotificationQueue() {
+    numberOfMessagesCurrentlyOnQueue(notificationSqsClient, notificationQueue.queueUrl, 0)
   }
 
   protected fun offenderEvent(crn: String) = HmppsOffenderEvent(crn)
