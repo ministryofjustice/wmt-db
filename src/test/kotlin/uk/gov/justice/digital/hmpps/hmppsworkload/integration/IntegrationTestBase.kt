@@ -455,6 +455,10 @@ abstract class IntegrationTestBase {
     numberOfMessagesCurrentlyOnQueue(notificationSqsClient, notificationQueue.queueUrl, 0)
   }
 
+  protected fun noMessagesOnNotificationQueueDLQ() {
+    numberOfMessagesCurrentlyOnQueue(notificationSqsClient, notificationQueue.queueUrl, 0)
+  }
+
   protected fun offenderEvent(crn: String) = HmppsOffenderEvent(crn)
 
   protected fun jsonString(any: Any) = objectMapper.writeValueAsString(any) as String

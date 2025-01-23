@@ -20,8 +20,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.utils.DateUtils
 import uk.gov.justice.digital.hmpps.hmppsworkload.utils.capitalize
 import uk.gov.service.notify.NotificationClientApi
-import uk.gov.service.notify.NotificationClientException
-import uk.gov.service.notify.SendEmailResponse
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
