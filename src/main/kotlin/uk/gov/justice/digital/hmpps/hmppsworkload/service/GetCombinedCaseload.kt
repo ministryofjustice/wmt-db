@@ -16,16 +16,14 @@ class GetCombinedCaseload(
   /***
    * Get combined Cases from WMT (offenderManagerRepository) and realtime cases (personManagerRepository).
    */
-  fun getCases(staffIdentifier: StaffIdentifier): List<Case> {
-    return caseDetailsRepository.findAllById(
-      offenderManagerRepository.findCasesByTeamCodeAndStaffCode(staffIdentifier.staffCode, staffIdentifier.teamCode)
-        .union(
-          personManagerRepository.findByStaffCodeAndTeamCodeAndIsActiveIsTrue(
-            staffIdentifier.staffCode,
-            staffIdentifier.teamCode,
-          ).map { c -> c.crn },
-        ),
-    )
-      .map { cde -> Case(cde.tier, cde.type, false, cde.crn) }
-  }
+  fun getCases(staffIdentifier: StaffIdentifier): List<Case> = caseDetailsRepository.findAllById(
+    offenderManagerRepository.findCasesByTeamCodeAndStaffCode(staffIdentifier.staffCode, staffIdentifier.teamCode)
+      .union(
+        personManagerRepository.findByStaffCodeAndTeamCodeAndIsActiveIsTrue(
+          staffIdentifier.staffCode,
+          staffIdentifier.teamCode,
+        ).map { c -> c.crn },
+      ),
+  )
+    .map { cde -> Case(cde.tier, cde.type, false, cde.crn) }
 }

@@ -48,10 +48,8 @@ class GetOffenderManagerService(
     return OffenderManagerPotentialWorkload.from(overview, impactResponse, potentialCase)
   }
 
-  private fun getPotentialCase(crn: String): Case {
-    return caseDetailsRepository.findByIdOrNull(crn)!!
-      .let { Case(tier = it.tier, type = it.type, crn = crn) }
-  }
+  private fun getPotentialCase(crn: String): Case = caseDetailsRepository.findByIdOrNull(crn)!!
+    .let { Case(tier = it.tier, type = it.type, crn = crn) }
 
   private fun getCurrentCasePoints(staffIdentifier: StaffIdentifier, case: Case): BigInteger = offenderManagerRepository.findCaseByTeamCodeAndStaffCodeAndCrn(staffIdentifier.teamCode, staffIdentifier.staffCode, case.crn)?.let {
     return caseCalculator.getPointsForCase(case)
@@ -93,14 +91,11 @@ class GetOffenderManagerService(
     it
   } ?: getDefaultOffenderManagerOverview(staffIdentifier.staffCode, grade)
 
-  suspend fun getCases(staffIdentifier: StaffIdentifier): OffenderManagerCases? =
-    offenderManagerRepository.findCasesByTeamCodeAndStaffCode(staffIdentifier.staffCode, staffIdentifier.teamCode).let { cases ->
-      val crnDetails = getCrnToCaseDetails(cases)
-      val staffActiveCases = workforceAllocationsToDeliusApiClient.staffActiveCases(staffIdentifier.staffCode, crnDetails.keys)
-      OffenderManagerCases.from(staffActiveCases, crnDetails)
-    }
-
-  private fun getCrnToCaseDetails(crns: List<String>): Map<String, CaseDetailsEntity> {
-    return if (crns.isEmpty()) emptyMap() else caseDetailsRepository.findAllById(crns).associateBy { it.crn }
+  suspend fun getCases(staffIdentifier: StaffIdentifier): OffenderManagerCases? = offenderManagerRepository.findCasesByTeamCodeAndStaffCode(staffIdentifier.staffCode, staffIdentifier.teamCode).let { cases ->
+    val crnDetails = getCrnToCaseDetails(cases)
+    val staffActiveCases = workforceAllocationsToDeliusApiClient.staffActiveCases(staffIdentifier.staffCode, crnDetails.keys)
+    OffenderManagerCases.from(staffActiveCases, crnDetails)
   }
+
+  private fun getCrnToCaseDetails(crns: List<String>): Map<String, CaseDetailsEntity> = if (crns.isEmpty()) emptyMap() else caseDetailsRepository.findAllById(crns).associateBy { it.crn }
 }

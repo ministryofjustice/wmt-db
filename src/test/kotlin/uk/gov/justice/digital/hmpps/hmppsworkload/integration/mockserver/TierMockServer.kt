@@ -13,7 +13,10 @@ import org.mockserver.verify.VerificationTimes
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.TierApiExtension.Companion.hmppsTier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.notFoundTierResponse
 
-class TierApiExtension : BeforeAllCallback, AfterAllCallback, BeforeEachCallback {
+class TierApiExtension :
+  BeforeAllCallback,
+  AfterAllCallback,
+  BeforeEachCallback {
 
   companion object {
 

@@ -36,18 +36,14 @@ class WorkloadCalculationService(
       staffIdentifier,
       staffGrade,
     ),
-  ): WorkloadCalculationEntity {
-    return workloadCalculationRepository.save(calculate(staffIdentifier, staffGrade, availableHours))
-  }
+  ): WorkloadCalculationEntity = workloadCalculationRepository.save(calculate(staffIdentifier, staffGrade, availableHours))
 
   private fun getAvailableHours(
     staffIdentifier: StaffIdentifier,
     staffGrade: String,
-  ): BigDecimal {
-    return this.weeklyHours.findWeeklyHours(staffIdentifier, staffGrade) - getReductionService.findReductionHours(
-      staffIdentifier,
-    )
-  }
+  ): BigDecimal = this.weeklyHours.findWeeklyHours(staffIdentifier, staffGrade) - getReductionService.findReductionHours(
+    staffIdentifier,
+  )
 
   private fun calculate(staffIdentifier: StaffIdentifier, staffGrade: String, availableHours: BigDecimal): WorkloadCalculationEntity {
     val workloadCalculationsElements = getWorkloadCalculationElements(staffIdentifier)
@@ -88,11 +84,9 @@ class WorkloadCalculationService(
       workloadCalculator.getWorkloadPoints(workloadPointsElements),
     )
   }
-  private fun getCourtReportCounts(courtReports: List<CourtReport>, type: CourtReportType): Int =
-    courtReports.count { it.type == type }
+  private fun getCourtReportCounts(courtReports: List<CourtReport>, type: CourtReportType): Int = courtReports.count { it.type == type }
 
-  private fun getContactTypeCodeCounts(contacts: List<Contact>): Map<String, Int> =
-    contacts.groupingBy { it.typeCode }.eachCount()
+  private fun getContactTypeCodeCounts(contacts: List<Contact>): Map<String, Int> = contacts.groupingBy { it.typeCode }.eachCount()
 }
 
 data class WorkloadCalculationElements(

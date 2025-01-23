@@ -8,11 +8,9 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.repository.WMTCMSRepositor
 @Service
 class WMTGetContacts(private val wmtcmsRepository: WMTCMSRepository) {
 
-  fun findContactsOutsideCaseload(staffIdentifier: StaffIdentifier): List<Contact> =
-    wmtcmsRepository.findByStaffTeamCodeAndStaffCodeAndPersonManagerStaffCodeNot(staffIdentifier.teamCode, staffIdentifier.staffCode, staffIdentifier.staffCode)
-      .map { Contact(it.contactTypeCode) }
+  fun findContactsOutsideCaseload(staffIdentifier: StaffIdentifier): List<Contact> = wmtcmsRepository.findByStaffTeamCodeAndStaffCodeAndPersonManagerStaffCodeNot(staffIdentifier.teamCode, staffIdentifier.staffCode, staffIdentifier.staffCode)
+    .map { Contact(it.contactTypeCode) }
 
-  fun findContactsInCaseloadPerformedByOthers(staffIdentifier: StaffIdentifier): List<Contact> =
-    wmtcmsRepository.findByPersonManagerTeamCodeAndPersonManagerStaffCodeAndStaffCodeNot(staffIdentifier.teamCode, staffIdentifier.staffCode, staffIdentifier.staffCode)
-      .map { Contact(it.contactTypeCode) }
+  fun findContactsInCaseloadPerformedByOthers(staffIdentifier: StaffIdentifier): List<Contact> = wmtcmsRepository.findByPersonManagerTeamCodeAndPersonManagerStaffCodeAndStaffCodeNot(staffIdentifier.teamCode, staffIdentifier.staffCode, staffIdentifier.staffCode)
+    .map { Contact(it.contactTypeCode) }
 }

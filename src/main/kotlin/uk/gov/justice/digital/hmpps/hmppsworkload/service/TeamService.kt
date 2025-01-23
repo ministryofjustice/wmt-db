@@ -58,25 +58,22 @@ class TeamService(
 
   private fun teamStaffId(teamCode: String, staffCode: String) = "$teamCode-$staffCode"
 
-  suspend fun getWorkloadCases(teams: List<String>): Flow<WorkloadCase> =
-    teamRepository.findWorkloadCountCaseByCode(teams).map {
-      WorkloadCase(it.teamCode, it.totalCases, calculateCapacity(it.totalPoints.toBigInteger(), it.availablePoints.toBigInteger()).toDouble())
-    }.asFlow()
+  suspend fun getWorkloadCases(teams: List<String>): Flow<WorkloadCase> = teamRepository.findWorkloadCountCaseByCode(teams).map {
+    WorkloadCase(it.teamCode, it.totalCases, calculateCapacity(it.totalPoints.toBigInteger(), it.availablePoints.toBigInteger()).toDouble())
+  }.asFlow()
 
   private fun getTeamOverviewForOffenderManagerWithoutWorkload(
     staffCode: String,
     grade: String,
     teamCode: String,
-  ): TeamOverview {
-    return TeamOverview(
-      0,
-      0,
-      defaultAvailablePointsForGrade(grade),
-      BigInteger.ZERO,
-      staffCode,
-      teamCode,
-    )
-  }
+  ): TeamOverview = TeamOverview(
+    0,
+    0,
+    defaultAvailablePointsForGrade(grade),
+    BigInteger.ZERO,
+    staffCode,
+    teamCode,
+  )
 
   private fun defaultAvailablePointsForGrade(grade: String): BigInteger {
     val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)

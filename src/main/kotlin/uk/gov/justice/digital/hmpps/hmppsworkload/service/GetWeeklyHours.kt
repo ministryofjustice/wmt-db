@@ -14,7 +14,6 @@ class GetWeeklyHours(private val wmtWorkloadOwnerRepository: WMTWorkloadOwnerRep
       ?: getDefaultWeeklyHoursForGrade(staffGrade)
     ).stripTrailingZeros()
 
-  private fun getDefaultWeeklyHoursForGrade(staffGrade: String): BigDecimal =
-    workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
-      .getDefaultContractedHours(staffGrade)
+  private fun getDefaultWeeklyHoursForGrade(staffGrade: String): BigDecimal = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
+    .getDefaultContractedHours(staffGrade)
 }

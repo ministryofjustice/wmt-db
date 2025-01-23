@@ -384,9 +384,8 @@ abstract class IntegrationTestBase {
     )
   }
 
-  protected fun setupWmtCaseCategoryTier(tier: Tier): CaseCategoryEntity =
-    caseCategoryRepository.findByCategoryName(tier.name)
-      ?: caseCategoryRepository.save(CaseCategoryEntity(categoryName = tier.name, categoryId = tier.ordinal))
+  protected fun setupWmtCaseCategoryTier(tier: Tier): CaseCategoryEntity = caseCategoryRepository.findByCategoryName(tier.name)
+    ?: caseCategoryRepository.save(CaseCategoryEntity(categoryName = tier.name, categoryId = tier.ordinal))
 
   protected fun setupWmtUntiered(): CaseCategoryEntity = caseCategoryRepository.findByCategoryName("Untiered")
     ?: caseCategoryRepository.save(CaseCategoryEntity(categoryName = "Untiered", categoryId = 0))
@@ -485,8 +484,7 @@ abstract class IntegrationTestBase {
     return messages
   }
 
-  protected fun verifyAuditMessageOnQueue(): Boolean =
-    getNumberOfMessagesCurrentlyOnQueue(hmppsAuditQueueClient, hmppsAuditQueue.queueUrl) == 1
+  protected fun verifyAuditMessageOnQueue(): Boolean = getNumberOfMessagesCurrentlyOnQueue(hmppsAuditQueueClient, hmppsAuditQueue.queueUrl) == 1
 
   protected fun getAuditMessages(): AuditMessage {
     val message = hmppsAuditQueueClient.receiveMessage(ReceiveMessageRequest.builder().queueUrl(hmppsAuditQueue.queueUrl).build())
@@ -497,8 +495,7 @@ abstract class IntegrationTestBase {
     }.first()
   }
 
-  protected fun verifyReductionsCompletedOnQueue(): Boolean =
-    getNumberOfMessagesCurrentlyOnQueue(hmppsReductionsCompletedClient, hmppsReductionsCompletedQueue.queueUrl) == 1
+  protected fun verifyReductionsCompletedOnQueue(): Boolean = getNumberOfMessagesCurrentlyOnQueue(hmppsReductionsCompletedClient, hmppsReductionsCompletedQueue.queueUrl) == 1
 
   protected fun getReductionsCompletedMessages(): HmppsMessage<JsonNode> {
     val message = hmppsReductionsCompletedClient.receiveMessage(ReceiveMessageRequest.builder().queueUrl(hmppsReductionsCompletedQueue.queueUrl).build())

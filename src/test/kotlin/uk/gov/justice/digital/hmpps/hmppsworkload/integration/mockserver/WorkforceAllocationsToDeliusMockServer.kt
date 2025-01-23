@@ -26,7 +26,10 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforc
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.officerOverviewResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.personSummaryResponse
 
-class WorkforceAllocationsToDeliusExtension : BeforeAllCallback, AfterAllCallback, BeforeEachCallback {
+class WorkforceAllocationsToDeliusExtension :
+  BeforeAllCallback,
+  AfterAllCallback,
+  BeforeEachCallback {
 
   companion object {
     lateinit var workforceAllocationsToDelius: WorkforceAllocationsToDeliusMockServer

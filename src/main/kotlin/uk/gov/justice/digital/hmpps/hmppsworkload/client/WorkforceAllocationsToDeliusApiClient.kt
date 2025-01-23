@@ -38,40 +38,32 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
       }
   }
 
-  suspend fun getPersonByCrn(crn: String): PersonSummary? {
-    return getPerson(crn, "CRN") { response ->
-      when (response.statusCode()) {
-        HttpStatus.OK -> response.awaitBody()
-        HttpStatus.NOT_FOUND -> PersonSummary(crn, Name("Unknown", "", "Unknown"), CaseType.UNKNOWN)
-        else -> throw response.createExceptionAndAwait()
-      }
+  suspend fun getPersonByCrn(crn: String): PersonSummary? = getPerson(crn, "CRN") { response ->
+    when (response.statusCode()) {
+      HttpStatus.OK -> response.awaitBody()
+      HttpStatus.NOT_FOUND -> PersonSummary(crn, Name("Unknown", "", "Unknown"), CaseType.UNKNOWN)
+      else -> throw response.createExceptionAndAwait()
     }
   }
 
-  suspend fun getPersonByNoms(noms: String): PersonSummary? {
-    return getPerson(noms, "NOMS") { response ->
-      when (response.statusCode()) {
-        HttpStatus.OK -> response.awaitBody()
-        HttpStatus.NOT_FOUND -> null
-        else -> throw response.createExceptionAndAwait()
-      }
+  suspend fun getPersonByNoms(noms: String): PersonSummary? = getPerson(noms, "NOMS") { response ->
+    when (response.statusCode()) {
+      HttpStatus.OK -> response.awaitBody()
+      HttpStatus.NOT_FOUND -> null
+      else -> throw response.createExceptionAndAwait()
     }
   }
 
-  private suspend fun getPerson(identifier: String, identifierType: String, responseHandler: suspend (ClientResponse) -> PersonSummary?): PersonSummary? {
-    return webClient
-      .get()
-      .uri("/person/{identifier}?type={identifierType}", identifier, identifierType)
-      .awaitExchangeOrNull(responseHandler)
-  }
+  private suspend fun getPerson(identifier: String, identifierType: String, responseHandler: suspend (ClientResponse) -> PersonSummary?): PersonSummary? = webClient
+    .get()
+    .uri("/person/{identifier}?type={identifierType}", identifier, identifierType)
+    .awaitExchangeOrNull(responseHandler)
 
-  suspend fun getOfficerView(staffCode: String): OfficerView {
-    return webClient
-      .get()
-      .uri("/staff/{staffCode}/officer-view", staffCode)
-      .retrieve()
-      .awaitBody()
-  }
+  suspend fun getOfficerView(staffCode: String): OfficerView = webClient
+    .get()
+    .uri("/staff/{staffCode}/officer-view", staffCode)
+    .retrieve()
+    .awaitBody()
 
   suspend fun impact(crn: String, staffCode: String): ImpactResponse = webClient
     .get()
@@ -95,19 +87,17 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
       .awaitBody()
   }
 
-  suspend fun allocationDetails(crn: String, eventNumber: Int, staffCode: String, loggedInUser: String): AllocationDemandDetails =
-    webClient
-      .get()
-      .uri("/allocation-demand/{crn}/{eventNumber}/allocation?staff={staffCode}&allocatingStaffUsername={loggedInUser}", crn, eventNumber, staffCode, loggedInUser)
-      .retrieve()
-      .awaitBody()
+  suspend fun allocationDetails(crn: String, eventNumber: Int, staffCode: String, loggedInUser: String): AllocationDemandDetails = webClient
+    .get()
+    .uri("/allocation-demand/{crn}/{eventNumber}/allocation?staff={staffCode}&allocatingStaffUsername={loggedInUser}", crn, eventNumber, staffCode, loggedInUser)
+    .retrieve()
+    .awaitBody()
 
-  suspend fun allocationDetails(eventManagers: List<EventManagerEntity>): AllocationDetails =
-    webClient
-      .post()
-      .uri("/allocation/details")
-      .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(AllocationDetailsRequest.from(eventManagers))
-      .retrieve()
-      .awaitBody()
+  suspend fun allocationDetails(eventManagers: List<EventManagerEntity>): AllocationDetails = webClient
+    .post()
+    .uri("/allocation/details")
+    .contentType(MediaType.APPLICATION_JSON)
+    .bodyValue(AllocationDetailsRequest.from(eventManagers))
+    .retrieve()
+    .awaitBody()
 }

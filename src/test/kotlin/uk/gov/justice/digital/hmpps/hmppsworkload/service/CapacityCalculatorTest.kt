@@ -34,11 +34,9 @@ class CapacityCalculatorTest {
     defaultContractedHoursForGrade: Double,
     currentHours: Double,
     reductionHours: Double,
-  ): BigInteger {
-    return calculateAvailablePoints(
-      BigDecimal.valueOf(availablePoints),
-      BigDecimal.valueOf(defaultContractedHoursForGrade),
-      BigDecimal.valueOf(currentHours) - BigDecimal.valueOf(reductionHours),
-    )
-  }
+  ): BigInteger = calculateAvailablePoints(
+    BigDecimal.valueOf(availablePoints),
+    BigDecimal.valueOf(defaultContractedHoursForGrade),
+    BigDecimal.valueOf(currentHours) - BigDecimal.valueOf(reductionHours),
+  )
 }

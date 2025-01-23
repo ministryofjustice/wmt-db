@@ -38,28 +38,12 @@ data class OffenderManagerCaseloadTotals(
   val D1_S: BigDecimal,
   val D0_S: BigDecimal,
 ) {
-  fun getATotal(): BigDecimal {
-    return A3.add(A2).add(A1).add(A0)
-  }
-  fun getBTotal(): BigDecimal {
-    return B3.add(B2).add(B1).add(B0)
-  }
-  fun getCTotal(): BigDecimal {
-    return C3.add(C2).add(C1).add(C0)
-  }
-  fun getDTotal(): BigDecimal {
-    return D3.add(D2).add(D1).add(D0)
-  }
-  fun getASTotal(): BigDecimal {
-    return A3_S.add(A2_S).add(A1_S).add(A0_S)
-  }
-  fun getBSTotal(): BigDecimal {
-    return B3_S.add(B2_S).add(B1_S).add(B0_S)
-  }
-  fun getCSTotal(): BigDecimal {
-    return C3_S.add(C2_S).add(C1_S).add(C0_S)
-  }
-  fun getDSTotal(): BigDecimal {
-    return D3_S.add(D2_S).add(D1_S).add(D0_S)
-  }
+  fun getATotal(): BigDecimal = A3.add(A2).add(A1).add(A0)
+  fun getBTotal(): BigDecimal = B3.add(B2).add(B1).add(B0)
+  fun getCTotal(): BigDecimal = C3.add(C2).add(C1).add(C0)
+  fun getDTotal(): BigDecimal = D3.add(D2).add(D1).add(D0)
+  fun getASTotal(): BigDecimal = A3_S.add(A2_S).add(A1_S).add(A0_S)
+  fun getBSTotal(): BigDecimal = B3_S.add(B2_S).add(B1_S).add(B0_S)
+  fun getCSTotal(): BigDecimal = C3_S.add(C2_S).add(C1_S).add(C0_S)
+  fun getDSTotal(): BigDecimal = D3_S.add(D2_S).add(D1_S).add(D0_S)
 }

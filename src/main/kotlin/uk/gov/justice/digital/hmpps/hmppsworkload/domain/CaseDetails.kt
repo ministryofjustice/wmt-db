@@ -13,8 +13,6 @@ data class CaseDetails @JsonCreator constructor(
   val personOnProbationSurname: String,
 ) {
   companion object {
-    fun from(caseDetailsEntity: CaseDetailsEntity): CaseDetails {
-      return CaseDetails(caseDetailsEntity.tier, caseDetailsEntity.firstName, caseDetailsEntity.surname)
-    }
+    fun from(caseDetailsEntity: CaseDetailsEntity): CaseDetails = CaseDetails(caseDetailsEntity.tier, caseDetailsEntity.firstName, caseDetailsEntity.surname)
   }
 }

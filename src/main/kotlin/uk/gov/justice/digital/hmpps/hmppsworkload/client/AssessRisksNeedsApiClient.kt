@@ -13,17 +13,15 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.RiskSummary
 @Component
 class AssessRisksNeedsApiClient(@Qualifier("assessRisksNeedsClientUserEnhancedAppScope") private val webClient: WebClient) {
 
-  suspend fun getRiskSummary(crn: String): RiskSummary? {
-    return webClient
-      .get()
-      .uri("/risks/crn/{crn}/summary", crn)
-      .retrieve()
-      .bodyToMono(RiskSummary::class.java)
-      .retry(1)
-      .onErrorResume {
-        Mono.empty()
-      }.awaitSingleOrNull()
-  }
+  suspend fun getRiskSummary(crn: String): RiskSummary? = webClient
+    .get()
+    .uri("/risks/crn/{crn}/summary", crn)
+    .retrieve()
+    .bodyToMono(RiskSummary::class.java)
+    .retry(1)
+    .onErrorResume {
+      Mono.empty()
+    }.awaitSingleOrNull()
 
   suspend fun getRiskPredictors(crn: String): List<RiskPredictor> {
     val responseType = object : ParameterizedTypeReference<List<RiskPredictor>>() {}

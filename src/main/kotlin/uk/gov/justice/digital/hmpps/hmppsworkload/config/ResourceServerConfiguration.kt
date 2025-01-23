@@ -13,23 +13,22 @@ import org.springframework.security.web.server.SecurityWebFilterChain
 @EnableReactiveMethodSecurity(useAuthorizationManager = false)
 class ResourceServerConfiguration {
   @Bean
-  fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain =
-    http {
-      // Can't have CSRF protection as requires session
-      csrf { disable() }
-      authorizeExchange {
-        listOf(
-          "/webjars/**",
-          "/favicon.ico",
-          "/health/**",
-          "/info",
-          "/v3/api-docs/**",
-          "/swagger-ui/**",
-          "/swagger-ui.html",
-          "/queue-admin/retry-all-dlqs",
-        ).forEach { authorize(it, permitAll) }
-        authorize(anyExchange, authenticated)
-      }
-      oauth2ResourceServer { jwt { jwtAuthenticationConverter = AuthAwareTokenConverter() } }
+  fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain = http {
+    // Can't have CSRF protection as requires session
+    csrf { disable() }
+    authorizeExchange {
+      listOf(
+        "/webjars/**",
+        "/favicon.ico",
+        "/health/**",
+        "/info",
+        "/v3/api-docs/**",
+        "/swagger-ui/**",
+        "/swagger-ui.html",
+        "/queue-admin/retry-all-dlqs",
+      ).forEach { authorize(it, permitAll) }
+      authorize(anyExchange, authenticated)
     }
+    oauth2ResourceServer { jwt { jwtAuthenticationConverter = AuthAwareTokenConverter() } }
+  }
 }

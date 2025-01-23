@@ -19,9 +19,7 @@ data class OffenderManagerCases @JsonCreator constructor(
   val email: String?,
 ) {
   companion object {
-    fun from(staffActiveCases: StaffActiveCases, offenderDetails: Map<String, CaseDetailsEntity>): OffenderManagerCases {
-      return OffenderManagerCases(staffActiveCases.name, staffActiveCases.getGrade(), staffActiveCases.code, staffActiveCases.cases.map { OffenderManagerActiveCase.from(it, offenderDetails[it.crn]!!) }, staffActiveCases.email)
-    }
+    fun from(staffActiveCases: StaffActiveCases, offenderDetails: Map<String, CaseDetailsEntity>): OffenderManagerCases = OffenderManagerCases(staffActiveCases.name, staffActiveCases.getGrade(), staffActiveCases.code, staffActiveCases.cases.map { OffenderManagerActiveCase.from(it, offenderDetails[it.crn]!!) }, staffActiveCases.email)
   }
 }
 
@@ -36,8 +34,6 @@ data class OffenderManagerActiveCase(
   val type: String,
 ) {
   companion object {
-    fun from(activeCase: ActiveCase, caseDetails: CaseDetailsEntity): OffenderManagerActiveCase {
-      return OffenderManagerActiveCase(activeCase.crn, caseDetails.tier.name, activeCase.name, activeCase.type)
-    }
+    fun from(activeCase: ActiveCase, caseDetails: CaseDetailsEntity): OffenderManagerActiveCase = OffenderManagerActiveCase(activeCase.crn, caseDetails.tier.name, activeCase.name, activeCase.type)
   }
 }

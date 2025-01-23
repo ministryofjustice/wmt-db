@@ -14,7 +14,10 @@ import org.mockserver.verify.VerificationTimes
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.successfulRiskPredictorResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.successfulRiskSummaryResponse
 
-class AssessRisksNeedsApiExtension : BeforeAllCallback, AfterAllCallback, BeforeEachCallback {
+class AssessRisksNeedsApiExtension :
+  BeforeAllCallback,
+  AfterAllCallback,
+  BeforeEachCallback {
 
   companion object {
     lateinit var assessRisksNeedsApi: AssessRisksNeedsMockServer
