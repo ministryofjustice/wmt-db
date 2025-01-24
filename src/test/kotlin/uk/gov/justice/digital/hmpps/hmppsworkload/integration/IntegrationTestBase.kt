@@ -174,7 +174,7 @@ abstract class IntegrationTestBase {
       ?: throw MissingQueueException("HmppsQueue  workloadprisonerqueue not found")
   }
 
-  private val notificationQueue by lazy {
+  protected val notificationQueue by lazy {
     hmppsQueueService.findByQueueId("hmppsnotificationqueue")
       ?: throw MissingQueueException("HmppsQueue  hmppsnotificationqueue not found")
   }
@@ -207,7 +207,7 @@ abstract class IntegrationTestBase {
   private val workloadPrisonerSqsDlqClient by lazy { workloadPrisonerQueue.sqsDlqClient }
   protected val workloadPrisonerSqsClient by lazy { workloadPrisonerQueue.sqsClient }
 
-  private val notificationSqsClient by lazy { notificationQueue.sqsClient }
+  protected val notificationSqsClient by lazy { notificationQueue.sqsClient }
   protected val notificationSqsDlqClient by lazy { notificationQueue.sqsDlqClient }
 
   @Autowired
@@ -453,6 +453,10 @@ abstract class IntegrationTestBase {
 
   protected fun noMessagesOnNotificationQueue() {
     numberOfMessagesCurrentlyOnQueue(notificationSqsClient, notificationQueue.queueUrl, 0)
+  }
+
+  protected fun messagesOnNotificationQueue() {
+    numberOfMessagesCurrentlyOnQueue(notificationSqsClient, notificationQueue.queueUrl, 1)
   }
 
   protected fun noMessagesOnNotificationQueueDLQ() {

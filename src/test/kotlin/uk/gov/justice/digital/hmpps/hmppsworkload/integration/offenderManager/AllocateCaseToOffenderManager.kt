@@ -38,6 +38,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.service.TelemetryEventType
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.TelemetryEventType.PERSON_MANAGER_ALLOCATED
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.getWmtPeriod
 import uk.gov.service.notify.NotificationClientApi
+import uk.gov.service.notify.NotificationClientException
 import uk.gov.service.notify.SendEmailResponse
 import java.math.BigInteger
 import java.time.LocalDateTime
@@ -133,8 +134,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `Notify error still keeps entry in db`() {
-    // TODO: how can we verify this behaviour?
-    // every { notificationClient.sendEmail(any(), any(), any(), any()) } throws NotificationClientException("An exception")
+    every { notificationClient.sendEmail(any(), any(), any(), any()) } throws NotificationClientException("An exception")
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY, "Jane", "Doe"))
 
     webTestClient.post()
@@ -146,8 +146,6 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       }
       .exchange()
       .expectStatus()
-      // TODO: how can we verify this behaviour?
-      // .is5xxServerError
       .isOk
 
     val personManager = personManagerRepository.findFirstByCrnOrderByCreatedDateDesc(crn)!!

@@ -57,7 +57,8 @@ class NotificationListener(
   }
 
   private fun getNotification(rawMessage: String): NotificationEmail {
-    val message = objectMapper.readValue(rawMessage, SQSMessage::class.java)
-    return objectMapper.readValue(message.message, NotificationEmail::class.java)
+    // TODO what type is raw message ?
+    // val message = objectMapper.readValue(rawMessage, SQSMessage::class.java)
+    return objectMapper.readValue(rawMessage, NotificationEmail::class.java)
   }
 }
