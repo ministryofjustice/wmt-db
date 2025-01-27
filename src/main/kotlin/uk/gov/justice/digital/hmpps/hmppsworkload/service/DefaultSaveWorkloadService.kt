@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
-import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -47,7 +46,7 @@ class DefaultSaveWorkloadService(
       .also { afterRequirementManagersSaved(it, caseDetails) }
 
     if (personManagerSaveResult.hasChanged || eventManagerSaveResult.hasChanged || requirementManagerSaveResults.any { it.hasChanged }) {
-      runBlocking { notificationService.notifyAllocation(allocationData, allocateCase, caseDetails) }
+      notificationService.notifyAllocation(allocationData, allocateCase, caseDetails)
       log.info("Allocation notified for case: ${caseDetails.crn}, conviction number: ${allocateCase.eventNumber}, to: ${allocationData.staff.code}, from: ${allocationData.allocatingStaff.code}")
       sqsSuccessPublisher.auditAllocation(allocateCase.crn, allocateCase.eventNumber, loggedInUser, unallocatedRequirements.map { it.id })
     }
