@@ -48,29 +48,27 @@ data class OffenderManagerOverview @JsonCreator constructor(
   val lastAllocatedEvent: LastAllocatedEvent?,
 ) {
   companion object {
-    fun from(overviewOffenderManager: OverviewOffenderManager, officerView: OfficerView): OffenderManagerOverview {
-      return OffenderManagerOverview(
-        officerView.name.forename,
-        officerView.name.surname,
-        officerView.getGrade(),
-        overviewOffenderManager.capacity,
-        overviewOffenderManager.code,
-        officerView.email,
-        overviewOffenderManager.totalCommunityCases.plus(overviewOffenderManager.totalCustodyCases),
-        overviewOffenderManager.contractedHours,
-        overviewOffenderManager.reductionHours,
-        overviewOffenderManager.availablePoints,
-        overviewOffenderManager.totalPoints,
-        overviewOffenderManager.availablePoints.minus(overviewOffenderManager.totalPoints),
-        overviewOffenderManager.lastUpdatedOn,
-        overviewOffenderManager.nextReductionChange,
-        overviewOffenderManager.tierCaseTotals,
-        overviewOffenderManager.paroleReportsDue,
-        officerView.casesDueToEndInNext4Weeks,
-        officerView.releasesWithinNext4Weeks,
-        overviewOffenderManager.lastAllocatedEvent?.let { LastAllocatedEvent.from(it) },
-      )
-    }
+    fun from(overviewOffenderManager: OverviewOffenderManager, officerView: OfficerView): OffenderManagerOverview = OffenderManagerOverview(
+      officerView.name.forename,
+      officerView.name.surname,
+      officerView.getGrade(),
+      overviewOffenderManager.capacity,
+      overviewOffenderManager.code,
+      officerView.email,
+      overviewOffenderManager.totalCommunityCases.plus(overviewOffenderManager.totalCustodyCases),
+      overviewOffenderManager.contractedHours,
+      overviewOffenderManager.reductionHours,
+      overviewOffenderManager.availablePoints,
+      overviewOffenderManager.totalPoints,
+      overviewOffenderManager.availablePoints.minus(overviewOffenderManager.totalPoints),
+      overviewOffenderManager.lastUpdatedOn,
+      overviewOffenderManager.nextReductionChange,
+      overviewOffenderManager.tierCaseTotals,
+      overviewOffenderManager.paroleReportsDue,
+      officerView.casesDueToEndInNext4Weeks,
+      officerView.releasesWithinNext4Weeks,
+      overviewOffenderManager.lastAllocatedEvent?.let { LastAllocatedEvent.from(it) },
+    )
   }
 }
 

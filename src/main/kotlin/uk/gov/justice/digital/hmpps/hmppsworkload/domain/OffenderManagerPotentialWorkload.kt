@@ -20,14 +20,12 @@ data class OffenderManagerPotentialWorkload @JsonCreator constructor(
   val tier: Tier,
 ) {
   companion object {
-    fun from(offenderManagerOverview: OverviewOffenderManager, impactResponse: ImpactResponse, potentialCase: Case): OffenderManagerPotentialWorkload {
-      return OffenderManagerPotentialWorkload(
-        offenderManagerOverview.capacity,
-        offenderManagerOverview.potentialCapacity!!,
-        impactResponse.name,
-        impactResponse.staff,
-        potentialCase.tier,
-      )
-    }
+    fun from(offenderManagerOverview: OverviewOffenderManager, impactResponse: ImpactResponse, potentialCase: Case): OffenderManagerPotentialWorkload = OffenderManagerPotentialWorkload(
+      offenderManagerOverview.capacity,
+      offenderManagerOverview.potentialCapacity!!,
+      impactResponse.name,
+      impactResponse.staff,
+      potentialCase.tier,
+    )
   }
 }

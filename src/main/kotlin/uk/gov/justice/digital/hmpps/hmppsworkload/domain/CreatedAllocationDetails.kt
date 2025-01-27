@@ -11,19 +11,17 @@ import java.time.ZonedDateTime
 data class CreatedAllocationDetails(val cases: List<CreatedAllocationDetail>) {
   companion object {
     private val log = LoggerFactory.getLogger(this::class.java)
-    fun from(eventManagers: List<EventManagerEntity>, eventManagerDetails: Map<String, AllocationDetail>, caseDetails: Map<String, CaseDetailsEntity>): CreatedAllocationDetails {
-      return CreatedAllocationDetails(
-        eventManagers
-          .filter {
-            val detailsExist = eventManagerDetails.containsKey(it.crn) && caseDetails.containsKey(it.crn)
-            if (!detailsExist) {
-              log.info("Retrieving allocated events crn {} delius details exist {}, case details exist {}", it.crn, eventManagerDetails.containsKey(it.crn), caseDetails.containsKey(it.crn))
-            }
-            detailsExist
+    fun from(eventManagers: List<EventManagerEntity>, eventManagerDetails: Map<String, AllocationDetail>, caseDetails: Map<String, CaseDetailsEntity>): CreatedAllocationDetails = CreatedAllocationDetails(
+      eventManagers
+        .filter {
+          val detailsExist = eventManagerDetails.containsKey(it.crn) && caseDetails.containsKey(it.crn)
+          if (!detailsExist) {
+            log.info("Retrieving allocated events crn {} delius details exist {}, case details exist {}", it.crn, eventManagerDetails.containsKey(it.crn), caseDetails.containsKey(it.crn))
           }
-          .map { CreatedAllocationDetail.from(eventManagerDetails[it.crn]!!, caseDetails[it.crn]!!, it) },
-      )
-    }
+          detailsExist
+        }
+        .map { CreatedAllocationDetail.from(eventManagerDetails[it.crn]!!, caseDetails[it.crn]!!, it) },
+    )
   }
 }
 
@@ -37,8 +35,6 @@ data class CreatedAllocationDetail(
   val teamCode: String,
 ) {
   companion object {
-    fun from(allocationDetail: AllocationDetail, caseDetail: CaseDetailsEntity, eventManagerEntity: EventManagerEntity): CreatedAllocationDetail {
-      return CreatedAllocationDetail(eventManagerEntity.crn, allocationDetail.name, allocationDetail.staff, caseDetail.tier, eventManagerEntity.createdDate!!, eventManagerEntity.spoName!!, eventManagerEntity.teamCode)
-    }
+    fun from(allocationDetail: AllocationDetail, caseDetail: CaseDetailsEntity, eventManagerEntity: EventManagerEntity): CreatedAllocationDetail = CreatedAllocationDetail(eventManagerEntity.crn, allocationDetail.name, allocationDetail.staff, caseDetail.tier, eventManagerEntity.createdDate!!, eventManagerEntity.spoName!!, eventManagerEntity.teamCode)
   }
 }

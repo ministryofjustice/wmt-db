@@ -32,8 +32,7 @@ class TierCalculationEventListener(
     return objectMapper.readValue(message, CalculationEventData::class.java)
   }
 
-  private fun crnFrom(calculationEventData: CalculationEventData) =
-    calculationEventData.personReference.identifiers.first { it.type == "CRN" }.value
+  private fun crnFrom(calculationEventData: CalculationEventData) = calculationEventData.personReference.identifiers.first { it.type == "CRN" }.value
 
   companion object {
     private val log = LoggerFactory.getLogger(this::class.java)

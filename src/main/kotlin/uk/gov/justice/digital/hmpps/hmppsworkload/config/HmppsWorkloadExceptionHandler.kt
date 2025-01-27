@@ -43,17 +43,15 @@ class HmppsWorkloadExceptionHandler {
   }
 
   @ExceptionHandler(AccessDeniedException::class)
-  suspend fun handleAccessDeniedException(e: Exception): ResponseEntity<ErrorResponse> {
-    return ResponseEntity
-      .status(HttpStatus.FORBIDDEN)
-      .body(
-        ErrorResponse(
-          status = HttpStatus.FORBIDDEN,
-          userMessage = "Access is denied",
-          developerMessage = e.message,
-        ),
-      )
-  }
+  suspend fun handleAccessDeniedException(e: Exception): ResponseEntity<ErrorResponse> = ResponseEntity
+    .status(HttpStatus.FORBIDDEN)
+    .body(
+      ErrorResponse(
+        status = HttpStatus.FORBIDDEN,
+        userMessage = "Access is denied",
+        developerMessage = e.message,
+      ),
+    )
 
   @ExceptionHandler(java.lang.Exception::class)
   suspend fun handleException(e: java.lang.Exception): ResponseEntity<ErrorResponse?>? {

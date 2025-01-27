@@ -9,11 +9,10 @@ import java.util.stream.IntStream
 
 @Service
 class WMTGetCourtReports(private val wmtCourtReportsRepository: WMTCourtReportsRepository) {
-  fun getCourtReports(staffIdentifier: StaffIdentifier): List<CourtReport> =
-    wmtCourtReportsRepository.findByStaffCodeAndTeamCode(staffIdentifier.staffCode, staffIdentifier.teamCode)?.let { wmtCourtReportsEntity ->
-      return countToCourtReports(wmtCourtReportsEntity.standardDeliveryReportCount, CourtReportType.STANDARD) +
-        countToCourtReports(wmtCourtReportsEntity.fastDeliveryReportCount, CourtReportType.FAST)
-    } ?: emptyList()
+  fun getCourtReports(staffIdentifier: StaffIdentifier): List<CourtReport> = wmtCourtReportsRepository.findByStaffCodeAndTeamCode(staffIdentifier.staffCode, staffIdentifier.teamCode)?.let { wmtCourtReportsEntity ->
+    return countToCourtReports(wmtCourtReportsEntity.standardDeliveryReportCount, CourtReportType.STANDARD) +
+      countToCourtReports(wmtCourtReportsEntity.fastDeliveryReportCount, CourtReportType.FAST)
+  } ?: emptyList()
 
   private fun countToCourtReports(count: Int?, type: CourtReportType): List<CourtReport> = IntStream.range(0, count ?: 0).mapToObj {
     CourtReport(type)

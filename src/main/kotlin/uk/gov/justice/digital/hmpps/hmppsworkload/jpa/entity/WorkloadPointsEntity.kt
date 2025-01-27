@@ -80,17 +80,13 @@ data class WorkloadPointsEntity(
     else -> emptyMap()
   }
 
-  fun getDefaultPointsAvailable(grade: String): BigDecimal {
-    return when (grade) {
-      "SPO" -> defaultAvailablePointsSPO
-      else -> defaultAvailablePointsPO
-    }
+  fun getDefaultPointsAvailable(grade: String): BigDecimal = when (grade) {
+    "SPO" -> defaultAvailablePointsSPO
+    else -> defaultAvailablePointsPO
   }
-  fun getDefaultContractedHours(grade: String): BigDecimal {
-    return when (grade) {
-      "PO", "PQiP" -> defaultContractedHoursPO
-      "PSO" -> defaultContractedHoursPSO
-      else -> defaultContractedHoursSPO
-    }
+  fun getDefaultContractedHours(grade: String): BigDecimal = when (grade) {
+    "PO", "PQiP" -> defaultContractedHoursPO
+    "PSO" -> defaultContractedHoursPSO
+    else -> defaultContractedHoursSPO
   }
 }

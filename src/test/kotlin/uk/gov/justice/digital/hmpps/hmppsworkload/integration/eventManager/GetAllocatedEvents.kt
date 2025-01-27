@@ -167,8 +167,7 @@ class GetAllocatedEvents : IntegrationTestBase() {
       .doesNotExist()
   }
 
-  private fun thirtyDaysInPast(): String? =
-    ZonedDateTime.now().minusDays(30).truncatedTo(ChronoUnit.DAYS).withZoneSameInstant(ZoneOffset.UTC).format(
-      DateTimeFormatter.ISO_OFFSET_DATE_TIME,
-    )
+  private fun thirtyDaysInPast(): String? = ZonedDateTime.now().minusDays(30).truncatedTo(ChronoUnit.DAYS).withZoneSameInstant(ZoneOffset.UTC).format(
+    DateTimeFormatter.ISO_OFFSET_DATE_TIME,
+  )
 }

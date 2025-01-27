@@ -6,8 +6,7 @@ data class AllocationDetailsRequest(
   val cases: List<AllocationDetailCase>,
 ) {
   companion object {
-    fun from(eventManagers: List<EventManagerEntity>): AllocationDetailsRequest =
-      AllocationDetailsRequest(eventManagers.map { AllocationDetailCase(it.crn, it.staffCode) })
+    fun from(eventManagers: List<EventManagerEntity>): AllocationDetailsRequest = AllocationDetailsRequest(eventManagers.map { AllocationDetailCase(it.crn, it.staffCode) })
   }
 }
 

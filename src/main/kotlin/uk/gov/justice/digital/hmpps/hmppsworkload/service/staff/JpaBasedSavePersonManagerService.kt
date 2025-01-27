@@ -22,22 +22,21 @@ class JpaBasedSavePersonManagerService(
     deliusStaff: StaffMember,
     loggedInUser: String,
     crn: String,
-  ): SaveResult<PersonManagerEntity> =
-    personManagerRepository.findFirstByCrnOrderByCreatedDateDesc(crn)?.let { personManager ->
-      if (personManager.staffCode == deliusStaff.code && personManager.teamCode == teamCode) {
-        SaveResult(personManager, false)
-      } else {
-        val currentPersonManager = getPersonManager.findLatestByCrn(crn)
-        createPersonManager(deliusStaff, teamCode, loggedInUser, crn).also {
-          personManager.isActive = false
-          personManagerRepository.save(personManager)
-          workloadCalculationService.saveWorkloadCalculation(
-            StaffIdentifier(currentPersonManager!!.staffCode, currentPersonManager.teamCode),
-            currentPersonManager.staffGrade,
-          )
-        }
+  ): SaveResult<PersonManagerEntity> = personManagerRepository.findFirstByCrnOrderByCreatedDateDesc(crn)?.let { personManager ->
+    if (personManager.staffCode == deliusStaff.code && personManager.teamCode == teamCode) {
+      SaveResult(personManager, false)
+    } else {
+      val currentPersonManager = getPersonManager.findLatestByCrn(crn)
+      createPersonManager(deliusStaff, teamCode, loggedInUser, crn).also {
+        personManager.isActive = false
+        personManagerRepository.save(personManager)
+        workloadCalculationService.saveWorkloadCalculation(
+          StaffIdentifier(currentPersonManager!!.staffCode, currentPersonManager.teamCode),
+          currentPersonManager.staffGrade,
+        )
       }
-    } ?: createPersonManager(deliusStaff, teamCode, loggedInUser, crn)
+    }
+  } ?: createPersonManager(deliusStaff, teamCode, loggedInUser, crn)
 
   private fun createPersonManager(
     deliusStaff: StaffMember,

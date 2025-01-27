@@ -30,8 +30,7 @@ class TeamController(
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/team/choose-practitioner")
-  suspend fun getPractitioners(@RequestParam teamCodes: List<String>, @RequestParam crn: String, @RequestParam grades: List<String>?): PractitionerWorkload =
-    teamService.getPractitioners(teamCodes, crn, grades) ?: throw EntityNotFoundException("Choose practitioner not found for $teamCodes")
+  suspend fun getPractitioners(@RequestParam teamCodes: List<String>, @RequestParam crn: String, @RequestParam grades: List<String>?): PractitionerWorkload = teamService.getPractitioners(teamCodes, crn, grades) ?: throw EntityNotFoundException("Choose practitioner not found for $teamCodes")
 
   @Operation(summary = "Retrieve Team workload and case count by Team Codes")
   @ApiResponses(
@@ -41,7 +40,5 @@ class TeamController(
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT')")
   @GetMapping("/team/workloadcases")
-  suspend fun getTeamWorkloadAndCaseCount(@RequestParam(required = true) teams: List<String>): Flow<WorkloadCase> {
-    return teamService.getWorkloadCases(teams)
-  }
+  suspend fun getTeamWorkloadAndCaseCount(@RequestParam(required = true) teams: List<String>): Flow<WorkloadCase> = teamService.getWorkloadCases(teams)
 }

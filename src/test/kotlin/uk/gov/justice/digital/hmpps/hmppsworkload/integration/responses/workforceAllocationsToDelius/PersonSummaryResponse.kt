@@ -2,8 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workfor
 
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 
-fun personSummaryResponse(crn: String, type: CaseType?): String {
-  return """
+fun personSummaryResponse(crn: String, type: CaseType?): String = """
 {
   "crn": "$crn",
   "name": {
@@ -13,5 +12,4 @@ fun personSummaryResponse(crn: String, type: CaseType?): String {
   },
   "type": "$type"
 }
-  """.trimIndent()
-}
+""".trimIndent()

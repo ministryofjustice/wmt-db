@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.1.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.1.2"
   kotlin("plugin.spring") version "2.0.21"
   kotlin("plugin.jpa") version "2.0.21"
   id("io.gitlab.arturbosch.detekt").version("1.23.7")
@@ -105,4 +105,8 @@ configurations.matching { it.name == "detekt" }.all {
       useVersion("2.0.10")
     }
   }
+}
+
+ktlint {
+  version.set("1.5.0")
 }

@@ -39,9 +39,7 @@ class OffenderManagerController(
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/team/{teamCode}/offenderManager/{staffCode}/impact/person/{crn}")
-  suspend fun getImpactOfAllocation(@PathVariable(required = true) teamCode: String, @PathVariable(required = true) staffCode: String, @PathVariable crn: String): OffenderManagerPotentialWorkload {
-    return getOffenderManagerService.getPotentialWorkload(StaffIdentifier(staffCode, teamCode), crn) ?: throw EntityNotFoundException("Team $teamCode and staff Code $staffCode combination not found")
-  }
+  suspend fun getImpactOfAllocation(@PathVariable(required = true) teamCode: String, @PathVariable(required = true) staffCode: String, @PathVariable crn: String): OffenderManagerPotentialWorkload = getOffenderManagerService.getPotentialWorkload(StaffIdentifier(staffCode, teamCode), crn) ?: throw EntityNotFoundException("Team $teamCode and staff Code $staffCode combination not found")
 
   @Operation(summary = "Retrieves overview of Offender Manager")
   @ApiResponses(
@@ -52,10 +50,8 @@ class OffenderManagerController(
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/team/{teamCode}/offenderManagers/{offenderManagerCode}")
-  suspend fun getOverview(@PathVariable(required = true) teamCode: String, @PathVariable(required = true) offenderManagerCode: String): OffenderManagerOverview {
-    return getOffenderManagerService.getOverview(StaffIdentifier(offenderManagerCode, teamCode)) ?: run {
-      throw EntityNotFoundException("Team $teamCode and offender manager $offenderManagerCode combination not found")
-    }
+  suspend fun getOverview(@PathVariable(required = true) teamCode: String, @PathVariable(required = true) offenderManagerCode: String): OffenderManagerOverview = getOffenderManagerService.getOverview(StaffIdentifier(offenderManagerCode, teamCode)) ?: run {
+    throw EntityNotFoundException("Team $teamCode and offender manager $offenderManagerCode combination not found")
   }
 
   @Operation(summary = "Allocate Case to an Offender Manager")
@@ -86,8 +82,7 @@ class OffenderManagerController(
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/team/{teamCode}/offenderManagers/{offenderManagerCode}/cases")
-  suspend fun getCases(@PathVariable(required = true) teamCode: String, @PathVariable(required = true) offenderManagerCode: String): OffenderManagerCases =
-    getOffenderManagerService.getCases(StaffIdentifier(offenderManagerCode, teamCode)) ?: throw EntityNotFoundException("Team $teamCode and offender manager $offenderManagerCode combination not found")
+  suspend fun getCases(@PathVariable(required = true) teamCode: String, @PathVariable(required = true) offenderManagerCode: String): OffenderManagerCases = getOffenderManagerService.getCases(StaffIdentifier(offenderManagerCode, teamCode)) ?: throw EntityNotFoundException("Team $teamCode and offender manager $offenderManagerCode combination not found")
 
   companion object {
     private val log = LoggerFactory.getLogger(this::class.java)

@@ -19,14 +19,12 @@ data class PersonManagerDetails @JsonCreator constructor(
   val crn: String,
 ) {
   companion object {
-    fun from(personManagerEntity: PersonManagerEntity): PersonManagerDetails {
-      return PersonManagerDetails(
-        personManagerEntity.uuid,
-        personManagerEntity.staffCode,
-        personManagerEntity.teamCode,
-        personManagerEntity.createdDate!!,
-        personManagerEntity.crn,
-      )
-    }
+    fun from(personManagerEntity: PersonManagerEntity): PersonManagerDetails = PersonManagerDetails(
+      personManagerEntity.uuid,
+      personManagerEntity.staffCode,
+      personManagerEntity.teamCode,
+      personManagerEntity.createdDate!!,
+      personManagerEntity.crn,
+    )
   }
 }

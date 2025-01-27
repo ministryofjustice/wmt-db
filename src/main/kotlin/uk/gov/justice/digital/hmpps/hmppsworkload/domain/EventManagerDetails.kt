@@ -32,8 +32,6 @@ data class EventManagerDetails @JsonCreator constructor(
   val spoName: String?,
 ) {
   companion object {
-    fun from(eventManagerEntity: EventManagerEntity, eventManagerAuditEntity: EventManagerAuditEntity?): EventManagerDetails {
-      return EventManagerDetails(eventManagerEntity.uuid, eventManagerEntity.staffCode, eventManagerEntity.teamCode, eventManagerEntity.createdDate!!, eventManagerEntity.eventNumber, eventManagerAuditEntity?.spoOversightNotes, eventManagerAuditEntity?.sensitiveOversightNotes, eventManagerAuditEntity?.allocationJustificationNotes, eventManagerAuditEntity?.sensitiveNotes, eventManagerEntity.spoStaffCode, eventManagerEntity.spoName)
-    }
+    fun from(eventManagerEntity: EventManagerEntity, eventManagerAuditEntity: EventManagerAuditEntity?): EventManagerDetails = EventManagerDetails(eventManagerEntity.uuid, eventManagerEntity.staffCode, eventManagerEntity.teamCode, eventManagerEntity.createdDate!!, eventManagerEntity.eventNumber, eventManagerAuditEntity?.spoOversightNotes, eventManagerAuditEntity?.sensitiveOversightNotes, eventManagerAuditEntity?.allocationJustificationNotes, eventManagerAuditEntity?.sensitiveNotes, eventManagerEntity.spoStaffCode, eventManagerEntity.spoName)
   }
 }

@@ -22,8 +22,6 @@ data class RequirementManagerDetails @JsonCreator constructor(
   val eventNumber: Int?,
 ) {
   companion object {
-    fun from(requirementManagerEntity: RequirementManagerEntity): RequirementManagerDetails {
-      return RequirementManagerDetails(requirementManagerEntity.uuid, requirementManagerEntity.staffCode, requirementManagerEntity.teamCode, requirementManagerEntity.createdDate!!, requirementManagerEntity.requirementId, requirementManagerEntity.eventNumber)
-    }
+    fun from(requirementManagerEntity: RequirementManagerEntity): RequirementManagerDetails = RequirementManagerDetails(requirementManagerEntity.uuid, requirementManagerEntity.staffCode, requirementManagerEntity.teamCode, requirementManagerEntity.createdDate!!, requirementManagerEntity.requirementId, requirementManagerEntity.eventNumber)
   }
 }

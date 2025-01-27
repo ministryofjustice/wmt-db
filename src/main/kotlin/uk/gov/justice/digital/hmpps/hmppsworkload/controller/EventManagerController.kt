@@ -36,8 +36,7 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("\${event.manager.getByIdPath}")
-  suspend fun getEventManagerById(@PathVariable(required = true) id: UUID): EventManagerDetails =
-    getEventManager.findById(id) ?: throw EntityNotFoundException("Event Manager not found for id $id")
+  suspend fun getEventManagerById(@PathVariable(required = true) id: UUID): EventManagerDetails = getEventManager.findById(id) ?: throw EntityNotFoundException("Event Manager not found for id $id")
 
   @Operation(summary = "Get case details of Event Manager by crn and event number")
   @ApiResponses(
@@ -51,8 +50,7 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
   suspend fun getCaseDetailsForEventManager(
     @PathVariable(required = true) crn: String,
     @PathVariable(required = true) eventNumber: Int,
-  ): CaseDetails =
-    getEventManager.findDetailsByCrnAndEventNumber(crn, eventNumber) ?: throw EntityNotFoundException("Case details of event manager not found for crn $crn eventNumber $eventNumber")
+  ): CaseDetails = getEventManager.findDetailsByCrnAndEventNumber(crn, eventNumber) ?: throw EntityNotFoundException("Case details of event manager not found for crn $crn eventNumber $eventNumber")
 
   @Operation(summary = "Get Allocation complete details of Event Manager by crn and event number")
   @ApiResponses(
@@ -66,8 +64,7 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
   suspend fun getCompleteDetailsForEventManager(
     @PathVariable(required = true) crn: String,
     @PathVariable(required = true) eventNumber: Int,
-  ): CompleteDetails =
-    getEventManager.findCompleteDetailsByCrnAndEventNumber(crn, eventNumber) ?: throw EntityNotFoundException("Complete details of event manager not found for crn $crn eventNumber $eventNumber")
+  ): CompleteDetails = getEventManager.findCompleteDetailsByCrnAndEventNumber(crn, eventNumber) ?: throw EntityNotFoundException("Complete details of event manager not found for crn $crn eventNumber $eventNumber")
 
   @Operation(summary = "Get allocated event count by logged in user's teams")
   @ApiResponses(
@@ -82,8 +79,7 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     since: ZonedDateTime,
     @RequestBody teams: TeamsRequest,
-  ): CaseCount =
-    getEventManager.countAllocationsBy(since, teams.teams)
+  ): CaseCount = getEventManager.countAllocationsBy(since, teams.teams)
 
   @Operation(summary = "Get allocated events created by logged in user's selected teams")
   @ApiResponses(
@@ -98,8 +94,7 @@ class EventManagerController(private val getEventManager: JpaBasedGetEventManage
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     since: ZonedDateTime,
     @RequestBody teams: TeamsRequest,
-  ): CreatedAllocationDetails =
-    getEventManager.findAllocationsByTeam(since, teams.teams)
+  ): CreatedAllocationDetails = getEventManager.findAllocationsByTeam(since, teams.teams)
 
   data class TeamsRequest(val teams: List<String>)
 }

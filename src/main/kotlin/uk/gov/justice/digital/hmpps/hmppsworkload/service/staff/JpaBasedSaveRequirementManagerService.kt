@@ -21,20 +21,18 @@ class JpaBasedSaveRequirementManagerService(
     allocateCase: AllocateCase,
     loggedInUser: String,
     requirements: List<Requirement>,
-  ): List<SaveResult<RequirementManagerEntity>> {
-    return requirements
-      .map { requirement ->
-        requirementManagerRepository.findFirstByCrnAndEventNumberAndRequirementIdOrderByCreatedDateDesc(allocateCase.crn, allocateCase.eventNumber, requirement.id)?.let { requirementManagerEntity ->
-          if (requirementManagerEntity.staffCode == deliusStaff.code && requirementManagerEntity.teamCode == teamCode) {
-            SaveResult(requirementManagerEntity, false)
-          } else {
-            requirementManagerEntity.isActive = false
-            requirementManagerRepository.save(requirementManagerEntity)
-            saveRequirementManagerEntity(allocateCase, deliusStaff, teamCode, loggedInUser, requirement)
-          }
-        } ?: saveRequirementManagerEntity(allocateCase, deliusStaff, teamCode, loggedInUser, requirement)
-      }
-  }
+  ): List<SaveResult<RequirementManagerEntity>> = requirements
+    .map { requirement ->
+      requirementManagerRepository.findFirstByCrnAndEventNumberAndRequirementIdOrderByCreatedDateDesc(allocateCase.crn, allocateCase.eventNumber, requirement.id)?.let { requirementManagerEntity ->
+        if (requirementManagerEntity.staffCode == deliusStaff.code && requirementManagerEntity.teamCode == teamCode) {
+          SaveResult(requirementManagerEntity, false)
+        } else {
+          requirementManagerEntity.isActive = false
+          requirementManagerRepository.save(requirementManagerEntity)
+          saveRequirementManagerEntity(allocateCase, deliusStaff, teamCode, loggedInUser, requirement)
+        }
+      } ?: saveRequirementManagerEntity(allocateCase, deliusStaff, teamCode, loggedInUser, requirement)
+    }
 
   private fun saveRequirementManagerEntity(
     allocateCase: AllocateCase,

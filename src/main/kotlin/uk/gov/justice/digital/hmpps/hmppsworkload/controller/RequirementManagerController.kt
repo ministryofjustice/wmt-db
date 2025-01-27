@@ -27,8 +27,7 @@ class RequirementManagerController(private val getRequirementManager: GetRequire
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("\${requirement.manager.getByIdPath}")
-  suspend fun getRequirementManagerById(@PathVariable(required = true) id: UUID): RequirementManagerDetails =
-    getRequirementManager.findById(id)?.let { requirementManagerEntity -> RequirementManagerDetails.from(requirementManagerEntity) } ?: run {
-      throw EntityNotFoundException("Event Manager not found for id $id")
-    }
+  suspend fun getRequirementManagerById(@PathVariable(required = true) id: UUID): RequirementManagerDetails = getRequirementManager.findById(id)?.let { requirementManagerEntity -> RequirementManagerDetails.from(requirementManagerEntity) } ?: run {
+    throw EntityNotFoundException("Event Manager not found for id $id")
+  }
 }
