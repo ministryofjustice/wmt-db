@@ -46,7 +46,6 @@ hmpps.sqs:
       secretAccessKey: foobar
       queueName: hmpps_notification_queue
       dlqName: hmpps_notification_dlq
-      subscribeTopicId: hmppsdomaintopic
 
 
   topics:

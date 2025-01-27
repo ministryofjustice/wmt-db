@@ -71,13 +71,12 @@ class NotificationServiceTests {
   fun setup() {
     coEvery { assessRisksNeedsApiClient.getRiskSummary(any()) } returns null
     coEvery { assessRisksNeedsApiClient.getRiskPredictors(any()) } returns emptyList()
-    coEvery { sqsSuccessPublisher.sendNotification(any()) } returns NotificationMessageResponse(templateId, UUID.randomUUID().toString(), setOf("first@email.com", "second@email.com"))
+    coEvery { sqsSuccessPublisher.sendNotification(any()) } returns Unit
   }
 
   @Test
   fun `must add case name to email`() = runBlocking {
     val allocationDetails = getAllocationDetails(allocateCase.crn)
-
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
     val parameters = slot<NotificationEmail>()
     coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }

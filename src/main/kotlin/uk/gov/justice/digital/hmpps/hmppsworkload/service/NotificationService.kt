@@ -73,7 +73,7 @@ class NotificationService(
     log.info("Email request sent to Notify for crn: ${caseDetails.crn} with reference ID: $emailReferenceId")
     MDC.remove(REFERENCE_ID)
     MDC.remove(CRN)
-    return sqsSuccessPublisher.sendNotification(
+    sqsSuccessPublisher.sendNotification(
       NotificationEmail(
         emailTo = emailTo,
         emailTemplate = templateId,
@@ -81,6 +81,7 @@ class NotificationService(
         emailParameters = parameters,
       ),
     )
+    return NotificationMessageResponse(templateId, emailReferenceId, emailTo)
   }
 
   class NotificationInvalidSenderException(emailRecipient: String, cause: Throwable) : Exception("Unable to deliver to recipient $emailRecipient", cause)

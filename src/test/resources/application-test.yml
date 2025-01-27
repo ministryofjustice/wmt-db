@@ -65,7 +65,6 @@ hmpps.sqs:
       dlqName: hmpps_notification_dlq
       accessKeyId: foobar
       secretAccessKey: foobar
-      subscribeTopicId: hmppsdomaintopic
       dlqMaxReceiveCount: 1
   topics:
     hmppsdomaintopic:
