@@ -30,8 +30,8 @@ class NotificationListener(
       log.info("Email template: ${notification.emailTemplate}")
       handleError(email) {
         notificationClient.sendEmail(
-          email,
           notification.emailTemplate,
+          email,
           notification.emailParameters,
           notification.emailReferenceId,
         )
