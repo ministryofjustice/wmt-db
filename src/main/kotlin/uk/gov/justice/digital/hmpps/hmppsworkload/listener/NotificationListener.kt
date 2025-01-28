@@ -23,7 +23,8 @@ class NotificationListener(
 
   @SqsListener("hmppsnotificationqueue", factory = "hmppsQueueContainerFactoryProxy")
   fun processMessage(rawMessage: String) {
-    log.info("Processing message on notification queue")
+    val messageId = objectMapper.readValue(rawMessage, NotificationMessage::class.java).messageId
+    log.info("Processing message on notification queue for messageId: {}", messageId)
     val notification = getNotification(rawMessage)
     notification.emailTo.map { email ->
       log.info("Sending email to $email")
@@ -64,3 +65,8 @@ class NotificationListener(
     return objectMapper.readValue(rawMessage, NotificationEmail::class.java)
   }
 }
+
+data class NotificationMessage(
+  val messageId: String,
+  val otherFields: String,
+)
