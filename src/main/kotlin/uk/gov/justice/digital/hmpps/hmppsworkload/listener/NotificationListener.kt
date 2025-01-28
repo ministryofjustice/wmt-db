@@ -43,7 +43,9 @@ class NotificationListener(
     var attempt = 0
     while (true) {
       try {
-        return wrappedApiCall.invoke()
+        val sendEmailResponse = wrappedApiCall.invoke()
+        log.info("Allocation Email sent to {} for referenceId: {}", emailRecipient, sendEmailResponse.reference)
+        return sendEmailResponse
       } catch (notificationException: NotificationClientException) {
         if (notificationException.httpResult == 500 && attempt < MAX_RETRIES) {
           attempt++
@@ -59,8 +61,6 @@ class NotificationListener(
   }
 
   private fun getNotification(rawMessage: String): NotificationEmail {
-    // TODO what type is raw message ?
-    // val message = objectMapper.readValue(rawMessage, SQSMessage::class.java)
     return objectMapper.readValue(rawMessage, NotificationEmail::class.java)
   }
 }

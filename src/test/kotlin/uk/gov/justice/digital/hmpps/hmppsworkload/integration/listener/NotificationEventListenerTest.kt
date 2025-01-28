@@ -19,10 +19,6 @@ class NotificationEventListenerTest : IntegrationTestBase() {
   private fun placeMessageOnNotificationQueue() {
     var notificationEmail = NotificationEmail(setOf("gary@fred.com", "harry.potter@warner.com"), UUID.randomUUID().toString(), "test", mapOf("george" to "mildred"))
     var messageBody = objectMapper.writeValueAsString(notificationEmail)
-    // TODO what format should message body be
-//    var sqsMessage = SQSMessage(messageBody, "messageId" )
-//    messageBody = objectMapper.writeValueAsString(sqsMessage)
-
     notificationSqsClient.sendMessage(
       SendMessageRequest.builder().queueUrl(notificationQueue.queueUrl).messageBody(messageBody).build(),
     ).get()
