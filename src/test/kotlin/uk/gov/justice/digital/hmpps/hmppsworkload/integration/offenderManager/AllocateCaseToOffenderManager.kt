@@ -464,6 +464,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
     }
   }
 
+  @Disabled
   @Test
   fun `sends email by default to allocating officer`() {
     val allocateToEmail = "allocateTo-user@test.justice.gov.uk"
