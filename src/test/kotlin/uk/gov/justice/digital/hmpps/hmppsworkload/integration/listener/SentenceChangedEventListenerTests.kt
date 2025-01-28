@@ -164,11 +164,9 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
 
     placeSentenceChangedEventOnOffenderTopic(crn)
 
-    noMessagesOnNotificationQueue() // ==1
+    noMessagesOnNotificationQueue()
     noMessagesOnNotificationQueueDLQ()
-    // TODO: how can we verify this behaviour?
-    noMessagesOnOffenderEventsQueue() // ==1
-    // TODO: how can we verify this behaviour?
+    noMessagesOnOffenderEventsQueue()
     noMessagesOnOffenderEventsDLQ()
 
     val count = caseDetailsRepository.count()
