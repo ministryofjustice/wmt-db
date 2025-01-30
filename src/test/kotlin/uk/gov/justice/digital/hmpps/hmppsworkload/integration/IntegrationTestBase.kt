@@ -208,7 +208,7 @@ abstract class IntegrationTestBase {
   protected val workloadPrisonerSqsClient by lazy { workloadPrisonerQueue.sqsClient }
 
   protected val notificationSqsClient by lazy { notificationQueue.sqsClient }
-  protected val notificationSqsDlqClient by lazy { notificationQueue.sqsDlqClient }
+  private val notificationSqsDlqClient by lazy { notificationQueue.sqsDlqClient }
 
   @Autowired
   protected lateinit var hmppsQueueService: HmppsQueueService
@@ -461,6 +461,10 @@ abstract class IntegrationTestBase {
 
   protected fun noMessagesOnNotificationQueueDLQ() {
     numberOfMessagesCurrentlyOnQueue(notificationSqsClient, notificationQueue.queueUrl, 0)
+  }
+
+  protected fun messagesOnNotificationQueueDLQ() {
+    numberOfMessagesCurrentlyOnQueue(notificationSqsDlqClient!!, notificationQueue.dlqUrl!!, 1)
   }
 
   protected fun offenderEvent(crn: String) = HmppsOffenderEvent(crn)
