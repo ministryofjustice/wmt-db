@@ -164,11 +164,14 @@ class SentenceChangedEventListenerTests : IntegrationTestBase() {
 
     placeSentenceChangedEventOnOffenderTopic(crn)
 
+    noMessagesOnNotificationQueue()
+    noMessagesOnNotificationQueueDLQ()
     noMessagesOnOffenderEventsQueue()
     noMessagesOnOffenderEventsDLQ()
 
     val count = caseDetailsRepository.count()
 
+    // check that the case details have been deleted
     assertEquals(0, count)
     assertFalse(personManagerRepository.findByIdOrNull(personManagerEntity.id!!)!!.isActive)
     assertFalse(eventManagerRepository.findByIdOrNull(eventManagerEntity.id!!)!!.isActive)

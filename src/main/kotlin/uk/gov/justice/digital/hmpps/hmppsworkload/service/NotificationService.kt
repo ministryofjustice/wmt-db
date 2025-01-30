@@ -20,8 +20,6 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.utils.DateUtils
 import uk.gov.justice.digital.hmpps.hmppsworkload.utils.capitalize
 import uk.gov.service.notify.NotificationClientApi
-import uk.gov.service.notify.NotificationClientException
-import uk.gov.service.notify.SendEmailResponse
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -40,11 +38,12 @@ class NotificationService(
   @Value("\${application.notify.allocation.template}") private val allocationTemplateId: String,
   @Value("\${application.notify.allocation.laoTemplate}") private val allocationTemplateLAOId: String,
   @Qualifier("assessRisksNeedsClientUserEnhanced") private val assessRisksNeedsApiClient: AssessRisksNeedsApiClient,
+  private val sqsSuccessPublisher: SqsSuccessPublisher,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
   @Suppress("LongParameterList", "LongMethod")
-  suspend fun notifyAllocation(allocationDemandDetails: AllocationDemandDetails, allocateCase: AllocateCase, caseDetails: CaseDetailsEntity): List<SendEmailResponse> {
+  suspend fun notifyAllocation(allocationDemandDetails: AllocationDemandDetails, allocateCase: AllocateCase, caseDetails: CaseDetailsEntity): NotificationMessageResponse {
     val emailReferenceId = UUID.randomUUID().toString()
     val notifyData = getNotifyData(allocateCase.crn)
     val parameters: Map<String, Any>
@@ -74,21 +73,18 @@ class NotificationService(
     log.info("Email request sent to Notify for crn: ${caseDetails.crn} with reference ID: $emailReferenceId")
     MDC.remove(REFERENCE_ID)
     MDC.remove(CRN)
-    return emailTo.map { email -> addRecipientTo400Response(email) { notificationClient.sendEmail(templateId, email, parameters, emailReferenceId) } }
+    sqsSuccessPublisher.sendNotification(
+      NotificationEmail(
+        emailTo = emailTo,
+        emailTemplate = templateId,
+        emailReferenceId = emailReferenceId,
+        emailParameters = parameters,
+      ),
+    )
+    return NotificationMessageResponse(templateId, emailReferenceId, emailTo)
   }
 
   class NotificationInvalidSenderException(emailRecipient: String, cause: Throwable) : Exception("Unable to deliver to recipient $emailRecipient", cause)
-
-  private fun addRecipientTo400Response(emailRecipient: String, wrappedApiCall: () -> SendEmailResponse): SendEmailResponse {
-    try {
-      return wrappedApiCall.invoke()
-    } catch (notificationException: NotificationClientException) {
-      if (notificationException.httpResult == 400) {
-        throw NotificationInvalidSenderException(emailRecipient, notificationException)
-      }
-      throw notificationException
-    }
-  }
 
   private fun getLoggedInUserParameters(loggedInUser: StaffMember): Map<String, Any> = mapOf(
     "allocatingOfficerName" to loggedInUser.name.getCombinedName(),
@@ -159,7 +155,20 @@ class NotificationService(
   }
 }
 
+data class NotificationMessageResponse(
+  val templateId: String,
+  val referenceId: String,
+  val email: Set<String>,
+)
+
 data class NotifyData(
   val riskSummary: RiskSummary?,
   val riskPredictors: List<RiskPredictor>,
+)
+
+data class NotificationEmail(
+  val emailTo: Set<String>,
+  val emailTemplate: String,
+  val emailReferenceId: String,
+  val emailParameters: Map<String, Any>,
 )
