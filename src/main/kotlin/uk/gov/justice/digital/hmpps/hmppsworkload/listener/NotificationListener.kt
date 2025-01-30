@@ -63,8 +63,3 @@ class NotificationListener(
 
   private fun getNotification(rawMessage: String): NotificationEmail = objectMapper.readValue(rawMessage, NotificationEmail::class.java)
 }
-
-data class NotificationMessage(
-  val messageId: String,
-  val otherFields: String,
-)
