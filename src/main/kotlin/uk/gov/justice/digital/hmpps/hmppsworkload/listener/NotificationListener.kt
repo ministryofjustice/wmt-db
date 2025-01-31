@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.awspring.cloud.sqs.annotation.SqsListener
 import org.slf4j.LoggerFactory
 import org.springframework.messaging.handler.annotation.Header
-import org.springframework.messaging.handler.annotation.Headers
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.NotificationEmail
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.NotificationService.NotificationInvalidSenderException
