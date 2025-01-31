@@ -23,7 +23,7 @@ class NotificationListener(
   }
 
   @SqsListener("hmppsnotificationqueue", factory = "hmppsQueueContainerFactoryProxy")
-  fun processMessage(rawMessage: String, @Headers headers: Map<String, String>) {
+  fun processMessage(rawMessage: String, @Headers headers: Map<String, Any>) {
     headers.map { (key, value) -> log.info("Header: $key = $value") }
     // log.info("Processing message on notification queue for messageId: ${headers["MessageId"]}")
     val notification = getNotification(rawMessage)
