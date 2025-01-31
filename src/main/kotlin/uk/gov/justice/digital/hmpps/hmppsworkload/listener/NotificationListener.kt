@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.listener
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.awspring.cloud.sqs.annotation.SqsListener
 import org.slf4j.LoggerFactory
+import org.springframework.messaging.handler.annotation.Header
 import org.springframework.messaging.handler.annotation.Headers
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.NotificationEmail
@@ -23,9 +24,8 @@ class NotificationListener(
   }
 
   @SqsListener("hmppsnotificationqueue", factory = "hmppsQueueContainerFactoryProxy")
-  fun processMessage(rawMessage: String, @Headers headers: Map<String, Any>) {
-    headers.map { (key, value) -> log.info("Header: $key = $value") }
-    // log.info("Processing message on notification queue for messageId: ${headers["MessageId"]}")
+  fun processMessage(rawMessage: String, @Header("id") messageId: String) {
+    log.info("Processing message on notification queue for messageId: ${messageId}")
     val notification = getNotification(rawMessage)
     notification.emailTo.map { email ->
       log.info("Sending email to $email")
