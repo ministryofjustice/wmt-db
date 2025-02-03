@@ -33,7 +33,6 @@ generic-prometheus-alerts:
     - "manage-a-workforce-production-hmpps_workload_person_on_probation_queue"
     - "manage-a-workforce-production-hmpps_workload_prisoner_queue"
     - "manage-a-workforce-production-hmpps_workload_staff_queue"
-    - "manage-a-workforce-production-hmpps_workload_notification_queue"
   sqsNumberAlertQueueNames:
     - "Digital-Prison-Services-prod-hmpps_workload_offender_events_queue_dl"
     - "manage-a-workforce-production-hmpps_extract_placed_dlq"
@@ -42,7 +41,6 @@ generic-prometheus-alerts:
     - "manage-a-workforce-production-hmpps_workload_person_on_probation_dlq"
     - "manage-a-workforce-production-hmpps_workload_prisoner_dlq"
     - "manage-a-workforce-production-hmpps_workload_staff_dlq"
-    - "manage-a-workforce-production-hmpps_workload_notification_dlq"
   sqsAlertsOldestThreshold: 2
   sqsAlertsTotalMessagesThreshold: 1
   runbookUrl: https://dsdmoj.atlassian.net/wiki/spaces/MaS/pages/3533964702/WMT+Run+book
