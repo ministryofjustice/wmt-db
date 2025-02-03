@@ -61,9 +61,7 @@ class NotificationListener(
     }
   }
 
-  private fun getNotification(rawMessage: String): NotificationEmail {
-    return objectMapper.readValue(rawMessage, NotificationEmail::class.java)
-  }
+  private fun getNotification(rawMessage: String): NotificationEmail = objectMapper.readValue(rawMessage, NotificationEmail::class.java)
 }
 
 data class NotificationMessage(
