@@ -49,6 +49,10 @@ generic-service:
       HMPPS_SQS_QUEUES_WORKLOADPRISONERQUEUE_QUEUE_NAME: "sqs_queue_name"
     sqs-prisoner-events-dl-secret:
       HMPPS_SQS_QUEUES_WORKLOADPRISONERQUEUE_DLQ_NAME: "sqs_queue_name"
+    sqs-notification-events-secret:
+      HMPPS_SQS_QUEUES_HMPPSNOTIFICATIONQUEUE_QUEUE_NAME: "sqs_queue_name"
+    sqs-notification-events-dl-secret:
+      HMPPS_SQS_QUEUES_HMPPSNOTIFICATIONQUEUE_DLQ_NAME: "sqs_queue_name"
 
 # Alert for business hours only - 7am to 6pm UTC (8am to 7pm BST) on week days (Monday to Friday)
 generic-prometheus-alerts:

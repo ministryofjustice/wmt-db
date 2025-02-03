@@ -34,14 +34,14 @@ class SendEmail : IntegrationTestBase() {
     assessRisksNeedsApi.riskSummaryErrorResponse(crn)
     assessRisksNeedsApi.riskPredictorResponse(crn)
     caseDetailsRepository.save(caseDetailsEntity)
-    val emailSendResponse = notificationService.notifyAllocation(
+    val emailMessageResponse = notificationService.notifyAllocation(
       allocationDetails,
       allocateCase,
       caseDetailsEntity,
     )
     assessRisksNeedsApi.verifyRiskSummaryCalled(crn, 2)
     assessRisksNeedsApi.verifyRiskPredictorCalled(crn, 1)
-    assertEquals(UUID.fromString("5db23c80-9cb6-4b8e-a0f6-56061e50a9ef"), emailSendResponse.first().templateId)
+    assertEquals(UUID.fromString("5db23c80-9cb6-4b8e-a0f6-56061e50a9ef"), emailMessageResponse.templateId)
   }
 
   @Test
@@ -54,14 +54,14 @@ class SendEmail : IntegrationTestBase() {
     assessRisksNeedsApi.riskSummaryErrorResponse(crn)
     assessRisksNeedsApi.riskPredictorResponse(crn)
     caseDetailsRepository.save(caseDetailsEntity)
-    val emailSendResponse = notificationService.notifyAllocation(
+    val emailMessageResponse = notificationService.notifyAllocation(
       allocationDetails,
       allocateCase,
       caseDetailsEntity,
     )
     assessRisksNeedsApi.verifyRiskSummaryCalled(crn, 2)
     assessRisksNeedsApi.verifyRiskPredictorCalled(crn, 1)
-    assertEquals(UUID.fromString("fc55e1ce-47d6-479c-ac80-3ac77c9fe609"), emailSendResponse.first().templateId)
+    assertEquals(UUID.fromString("fc55e1ce-47d6-479c-ac80-3ac77c9fe609"), emailMessageResponse.templateId)
   }
 
   @Test
@@ -74,14 +74,14 @@ class SendEmail : IntegrationTestBase() {
     assessRisksNeedsApi.riskSummaryResponse(crn)
     assessRisksNeedsApi.riskPredictorErrorResponse(crn)
     caseDetailsRepository.save(caseDetailsEntity)
-    val emailSendResponse = notificationService.notifyAllocation(
+    val emailMessageResponse = notificationService.notifyAllocation(
       allocationDetails,
       allocateCase,
       caseDetailsEntity,
     )
     assessRisksNeedsApi.verifyRiskSummaryCalled(crn, 1)
     assessRisksNeedsApi.verifyRiskPredictorCalled(crn, 2)
-    assertEquals(UUID.fromString("5db23c80-9cb6-4b8e-a0f6-56061e50a9ef"), emailSendResponse.first().templateId)
+    assertEquals(UUID.fromString("5db23c80-9cb6-4b8e-a0f6-56061e50a9ef"), emailMessageResponse.templateId)
   }
 
   @Test
@@ -94,13 +94,13 @@ class SendEmail : IntegrationTestBase() {
     assessRisksNeedsApi.riskSummaryResponse(crn)
     assessRisksNeedsApi.riskPredictorErrorResponse(crn)
     caseDetailsRepository.save(caseDetailsEntity)
-    val emailSendResponse = notificationService.notifyAllocation(
+    val emailMessageResponse = notificationService.notifyAllocation(
       allocationDetails,
       allocateCase,
       caseDetailsEntity,
     )
     assessRisksNeedsApi.verifyRiskSummaryCalled(crn, 1)
     assessRisksNeedsApi.verifyRiskPredictorCalled(crn, 2)
-    assertEquals(UUID.fromString("fc55e1ce-47d6-479c-ac80-3ac77c9fe609"), emailSendResponse.first().templateId)
+    assertEquals(UUID.fromString("fc55e1ce-47d6-479c-ac80-3ac77c9fe609"), emailMessageResponse.templateId)
   }
 }

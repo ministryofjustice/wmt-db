@@ -1,10 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
 import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.coVerify
 import io.mockk.mockk
 import io.mockk.slot
-import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -21,20 +20,20 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.domain.AllocateCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.getAllocationDetails
-import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.emailResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.CaseDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsworkload.utils.DateUtils
 import uk.gov.service.notify.NotificationClientApi
-import uk.gov.service.notify.SendEmailResponse
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 class NotificationServiceTests {
   private val notificationClient = mockk<NotificationClientApi>()
+  private val sqsSuccessPublisher = mockk<SqsSuccessPublisher>()
   private val assessRisksNeedsApiClient = mockk<AssessRisksNeedsApiClient>()
   private val templateId = "templateId"
   private val laoTemplateID = "laoTemplateId"
@@ -43,6 +42,7 @@ class NotificationServiceTests {
     templateId,
     laoTemplateID,
     assessRisksNeedsApiClient,
+    sqsSuccessPublisher,
   )
   private val allocateCase = AllocateCase("CRN1111", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1, allocationJustificationNotes = "Some Notes", sensitiveNotes = false, spoOversightNotes = "spo notes", sensitiveOversightNotes = null, laoCase = false)
   private val parameters = mapOf(
@@ -71,17 +71,16 @@ class NotificationServiceTests {
   fun setup() {
     coEvery { assessRisksNeedsApiClient.getRiskSummary(any()) } returns null
     coEvery { assessRisksNeedsApiClient.getRiskPredictors(any()) } returns emptyList()
-    every { notificationClient.sendEmail(any(), any(), any(), any()) } returns SendEmailResponse(emailResponse())
+    coEvery { sqsSuccessPublisher.sendNotification(any()) } returns Unit
   }
 
   @Test
   fun `must add case name to email`() = runBlocking {
     val allocationDetails = getAllocationDetails(allocateCase.crn)
-
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
-    Assertions.assertEquals(allocationDetails.name.getCombinedName(), parameters.captured["case_name"])
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
+    Assertions.assertEquals(allocationDetails.name.getCombinedName(), parameters.captured.emailParameters["case_name"])
   }
 
   @Test
@@ -89,9 +88,11 @@ class NotificationServiceTests {
     val allocationDetails = getAllocationDetails(allocateCase.crn)
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
-    Assertions.assertEquals(allocateCase.crn, parameters.captured["crn"])
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) {
+      sqsSuccessPublisher.sendNotification(capture(parameters))
+    }
+    Assertions.assertEquals(allocateCase.crn, parameters.captured.emailParameters["crn"])
   }
 
   @Test
@@ -99,9 +100,9 @@ class NotificationServiceTests {
     val allocationDetails = getAllocationDetails(allocateCase.crn)
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
-    Assertions.assertEquals(allocationDetails.staff.name.getCombinedName(), parameters.captured["officer_name"])
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
+    Assertions.assertEquals(allocationDetails.staff.name.getCombinedName(), parameters.captured.emailParameters["officer_name"])
   }
 
   @Test
@@ -109,20 +110,20 @@ class NotificationServiceTests {
     val allocationDetails = getAllocationDetails(allocateCase.crn)
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
-    Assertions.assertEquals(allocationDetails.court.name, parameters.captured["court_name"])
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
+    Assertions.assertEquals(allocationDetails.court.name, parameters.captured.emailParameters["court_name"])
   }
 
   @Test
   fun `must add court sentence date`() = runBlocking {
     val allocationDetails = getAllocationDetails(allocateCase.crn)
-
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, parameters, any()) }
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
     Assertions.assertEquals(
       allocationDetails.sentence.date.withZoneSameInstant(ZoneId.systemDefault()).format(DateUtils.notifyDateFormat),
-      parameters["sentence_date"],
+      parameters.captured.emailParameters["sentence_date"],
     )
   }
 
@@ -131,9 +132,9 @@ class NotificationServiceTests {
     val allocationDetails = getAllocationDetails(allocateCase.crn)
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
-    Assertions.assertEquals("no initial appointment needed", parameters.captured["induction_statement"])
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
+    Assertions.assertEquals("no initial appointment needed", parameters.captured.emailParameters["induction_statement"])
   }
 
   @Test
@@ -142,9 +143,9 @@ class NotificationServiceTests {
     val caseDetails = CaseDetailsEntity("", Tier.B3, CaseType.COMMUNITY, "Jane", "Doe")
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
-    Assertions.assertEquals("their initial appointment is scheduled for ${allocationDetails.initialAppointment!!.date.format(DateTimeFormatter.ofPattern("d MMMM yyyy"))}", parameters.captured["induction_statement"])
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
+    Assertions.assertEquals("their initial appointment is scheduled for ${allocationDetails.initialAppointment!!.date.format(DateTimeFormatter.ofPattern("d MMMM yyyy"))}", parameters.captured.emailParameters["induction_statement"])
   }
 
   @Test
@@ -153,9 +154,9 @@ class NotificationServiceTests {
     val caseDetails = CaseDetailsEntity("", Tier.B3, CaseType.COMMUNITY, "Jane", "Doe")
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
-    Assertions.assertEquals("their initial appointment was scheduled for ${allocationDetails.initialAppointment!!.date.format(DateTimeFormatter.ofPattern("d MMMM yyyy"))}", parameters.captured["induction_statement"])
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
+    Assertions.assertEquals("their initial appointment was scheduled for ${allocationDetails.initialAppointment!!.date.format(DateTimeFormatter.ofPattern("d MMMM yyyy"))}", parameters.captured.emailParameters["induction_statement"])
   }
 
   @Test
@@ -164,9 +165,9 @@ class NotificationServiceTests {
     val caseDetails = CaseDetailsEntity("", Tier.B3, CaseType.COMMUNITY, "Jane", "Doe")
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
-    Assertions.assertEquals("no date found for the initial appointment, please check with your team", parameters.captured["induction_statement"])
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
+    Assertions.assertEquals("no date found for the initial appointment, please check with your team", parameters.captured.emailParameters["induction_statement"])
   }
 
   @Test
@@ -175,9 +176,9 @@ class NotificationServiceTests {
     val allocationDetails = getAllocationDetails(allocateCase.crn, offenceDetails = listOf(offenceDetails))
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
-    Assertions.assertEquals(listOf(offenceDetails.mainCategory), parameters.captured["offences"])
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
+    Assertions.assertEquals(listOf(offenceDetails.mainCategory), parameters.captured.emailParameters["offences"])
   }
 
   @Test
@@ -185,9 +186,9 @@ class NotificationServiceTests {
     val allocationDetails = getAllocationDetails(allocateCase.crn)
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
-    Assertions.assertEquals("${allocationDetails.sentence.description} (${allocationDetails.sentence.length})", parameters.captured["order"])
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
+    Assertions.assertEquals("${allocationDetails.sentence.description} (${allocationDetails.sentence.length})", parameters.captured.emailParameters["order"])
   }
 
   @Test
@@ -215,9 +216,9 @@ class NotificationServiceTests {
     val allocationDetails = getAllocationDetails(allocateCase.crn, activeRequirements = listOf(requirement))
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
-    Assertions.assertEquals(listOf("${requirement.mainCategory}: ${requirement.subCategory} ${requirement.length}"), parameters.captured["requirements"])
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
+    Assertions.assertEquals(listOf("${requirement.mainCategory}: ${requirement.subCategory} ${requirement.length}"), parameters.captured.emailParameters["requirements"])
   }
 
   @Test
@@ -245,9 +246,9 @@ class NotificationServiceTests {
     val allocationDetails = getAllocationDetails(allocateCase.crn, activeRequirements = listOf(requirement))
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
-    Assertions.assertEquals(listOf("${requirement.mainCategory}: ${requirement.subCategory}"), parameters.captured["requirements"])
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
+    Assertions.assertEquals(listOf("${requirement.mainCategory}: ${requirement.subCategory}"), parameters.captured.emailParameters["requirements"])
   }
 
   @Test
@@ -275,9 +276,9 @@ class NotificationServiceTests {
     val allocationDetails = getAllocationDetails(allocateCase.crn, activeRequirements = listOf(requirement))
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
-    Assertions.assertEquals(listOf("${requirement.mainCategory}: ${requirement.mainCategory}"), parameters.captured["requirements"])
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
+    Assertions.assertEquals(listOf("${requirement.mainCategory}: ${requirement.mainCategory}"), parameters.captured.emailParameters["requirements"])
   }
 
   @Test
@@ -286,9 +287,9 @@ class NotificationServiceTests {
     coEvery { assessRisksNeedsApiClient.getRiskSummary(allocateCase.crn) } returns RiskSummary("HIGH")
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
-    Assertions.assertEquals("High", parameters.captured["rosh"])
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
+    Assertions.assertEquals("High", parameters.captured.emailParameters["rosh"])
   }
 
   @Test
@@ -298,9 +299,9 @@ class NotificationServiceTests {
     coEvery { assessRisksNeedsApiClient.getRiskPredictors(allocateCase.crn) } returns listOf(riskPredictor)
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
-    Assertions.assertEquals("Medium", parameters.captured["rsrLevel"])
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
+    Assertions.assertEquals("Medium", parameters.captured.emailParameters["rsrLevel"])
   }
 
   @Test
@@ -310,9 +311,9 @@ class NotificationServiceTests {
     coEvery { assessRisksNeedsApiClient.getRiskPredictors(allocateCase.crn) } returns listOf(riskPredictor)
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
-    Assertions.assertEquals(riskPredictor.rsrPercentageScore.toString(), parameters.captured["rsrPercentage"])
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
+    Assertions.assertEquals(riskPredictor.rsrPercentageScore.toString(), parameters.captured.emailParameters["rsrPercentage"])
   }
 
   @Test
@@ -321,9 +322,9 @@ class NotificationServiceTests {
     val allocationDetails = getAllocationDetails(allocateCase.crn, ogrs = ogrs)
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
-    Assertions.assertEquals(ogrs.score.toString(), parameters.captured["ogrsPercentage"])
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
+    Assertions.assertEquals(ogrs.score.toString(), parameters.captured.emailParameters["ogrsPercentage"])
   }
 
   @Test
@@ -332,9 +333,9 @@ class NotificationServiceTests {
     val allocationDetails = getAllocationDetails(allocateCase.crn, ogrs = ogrs)
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
-    Assertions.assertEquals("Low", parameters.captured["ogrsLevel"])
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
+    Assertions.assertEquals("Low", parameters.captured.emailParameters["ogrsLevel"])
   }
 
   @Test
@@ -343,9 +344,9 @@ class NotificationServiceTests {
     val allocationDetails = getAllocationDetails(allocateCase.crn, ogrs = ogrs)
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
-    Assertions.assertEquals("Medium", parameters.captured["ogrsLevel"])
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
+    Assertions.assertEquals("Medium", parameters.captured.emailParameters["ogrsLevel"])
   }
 
   @Test
@@ -354,9 +355,9 @@ class NotificationServiceTests {
     val allocationDetails = getAllocationDetails(allocateCase.crn, ogrs = ogrs)
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
-    Assertions.assertEquals("High", parameters.captured["ogrsLevel"])
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
+    Assertions.assertEquals("High", parameters.captured.emailParameters["ogrsLevel"])
   }
 
   @Test
@@ -365,9 +366,9 @@ class NotificationServiceTests {
     val allocationDetails = getAllocationDetails(allocateCase.crn, ogrs = ogrs)
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
-    Assertions.assertEquals("Very High", parameters.captured["ogrsLevel"])
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
+    Assertions.assertEquals("Very High", parameters.captured.emailParameters["ogrsLevel"])
   }
 
   @Test
@@ -376,9 +377,9 @@ class NotificationServiceTests {
     val allocateCase = AllocateCase("CRN1111", "Some Notes", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1, allocationJustificationNotes = "Some Notes", sensitiveNotes = false, spoOversightNotes = "spo notes", sensitiveOversightNotes = null, laoCase = false)
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
-    Assertions.assertEquals(allocateCase.instructions, parameters.captured["notes"])
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
+    Assertions.assertEquals(allocateCase.instructions, parameters.captured.emailParameters["notes"])
   }
 
   @Test
@@ -387,9 +388,9 @@ class NotificationServiceTests {
     val allocateCase = AllocateCase("CRN1111", "Some Notes", sendEmailCopyToAllocatingOfficer = false, eventNumber = 1, allocationJustificationNotes = "some notes", sensitiveNotes = false, spoOversightNotes = "spo notes", sensitiveOversightNotes = null, laoCase = false)
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
-    Assertions.assertEquals(allocationDetails.allocatingStaff.name.getCombinedName(), parameters.captured["allocatingOfficerName"])
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
+    Assertions.assertEquals(allocationDetails.allocatingStaff.name.getCombinedName(), parameters.captured.emailParameters["allocatingOfficerName"])
   }
 
   @Test
@@ -397,9 +398,9 @@ class NotificationServiceTests {
     val allocationDetails = getAllocationDetails(allocateCase.crn)
 
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    val parameters = slot<MutableMap<String, Any>>()
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, capture(parameters), any()) }
-    Assertions.assertEquals(allocationDetails.allocatingStaff.getGrade(), parameters.captured["allocatingOfficerGrade"])
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
+    Assertions.assertEquals(allocationDetails.allocatingStaff.getGrade(), parameters.captured.emailParameters["allocatingOfficerGrade"])
   }
 
   @Test
@@ -408,10 +409,8 @@ class NotificationServiceTests {
     val firstEmail = "first@email.com"
     val secondEmail = "second@email.com"
     val allocateCase = AllocateCase("CRN1111", "instructions", listOf(firstEmail, secondEmail), false, 1, allocationJustificationNotes = "some notes", sensitiveNotes = false, spoOversightNotes = "spo notes", sensitiveOversightNotes = null, laoCase = false)
-
     notificationService.notifyAllocation(allocationDetails, allocateCase, caseDetails)
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, allocationDetails.staff.email, any(), any()) }
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, firstEmail, any(), any()) }
-    verify(exactly = 1) { notificationClient.sendEmail(templateId, secondEmail, any(), any()) }
+    val parameters = slot<NotificationEmail>()
+    coVerify(exactly = 1) { sqsSuccessPublisher.sendNotification(capture(parameters)) }
   }
 }
