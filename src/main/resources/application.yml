@@ -24,8 +24,8 @@ spring:
         - "stdout"
   flyway:
     url: "jdbc:postgresql://${database.endpoint:localhost:5432}/${database.name:postgres}"
-    user: "${database.username}"
-    password: "${database.password}"
+    user: "${database.username:root}"
+    password: "${database.password:dev}"
     locations: classpath:db/migration
     mixed: true
     enabled: true
