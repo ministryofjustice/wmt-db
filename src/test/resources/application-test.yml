@@ -60,12 +60,6 @@ hmpps.sqs:
       accessKeyId: foobar
       secretAccessKey: foobar
       dlqMaxReceiveCount: 1
-    hmppsnotificationqueue:
-      queueName: hmpps_notification_queue
-      dlqName: hmpps_notification_dlq
-      accessKeyId: foobar
-      secretAccessKey: foobar
-      dlqMaxReceiveCount: 1
   topics:
     hmppsdomaintopic:
       arn: arn:aws:sns:eu-west-2:000000000000:${random.uuid}

@@ -80,10 +80,6 @@ generic-service:
       HMPPS_SQS_QUEUES_WORKLOADPRISONERQUEUE_QUEUE_NAME: "sqs_queue_name"
     sqs-prisoner-events-dl-secret:
       HMPPS_SQS_QUEUES_WORKLOADPRISONERQUEUE_DLQ_NAME: "sqs_queue_name"
-    sqs-notification-events-secret:
-      HMPPS_SQS_QUEUES_HMPPSNOTIFICATIONQUEUE_QUEUE_NAME: "sqs_queue_name"
-    sqs-notification-events-dl-secret:
-      HMPPS_SQS_QUEUES_HMPPSNOTIFICATIONQUEUE_DLQ_NAME: "sqs_queue_name"
 
   allowlist:
     cymulate-1: 54.217.50.18/32
