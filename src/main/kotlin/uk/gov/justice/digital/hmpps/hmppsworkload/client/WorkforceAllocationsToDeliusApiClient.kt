@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.client
 
+import org.slf4j.LoggerFactory
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -27,6 +28,10 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 
 class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
 
+  companion object {
+    val log = LoggerFactory.getLogger(this::class.java)
+  }
+
   suspend fun choosePractitioners(crn: String, teamCodes: List<String>): ChoosePractitionerResponse? {
     val teams = teamCodes.joinToString(separator = ",")
     return webClient
@@ -43,7 +48,7 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
 
   suspend fun choosePractitioners(teamCodes: List<String>): ChoosePractitionerResponse? {
     val teams = teamCodes.joinToString(separator = ",")
-    val teamDetail: List<StaffMember> = webClient
+    val teamDetails = webClient
       .get()
       .uri("/teams?teamCode={teams}", teams)
       .awaitExchangeOrNull { response ->
@@ -53,6 +58,8 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
           else -> throw response.createExceptionAndAwait()
         }
       } ?: return null
+    log.info("Team details: $teamDetails")
+    val teamDetail = teamDetails as List<StaffMember>
     return createPractitionersResponse(teams, teamDetail.map { StaffMember(it.code, it.name, it.email, it.retrieveGrade()) })
   }
 
