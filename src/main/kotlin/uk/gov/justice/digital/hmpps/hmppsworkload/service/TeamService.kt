@@ -88,10 +88,10 @@ class TeamService(
 
   suspend fun getPractitioners(teamCodes: List<String>, grades: List<String>?): Map<String, List<Practitioner>>? {
     return workforceAllocationsToDeliusApiClient.choosePractitioners(teamCodes)?.let { choosePractitionerResponse ->
-      val practitionerWorkloads = teamRepository.findAllByTeamCodes(teamCodes).associateBy { teamStaffId(it.teamCode, it.staffCode) }
+      val practitionerWorkloads = teamRepository.findAllByTeamCodes(teamCodes).associateBy { it.staffCode }
       val caseCountAfter = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).minusDays(CASE_COUNT_PERIOD_DAYS)
       val practitionerCaseCounts = personManagerRepository.findByTeamCodeInAndCreatedDateGreaterThanEqualAndIsActiveIsTrue(teamCodes, caseCountAfter)
-        .groupBy { teamStaffId(it.teamCode, it.staffCode) }
+        .groupBy { it.staffCode }
         .mapValues { countEntry -> countEntry.value.size }
       log.info("Practitioner Workloads: $practitionerWorkloads")
       log.info("Practitioner Case Counts: $practitionerCaseCounts")
@@ -100,7 +100,7 @@ class TeamService(
         team.value
           .filter { grades == null || grades.contains(it.retrieveGrade()) }
           .map {
-            val teamStaffId = teamStaffId(team.key, it.code)
+            val teamStaffId = it.code
             val practitionerWorkload = practitionerWorkloads[teamStaffId]
               ?: getTeamOverviewForOffenderManagerWithoutWorkload(it.code, it.retrieveGrade()!!, team.key)
             Practitioner.from(it, practitionerWorkload, practitionerCaseCounts.getOrDefault(teamStaffId, 0))
