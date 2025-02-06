@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.client
 
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpStatus
@@ -48,7 +50,7 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
 
   suspend fun choosePractitioners(teamCodes: List<String>): ChoosePractitionerResponse? {
     val teams = teamCodes.joinToString(separator = ",")
-    val teamDetails: Map<String, List<StaffMember>> = webClient
+    val responseString: String = webClient
       .get()
       .uri("/teams?teamCode={teams}", teams)
       .awaitExchangeOrNull { response ->
@@ -58,6 +60,8 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
           else -> throw response.createExceptionAndAwait()
         }
       } ?: return null
+    val objectMapper = jacksonObjectMapper()
+    val teamDetails: Map<String, List<StaffMember>> = objectMapper.readValue(responseString, object : TypeReference<Map<String, List<StaffMember>>>() {})
     val teamDetail = teamDetails.values.flatten()
     return createPractitionersResponse(teamDetails.keys.first(), teamDetail.map { StaffMember(it.code, it.name, it.email, it.retrieveGrade()) })
   }
