@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsworkload.service
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToDeliusApiClient
@@ -27,6 +28,11 @@ class TeamService(
   private val caseDetailsRepository: CaseDetailsRepository,
   private val workforceAllocationsToDeliusApiClient: WorkforceAllocationsToDeliusApiClient,
 ) {
+
+  companion object {
+    private val log = LoggerFactory.getLogger(this::class.java)
+  }
+
   suspend fun getPractitioners(teamCodes: List<String>, crn: String, grades: List<String>?): PractitionerWorkload? {
     return workforceAllocationsToDeliusApiClient.choosePractitioners(crn, teamCodes)?.let { choosePractitionerResponse ->
       val practitionerWorkloads = teamRepository.findAllByTeamCodes(teamCodes).associateBy { teamStaffId(it.teamCode, it.staffCode) }
@@ -87,14 +93,16 @@ class TeamService(
       val practitionerCaseCounts = personManagerRepository.findByTeamCodeInAndCreatedDateGreaterThanEqualAndIsActiveIsTrue(teamCodes, caseCountAfter)
         .groupBy { teamStaffId(it.teamCode, it.staffCode) }
         .mapValues { countEntry -> countEntry.value.size }
+      log.info("Practitioner Workloads: $practitionerWorkloads")
+      log.info("Practitioner Case Counts: $practitionerCaseCounts")
 
       return choosePractitionerResponse.teams.mapValues { team ->
         team.value
-          .filter { grades == null || grades.contains(it.getGrade()) }
+          .filter { grades == null || grades.contains(it.retrieveGrade()) }
           .map {
             val teamStaffId = teamStaffId(team.key, it.code)
             val practitionerWorkload = practitionerWorkloads[teamStaffId]
-              ?: getTeamOverviewForOffenderManagerWithoutWorkload(it.code, it.getGrade(), team.key)
+              ?: getTeamOverviewForOffenderManagerWithoutWorkload(it.code, it.retrieveGrade()!!, team.key)
             Practitioner.from(it, practitionerWorkload, practitionerCaseCounts.getOrDefault(teamStaffId, 0))
           }
       }
