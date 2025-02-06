@@ -79,4 +79,25 @@ class TeamService(
     val workloadPoints = workloadPointsRepository.findFirstByIsT2AAndEffectiveToIsNullOrderByEffectiveFromDesc(false)
     return workloadPoints.getDefaultPointsAvailable(grade).toBigInteger()
   }
+
+  suspend fun getPractitioners(teamCodes: List<String>, grades: List<String>?): Map<String, List<Practitioner>>? {
+    return workforceAllocationsToDeliusApiClient.choosePractitioners(teamCodes)?.let { choosePractitionerResponse ->
+      val practitionerWorkloads = teamRepository.findAllByTeamCodes(teamCodes).associateBy { teamStaffId(it.teamCode, it.staffCode) }
+      val caseCountAfter = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).minusDays(CASE_COUNT_PERIOD_DAYS)
+      val practitionerCaseCounts = personManagerRepository.findByTeamCodeInAndCreatedDateGreaterThanEqualAndIsActiveIsTrue(teamCodes, caseCountAfter)
+        .groupBy { teamStaffId(it.teamCode, it.staffCode) }
+        .mapValues { countEntry -> countEntry.value.size }
+
+      return choosePractitionerResponse.teams.mapValues { team ->
+        team.value
+          .filter { grades == null || grades.contains(it.getGrade()) }
+          .map {
+            val teamStaffId = teamStaffId(team.key, it.code)
+            val practitionerWorkload = practitionerWorkloads[teamStaffId]
+              ?: getTeamOverviewForOffenderManagerWithoutWorkload(it.code, it.getGrade(), team.key)
+            Practitioner.from(it, practitionerWorkload, practitionerCaseCounts.getOrDefault(teamStaffId, 0))
+          }
+      }
+    }
+  }
 }

@@ -13,12 +13,15 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.AllocationDemandDet
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.AllocationDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.AllocationDetailsRequest
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ChoosePractitionerResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.CommunityPersonManager
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.CompleteDetails
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ImpactResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.Name
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.OfficerView
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.PersonSummary
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.ProbationStatus
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffActiveCases
+import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffMember
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.entity.EventManagerEntity
 
@@ -36,6 +39,28 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
           else -> throw response.createExceptionAndAwait()
         }
       }
+  }
+
+  suspend fun choosePractitioners(teamCodes: List<String>): ChoosePractitionerResponse? {
+    val teams = teamCodes.joinToString(separator = ",")
+    val teamDetail: List<StaffMember> = webClient
+      .get()
+      .uri("/teams?teamCode={teams}", teams)
+      .awaitExchangeOrNull { response ->
+        when (response.statusCode()) {
+          HttpStatus.OK -> response.awaitBody()
+          HttpStatus.NOT_FOUND -> null
+          else -> throw response.createExceptionAndAwait()
+        }
+      } ?: return null
+    return createPractitionersResponse(teams, teamDetail.map { StaffMember(it.code, it.name, it.email, it.retrieveGrade()) })
+  }
+
+  private fun createPractitionersResponse(teams: String, staffMembers: List<StaffMember>): ChoosePractitionerResponse? {
+    val nullName = Name("", "", "")
+    val nullProbationStatus = ProbationStatus("", "")
+    val nullCommunityPersonManager = CommunityPersonManager("", nullName, "", "")
+    return ChoosePractitionerResponse("", nullName, nullProbationStatus, nullCommunityPersonManager, mapOf(teams to staffMembers))
   }
 
   suspend fun getPersonByCrn(crn: String): PersonSummary? = getPerson(crn, "CRN") { response ->

@@ -35,9 +35,11 @@ data class CommunityPersonManager constructor(
   val isUnallocated: Boolean = code.endsWith("U")
 }
 
-data class StaffMember constructor(
+data class StaffMember(
   val code: String,
   val name: Name,
   val email: String?,
   private val grade: String?,
-) : Grade(grade)
+) : Grade(grade) {
+  fun retrieveGrade(): String? = grade
+}
