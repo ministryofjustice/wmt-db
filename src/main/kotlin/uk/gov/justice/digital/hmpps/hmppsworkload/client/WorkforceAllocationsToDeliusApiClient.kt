@@ -48,7 +48,7 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
 
   suspend fun choosePractitioners(teamCodes: List<String>): ChoosePractitionerResponse? {
     val teams = teamCodes.joinToString(separator = ",")
-    val teamDetails = webClient
+    val teamDetails: Map<String, List<StaffMember>> = webClient
       .get()
       .uri("/teams?teamCode={teams}", teams)
       .awaitExchangeOrNull { response ->
@@ -58,9 +58,8 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
           else -> throw response.createExceptionAndAwait()
         }
       } ?: return null
-    log.info("Team details: $teamDetails")
-    val teamDetail = teamDetails as List<StaffMember>
-    return createPractitionersResponse(teams, teamDetail.map { StaffMember(it.code, it.name, it.email, it.retrieveGrade()) })
+    val teamDetail = teamDetails.values.flatten()
+    return createPractitionersResponse(teamDetails.keys.first(), teamDetail.map { StaffMember(it.code, it.name, it.email, it.retrieveGrade()) })
   }
 
   private fun createPractitionersResponse(teams: String, staffMembers: List<StaffMember>): ChoosePractitionerResponse? {
