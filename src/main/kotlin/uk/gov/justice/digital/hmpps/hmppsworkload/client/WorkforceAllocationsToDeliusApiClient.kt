@@ -61,8 +61,8 @@ class WorkforceAllocationsToDeliusApiClient(private val webClient: WebClient) {
         }
       } ?: return null
     val objectMapper = jacksonObjectMapper()
-    val teamDetails: Map<String, List<StaffMember>> = objectMapper.readValue(responseString, object : TypeReference<Map<String, List<StaffMember>>>() {})
-    val teamDetail = teamDetails.values.flatten()
+    val teamDetails: Map<String, Map<String, List<StaffMember>>> = objectMapper.readValue(responseString, object : TypeReference<Map<String, Map<String, List<StaffMember>>>>() {})
+    val teamDetail = teamDetails["teams"]?.values?.flatten() ?: emptyList()
     return createPractitionersResponse(teamDetails.keys.first(), teamDetail.map { StaffMember(it.code, it.name, it.email, it.retrieveGrade()) })
   }
 
