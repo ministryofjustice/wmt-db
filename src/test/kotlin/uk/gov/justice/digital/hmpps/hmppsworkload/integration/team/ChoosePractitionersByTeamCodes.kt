@@ -210,7 +210,7 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
   }
 
   @Test
-  fun `can get choose practitioner response team only`() {
+  fun `can get choose practitioner response team code only`() {
     val teamCode = "T1"
 
     workforceAllocationsToDelius.choosePractitionerByTeamCodesResponseNoPoP(listOf(teamCode))
