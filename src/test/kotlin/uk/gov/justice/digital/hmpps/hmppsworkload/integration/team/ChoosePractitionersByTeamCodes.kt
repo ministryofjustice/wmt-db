@@ -210,6 +210,46 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
   }
 
   @Test
+  fun `can get choose practitioner response team only`() {
+    val teamCode = "T1"
+
+    workforceAllocationsToDelius.choosePractitionerByTeamCodesResponseNoPoP(listOf(teamCode))
+    val firstWmtStaff = setupCurrentWmtStaff("OM1", teamCode)
+
+    val firstOm = firstWmtStaff.offenderManager.code
+
+    val storedPersonManager = PersonManagerEntity(crn = "CRN5", staffCode = firstOm, teamCode = teamCode, createdBy = "USER1", isActive = true)
+    personManagerRepository.save(storedPersonManager)
+
+    val movedPersonManager = PersonManagerEntity(crn = "CRN3", staffCode = firstOm, teamCode = teamCode, createdBy = "USER1", createdDate = ZonedDateTime.now().minusDays(5L), isActive = false)
+    personManagerRepository.save(movedPersonManager)
+
+    webTestClient.get()
+      .uri("/team/practitioner-workloadcases?teamCode=$teamCode")
+      .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT")) }
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody()
+      .jsonPath("$.$teamCode.teams[?(@.code == '$firstOm')].name.forename")
+      .isEqualTo("Jane")
+      .jsonPath("$.$teamCode.teams[?(@.code == '$firstOm')].name.surname")
+      .isEqualTo("Doe")
+      .jsonPath("$.$teamCode.teams[?(@.code == '$firstOm')].email")
+      .isEqualTo("j.doe@email.co.uk")
+      .jsonPath("$.$teamCode.teams[?(@.code == '$firstOm')].grade")
+      .isEqualTo("PO")
+      .jsonPath("$.$teamCode.teams[?(@.code == '$firstOm')].workload")
+      .isEqualTo(50.toDouble())
+      .jsonPath("$.$teamCode.teams[?(@.code == '$firstOm')].casesPastWeek")
+      .isEqualTo(1)
+      .jsonPath("$.$teamCode.teams[?(@.code == '$firstOm')].communityCases")
+      .isEqualTo(15)
+      .jsonPath("$.$teamCode.teams[?(@.code == '$firstOm')].custodyCases")
+      .isEqualTo(20)
+  }
+
+  @Test
   fun `throws 404 when crn not in repository`() {
     val teamCode = "T1"
     val teamCode2 = "T2"
