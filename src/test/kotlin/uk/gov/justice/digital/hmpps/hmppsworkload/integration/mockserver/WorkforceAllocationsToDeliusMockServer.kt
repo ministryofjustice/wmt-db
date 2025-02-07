@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.integration.domain.ActiveCases
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.domain.AllocationDetailIntegration
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.mockserver.WorkforceAllocationsToDeliusExtension.Companion.workforceAllocationsToDelius
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.allocationCompleteResponse
+import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.choosePractitionerByTeamCodeResponseNoPoP
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.choosePractitionerByTeamCodesNoCommunityPersonManagerResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.choosePractitionerByTeamResponse
 import uk.gov.justice.digital.hmpps.hmppsworkload.integration.responses.workforceAllocationsToDelius.choosePractitionerByTeamResponseUnallocated
@@ -58,6 +59,18 @@ class WorkforceAllocationsToDeliusMockServer : ClientAndServer(MOCKSERVER_PORT) 
 
     workforceAllocationsToDelius.`when`(choosePractitionerRequest, Times.exactly(1)).respond(
       HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(choosePractitionerByTeamResponse()),
+    )
+  }
+
+  fun choosePractitionerByTeamCodesResponseNoPoP(teamCodes: List<String>) {
+    val choosePractitionerRequest =
+      HttpRequest.request()
+        .withPath("/teams").withQueryStringParameter("teamCode", teamCodes.joinToString(separator = ","))
+
+    workforceAllocationsToDelius.`when`(choosePractitionerRequest, Times.exactly(1)).respond(
+      HttpResponse.response().withContentType(MediaType.APPLICATION_JSON).withBody(
+        choosePractitionerByTeamCodeResponseNoPoP(),
+      ),
     )
   }
 
