@@ -18,7 +18,7 @@ import java.math.BigInteger
 import java.time.LocalDate
 import java.time.ZoneId
 
-private const val CASE_COUNT_PERIOD_DAYS = 30L
+private const val CASE_COUNT_PERIOD_DAYS = 7L
 
 @Service
 class TeamService(
