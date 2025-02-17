@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Practitioner
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PractitionerWithRawWorkloadPoints
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PractitionerWorkload
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.WorkloadCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.TeamService
@@ -56,7 +56,7 @@ class TeamController(
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT')")
   @GetMapping("/team/practitioner-workloadcases")
-  suspend fun getPractitionerWorkloadAndCaseCount(@RequestParam(required = true) teamCode: String): Map<String, Map<String, List<Practitioner>>> {
+  suspend fun getPractitionerWorkloadAndCaseCount(@RequestParam(required = true) teamCode: String): Map<String, Map<String, List<PractitionerWithRawWorkloadPoints>>> {
     val practitioners = teamService.getPractitioners(listOf(teamCode))
       ?: throw EntityNotFoundException("Choose practitioner not found for $teamCode")
     return mapOf(teamCode to practitioners)
