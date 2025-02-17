@@ -7,6 +7,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsworkload.client.WorkforceAllocationsToDeliusApiClient
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Practitioner
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PractitionerWithRawWorkloadPoints
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PractitionerWorkload
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.WorkloadCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.TeamOverview
@@ -86,7 +87,7 @@ class TeamService(
     return workloadPoints.getDefaultPointsAvailable(grade).toBigInteger()
   }
 
-  suspend fun getPractitioners(teamCodes: List<String>): Map<String, List<Practitioner>>? {
+  suspend fun getPractitioners(teamCodes: List<String>): Map<String, List<PractitionerWithRawWorkloadPoints>>? {
     return workforceAllocationsToDeliusApiClient.choosePractitioners(teamCodes)?.let { choosePractitionerResponse ->
       val practitionerWorkloads = teamRepository.findAllByTeamCodes(teamCodes).associateBy { it.staffCode }
       val caseCountAfter = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).minusDays(CASE_COUNT_PERIOD_DAYS)
@@ -103,7 +104,7 @@ class TeamService(
           log.info("Practitioner Workload: ${practitionerWorkloads[teamStaffId]}")
           val practitionerWorkload = practitionerWorkloads[teamStaffId]
             ?: getTeamOverviewForOffenderManagerWithoutWorkload(it.code, it.retrieveGrade(), team.key)
-          Practitioner.from(it, practitionerWorkload, practitionerCaseCounts.getOrDefault(teamStaffId, 0))
+          PractitionerWithRawWorkloadPoints.from(it, practitionerWorkload, practitionerCaseCounts.getOrDefault(teamStaffId, 0))
         }
       }
     }
