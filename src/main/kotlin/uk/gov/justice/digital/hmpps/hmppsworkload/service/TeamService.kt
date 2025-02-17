@@ -97,16 +97,14 @@ class TeamService(
       log.info("Practitioner Case Counts: $practitionerCaseCounts")
 
       return choosePractitionerResponse.teams.mapValues { team ->
-        team.value
-          .filter { it.retrieveGrade() != null }
-          .map {
-            val teamStaffId = it.code
-            log.info("StaffId to get workload: $teamStaffId")
-            log.info("Practitioner Workload: ${practitionerWorkloads[teamStaffId]}")
-            val practitionerWorkload = practitionerWorkloads[teamStaffId]
-              ?: getTeamOverviewForOffenderManagerWithoutWorkload(it.code, it.retrieveGrade()!!, team.key)
-            Practitioner.from(it, practitionerWorkload, practitionerCaseCounts.getOrDefault(teamStaffId, 0))
-          }
+        team.value.map {
+          val teamStaffId = it.code
+          log.info("StaffId to get workload: $teamStaffId")
+          log.info("Practitioner Workload: ${practitionerWorkloads[teamStaffId]}")
+          val practitionerWorkload = practitionerWorkloads[teamStaffId]
+            ?: getTeamOverviewForOffenderManagerWithoutWorkload(it.code, it.retrieveGrade()!!, team.key)
+          Practitioner.from(it, practitionerWorkload, practitionerCaseCounts.getOrDefault(teamStaffId, 0))
+        }
       }
     }
   }
