@@ -70,12 +70,12 @@ class TeamService(
 
   private fun getTeamOverviewForOffenderManagerWithoutWorkload(
     staffCode: String,
-    grade: String,
+    grade: String?,
     teamCode: String,
   ): TeamOverview = TeamOverview(
     0,
     0,
-    defaultAvailablePointsForGrade(grade),
+    defaultAvailablePointsForGrade(grade ?: "PO"),
     BigInteger.ZERO,
     staffCode,
     teamCode,
@@ -102,7 +102,7 @@ class TeamService(
           log.info("StaffId to get workload: $teamStaffId")
           log.info("Practitioner Workload: ${practitionerWorkloads[teamStaffId]}")
           val practitionerWorkload = practitionerWorkloads[teamStaffId]
-            ?: getTeamOverviewForOffenderManagerWithoutWorkload(it.code, it.retrieveGrade()!!, team.key)
+            ?: getTeamOverviewForOffenderManagerWithoutWorkload(it.code, it.retrieveGrade(), team.key)
           Practitioner.from(it, practitionerWorkload, practitionerCaseCounts.getOrDefault(teamStaffId, 0))
         }
       }
