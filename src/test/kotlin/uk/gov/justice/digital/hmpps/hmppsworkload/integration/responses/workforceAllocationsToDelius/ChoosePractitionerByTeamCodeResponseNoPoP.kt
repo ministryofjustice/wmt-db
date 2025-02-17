@@ -19,7 +19,8 @@ fun choosePractitionerByTeamCodeResponseNoPoP() = """
           "forename": "No",
           "surname": "Workload"
         },
-        "email": "no.workload.email@co.uk"
+        "email": "no.workload.email@co.uk",
+        "grade": "SPO"
       }
      ]
   }
