@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsworkload.client.dto.StaffMember
 import uk.gov.justice.digital.hmpps.hmppsworkload.jpa.mapping.TeamOverview
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.calculateCapacity
 import java.math.BigDecimal
+import java.math.BigInteger
 
 /***
  * Person on probation and practitioner workload
@@ -33,6 +34,34 @@ data class PractitionerWorkload @JsonCreator constructor(
       choosePractitionerResponse.probationStatus,
       choosePractitionerResponse.communityPersonManager?.takeUnless { it.isUnallocated },
       teams,
+    )
+  }
+}
+
+data class PractitionerWithRawWorkloadPoints(
+  val code: String,
+  val name: Name,
+  val email: String?,
+  val grade: String,
+  val workload: BigDecimal,
+  val casesPastWeek: Int,
+  val communityCases: Int,
+  val custodyCases: Int,
+  val availablePoints: BigInteger,
+  val totalPoints: BigInteger,
+) {
+  companion object {
+    fun from(staffMember: StaffMember, practitionerWorkload: TeamOverview, caseCount: Int): PractitionerWithRawWorkloadPoints = PractitionerWithRawWorkloadPoints(
+      staffMember.code,
+      staffMember.name,
+      staffMember.email.takeUnless { email -> email.isNullOrBlank() },
+      staffMember.getGrade(),
+      calculateCapacity(practitionerWorkload.totalPoints, practitionerWorkload.availablePoints),
+      caseCount,
+      practitionerWorkload.totalCommunityCases,
+      practitionerWorkload.totalCustodyCases,
+      practitionerWorkload.availablePoints,
+      practitionerWorkload.totalPoints,
     )
   }
 }
