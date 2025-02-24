@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsworkload.integration.team
 
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.CaseType
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.Tier
@@ -110,7 +109,6 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
       .isEqualTo("PQiP")
   }
 
-  @Disabled
   @Test
   fun `can get choose practitioner response team only`() {
     val teamCode = "T1"
@@ -139,7 +137,7 @@ class ChoosePractitionersByTeamCodes : IntegrationTestBase() {
     personManagerRepository.save(personManagerWithNoWorkload)
 
     webTestClient.get()
-      .uri("/team/choose-practitioner?&teamCodes=$teamCode,$teamCode2")
+      .uri("/team/choose-practitioner?&teamCodes=$teamCode,$teamCode2&crn=$crn")
       .headers { it.authToken(roles = listOf("ROLE_WORKLOAD_MEASUREMENT")) }
       .exchange()
       .expectStatus()
