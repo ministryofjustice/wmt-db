@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PractitionerWithRawWorkloadPoints
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.PractitionerWorkload
 import uk.gov.justice.digital.hmpps.hmppsworkload.domain.WorkloadCase
 import uk.gov.justice.digital.hmpps.hmppsworkload.service.TeamService
@@ -30,7 +31,12 @@ class TeamController(
   )
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT') or hasRole('ROLE_WORKLOAD_READ')")
   @GetMapping("/team/choose-practitioner")
-  suspend fun getPractitioners(@RequestParam teamCodes: List<String>, @RequestParam crn: String, @RequestParam grades: List<String>?): PractitionerWorkload = teamService.getPractitioners(teamCodes, crn, grades) ?: throw EntityNotFoundException("Choose practitioner not found for $teamCodes")
+  suspend fun getPractitioners(
+    @RequestParam teamCodes: List<String>,
+    @RequestParam crn: String,
+    @RequestParam grades: List<String>?,
+  ): PractitionerWorkload = teamService.getPractitioners(teamCodes, crn, grades)
+    ?: throw EntityNotFoundException("Choose practitioner not found for $teamCodes")
 
   @Operation(summary = "Retrieve Team workload and case count by Team Codes")
   @ApiResponses(
@@ -41,4 +47,18 @@ class TeamController(
   @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT')")
   @GetMapping("/team/workloadcases")
   suspend fun getTeamWorkloadAndCaseCount(@RequestParam(required = true) teams: List<String>): Flow<WorkloadCase> = teamService.getWorkloadCases(teams)
+
+  @Operation(summary = "Retrieve Team workload and case count by Practitioner")
+  @ApiResponses(
+    value = [
+      ApiResponse(responseCode = "200", description = "OK"),
+    ],
+  )
+  @PreAuthorize("hasRole('ROLE_WORKLOAD_MEASUREMENT')")
+  @GetMapping("/team/practitioner-workloadcases")
+  suspend fun getPractitionerWorkloadAndCaseCount(@RequestParam(required = true) teamCode: String): Map<String, Map<String, List<PractitionerWithRawWorkloadPoints>>> {
+    val practitioners = teamService.getPractitioners(listOf(teamCode))
+      ?: throw EntityNotFoundException("Choose practitioner not found for $teamCode")
+    return mapOf(teamCode to practitioners)
+  }
 }
