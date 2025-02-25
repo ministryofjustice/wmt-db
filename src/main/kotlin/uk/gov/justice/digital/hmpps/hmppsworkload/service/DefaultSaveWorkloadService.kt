@@ -70,15 +70,13 @@ class DefaultSaveWorkloadService(
   }
 
   private fun afterPersonManagerSaved(personManagerSaveResult: SaveResult<PersonManagerEntity>, deliusStaff: StaffMember, caseDetails: CaseDetailsEntity) {
-    if (personManagerSaveResult.hasChanged) {
-      telemetryService.trackPersonManagerAllocated(personManagerSaveResult.entity, caseDetails)
-      telemetryService.trackStaffGradeToTierAllocated(caseDetails, deliusStaff, personManagerSaveResult.entity.teamCode)
-      sqsSuccessPublisher.updatePerson(
-        personManagerSaveResult.entity.crn,
-        personManagerSaveResult.entity.uuid,
-        personManagerSaveResult.entity.createdDate!!,
-      )
-    }
+    telemetryService.trackPersonManagerAllocated(personManagerSaveResult.entity, caseDetails)
+    telemetryService.trackStaffGradeToTierAllocated(caseDetails, deliusStaff, personManagerSaveResult.entity.teamCode)
+    sqsSuccessPublisher.updatePerson(
+      personManagerSaveResult.entity.crn,
+      personManagerSaveResult.entity.uuid,
+      personManagerSaveResult.entity.createdDate!!,
+    )
   }
 
   private fun afterEventManagerSaved(eventManagerSaveResult: SaveResult<EventManagerEntity>, caseDetails: CaseDetailsEntity) {
