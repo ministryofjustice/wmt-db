@@ -80,10 +80,8 @@ class DefaultSaveWorkloadService(
   }
 
   private fun afterEventManagerSaved(eventManagerSaveResult: SaveResult<EventManagerEntity>, caseDetails: CaseDetailsEntity) {
-    if (eventManagerSaveResult.hasChanged) {
-      telemetryService.trackEventManagerAllocated(eventManagerSaveResult.entity, caseDetails)
-      sqsSuccessPublisher.updateEvent(eventManagerSaveResult.entity.crn, eventManagerSaveResult.entity.uuid, eventManagerSaveResult.entity.createdDate!!)
-    }
+    telemetryService.trackEventManagerAllocated(eventManagerSaveResult.entity, caseDetails)
+    sqsSuccessPublisher.updateEvent(eventManagerSaveResult.entity.crn, eventManagerSaveResult.entity.uuid, eventManagerSaveResult.entity.createdDate!!)
   }
 
   private fun afterRequirementManagersSaved(requirementManagerSaveResults: List<SaveResult<RequirementManagerEntity>>, caseDetails: CaseDetailsEntity) {
