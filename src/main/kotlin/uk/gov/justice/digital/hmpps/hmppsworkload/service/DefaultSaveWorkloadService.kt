@@ -45,11 +45,10 @@ class DefaultSaveWorkloadService(
     val requirementManagerSaveResults = saveRequirementManagerService.saveRequirementManagers(allocatedStaffId.teamCode, allocationData.staff, allocateCase, loggedInUser, unallocatedRequirements)
       .also { afterRequirementManagersSaved(it, caseDetails) }
 
-    if (personManagerSaveResult.hasChanged || eventManagerSaveResult.hasChanged || requirementManagerSaveResults.any { it.hasChanged }) {
-      notificationService.notifyAllocation(allocationData, allocateCase, caseDetails)
-      log.info("Allocation notified for case: ${caseDetails.crn}, conviction number: ${allocateCase.eventNumber}, to: ${allocationData.staff.code}, from: ${allocationData.allocatingStaff.code}")
-      sqsSuccessPublisher.auditAllocation(allocateCase.crn, allocateCase.eventNumber, loggedInUser, unallocatedRequirements.map { it.id })
-    }
+    notificationService.notifyAllocation(allocationData, allocateCase, caseDetails)
+    log.info("Allocation notified for case: ${caseDetails.crn}, conviction number: ${allocateCase.eventNumber}, to: ${allocationData.staff.code}, from: ${allocationData.allocatingStaff.code}")
+    sqsSuccessPublisher.auditAllocation(allocateCase.crn, allocateCase.eventNumber, loggedInUser, unallocatedRequirements.map { it.id })
+
     log.info("Case allocated: ${caseDetails.crn}, by ${allocationData.allocatingStaff.code}")
     return CaseAllocated(personManagerSaveResult.entity.uuid, eventManagerSaveResult.entity.uuid, requirementManagerSaveResults.map { it.entity.uuid })
   }
@@ -71,22 +70,18 @@ class DefaultSaveWorkloadService(
   }
 
   private fun afterPersonManagerSaved(personManagerSaveResult: SaveResult<PersonManagerEntity>, deliusStaff: StaffMember, caseDetails: CaseDetailsEntity) {
-    if (personManagerSaveResult.hasChanged) {
-      telemetryService.trackPersonManagerAllocated(personManagerSaveResult.entity, caseDetails)
-      telemetryService.trackStaffGradeToTierAllocated(caseDetails, deliusStaff, personManagerSaveResult.entity.teamCode)
-      sqsSuccessPublisher.updatePerson(
-        personManagerSaveResult.entity.crn,
-        personManagerSaveResult.entity.uuid,
-        personManagerSaveResult.entity.createdDate!!,
-      )
-    }
+    telemetryService.trackPersonManagerAllocated(personManagerSaveResult.entity, caseDetails)
+    telemetryService.trackStaffGradeToTierAllocated(caseDetails, deliusStaff, personManagerSaveResult.entity.teamCode)
+    sqsSuccessPublisher.updatePerson(
+      personManagerSaveResult.entity.crn,
+      personManagerSaveResult.entity.uuid,
+      personManagerSaveResult.entity.createdDate!!,
+    )
   }
 
   private fun afterEventManagerSaved(eventManagerSaveResult: SaveResult<EventManagerEntity>, caseDetails: CaseDetailsEntity) {
-    if (eventManagerSaveResult.hasChanged) {
-      telemetryService.trackEventManagerAllocated(eventManagerSaveResult.entity, caseDetails)
-      sqsSuccessPublisher.updateEvent(eventManagerSaveResult.entity.crn, eventManagerSaveResult.entity.uuid, eventManagerSaveResult.entity.createdDate!!)
-    }
+    telemetryService.trackEventManagerAllocated(eventManagerSaveResult.entity, caseDetails)
+    sqsSuccessPublisher.updateEvent(eventManagerSaveResult.entity.crn, eventManagerSaveResult.entity.uuid, eventManagerSaveResult.entity.createdDate!!)
   }
 
   private fun afterRequirementManagersSaved(requirementManagerSaveResults: List<SaveResult<RequirementManagerEntity>>, caseDetails: CaseDetailsEntity) {

@@ -271,6 +271,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `only send the email once when clicking allocate multiple times`() {
+    // WFP-2937 we have changed the front end behaviour to disable the button after the first click
     workforceAllocationsToDelius.allocationResponse(crn, eventNumber, staffCode, allocatingOfficerUsername)
 
     caseDetailsRepository.save(CaseDetailsEntity(crn, Tier.A0, CaseType.CUSTODY, "Jane", "Doe"))
@@ -297,7 +298,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       }
       .exchange()
       .expectStatus()
-      .isOk
+      .is5xxServerError
   }
 
   @Test
