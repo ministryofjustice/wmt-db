@@ -50,6 +50,7 @@ import uk.gov.service.notify.NotificationClientException
 import uk.gov.service.notify.SendEmailResponse
 import java.math.BigInteger
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.util.*
 
 class AllocateCaseToOffenderManager : IntegrationTestBase() {
@@ -172,13 +173,15 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
 
   @Test
   fun `can allocate an already managed CRN to same staff member`() {
-    val storedPersonManager = PersonManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, createdBy = "USER1", isActive = true)
+    val createdDate = ZonedDateTime.now()
+    val storedPersonManager = PersonManagerEntity(crn = crn, staffCode = staffCode, teamCode = teamCode, createdBy = "USER1", createdDate = createdDate, isActive = true)
     personManagerRepository.save(storedPersonManager)
     val storedEventManager = EventManagerEntity(
       crn = crn,
       staffCode = staffCode,
       teamCode = teamCode,
       createdBy = "USER1",
+      createdDate = createdDate,
       isActive = true,
       eventNumber = eventNumber,
       spoStaffCode = "SP2",
@@ -191,6 +194,7 @@ class AllocateCaseToOffenderManager : IntegrationTestBase() {
       staffCode = staffCode,
       teamCode = teamCode,
       createdBy = "USER1",
+      createdDate = createdDate,
       isActive = true,
       eventNumber = eventNumber,
     )
